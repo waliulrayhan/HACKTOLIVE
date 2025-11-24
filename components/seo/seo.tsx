@@ -1,18 +1,15 @@
-import { NextSeo, NextSeoProps } from 'next-seo'
-
 import React from 'react'
 
 import siteConfig from '#data/config'
 
-export interface SEOProps extends NextSeoProps {}
+export interface SEOProps {
+  title?: string
+  description?: string
+  [key: string]: any
+}
 
-export const SEO = ({ title, description, ...props }: SEOProps) => (
-  <NextSeo
-    title={title}
-    description={description}
-    openGraph={{ ...siteConfig.seo.openGraph, title, description }}
-    titleTemplate={siteConfig.seo.titleTemplate}
-    twitter={siteConfig.seo.twitter}
-    {...props}
-  />
-)
+export const SEO = ({ title, description, ...props }: SEOProps) => {
+  // This component is a placeholder for SEO metadata
+  // In Next.js App Router, use metadata export in layout.tsx instead
+  return null
+}

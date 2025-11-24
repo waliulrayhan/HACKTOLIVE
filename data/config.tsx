@@ -2,7 +2,6 @@
 
 import { Button } from '@chakra-ui/react'
 import { Link } from '@saas-ui/react'
-import { NextSeoProps } from 'next-seo'
 import { FaGithub, FaTwitter, FaFacebook, FaLinkedin, FaYoutube, FaInstagram, FaDribbble, FaBehance, FaRss } from 'react-icons/fa'
 import { FiCheck } from 'react-icons/fi'
 import { Logo } from './logo'
@@ -12,7 +11,7 @@ const siteConfig = {
   seo: {
     title: 'HackToLive (H4K2LIV3) - Cybersecurity & Ethical Hacking Platform',
     description: 'Bangladesh\'s premier cybersecurity platform offering professional security services, ethical hacking training, and academy courses in Bengali.',
-  } as NextSeoProps,
+  },
   termsUrl: '/terms-of-service',
   privacyUrl: '/privacy-policy',
   header: {
