@@ -27,7 +27,7 @@ const providers = {
 
 const Login: NextPage = () => {
   return (
-    <Section height="100vh" innerWidth="container.xl">
+    <Section minHeight="calc(100vh - 200px)" innerWidth="container.xl" display="flex" alignItems="center" justifyContent="center">
       <BackgroundGradient
         zIndex="-1"
         width={{ base: 'full', lg: '50%' }}
@@ -39,12 +39,13 @@ const Login: NextPage = () => {
           borderColor: 'gray.700',
         }}
       />
-      <PageTransition height="100%" display="flex" alignItems="center">
+      <PageTransition width="100%" display="flex" alignItems="center" justifyContent="center">
         <Stack
           width="100%"
-          alignItems={{ base: 'center', lg: 'flex-start' }}
-          spacing="20"
+          alignItems="center"
+          spacing={{ base: '8', lg: '20' }}
           flexDirection={{ base: 'column', lg: 'row' }}
+          justifyContent="center"
         >
           <Box pe="20">
             <NextLink href="/">

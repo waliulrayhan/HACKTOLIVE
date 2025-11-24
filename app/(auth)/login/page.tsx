@@ -23,10 +23,10 @@ const providers = {
 
 const Login: NextPage = () => {
   return (
-    <Section height="calc(100vh - 200px)" innerWidth="container.sm">
+    <Section minHeight="calc(100vh - 200px)" innerWidth="container.sm" display="flex" alignItems="center" justifyContent="center">
       <BackgroundGradient zIndex="-1" />
 
-      <Center height="100%" pt="20">
+      <Center width="100%">
         <PageTransition width="100%">
           <Auth
             view="login"
