@@ -18,16 +18,19 @@ import {
   Divider,
   Text,
   Heading,
+  Stack,
 } from '@chakra-ui/react'
 import { Link } from '@saas-ui/react'
 import { BackgroundGradient } from 'components/gradients/background-gradient'
 import { PageTransition } from 'components/motion/page-transition'
 import { Section } from 'components/section'
+import { Features } from 'components/features'
 import { NextPage } from 'next'
 import { FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { useState, useRef } from 'react'
 import ReCAPTCHA from 'react-google-recaptcha'
 import NextLink from 'next/link'
+import siteConfig from 'data/config'
 
 const Signup: NextPage = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -145,24 +148,74 @@ const Signup: NextPage = () => {
   return (
     <Section 
       minHeight="calc(100vh - 200px)" 
-      innerWidth="container.sm" 
+      innerWidth="container.xl" 
       display="flex" 
       alignItems="center" 
       justifyContent="center"
     >
-      <BackgroundGradient zIndex="-1" />
+      <BackgroundGradient 
+        zIndex="-1"
+        width={{ base: 'full', lg: '50%' }}
+        left="auto"
+        right="0"
+        borderLeftWidth="1px"
+        borderColor="gray.200"
+        _dark={{
+          borderColor: 'gray.700',
+        }}
+      />
 
-      <Center width="100%">
-        <PageTransition width="100%">
-          <Box maxW="md" w="full">
-            <VStack spacing={6} align="stretch">
-              {/* Title */}
-              <Heading size="lg" textAlign="center">
-                Sign up
-              </Heading>
+      <PageTransition width="100%" display="flex" alignItems="center" justifyContent="center">
+        <Stack
+          width="100%"
+          alignItems="center"
+          spacing={{ base: '8', lg: '20' }}
+          flexDirection={{ base: 'column', lg: 'row' }}
+          justifyContent="center"
+          py={{ base: '8', md: '0' }}
+        >
+          {/* Left Side - Features (Desktop only) */}
+          <Box pe={{ base: '0', lg: '20' }} width={{ base: '100%', lg: 'auto' }}>
+            <NextLink href="/">
+              <Box
+                as={siteConfig.logo}
+                width="160px"
+                ms={{ base: '0', lg: '4' }}
+                mb={{ base: '8', lg: 16 }}
+                mx={{ base: 'auto', lg: '0' }}
+              />
+            </NextLink>
+            <Features
+              display={{ base: 'none', lg: 'flex' }}
+              columns={1}
+              iconSize={4}
+              flex="1"
+              py="0"
+              ps="0"
+              maxW={{ base: '100%', xl: '80%' }}
+              features={siteConfig.signup.features.map((feature) => ({
+                iconPosition: 'left',
+                variant: 'left-icon',
+                ...feature,
+              }))}
+            />
+          </Box>
 
-              {/* Signup Form */}
-              <form onSubmit={handleSubmit}>
+          {/* Right Side - Signup Form */}
+          <Center height="100%" flex="1" width="100%">
+            <Box 
+              width={{ base: '100%', sm: 'container.sm' }} 
+              maxW="100%"
+              pt={{ base: '0', md: '8' }}
+            >
+              <VStack spacing={6} align="stretch">
+                {/* Title */}
+                <Heading size="lg" textAlign="center">
+                  Sign up
+                </Heading>
+
+                {/* Signup Form */}
+                <form onSubmit={handleSubmit}>
                 <VStack spacing={4}>
                   {/* Name Field */}
                   <FormControl isInvalid={!!errors.name}>
@@ -338,8 +391,9 @@ const Signup: NextPage = () => {
               </Text>
             </VStack>
           </Box>
-        </PageTransition>
-      </Center>
+        </Center>
+      </Stack>
+    </PageTransition>
     </Section>
   )
 }
