@@ -45,7 +45,7 @@ export const Header = (props: HeaderProps) => {
       borderBottomWidth={y > height ? '1px' : ''}
       {...props}
     >
-      <Container maxW="container.2xl" px="8" py="4">
+      <Container maxW="container.2xl" px={{ base: '8', md: '12', lg: '20' }} py="4">
         <Flex width="full" align="center" justify="space-between">
           <Logo
             onClick={(e) => {

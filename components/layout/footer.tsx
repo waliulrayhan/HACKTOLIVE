@@ -146,12 +146,12 @@ export const Footer: React.FC<FooterProps> = (props) => {
         </Box>
       )}
 
-      <Container maxW="container.2xl" px={{ base: '4', md: '8' }} py={{ base: '12', md: '16' }} position="relative" zIndex={1}>
+      <Container maxW="container.2xl" px={{ base: '8', md: '12', lg: '20' }} py={{ base: '16', md: '20' }} position="relative" zIndex={1}>
         <SimpleGrid
           columns={{ base: 2, md: 3, lg: 5 }}
-          spacing={{ base: '8', md: '12' }}
-          mb="12"
-          justifyItems="center"
+          spacing={{ base: '10', md: '14', lg: '16' }}
+          mb="16"
+          justifyItems="start"
         >
           {/* Logo and Links Column */}
           <Box
@@ -161,8 +161,8 @@ export const Footer: React.FC<FooterProps> = (props) => {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0 } as any}
           >
-            <Stack spacing="6" align="center" textAlign="center">
-              <Flex justify="center">
+            <Stack spacing="8" align="flex-start">
+              <Flex>
                 <Box 
                   as={motion.div}
                   whileHover={{ scale: 1.05 }}
@@ -171,7 +171,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
                   <Box as={siteConfig.logo} height="32px" />
                 </Box>
               </Flex>
-              <Stack spacing="3">
+              <Stack spacing="4">
                 {siteConfig.footer.logoLinks?.map(({ href, label }) => (
                   <FooterLink key={href} href={href}>
                     {label}
@@ -189,16 +189,16 @@ export const Footer: React.FC<FooterProps> = (props) => {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 } as any}
           >
-            <Stack spacing="6" align="center" textAlign="center">
+            <Stack spacing="8" align="flex-start">
             <Text
-              fontSize="sm"
-              fontWeight="semibold"
+              fontSize="md"
+              fontWeight="bold"
               color="gray.900"
               _dark={{ color: 'white' }}
             >
               Resources
             </Text>
-              <Stack spacing="3">
+              <Stack spacing="4">
                 {siteConfig.footer.resources?.map(({ href, label }) => (
                   <FooterLink key={href} href={href}>
                     {label}
@@ -216,16 +216,16 @@ export const Footer: React.FC<FooterProps> = (props) => {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 } as any}
           >
-            <Stack spacing="6" align="center" textAlign="center">
+            <Stack spacing="8" align="flex-start">
             <Text
-              fontSize="sm"
-              fontWeight="semibold"
+              fontSize="md"
+              fontWeight="bold"
               color="gray.900"
               _dark={{ color: 'white' }}
             >
               Contact
             </Text>
-              <Stack spacing="3">
+              <Stack spacing="4">
                 {siteConfig.footer.contact?.map(({ href, label }) => (
                   <FooterLink key={href} href={href}>
                     {label}
@@ -243,16 +243,16 @@ export const Footer: React.FC<FooterProps> = (props) => {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 } as any}
           >
-            <Stack spacing="6" align="center" textAlign="center">
+            <Stack spacing="8" align="flex-start">
             <Text
-              fontSize="sm"
-              fontWeight="semibold"
+              fontSize="md"
+              fontWeight="bold"
               color="gray.900"
               _dark={{ color: 'white' }}
             >
               Legal
             </Text>
-              <Stack spacing="3">
+              <Stack spacing="4">
                 {siteConfig.footer.legal?.map(({ href, label }) => (
                   <FooterLink key={href} href={href}>
                     {label}
@@ -270,16 +270,16 @@ export const Footer: React.FC<FooterProps> = (props) => {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.4 } as any}
           >
-            <Stack spacing="6" align="center" textAlign="center">
+            <Stack spacing="8" align="flex-start">
             <Text
-              fontSize="sm"
-              fontWeight="semibold"
+              fontSize="md"
+              fontWeight="bold"
               color="gray.900"
               _dark={{ color: 'white' }}
             >
               Press
             </Text>
-              <Stack spacing="3">
+              <Stack spacing="4">
                 {siteConfig.footer.press?.map(({ href, label }) => (
                   <FooterLink key={href} href={href}>
                     {label}
@@ -291,7 +291,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
         </SimpleGrid>
 
         <Divider
-          mb="8"
+          my="12"
           borderColor="gray.200"
           _dark={{ borderColor: 'gray.800' }}
         />
@@ -304,7 +304,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
           gap="10"
         >
           {/* Social Icons */}
-          <HStack spacing="4">
+          <HStack spacing="3">
             {siteConfig.footer.socialIcons?.map(({ href, icon }) => (
               <Link
                 key={href}
@@ -314,7 +314,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
               >
                 <Icon
                   as={icon}
-                  boxSize="5"
+                  boxSize="4"
                   color="gray.500"
                   _dark={{ color: 'gray.400' }}
                 />
