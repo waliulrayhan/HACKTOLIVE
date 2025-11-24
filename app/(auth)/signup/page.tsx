@@ -46,14 +46,16 @@ const Login: NextPage = () => {
           spacing={{ base: '8', lg: '20' }}
           flexDirection={{ base: 'column', lg: 'row' }}
           justifyContent="center"
+          py={{ base: '8', md: '0' }}
         >
-          <Box pe="20">
+          <Box pe={{ base: '0', lg: '20' }} width={{ base: '100%', lg: 'auto' }}>
             <NextLink href="/">
               <Box
                 as={siteConfig.logo}
                 width="160px"
-                ms="4"
-                mb={{ base: 0, lg: 16 }}
+                ms={{ base: '0', lg: '4' }}
+                mb={{ base: '8', lg: 16 }}
+                mx={{ base: 'auto', lg: '0' }}
               />
             </NextLink>
             <Features
@@ -72,8 +74,12 @@ const Login: NextPage = () => {
               }))}
             />
           </Box>
-          <Center height="100%" flex="1">
-            <Box width="container.sm" pt="8" px="8">
+          <Center height="100%" flex="1" width="100%">
+            <Box 
+              width={{ base: '100%', sm: 'container.sm' }} 
+              maxW="100%"
+              pt={{ base: '0', md: '8' }}
+            >
               <Auth
                 view="signup"
                 title={siteConfig.signup.title}
