@@ -3,7 +3,7 @@
 import { Button } from '@chakra-ui/react'
 import { Link } from '@saas-ui/react'
 import { NextSeoProps } from 'next-seo'
-import { FaGithub, FaTwitter } from 'react-icons/fa'
+import { FaGithub, FaTwitter, FaFacebook, FaLinkedin, FaYoutube, FaInstagram, FaDribbble, FaBehance, FaRss } from 'react-icons/fa'
 import { FiCheck } from 'react-icons/fi'
 import { Logo } from './logo'
 
@@ -43,22 +43,145 @@ const siteConfig = {
   footer: {
     copyright: (
       <>
-        Built by{' '}
-        <Link href="https://twitter.com/Pagebakers">Eelco Wiersma</Link>
+        © Copyright 2025 Nextless. All Rights Reserved.
       </>
     ),
-    links: [
+    logoLinks: [
       {
-        href: 'mailto:hello@saas-ui.dev',
-        label: 'Contact',
+        href: '#',
+        label: 'First link',
       },
       {
-        href: 'https://twitter.com/saas_js',
-        label: <FaTwitter size="14" />,
+        href: '#',
+        label: 'Second link',
       },
       {
-        href: 'https://github.com/saas-js/saas-ui',
-        label: <FaGithub size="14" />,
+        href: '#',
+        label: 'Third link',
+      },
+      {
+        href: '#',
+        label: 'Forth link',
+      },
+    ],
+    resources: [
+      {
+        href: '#',
+        label: 'First link',
+      },
+      {
+        href: '#',
+        label: 'Second link',
+      },
+      {
+        href: '#',
+        label: 'Third link',
+      },
+      {
+        href: '#',
+        label: 'Forth link',
+      },
+    ],
+    contact: [
+      {
+        href: '#',
+        label: 'First link',
+      },
+      {
+        href: '#',
+        label: 'Second link',
+      },
+      {
+        href: '#',
+        label: 'Third link',
+      },
+      {
+        href: '#',
+        label: 'Forth link',
+      },
+    ],
+    legal: [
+      {
+        href: '#',
+        label: 'First link',
+      },
+      {
+        href: '#',
+        label: 'Second link',
+      },
+      {
+        href: '#',
+        label: 'Third link',
+      },
+      {
+        href: '#',
+        label: 'Forth link',
+      },
+    ],
+    press: [
+      {
+        href: '#',
+        label: 'First link',
+      },
+      {
+        href: '#',
+        label: 'Second link',
+      },
+      {
+        href: '#',
+        label: 'Third link',
+      },
+      {
+        href: '#',
+        label: 'Forth link',
+      },
+    ],
+    socialIcons: [
+      {
+        href: 'https://github.com',
+        icon: FaGithub,
+      },
+      {
+        href: 'https://facebook.com',
+        icon: FaFacebook,
+      },
+      {
+        href: 'https://twitter.com',
+        icon: FaTwitter,
+      },
+      {
+        href: 'https://youtube.com',
+        icon: FaYoutube,
+      },
+      {
+        href: 'https://instagram.com',
+        icon: FaInstagram,
+      },
+      {
+        href: 'https://dribbble.com',
+        icon: FaDribbble,
+      },
+      {
+        href: 'https://linkedin.com',
+        icon: FaLinkedin,
+      },
+      {
+        href: 'https://behance.net',
+        icon: FaBehance,
+      },
+      {
+        href: '#',
+        icon: FaRss,
+      },
+    ],
+    bottomLinks: [
+      {
+        href: '#',
+        label: 'Terms Of Service',
+      },
+      {
+        href: '#',
+        label: 'Privacy Policy',
       },
     ],
   },
