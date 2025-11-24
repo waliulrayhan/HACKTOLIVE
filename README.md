@@ -379,3 +379,5 @@ For cybersecurity services or academy enrollment:
 **HackToLive (H4K2LIV3)** - Empowering Bangladesh's Cybersecurity Future 🛡️
 
 *Built with Next.js, Chakra UI, and Tailwind CSS*
+
+Md. Waliul Islam Rayhan
