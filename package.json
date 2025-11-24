@@ -1,6 +1,8 @@
 {
   "name": "hacktolive",
   "version": "1.0.0",
+  "description": "HackToLive - Bangladesh's premier cybersecurity and ethical hacking platform. Professional security services and educational academy.",
+  "author": "HackToLive (H4K2LIV3)",
   "private": true,
   "type": "module",
   "scripts": {

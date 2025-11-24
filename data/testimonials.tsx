@@ -1,40 +1,37 @@
 export default {
-  title: 'Loved by tech people',
+  title: 'Trusted by Security Professionals & Students',
   items: [
     {
-      name: 'Eelco Wiersma',
-      description: 'Founder Saas UI',
+      name: 'Md. Shakib Rahman',
+      description: 'Security Engineer, Tech Corp',
+      avatar: '/static/images/avatar2.jpg',
+      children: (
+        <>
+          "HackToLive Academy transformed my career. The Bengali courses made complex concepts easy to understand, 
+          and the hands-on labs gave me real-world skills. Now I work as a security professional!"
+        </>
+      ),
+    },
+    {
+      name: 'Anika Tabassum',
+      description: 'Penetration Tester',
+      avatar: '/static/images/avatar3.jpg',
+      children: (
+        <>
+          "The premium batch was worth every taka. Expert instructors, practical training with Metasploit 
+          and BurpSuite, and CTF participation prepared me for the industry. Highly recommended!"
+        </>
+      ),
+    },
+    {
+      name: 'Rafiq Ahmed',
+      description: 'IT Manager, Financial Institution',
       avatar:
         'https://pbs.twimg.com/profile_images/1470742164024008706/k-eXHtu0_normal.jpg',
       children: (
         <>
-          “With SaaS UI I am able to produce high quality dashboard apps and
-          internal tools without a lot of design skills. The ROI really is
-          amazing.”
-        </>
-      ),
-    },
-    {
-      name: 'Caroline Yahaya',
-      description: 'Fullstack Developer',
-      avatar: '/static/images/avatar2.jpg',
-      children: (
-        <>
-          “Saas UI allows me to build beautiful and functional UI super fast.
-          The components are very well thought out and the Next.js starter kit
-          saved me at least 100 hours of work.”
-        </>
-      ),
-    },
-    {
-      name: 'Alberto Vazquez',
-      description: 'Frontend Engineer',
-      avatar: '/static/images/avatar3.jpg',
-      children: (
-        <>
-          “Saas UI gave us a perfect starting point for our project, having the
-          storybooks already set up with beautifully crafted components and
-          fully mocked pages was a treat.”
+          "HackToLive's penetration testing service identified critical vulnerabilities in our systems. 
+          Their professional team and detailed reports helped us strengthen our security posture significantly."
         </>
       ),
     },

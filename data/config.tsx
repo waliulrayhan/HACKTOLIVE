@@ -10,8 +10,8 @@ import { Logo } from './logo'
 const siteConfig = {
   logo: Logo,
   seo: {
-    title: 'Saas UI',
-    description: 'The React component library for startups',
+    title: 'HackToLive (H4K2LIV3) - Cybersecurity & Ethical Hacking Platform',
+    description: 'Bangladesh\'s premier cybersecurity platform offering professional security services, ethical hacking training, and academy courses in Bengali.',
   } as NextSeoProps,
   termsUrl: '#',
   privacyUrl: '#',
@@ -19,11 +19,11 @@ const siteConfig = {
     links: [
       {
         id: 'features',
-        label: 'Features',
+        label: 'Services',
       },
       {
         id: 'pricing',
-        label: 'Pricing',
+        label: 'Academy',
       },
       {
         id: 'faq',
@@ -34,7 +34,7 @@ const siteConfig = {
         href: '/login',
       },
       {
-        label: 'Sign Up',
+        label: 'Enroll Now',
         href: '/signup',
         variant: 'primary',
       },
@@ -43,97 +43,97 @@ const siteConfig = {
   footer: {
     copyright: (
       <>
-        © Copyright 2025 Nextless. All Rights Reserved.
+        © Copyright 2025 HackToLive (H4K2LIV3). All Rights Reserved.
       </>
     ),
     logoLinks: [
       {
         href: '#',
-        label: 'First link',
+        label: 'Penetration Testing',
       },
       {
         href: '#',
-        label: 'Second link',
+        label: 'Vulnerability Assessment',
       },
       {
         href: '#',
-        label: 'Third link',
+        label: 'Digital Forensics',
       },
       {
         href: '#',
-        label: 'Forth link',
+        label: 'SOC Services',
       },
     ],
     resources: [
       {
         href: '#',
-        label: 'First link',
+        label: 'Academy Courses',
       },
       {
         href: '#',
-        label: 'Second link',
+        label: 'CTF Challenges',
       },
       {
         href: '#',
-        label: 'Third link',
+        label: 'Security Blog',
       },
       {
         href: '#',
-        label: 'Forth link',
+        label: 'Documentation',
       },
     ],
     contact: [
       {
-        href: '#',
-        label: 'First link',
+        href: 'tel:+8801521416287',
+        label: '+880 1521-416287',
+      },
+      {
+        href: 'tel:+8801601020699',
+        label: '+880 1601-020699',
       },
       {
         href: '#',
-        label: 'Second link',
+        label: 'Mohammadpur, Dhaka',
       },
       {
-        href: '#',
-        label: 'Third link',
-      },
-      {
-        href: '#',
-        label: 'Forth link',
+        href: 'https://hacktolive.net',
+        label: 'hacktolive.net',
       },
     ],
     legal: [
       {
         href: '#',
-        label: 'First link',
+        label: 'Terms of Service',
       },
       {
         href: '#',
-        label: 'Second link',
+        label: 'Privacy Policy',
       },
       {
         href: '#',
-        label: 'Third link',
+        label: 'Code of Conduct',
       },
       {
         href: '#',
-        label: 'Forth link',
+        label: 'Responsible Disclosure',
       },
     ],
     press: [
       {
         href: '#',
-        label: 'First link',
+        label: 'About Us',
       },
       {
         href: '#',
-        label: 'Second link',
+        label: 'Our Team',
       },
       {
         href: '#',
-        label: 'Third link',
+        label: 'Success Stories',
       },
       {
         href: '#',
-        label: 'Forth link',
+        label: 'Media Kit',
       },
     ],
     socialIcons: [
@@ -186,30 +186,30 @@ const siteConfig = {
     ],
   },
   signup: {
-    title: 'Start building with Saas UI',
+    title: 'Start Your Cybersecurity Journey with HackToLive',
     features: [
       {
         icon: FiCheck,
-        title: 'Accessible',
-        description: 'All components strictly follow WAI-ARIA standards.',
+        title: 'Bengali Language',
+        description: 'All courses available in Bengali for easy understanding and accessibility.',
       },
       {
         icon: FiCheck,
-        title: 'Themable',
+        title: 'Hands-on Learning',
         description:
-          'Fully customize all components to your brand with theme support and style props.',
+          'Practical labs and real-world scenarios to develop essential ethical hacking skills.',
       },
       {
         icon: FiCheck,
-        title: 'Composable',
+        title: 'Expert Instructors',
         description:
-          'Compose components to fit your needs and mix them together to create new ones.',
+          'Learn from experienced security professionals with extensive field experience.',
       },
       {
         icon: FiCheck,
-        title: 'Productive',
+        title: 'CTF Participation',
         description:
-          'Designed to reduce boilerplate and fully typed, build your product at speed.',
+          'Join our H4K2LIV3_Academy team in competitive Capture-The-Flag challenges worldwide.',
       },
     ],
   },

@@ -1,6 +1,13 @@
-# HACKTOLIVE
+# HACKTOLIVE (H4K2LIV3)
 
-A unified Next.js application combining a landing page, authentication system, and admin dashboard. This project merges two separate applications into a single, cohesive platform.
+**HackToLive** is a comprehensive cybersecurity and ethical hacking platform built with Next.js. This unified web application serves as the digital hub for HackToLive's cybersecurity services, educational academy, and administrative operations.
+
+## About HackToLive
+
+HackToLive is Bangladesh's premier cybersecurity platform, operating both as a **professional security service provider** and an **educational academy** for ethical hacking and cyber-security training. Based in Mohammadpur, Dhaka, Bangladesh, we're committed to strengthening cyber resilience through expert security services and accessible education in Bengali.
+
+### Our Mission
+To empower individuals and organizations with world-class cybersecurity expertise, making ethical hacking education accessible to Bengali-speaking communities while providing enterprise-grade security services.
 
 ## Project Structure
 
@@ -189,33 +196,57 @@ import { useHook } from '#hooks/useHook'
 import { theme } from '#theme'
 ```
 
-## Key Features
+## Platform Services
 
-### Landing Page
+### 🔒 Cybersecurity Services
+- **Penetration Testing** - Web application and mobile security assessments
+- **Vulnerability Assessments** - Comprehensive security evaluations
+- **Digital Forensics** - Investigation and evidence analysis
+- **SOC Services** - Security Operations Center monitoring
+- **OSINT Investigations** - Open Source Intelligence gathering
+- **Security Consulting** - Expert advisory services
+
+### 🎓 HackToLive Academy
+- **Bengali Language Training** - Courses in native language for accessibility
+- **Fundamental Paths** - Beginner-friendly ethical hacking courses
+- **Premium Batches** - Intensive hands-on training programs
+- **CTF Competitions** - Capture-The-Flag challenges and team participation
+- **Practical Labs** - Real-world security scenario simulations
+- **Certification Programs** - Industry-recognized credentials
+
+### 📚 Course Topics
+- Network Fundamentals & Enumeration
+- Tools: Nmap, Metasploit, BurpSuite
+- Google Dorking & OSINT Techniques
+- Web Application Security
+- Mobile Penetration Testing
+- Linux Security & Administration
+
+## Platform Features
+
+### Public Website (Landing Page)
 - Modern, responsive design
+- Service showcase and academy information
 - Chakra UI components
 - Dark mode support
 - SEO optimized
-- Blog functionality (via posts)
+- Blog functionality for security updates
 
-### Authentication
-- Login and signup pages
-- Social authentication support (Google, GitHub)
+### Authentication System
+- Secure login and signup pages
+- Social authentication support
 - Form validation
-- @saas-ui/auth integration
+- Student and admin access control
 
 ### Admin Dashboard
 - 15+ dashboard pages
-- Analytics and charts
-- Calendar management
-- E-commerce features
-- CRM functionality
-- Kanban boards
-- File manager
-- Invoice system
+- Analytics and reporting
+- Student management
+- Course administration
+- Calendar for training schedules
+- Invoice and payment tracking
 - Profile management
-- Settings panel
-- UI component library
+- Settings and configuration
 
 ## Context Providers
 
@@ -291,14 +322,31 @@ vercel
    - Landing/Auth uses Chakra's color mode system
    - Both systems are independent
 
-## Project Origins
+## Contact Information
 
-This project was created by merging two separate applications:
+**HackToLive**
+- 📍 **Location:** Mohammadpur, Dhaka, Bangladesh
+- 📞 **Phone:** +880 1521-416287, +880 1601-020699
+- 🌐 **Website:** hacktolive.net
+- 🎓 **Academy:** academy.hacktolive.net
+- 🏆 **CTFtime:** H4K2LIV3_Academy team
 
-1. **saas-ui-nextjs-landing-page** - Landing page with authentication
-2. **free-nextjs-admin-dashboard** - Admin dashboard
+## Our Reputation
 
-Both projects have been seamlessly integrated while maintaining their original functionality and design integrity.
+- **Experienced Team:** Combined expertise from top security professionals
+- **Practical Approach:** Hands-on training and real-world security testing
+- **Community Active:** Regular CTF participation and competitive hacking
+- **Local Focus:** Bengali language courses for regional accessibility
+- **Comprehensive:** Both training and professional security services
+
+## Project Architecture
+
+This platform was built by merging two separate applications:
+
+1. **Marketing & Landing Page** - Chakra UI-based public website
+2. **Admin Dashboard** - Tailwind CSS-based management system
+
+Both systems are seamlessly integrated while maintaining their design integrity and functionality.
 
 ## License
 
@@ -306,20 +354,28 @@ This project combines components from multiple sources. Check individual compone
 
 ## Contributing
 
-Contributions are welcome! Please ensure:
+We welcome contributions! Please ensure:
 - Code follows the existing patterns
 - Styling stays within designated systems
 - TypeScript types are properly defined
 - Components are tested in both light and dark modes
+- Security best practices are followed
 
 ## Support
 
-For issues or questions:
+For technical issues:
 1. Check this README
-2. Review the original project documentation
-3. Check the Next.js 15 documentation
+2. Review the documentation
+3. Check the Next.js documentation
 4. Create an issue in the repository
+
+For cybersecurity services or academy enrollment:
+- Visit: hacktolive.net
+- Email: Contact through the website
+- Phone: +880 1521-416287
 
 ---
 
-**Built with ❤️ using Next.js, Chakra UI, and Tailwind CSS**
+**HackToLive (H4K2LIV3)** - Empowering Bangladesh's Cybersecurity Future 🛡️
+
+*Built with Next.js, Chakra UI, and Tailwind CSS*

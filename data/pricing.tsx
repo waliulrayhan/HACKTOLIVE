@@ -1,113 +1,115 @@
 import { HStack, Text } from '@chakra-ui/react'
 
 export default {
-  title: 'Pricing for every stage',
+  title: 'Academy Courses & Services',
   description:
-    'Pay once and get life-time access to our high quality components.',
+    'Choose the learning path that fits your goals. All courses taught in Bengali.',
   plans: [
     {
-      id: 'oss',
-      title: 'Open Source',
-      description: 'Basic compoents, perfect to get started.',
+      id: 'fundamental',
+      title: 'Fundamental Path',
+      description: 'Perfect for beginners starting their cybersecurity journey.',
       price: 'Free',
       features: [
         {
-          title: 'MIT License',
+          title: 'Introduction to Cybersecurity',
         },
         {
-          title: 'Authentication (Clerk/Supabase/Magic)',
+          title: 'Network Fundamentals',
         },
         {
-          title: 'Form (react-hook-form)',
+          title: 'Basic Linux Commands',
         },
         {
-          title: 'Modals manager',
+          title: 'Introduction to Ethical Hacking',
         },
         {
-          title: 'Hotkeys',
+          title: 'Community Access',
         },
         {
-          title: 'Web3 components',
+          title: 'Bengali Language Instruction',
         },
         {
-          title: 'And much more...',
+          title: 'Self-paced Learning',
         },
       ],
       action: {
-        href: '#',
+        href: '/signup',
       },
     },
     {
-      id: 'bootstrap',
-      title: 'Bootstrap',
-      description: 'Complete frontend stack for bootstrappers and small teams.',
-      price: 'Free',
+      id: 'premium',
+      title: 'Premium Batch',
+      description: 'Comprehensive hands-on training with live instruction.',
+      price: 'Contact Us',
       isRecommended: true,
       features: [
         {
-          title: 'One project',
+          title: 'Live Bengali Classes',
         },
         {
-          title: 'One developer',
+          title: 'Hands-on Practical Labs',
         },
         {
-          title: 'Advanced components',
+          title: 'Tools: Nmap, Metasploit, BurpSuite',
         },
         {
-          title: 'Multiple themes',
+          title: 'Web & Mobile Penetration Testing',
         },
         {
-          title: 'Next.js and Electron boilerplates',
+          title: 'CTF Challenge Access',
         },
         {
-          title: 'Private discord community',
+          title: 'Expert Mentor Support',
         },
         {
-          title: '1 year of updates',
+          title: 'Course Completion Certificate',
         },
         null,
         {
-          title: 'Private beta access',
+          title: 'H4K2LIV3 Team Participation',
           iconColor: 'green.500',
         },
       ],
       action: {
-        href: 'https://appulse.gumroad.com/l/saas-ui-pro-pre-order?variant=Single%20license',
+        href: 'tel:+8801521416287',
       },
     },
     {
-      id: 'startup',
-      title: 'Startup',
-      description: 'Unlimited license for growing teams.',
-      price: (
-        <HStack>
-          <Text textDecoration="line-through" fontSize="sm" color="gray.400">
-            €999,-
-          </Text>
-          <Text>€499,-</Text>
-        </HStack>
-      ),
+      id: 'enterprise',
+      title: 'Enterprise Services',
+      description: 'Professional cybersecurity services for organizations.',
+      price: 'Custom Quote',
       features: [
         {
-          title: 'Unlimited projects',
+          title: 'Penetration Testing',
         },
         {
-          title: 'Unlimited developers',
+          title: 'Vulnerability Assessments',
         },
         {
-          title: '1 year of updates',
+          title: 'Digital Forensics',
         },
         {
-          title: 'Everything from Bootstrap',
+          title: 'SOC Services',
+        },
+        {
+          title: 'OSINT Investigations',
+        },
+        {
+          title: 'Security Consulting',
+        },
+        {
+          title: 'Compliance Support',
         },
         null,
         {
-          title: 'Private beta access',
+          title: '24/7 Support Available',
           iconColor: 'green.500',
         },
       ],
       action: {
-        href: 'https://appulse.gumroad.com/l/saas-ui-pro-pre-order?variant=Unlimited%20license',
+        href: 'tel:+8801521416287',
       },
     },
   ],
