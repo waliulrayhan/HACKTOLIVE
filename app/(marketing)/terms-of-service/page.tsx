@@ -37,7 +37,7 @@ export default function TermsOfService() {
   const accentColor = useColorModeValue('blue.500', 'blue.300')
 
   return (
-    <Box bg={bgColor} minH="100vh" py={{ base: 8, md: 16 }}>
+    <Box bg={bgColor} minH="100vh" pt={{ base: 24, md: 16 }} pb={{ base: 8, md: 16 }}>
       <Container maxW="container.xl">
         <VStack spacing={10} align="stretch">
           {/* Header */}
@@ -57,6 +57,7 @@ export default function TermsOfService() {
               bgGradient="linear(to-r, blue.400, purple.500)"
               bgClip="text"
               fontWeight="extrabold"
+              lineHeight="1.2"
             >
               Terms of Service
             </Heading>

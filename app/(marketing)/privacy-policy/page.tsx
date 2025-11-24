@@ -38,7 +38,7 @@ export default function PrivacyPolicy() {
   const accentColor = useColorModeValue('blue.500', 'blue.300')
 
   return (
-    <Box bg={bgColor} minH="100vh" py={{ base: 8, md: 16 }}>
+    <Box bg={bgColor} minH="100vh" pt={{ base: 24, md: 16 }} pb={{ base: 8, md: 16 }}>
       <Container maxW="container.xl">
         <VStack spacing={10} align="stretch">
           {/* Header */}
@@ -58,6 +58,7 @@ export default function PrivacyPolicy() {
               bgGradient="linear(to-r, blue.400, purple.500)"
               bgClip="text"
               fontWeight="extrabold"
+              lineHeight="1.2"
             >
               Privacy Policy
             </Heading>
@@ -509,6 +510,70 @@ export default function PrivacyPolicy() {
                 laws regarding data protection and privacy. We are committed to protecting your personal 
                 information in accordance with the Information and Communication Technology Act and other 
                 relevant regulations.
+              </Text>
+            </Box>
+
+            {/* Section 13 - CCPA */}
+            <Box
+              bg={cardBg}
+              p={{ base: 6, md: 8 }}
+              borderRadius="xl"
+              borderWidth="1px"
+              borderColor={borderColor}
+              shadow="lg"
+              transition="all 0.3s"
+              _hover={{ shadow: 'xl', transform: 'translateY(-2px)' }}
+            >
+              <Flex align="center" mb={4}>
+                <Icon as={FiShield} w={8} h={8} color={accentColor} mr={3} />
+                <Heading as="h2" size="lg">
+                  13. CCPA Privacy Rights (California Residents)
+                </Heading>
+              </Flex>
+              <Text color="gray.700" _dark={{ color: 'gray.300' }} lineHeight="tall" mb={3}>
+                Under the California Consumer Privacy Act (CCPA), California residents have the right to:
+              </Text>
+              <UnorderedList spacing={2} pl={6} color="gray.700" _dark={{ color: 'gray.300' }}>
+                <ListItem>Request disclosure of categories and specific pieces of personal data we have collected</ListItem>
+                <ListItem>Request deletion of personal data we have collected</ListItem>
+                <ListItem>Opt-out of the sale of personal data (we do not sell personal data)</ListItem>
+                <ListItem>Non-discrimination for exercising CCPA rights</ListItem>
+              </UnorderedList>
+              <Text color="gray.700" _dark={{ color: 'gray.300' }} lineHeight="tall" mt={3}>
+                To exercise these rights, contact us at privacy@hacktolive.net. We will respond within 30 days.
+              </Text>
+            </Box>
+
+            {/* Section 14 - GDPR */}
+            <Box
+              bg={cardBg}
+              p={{ base: 6, md: 8 }}
+              borderRadius="xl"
+              borderWidth="1px"
+              borderColor={borderColor}
+              shadow="lg"
+              transition="all 0.3s"
+              _hover={{ shadow: 'xl', transform: 'translateY(-2px)' }}
+            >
+              <Flex align="center" mb={4}>
+                <Icon as={FiGlobe} w={8} h={8} color={accentColor} mr={3} />
+                <Heading as="h2" size="lg">
+                  14. GDPR Data Protection Rights (EU Residents)
+                </Heading>
+              </Flex>
+              <Text color="gray.700" _dark={{ color: 'gray.300' }} lineHeight="tall" mb={3}>
+                Under the General Data Protection Regulation (GDPR), EU residents are entitled to:
+              </Text>
+              <UnorderedList spacing={2} pl={6} color="gray.700" _dark={{ color: 'gray.300' }}>
+                <ListItem><strong>Right to access:</strong> Request copies of your personal data</ListItem>
+                <ListItem><strong>Right to rectification:</strong> Request correction of inaccurate or incomplete information</ListItem>
+                <ListItem><strong>Right to erasure:</strong> Request deletion of personal data under certain conditions</ListItem>
+                <ListItem><strong>Right to restrict processing:</strong> Request limitation of data processing under certain conditions</ListItem>
+                <ListItem><strong>Right to object:</strong> Object to processing of personal data under certain conditions</ListItem>
+                <ListItem><strong>Right to data portability:</strong> Request transfer of data to another organization or to you</ListItem>
+              </UnorderedList>
+              <Text color="gray.700" _dark={{ color: 'gray.300' }} lineHeight="tall" mt={3}>
+                To exercise these rights, contact us at privacy@hacktolive.net. We will respond within one month.
               </Text>
             </Box>
 
