@@ -12,25 +12,16 @@ import {
   Icon,
   Divider,
   IconButton,
+  useColorMode,
 } from '@chakra-ui/react'
-import { keyframes } from '@emotion/react'
 import { Link, LinkProps } from '@saas-ui/react'
 import { FaGithub, FaFacebook, FaTwitter, FaLinkedin, FaYoutube, FaInstagram, FaDribbble, FaBehance, FaRss, FaArrowUp } from 'react-icons/fa'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
+import Particles, { initParticlesEngine } from '@tsparticles/react'
+import { loadSlim } from '@tsparticles/slim'
+import { motion } from 'framer-motion'
 
 import siteConfig from '#data/config'
-
-const gradientAnimation = keyframes`
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-`
 
 export interface FooterProps extends BoxProps {
   columns?: number
@@ -39,45 +30,122 @@ export interface FooterProps extends BoxProps {
 export const Footer: React.FC<FooterProps> = (props) => {
   const { ...rest } = props
   const [showBackToTop, setShowBackToTop] = useState(false)
+  const [particlesInit, setParticlesInit] = useState(false)
+  const { colorMode } = useColorMode()
+  const footerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleScroll = () => {
-      setShowBackToTop(window.scrollY > 300)
+      if (!footerRef.current) return
+      
+      const footerRect = footerRef.current.getBoundingClientRect()
+      const windowHeight = window.innerHeight
+      
+      // Show button only when footer is visible in viewport
+      const isFooterVisible = footerRect.top < windowHeight && footerRect.bottom > 0
+      
+      setShowBackToTop(isFooterVisible)
     }
 
     window.addEventListener('scroll', handleScroll)
+    handleScroll() // Check initial state
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      await loadSlim(engine)
+    }).then(() => {
+      setParticlesInit(true)
+    })
   }, [])
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const particlesOptions = useMemo(
+    () => ({
+      background: {
+        color: {
+          value: 'transparent',
+        },
+      },
+      fpsLimit: 60,
+      fullScreen: {
+        enable: false,
+        zIndex: 0,
+      },
+      particles: {
+        color: {
+          value: colorMode === 'dark' ? ['#6366f1', '#8b5cf6', '#3b82f6'] : ['#6366f1', '#8b5cf6', '#3b82f6'],
+        },
+        links: {
+          color: colorMode === 'dark' ? '#6366f1' : '#3b82f6',
+          distance: 120,
+          enable: true,
+          opacity: 0.4,
+          width: 1.5,
+        },
+        move: {
+          enable: true,
+          outModes: {
+            default: 'bounce' as const,
+          },
+          random: false,
+          speed: 0.8,
+          straight: false,
+        },
+        number: {
+          density: {
+            enable: true,
+            area: 600,
+          },
+          value: 100,
+        },
+        opacity: {
+          value: 0.6,
+        },
+        shape: {
+          type: 'circle',
+        },
+        size: {
+          value: { min: 1, max: 4 },
+        },
+      },
+      detectRetina: true,
+    }),
+    [colorMode]
+  )
+
   return (
     <Box
+      ref={footerRef}
       position="relative"
       overflow="hidden"
       bg="gray.50"
       _dark={{ bg: 'gray.900', borderColor: 'gray.800' }}
       borderTop="1px"
       borderColor="gray.200"
-      _before={{
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'linear-gradient(45deg, rgba(99, 102, 241, 0.03) 0%, rgba(139, 92, 246, 0.03) 25%, rgba(59, 130, 246, 0.03) 50%, rgba(139, 92, 246, 0.03) 75%, rgba(99, 102, 241, 0.03) 100%)',
-        backgroundSize: '400% 400%',
-        animation: `${gradientAnimation} 15s ease infinite`,
-        opacity: 1,
-        _dark: {
-          background: 'linear-gradient(45deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 25%, rgba(59, 130, 246, 0.05) 50%, rgba(139, 92, 246, 0.05) 75%, rgba(99, 102, 241, 0.05) 100%)',
-        },
-      }}
       {...rest}
     >
+      {/* Particle Animation Background */}
+      {particlesInit && (
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          zIndex={0}
+        >
+          <Particles
+            id="tsparticles-footer"
+            options={particlesOptions}
+          />
+        </Box>
+      )}
+
       <Container maxW="container.2xl" px={{ base: '4', md: '8' }} py={{ base: '12', md: '16' }} position="relative" zIndex={1}>
         <SimpleGrid
           columns={{ base: 2, md: 3, lg: 5 }}
@@ -86,21 +154,42 @@ export const Footer: React.FC<FooterProps> = (props) => {
           justifyItems="center"
         >
           {/* Logo and Links Column */}
-          <Stack spacing="6" align="center" textAlign="center">
-            <Flex justify="center">
-              <Box as={siteConfig.logo} height="32px" />
-            </Flex>
-            <Stack spacing="3">
-              {siteConfig.footer.logoLinks?.map(({ href, label }) => (
-                <FooterLink key={href} href={href}>
-                  {label}
-                </FooterLink>
-              ))}
+          <Box
+            as={motion.div}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0 } as any}
+          >
+            <Stack spacing="6" align="center" textAlign="center">
+              <Flex justify="center">
+                <Box 
+                  as={motion.div}
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.2 } as any}
+                >
+                  <Box as={siteConfig.logo} height="32px" />
+                </Box>
+              </Flex>
+              <Stack spacing="3">
+                {siteConfig.footer.logoLinks?.map(({ href, label }) => (
+                  <FooterLink key={href} href={href}>
+                    {label}
+                  </FooterLink>
+                ))}
+              </Stack>
             </Stack>
-          </Stack>
+          </Box>
 
           {/* Resources Column */}
-          <Stack spacing="6" align="center" textAlign="center">
+          <Box
+            as={motion.div}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 } as any}
+          >
+            <Stack spacing="6" align="center" textAlign="center">
             <Text
               fontSize="sm"
               fontWeight="semibold"
@@ -109,17 +198,25 @@ export const Footer: React.FC<FooterProps> = (props) => {
             >
               Resources
             </Text>
-            <Stack spacing="3">
-              {siteConfig.footer.resources?.map(({ href, label }) => (
-                <FooterLink key={href} href={href}>
-                  {label}
-                </FooterLink>
-              ))}
+              <Stack spacing="3">
+                {siteConfig.footer.resources?.map(({ href, label }) => (
+                  <FooterLink key={href} href={href}>
+                    {label}
+                  </FooterLink>
+                ))}
+              </Stack>
             </Stack>
-          </Stack>
+          </Box>
 
           {/* Contact Column */}
-          <Stack spacing="6" align="center" textAlign="center">
+          <Box
+            as={motion.div}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 } as any}
+          >
+            <Stack spacing="6" align="center" textAlign="center">
             <Text
               fontSize="sm"
               fontWeight="semibold"
@@ -128,17 +225,25 @@ export const Footer: React.FC<FooterProps> = (props) => {
             >
               Contact
             </Text>
-            <Stack spacing="3">
-              {siteConfig.footer.contact?.map(({ href, label }) => (
-                <FooterLink key={href} href={href}>
-                  {label}
-                </FooterLink>
-              ))}
+              <Stack spacing="3">
+                {siteConfig.footer.contact?.map(({ href, label }) => (
+                  <FooterLink key={href} href={href}>
+                    {label}
+                  </FooterLink>
+                ))}
+              </Stack>
             </Stack>
-          </Stack>
+          </Box>
 
           {/* Legal Column */}
-          <Stack spacing="6" align="center" textAlign="center">
+          <Box
+            as={motion.div}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 } as any}
+          >
+            <Stack spacing="6" align="center" textAlign="center">
             <Text
               fontSize="sm"
               fontWeight="semibold"
@@ -147,17 +252,25 @@ export const Footer: React.FC<FooterProps> = (props) => {
             >
               Legal
             </Text>
-            <Stack spacing="3">
-              {siteConfig.footer.legal?.map(({ href, label }) => (
-                <FooterLink key={href} href={href}>
-                  {label}
-                </FooterLink>
-              ))}
+              <Stack spacing="3">
+                {siteConfig.footer.legal?.map(({ href, label }) => (
+                  <FooterLink key={href} href={href}>
+                    {label}
+                  </FooterLink>
+                ))}
+              </Stack>
             </Stack>
-          </Stack>
+          </Box>
 
           {/* Press Column */}
-          <Stack spacing="6" align="center" textAlign="center">
+          <Box
+            as={motion.div}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.4 } as any}
+          >
+            <Stack spacing="6" align="center" textAlign="center">
             <Text
               fontSize="sm"
               fontWeight="semibold"
@@ -166,14 +279,15 @@ export const Footer: React.FC<FooterProps> = (props) => {
             >
               Press
             </Text>
-            <Stack spacing="3">
-              {siteConfig.footer.press?.map(({ href, label }) => (
-                <FooterLink key={href} href={href}>
-                  {label}
-                </FooterLink>
-              ))}
+              <Stack spacing="3">
+                {siteConfig.footer.press?.map(({ href, label }) => (
+                  <FooterLink key={href} href={href}>
+                    {label}
+                  </FooterLink>
+                ))}
+              </Stack>
             </Stack>
-          </Stack>
+          </Box>
         </SimpleGrid>
 
         <Divider
@@ -226,26 +340,32 @@ export const Footer: React.FC<FooterProps> = (props) => {
         </Flex>
       </Container>
 
-      {/* Back to Top Button */}
-      {showBackToTop && (
+      {/* Back to Top Button - Only visible when footer is in view */}
+      <Box
+        as={motion.div}
+        initial={{ opacity: 0, scale: 0.8, y: 20 }}
+        animate={showBackToTop ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 20 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' } as any}
+        position="fixed"
+        bottom="8"
+        right="8"
+        zIndex={1000}
+        pointerEvents={showBackToTop ? 'auto' : 'none'}
+      >
         <IconButton
           aria-label="Back to top"
           icon={<FaArrowUp />}
-          position="fixed"
-          bottom="8"
-          right="8"
           size="md"
           colorScheme="blue"
           onClick={scrollToTop}
-          zIndex={1000}
           boxShadow="lg"
           _hover={{
             transform: 'translateY(-2px)',
             boxShadow: 'xl',
           }}
-          transition="all 0.3s ease"
+          transition="all 0.2s ease"
         />
-      )}
+      </Box>
     </Box>
   )
 }
