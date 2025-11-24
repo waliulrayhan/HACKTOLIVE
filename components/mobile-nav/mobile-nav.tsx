@@ -32,7 +32,18 @@ interface NavLinkProps extends LinkProps {
 
 function NavLink({ href, children, isActive, ...rest }: NavLinkProps) {
   const pathname = usePathname()
-  const bgActiveHoverColor = useColorModeValue('gray.100', 'whiteAlpha.100')
+  
+  // Background colors
+  const bgDefault = useColorModeValue('transparent', 'transparent')
+  const bgHover = useColorModeValue('purple.50', 'whiteAlpha.200')
+  const bgActive = useColorModeValue('purple.100', 'purple.900')
+  
+  // Text colors
+  const textDefault = useColorModeValue('gray.700', 'gray.300')
+  const textActive = useColorModeValue('purple.700', 'purple.200')
+  
+  // Border colors
+  const borderActive = useColorModeValue('purple.500', 'purple.400')
 
   const [, group] = href?.split('/') || []
   isActive = isActive ?? pathname?.includes(group)
@@ -40,19 +51,35 @@ function NavLink({ href, children, isActive, ...rest }: NavLinkProps) {
   return (
     <Link
       href={href}
-      display="inline-flex"
-      flex="1"
-      minH="40px"
-      px="8"
+      display="flex"
+      alignItems="center"
+      position="relative"
+      minH="48px"
+      px="6"
       py="3"
-      transition="0.2s all"
+      mx="4"
+      my="1"
+      borderRadius="lg"
+      transition="all 0.2s"
       fontWeight={isActive ? 'semibold' : 'medium'}
-      borderColor={isActive ? 'purple.400' : undefined}
-      borderBottomWidth="1px"
-      color={isActive ? 'white' : undefined}
+      fontSize="md"
+      bg={isActive ? bgActive : bgDefault}
+      color={isActive ? textActive : textDefault}
       _hover={{
-        bg: isActive ? 'purple.500' : bgActiveHoverColor,
+        bg: bgHover,
+        transform: 'translateX(4px)',
       }}
+      _before={isActive ? {
+        content: '""',
+        position: 'absolute',
+        left: 0,
+        top: '50%',
+        transform: 'translateY(-50%)',
+        width: '3px',
+        height: '60%',
+        bg: borderActive,
+        borderRadius: 'full',
+      } : undefined}
       {...rest}
     >
       {children}
@@ -69,7 +96,7 @@ export function MobileNavContent(props: MobileNavContentProps) {
   const { isOpen, onClose = () => {} } = props
   const closeBtnRef = React.useRef<HTMLButtonElement>(null)
   const pathname = usePathname()
-  const bgColor = useColorModeValue('whiteAlpha.900', 'blackAlpha.900')
+  const bgColor = useColorModeValue('white', 'gray.900')
 
   useRouteChanged(onClose)
   console.log({ isOpen })
@@ -107,7 +134,6 @@ export function MobileNavContent(props: MobileNavContentProps) {
             inset="0"
             zIndex="modal"
             pb="8"
-            backdropFilter="blur(5px)"
           >
             <Box>
               <Flex justify="space-between" px="8" pt="4" pb="4">
@@ -116,7 +142,7 @@ export function MobileNavContent(props: MobileNavContentProps) {
                   <CloseButton ref={closeBtnRef} onClick={onClose} />
                 </HStack>
               </Flex>
-              <Stack alignItems="stretch" spacing="0">
+              <Stack alignItems="stretch" spacing="1" mt="4" px="2">
                 {siteConfig.header.links.map(
                   ({ href, id, label, ...props }, i) => {
                     return (

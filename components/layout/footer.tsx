@@ -301,7 +301,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
           direction={{ base: 'column', md: 'row' }}
           justify="space-between"
           align={{ base: 'flex-start', md: 'center' }}
-          gap="6"
+          gap="10"
         >
           {/* Social Icons */}
           <HStack spacing="4">
