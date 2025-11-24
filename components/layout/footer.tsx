@@ -347,8 +347,8 @@ export const Footer: React.FC<FooterProps> = (props) => {
         animate={showBackToTop ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 20 }}
         transition={{ duration: 0.3, ease: 'easeInOut' } as any}
         position="fixed"
-        bottom="8"
-        right="8"
+        bottom="6"
+        right="6"
         zIndex={1000}
         pointerEvents={showBackToTop ? 'auto' : 'none'}
       >
