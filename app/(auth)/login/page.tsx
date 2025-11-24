@@ -109,7 +109,7 @@ const Login: NextPage = () => {
             <VStack spacing={6} align="stretch">
               {/* Title */}
               <Heading size="lg" textAlign="center">
-                Log in
+                Welcome back!
               </Heading>
 
               {/* Login Form */}
@@ -160,17 +160,25 @@ const Login: NextPage = () => {
                     <FormErrorMessage>{errors.password}</FormErrorMessage>
                   </FormControl>
 
-                  {/* Forgot Password */}
-                  <Box w="full" textAlign="left">
+                  {/* Keep me signed in and Forgot Password */}
+                  <HStack justify="space-between" w="full">
+                    <Checkbox
+                      isChecked={keepSignedIn}
+                      onChange={(e) => setKeepSignedIn(e.target.checked)}
+                      size="md"
+                    >
+                      Keep me signed in
+                    </Checkbox>
                     <Link
                       as={NextLink}
                       href="/forgot-password"
                       fontSize="sm"
-                      color="primary"
+                      color="blue.500"
+                      _hover={{ color: 'blue.600', textDecoration: 'underline' }}
                     >
                       Forgot Password?
                     </Link>
-                  </Box>
+                  </HStack>
 
                   {/* reCAPTCHA */}
                   {/* <FormControl isInvalid={!!errors.captcha}>
@@ -184,17 +192,6 @@ const Login: NextPage = () => {
                     </Box>
                     <FormErrorMessage justifyContent="center">{errors.captcha}</FormErrorMessage>
                   </FormControl> */}
-
-                  {/* Keep me signed in */}
-                  {/* <Box w="full">
-                    <Checkbox
-                      isChecked={keepSignedIn}
-                      onChange={(e) => setKeepSignedIn(e.target.checked)}
-                      size="sm"
-                    >
-                      Keep me signed in
-                    </Checkbox>
-                  </Box> */}
 
                   {/* Login Button */}
                   <Button
@@ -234,7 +231,9 @@ const Login: NextPage = () => {
                 <Link
                   as={NextLink}
                   href="/signup"
-                  color="primary"
+                  color="blue.500"
+                  fontWeight="semibold"
+                  _hover={{ color: 'blue.600', textDecoration: 'underline' }}
                 >
                   Sign up
                 </Link>
