@@ -13,8 +13,8 @@ const siteConfig = {
     title: 'HackToLive (H4K2LIV3) - Cybersecurity & Ethical Hacking Platform',
     description: 'Bangladesh\'s premier cybersecurity platform offering professional security services, ethical hacking training, and academy courses in Bengali.',
   } as NextSeoProps,
-  termsUrl: '#',
-  privacyUrl: '#',
+  termsUrl: '/terms-of-service',
+  privacyUrl: '/privacy-policy',
   header: {
     links: [
       {
@@ -102,11 +102,11 @@ const siteConfig = {
     ],
     legal: [
       {
-        href: '#',
+        href: '/terms-of-service',
         label: 'Terms of Service',
       },
       {
-        href: '#',
+        href: '/privacy-policy',
         label: 'Privacy Policy',
       },
       {
@@ -176,11 +176,11 @@ const siteConfig = {
     ],
     bottomLinks: [
       {
-        href: '#',
+        href: '/terms-of-service',
         label: 'Terms Of Service',
       },
       {
-        href: '#',
+        href: '/privacy-policy',
         label: 'Privacy Policy',
       },
     ],
