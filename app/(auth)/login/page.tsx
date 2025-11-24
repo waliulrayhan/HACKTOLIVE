@@ -112,26 +112,6 @@ const Login: NextPage = () => {
                 Log in
               </Heading>
 
-              {/* Google Sign In Button */}
-              <Button
-                leftIcon={<FaGoogle />}
-                onClick={handleGoogleLogin}
-                variant="outline"
-                size="lg"
-                w="full"
-              >
-                Continue with Google
-              </Button>
-
-              {/* Divider */}
-              <HStack>
-                <Divider />
-                <Text fontSize="sm" color="muted" whiteSpace="nowrap">
-                  or continue with
-                </Text>
-                <Divider />
-              </HStack>
-
               {/* Login Form */}
               <form onSubmit={handleSubmit}>
                 <VStack spacing={4}>
@@ -180,8 +160,20 @@ const Login: NextPage = () => {
                     <FormErrorMessage>{errors.password}</FormErrorMessage>
                   </FormControl>
 
+                  {/* Forgot Password */}
+                  <Box w="full" textAlign="left">
+                    <Link
+                      as={NextLink}
+                      href="/forgot-password"
+                      fontSize="sm"
+                      color="primary"
+                    >
+                      Forgot Password?
+                    </Link>
+                  </Box>
+
                   {/* reCAPTCHA */}
-                  <FormControl isInvalid={!!errors.captcha}>
+                  {/* <FormControl isInvalid={!!errors.captcha}>
                     <Box display="flex" justifyContent="center" my={2}>
                       <ReCAPTCHA
                         ref={recaptchaRef}
@@ -191,10 +183,10 @@ const Login: NextPage = () => {
                       />
                     </Box>
                     <FormErrorMessage justifyContent="center">{errors.captcha}</FormErrorMessage>
-                  </FormControl>
+                  </FormControl> */}
 
-                  {/* Keep me signed in and Forgot Password */}
-                  <HStack justify="space-between" w="full">
+                  {/* Keep me signed in */}
+                  {/* <Box w="full">
                     <Checkbox
                       isChecked={keepSignedIn}
                       onChange={(e) => setKeepSignedIn(e.target.checked)}
@@ -202,15 +194,7 @@ const Login: NextPage = () => {
                     >
                       Keep me signed in
                     </Checkbox>
-                    <Link
-                      as={NextLink}
-                      href="/forgot-password"
-                      fontSize="sm"
-                      color="primary"
-                    >
-                      Forgot Password?
-                    </Link>
-                  </HStack>
+                  </Box> */}
 
                   {/* Login Button */}
                   <Button
@@ -223,6 +207,26 @@ const Login: NextPage = () => {
                   </Button>
                 </VStack>
               </form>
+
+              {/* Divider */}
+              <HStack>
+                <Divider />
+                <Text fontSize="sm" color="muted" whiteSpace="nowrap">
+                  or continue with
+                </Text>
+                <Divider />
+              </HStack>
+
+              {/* Google Sign In Button */}
+              <Button
+                leftIcon={<FaGoogle />}
+                onClick={handleGoogleLogin}
+                variant="outline"
+                size="lg"
+                w="full"
+              >
+                Continue with Google
+              </Button>
 
               {/* Sign Up Link */}
               <Text textAlign="center" fontSize="sm" color="muted">
