@@ -14,6 +14,7 @@ import {
   Icon,
   Flex,
 } from '@chakra-ui/react'
+import { keyframes } from '@emotion/react'
 import { 
   FiShield, 
   FiDatabase, 
@@ -31,6 +32,38 @@ import {
   FiMail
 } from 'react-icons/fi'
 
+const waveAnimation = keyframes`
+  0% {
+    transform: translateX(0) translateY(0);
+  }
+  50% {
+    transform: translateX(-25%) translateY(-25%);
+  }
+  100% {
+    transform: translateX(0) translateY(0);
+  }
+`
+
+const pulseAnimation = keyframes`
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
+`
+
+const rotateAnimation = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+`
+
 export default function PrivacyPolicy() {
   const bgColor = useColorModeValue('gray.50', 'gray.900')
   const cardBg = useColorModeValue('white', 'gray.800')
@@ -38,7 +71,115 @@ export default function PrivacyPolicy() {
   const accentColor = useColorModeValue('blue.500', 'blue.300')
 
   return (
-    <Box bg={bgColor} minH="100vh" pt={{ base: 24, md: 16 }} pb={{ base: 8, md: 16 }}>
+    <Box 
+      position="relative"
+      minH="100vh" 
+      pt={{ base: 24, md: 16 }} 
+      pb={{ base: 8, md: 16 }}
+      overflow="hidden"
+    >
+      {/* Animated Wave Background */}
+      <Box
+        position="absolute"
+        top="-50%"
+        left="-50%"
+        width="200%"
+        height="200%"
+        opacity={useColorModeValue(0.08, 0.04)}
+        zIndex={0}
+      >
+        <Box
+          position="absolute"
+          top="0"
+          left="0"
+          right="0"
+          bottom="0"
+          bgGradient="radial(circle, blue.400 0%, purple.500 50%, transparent 70%)"
+          animation={`${waveAnimation} 20s ease-in-out infinite`}
+        />
+      </Box>
+      
+      {/* Pulsing Geometric Shapes */}
+      <Box
+        position="absolute"
+        top="20%"
+        right="5%"
+        width="400px"
+        height="400px"
+        border="2px solid"
+        borderColor={useColorModeValue('blue.200', 'blue.800')}
+        borderRadius="20%"
+        opacity={0.2}
+        sx={{
+          animation: `${rotateAnimation} 30s linear infinite, ${pulseAnimation} 8s ease-in-out infinite`,
+        }}
+        zIndex={0}
+      />
+      <Box
+        position="absolute"
+        bottom="15%"
+        left="8%"
+        width="300px"
+        height="300px"
+        border="2px solid"
+        borderColor={useColorModeValue('purple.200', 'purple.800')}
+        borderRadius="30%"
+        opacity={0.2}
+        sx={{
+          animation: `${rotateAnimation} 25s linear infinite reverse 1s, ${pulseAnimation} 6s ease-in-out infinite 1s`,
+        }}
+        zIndex={0}
+      />
+      <Box
+        position="absolute"
+        top="50%"
+        left="50%"
+        width="500px"
+        height="500px"
+        border="2px solid"
+        borderColor={useColorModeValue('pink.200', 'pink.800')}
+        borderRadius="40%"
+        opacity={0.15}
+        transform="translate(-50%, -50%)"
+        sx={{
+          animation: `${rotateAnimation} 40s linear infinite 2s, ${pulseAnimation} 10s ease-in-out infinite 2s`,
+        }}
+        zIndex={0}
+      />
+      
+      {/* Gradient Overlay Dots */}
+      <Box
+        position="absolute"
+        top="10%"
+        left="10%"
+        width="150px"
+        height="150px"
+        borderRadius="full"
+        bgGradient="radial(circle, blue.300, transparent)"
+        opacity={0.4}
+        filter="blur(40px)"
+        sx={{
+          animation: `${pulseAnimation} 7s ease-in-out infinite`,
+        }}
+        zIndex={0}
+      />
+      <Box
+        position="absolute"
+        bottom="20%"
+        right="15%"
+        width="200px"
+        height="200px"
+        borderRadius="full"
+        bgGradient="radial(circle, purple.300, transparent)"
+        opacity={0.4}
+        filter="blur(40px)"
+        sx={{
+          animation: `${pulseAnimation} 9s ease-in-out infinite 3s`,
+        }}
+        zIndex={0}
+      />
+      
+      <Box position="relative" zIndex={1} bg={bgColor}>
       <Container maxW="container.xl">
         <VStack spacing={10} align="stretch">
           {/* Header */}
@@ -612,6 +753,7 @@ export default function PrivacyPolicy() {
           </SimpleGrid>
         </VStack>
       </Container>
+      </Box>
     </Box>
   )
 }

@@ -14,6 +14,7 @@ import {
   Icon,
   Flex,
 } from '@chakra-ui/react'
+import { keyframes } from '@emotion/react'
 import { 
   FiCheckCircle, 
   FiShield, 
@@ -30,6 +31,27 @@ import {
   FiMail
 } from 'react-icons/fi'
 
+const gradientAnimation = keyframes`
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+`
+
+const floatingAnimation = keyframes`
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+`
+
 export default function TermsOfService() {
   const bgColor = useColorModeValue('gray.50', 'gray.900')
   const cardBg = useColorModeValue('white', 'gray.800')
@@ -37,7 +59,71 @@ export default function TermsOfService() {
   const accentColor = useColorModeValue('blue.500', 'blue.300')
 
   return (
-    <Box bg={bgColor} minH="100vh" pt={{ base: 24, md: 16 }} pb={{ base: 8, md: 16 }}>
+    <Box 
+      position="relative"
+      minH="100vh" 
+      pt={{ base: 24, md: 16 }} 
+      pb={{ base: 8, md: 16 }}
+      overflow="hidden"
+    >
+      {/* Animated Background */}
+      <Box
+        position="absolute"
+        top="0"
+        left="0"
+        right="0"
+        bottom="0"
+        bgGradient="linear(45deg, purple.500, pink.500, blue.500, purple.500)"
+        backgroundSize="400% 400%"
+        sx={{
+          animation: `${gradientAnimation} 15s ease infinite`,
+        }}
+        opacity={useColorModeValue(0.08, 0.04)}
+        zIndex={0}
+      />
+      
+      {/* Floating Circles */}
+      <Box
+        position="absolute"
+        top="10%"
+        left="5%"
+        width="300px"
+        height="300px"
+        borderRadius="full"
+        bg={useColorModeValue('blue.100', 'blue.900')}
+        opacity={0.3}
+        filter="blur(60px)"
+        animation={`${floatingAnimation} 8s ease-in-out infinite`}
+        zIndex={0}
+      />
+      <Box
+        position="absolute"
+        top="60%"
+        right="10%"
+        width="250px"
+        height="250px"
+        borderRadius="full"
+        bg={useColorModeValue('purple.100', 'purple.900')}
+        opacity={0.3}
+        filter="blur(60px)"
+        animation={`${floatingAnimation} 10s ease-in-out infinite 2s`}
+        zIndex={0}
+      />
+      <Box
+        position="absolute"
+        bottom="10%"
+        left="15%"
+        width="200px"
+        height="200px"
+        borderRadius="full"
+        bg={useColorModeValue('pink.100', 'pink.900')}
+        opacity={0.3}
+        filter="blur(60px)"
+        animation={`${floatingAnimation} 12s ease-in-out infinite 4s`}
+        zIndex={0}
+      />
+      
+      <Box position="relative" zIndex={1} bg={bgColor}>
       <Container maxW="container.xl">
         <VStack spacing={10} align="stretch">
           {/* Header */}
@@ -462,6 +548,7 @@ export default function TermsOfService() {
           </SimpleGrid>
         </VStack>
       </Container>
+      </Box>
     </Box>
   )
 }
