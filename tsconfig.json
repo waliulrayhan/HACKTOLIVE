@@ -24,17 +24,17 @@
       "@/*": [
         "./src/*"
       ],
-      "#components/*": [
-        "./components/*"
+      "@/components/*": [
+        "./src/components/*"
       ],
-      "#hooks/*": [
-        "./hooks/*"
+      "@/lib/*": [
+        "./src/lib/*"
       ],
-      "#data/*": [
-        "./data/*"
+      "@/styles/*": [
+        "./src/styles/*"
       ],
-      "#theme": [
-        "./theme"
+      "@/types/*": [
+        "./src/types/*"
       ]
     },
     "plugins": [
