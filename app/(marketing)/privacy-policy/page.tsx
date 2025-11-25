@@ -71,141 +71,88 @@ export default function PrivacyPolicy() {
   const accentColor = useColorModeValue('blue.500', 'blue.300')
 
   return (
-    <Box 
-      position="relative"
-      minH="100vh" 
-      pt={{ base: 24, md: 16 }} 
-      pb={{ base: 8, md: 16 }}
-      overflow="hidden"
-    >
-      {/* Animated Wave Background */}
+    <Box>
+      {/* Hero Section with Background Image */}
       <Box
-        position="absolute"
-        top="-50%"
-        left="-50%"
-        width="200%"
-        height="200%"
-        opacity={useColorModeValue(0.08, 0.04)}
-        zIndex={0}
+        position="relative"
+        pt={{ base: 24, md: 32 }}
+        pb={{ base: 16, md: 20 }}
+        overflow="hidden"
+        bgImage={{
+          base: "url('https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200')",
+          md: "url('https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=2000')"
+        }}
+        bgPosition="center"
+        bgSize="cover"
+        bgRepeat="no-repeat"
+        _before={{
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          bg: useColorModeValue(
+            'linear-gradient(135deg, rgba(26, 32, 44, 0.85) 0%, rgba(45, 55, 72, 0.90) 100%)',
+            'linear-gradient(135deg, rgba(26, 32, 44, 0.95) 0%, rgba(45, 55, 72, 0.98) 100%)'
+          ),
+          zIndex: 1,
+        }}
       >
+        {/* Geometric Shapes in Hero */}
         <Box
           position="absolute"
-          top="0"
-          left="0"
-          right="0"
-          bottom="0"
-          bgGradient="radial(circle, blue.400 0%, green.500 50%, transparent 70%)"
-          animation={`${waveAnimation} 20s ease-in-out infinite`}
+          top="15%"
+          right="5%"
+          width="300px"
+          height="300px"
+          border="2px solid"
+          borderColor="blue.400"
+          borderRadius="20%"
+          opacity={0.1}
+          sx={{
+            animation: `${rotateAnimation} 30s linear infinite, ${pulseAnimation} 8s ease-in-out infinite`,
+          }}
+          zIndex={1}
         />
-      </Box>
-      
-      {/* Pulsing Geometric Shapes */}
-      <Box
-        position="absolute"
-        top="20%"
-        right="5%"
-        width="400px"
-        height="400px"
-        border="2px solid"
-        borderColor={useColorModeValue('blue.200', 'blue.800')}
-        borderRadius="20%"
-        opacity={0.2}
-        sx={{
-          animation: `${rotateAnimation} 30s linear infinite, ${pulseAnimation} 8s ease-in-out infinite`,
-        }}
-        zIndex={0}
-      />
-      <Box
-        position="absolute"
-        bottom="15%"
-        left="8%"
-        width="300px"
-        height="300px"
-        border="2px solid"
-        borderColor={useColorModeValue('green.200', 'green.800')}
-        borderRadius="30%"
-        opacity={0.2}
-        sx={{
-          animation: `${rotateAnimation} 25s linear infinite reverse 1s, ${pulseAnimation} 6s ease-in-out infinite 1s`,
-        }}
-        zIndex={0}
-      />
-      <Box
-        position="absolute"
-        top="50%"
-        left="50%"
-        width="500px"
-        height="500px"
-        border="2px solid"
-        borderColor={useColorModeValue('pink.200', 'pink.800')}
-        borderRadius="40%"
-        opacity={0.15}
-        transform="translate(-50%, -50%)"
-        sx={{
-          animation: `${rotateAnimation} 40s linear infinite 2s, ${pulseAnimation} 10s ease-in-out infinite 2s`,
-        }}
-        zIndex={0}
-      />
-      
-      {/* Gradient Overlay Dots */}
-      <Box
-        position="absolute"
-        top="10%"
-        left="10%"
-        width="150px"
-        height="150px"
-        borderRadius="full"
-        bgGradient="radial(circle, blue.300, transparent)"
-        opacity={0.4}
-        filter="blur(40px)"
-        sx={{
-          animation: `${pulseAnimation} 7s ease-in-out infinite`,
-        }}
-        zIndex={0}
-      />
-      <Box
-        position="absolute"
-        bottom="20%"
-        right="15%"
-        width="200px"
-        height="200px"
-        borderRadius="full"
-        bgGradient="radial(circle, green.300, transparent)"
-        opacity={0.4}
-        filter="blur(40px)"
-        sx={{
-          animation: `${pulseAnimation} 9s ease-in-out infinite 3s`,
-        }}
-        zIndex={0}
-      />
-      
-      <Box position="relative" zIndex={1} bg={bgColor}>
-      <Container maxW="container.xl">
-        <VStack spacing={10} align="stretch">
-          {/* Header */}
-          <Box textAlign="center" mb={4}>
-            <Flex justify="center" mb={4}>
+        <Box
+          position="absolute"
+          bottom="20%"
+          left="8%"
+          width="250px"
+          height="250px"
+          border="2px solid"
+          borderColor="green.400"
+          borderRadius="30%"
+          opacity={0.1}
+          sx={{
+            animation: `${rotateAnimation} 25s linear infinite reverse 1s, ${pulseAnimation} 6s ease-in-out infinite 1s`,
+          }}
+          zIndex={1}
+        />
+        
+        <Container maxW="container.xl" position="relative" zIndex={2}>
+          <VStack spacing={6} align="center" textAlign="center">
+            <Flex justify="center" mb={2}>
               <Icon 
                 as={FiShield} 
                 w={16} 
                 h={16} 
-                color={accentColor}
+                color="green.400"
               />
             </Flex>
             <Heading
               as="h1"
               size="3xl"
               mb={4}
-              bgGradient="linear(to-r, blue.400, green.500)"
-              bgClip="text"
+              color="white"
               fontWeight="extrabold"
               lineHeight="1.2"
             >
               Privacy Policy
             </Heading>
             <Text 
-              color="gray.600" 
-              _dark={{ color: 'gray.400' }} 
+              color="gray.300"
               fontSize="lg"
               maxW="2xl"
               mx="auto"
@@ -213,14 +160,20 @@ export default function PrivacyPolicy() {
               Last Updated: November 25, 2025
             </Text>
             <Text 
-              color="gray.500" 
-              _dark={{ color: 'gray.500' }} 
+              color="gray.400"
               fontSize="md"
               mt={2}
             >
               Learn how we collect, use, and protect your personal information
             </Text>
-          </Box>
+          </VStack>
+        </Container>
+      </Box>
+
+      {/* Content Section */}
+      <Box bg={bgColor} pt={{ base: 12, md: 16 }} pb={{ base: 8, md: 16 }}>
+      <Container maxW="container.xl">
+        <VStack spacing={10} align="stretch">
 
           {/* Content Sections */}
           <SimpleGrid columns={{ base: 1 }} spacing={6}>

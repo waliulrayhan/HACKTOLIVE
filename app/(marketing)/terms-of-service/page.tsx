@@ -59,97 +59,84 @@ export default function TermsOfService() {
   const accentColor = useColorModeValue('blue.500', 'blue.300')
 
   return (
-    <Box 
-      position="relative"
-      minH="100vh" 
-      pt={{ base: 24, md: 16 }} 
-      pb={{ base: 8, md: 16 }}
-      overflow="hidden"
-    >
-      {/* Animated Background */}
+    <Box>
+      {/* Hero Section with Background Image */}
       <Box
-        position="absolute"
-        top="0"
-        left="0"
-        right="0"
-        bottom="0"
-        bgGradient="linear(45deg, green.500, cyan.500, blue.500, green.500)"
-        backgroundSize="400% 400%"
-        sx={{
-          animation: `${gradientAnimation} 15s ease infinite`,
+        position="relative"
+        pt={{ base: 24, md: 32 }}
+        pb={{ base: 16, md: 20 }}
+        overflow="hidden"
+        bgImage={{
+          base: "url('https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=1200')",
+          md: "url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=2000')"
         }}
-        opacity={useColorModeValue(0.08, 0.04)}
-        zIndex={0}
-      />
-      
-      {/* Floating Circles */}
-      <Box
-        position="absolute"
-        top="10%"
-        left="5%"
-        width="300px"
-        height="300px"
-        borderRadius="full"
-        bg={useColorModeValue('blue.100', 'blue.900')}
-        opacity={0.3}
-        filter="blur(60px)"
-        animation={`${floatingAnimation} 8s ease-in-out infinite`}
-        zIndex={0}
-      />
-      <Box
-        position="absolute"
-        top="60%"
-        right="10%"
-        width="250px"
-        height="250px"
-        borderRadius="full"
-        bg={useColorModeValue('green.100', 'green.900')}
-        opacity={0.3}
-        filter="blur(60px)"
-        animation={`${floatingAnimation} 10s ease-in-out infinite 2s`}
-        zIndex={0}
-      />
-      <Box
-        position="absolute"
-        bottom="10%"
-        left="15%"
-        width="200px"
-        height="200px"
-        borderRadius="full"
-        bg={useColorModeValue('pink.100', 'pink.900')}
-        opacity={0.3}
-        filter="blur(60px)"
-        animation={`${floatingAnimation} 12s ease-in-out infinite 4s`}
-        zIndex={0}
-      />
-      
-      <Box position="relative" zIndex={1} bg={bgColor}>
-      <Container maxW="container.xl">
-        <VStack spacing={10} align="stretch">
-          {/* Header */}
-          <Box textAlign="center" mb={4}>
-            <Flex justify="center" mb={4}>
+        bgPosition="center"
+        bgSize="cover"
+        bgRepeat="no-repeat"
+        _before={{
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          bg: useColorModeValue(
+            'linear-gradient(135deg, rgba(26, 32, 44, 0.85) 0%, rgba(45, 55, 72, 0.90) 100%)',
+            'linear-gradient(135deg, rgba(26, 32, 44, 0.95) 0%, rgba(45, 55, 72, 0.98) 100%)'
+          ),
+          zIndex: 1,
+        }}
+      >
+        {/* Floating Circles in Hero */}
+        <Box
+          position="absolute"
+          top="20%"
+          left="5%"
+          width="200px"
+          height="200px"
+          borderRadius="full"
+          bg="blue.400"
+          opacity={0.1}
+          filter="blur(60px)"
+          animation={`${floatingAnimation} 8s ease-in-out infinite`}
+          zIndex={1}
+        />
+        <Box
+          position="absolute"
+          bottom="20%"
+          right="10%"
+          width="250px"
+          height="250px"
+          borderRadius="full"
+          bg="green.400"
+          opacity={0.1}
+          filter="blur(60px)"
+          animation={`${floatingAnimation} 10s ease-in-out infinite 2s`}
+          zIndex={1}
+        />
+        
+        <Container maxW="container.xl" position="relative" zIndex={2}>
+          <VStack spacing={6} align="center" textAlign="center">
+            <Flex justify="center" mb={2}>
               <Icon 
                 as={FiFileText} 
                 w={16} 
                 h={16} 
-                color={accentColor}
+                color="green.400"
               />
             </Flex>
             <Heading
               as="h1"
               size="3xl"
               mb={4}
-              bgGradient="linear(to-r, blue.400, green.500)"
-              bgClip="text"
+              color="white"
               fontWeight="extrabold"
               lineHeight="1.2"
             >
               Terms of Service
             </Heading>
             <Text 
-              color="gray.600" 
-              _dark={{ color: 'gray.400' }} 
+              color="gray.300"
               fontSize="lg"
               maxW="2xl"
               mx="auto"
@@ -157,14 +144,20 @@ export default function TermsOfService() {
               Last Updated: November 25, 2025
             </Text>
             <Text 
-              color="gray.500" 
-              _dark={{ color: 'gray.500' }} 
+              color="gray.400"
               fontSize="md"
               mt={2}
             >
               Please read these terms carefully before using our services
             </Text>
-          </Box>
+          </VStack>
+        </Container>
+      </Box>
+
+      {/* Content Section */}
+      <Box bg={bgColor} pt={{ base: 12, md: 16 }} pb={{ base: 8, md: 16 }}>
+      <Container maxW="container.xl">
+        <VStack spacing={10} align="stretch">
 
           {/* Content Sections */}
           <SimpleGrid columns={{ base: 1 }} spacing={6}>
