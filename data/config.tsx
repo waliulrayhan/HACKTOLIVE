@@ -17,20 +17,37 @@ const siteConfig = {
   header: {
     links: [
       {
-        id: 'features',
-        label: 'Services',
+        label: 'Service',
+        href: '/service',
       },
       {
-        id: 'pricing',
         label: 'Academy',
+        href: '/academy',
       },
       {
-        id: 'faq',
-        label: 'FAQ',
+        label: 'Blog',
+        href: '/blog',
+      },
+      {
+        label: 'Shopping',
+        href: '/shopping',
+      },
+      {
+        label: 'About Us',
+        href: '/about',
+      },
+      {
+        label: 'Contact',
+        href: '/contact',
+      },
+      {
+        label: 'Career',
+        href: '/career',
       },
       {
         label: 'Login',
         href: '/login',
+        isAction: true,
       },
       {
         label: 'Get Started',

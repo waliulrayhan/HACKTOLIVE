@@ -54,12 +54,12 @@ function NavLink({ href, children, isActive, ...rest }: NavLinkProps) {
       display="flex"
       alignItems="center"
       position="relative"
-      minH="48px"
-      px="6"
-      py="3"
-      mx="4"
-      my="1"
-      borderRadius="lg"
+      minH="40px"
+      px="4"
+      py="2"
+      mx="2"
+      my="0.5"
+      borderRadius="md"
       transition="all 0.2s"
       fontWeight={isActive ? 'semibold' : 'medium'}
       fontSize="md"
@@ -143,19 +143,18 @@ export function MobileNavContent(props: MobileNavContentProps) {
                 </HStack>
               </Flex>
               <Stack alignItems="stretch" spacing="1" mt="4" px="2">
-                {siteConfig.header.links.map(
-                  ({ href, id, label, ...props }, i) => {
-                    return (
-                      <NavLink
-                        href={href || `/#${id}`}
-                        key={i}
-                        {...(props as any)}
-                      >
-                        {label}
-                      </NavLink>
-                    )
-                  },
-                )}
+                {siteConfig.header.links.map((link: any, i) => {
+                  const { href, id, label, ...props } = link
+                  return (
+                    <NavLink
+                      href={href || `/#${id}`}
+                      key={i}
+                      {...(props as any)}
+                    >
+                      {label}
+                    </NavLink>
+                  )
+                })}
               </Stack>
             </Box>
           </Flex>

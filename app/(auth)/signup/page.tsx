@@ -553,7 +553,7 @@ const Signup: NextPage = () => {
                             I agree to the{' '}
                             <Link
                               as={NextLink}
-                              href="/terms"
+                              href="/terms-of-service"
                               color="blue.500"
                               _hover={{ color: 'blue.600', textDecoration: 'underline' }}
                             >
@@ -562,7 +562,7 @@ const Signup: NextPage = () => {
                             {' '}and{' '}
                             <Link
                               as={NextLink}
-                              href="/privacy"
+                              href="/privacy-policy"
                               color="blue.500"
                               _hover={{ color: 'blue.600', textDecoration: 'underline' }}
                             >

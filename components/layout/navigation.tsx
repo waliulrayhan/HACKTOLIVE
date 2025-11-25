@@ -18,10 +18,14 @@ const Navigation: React.FC = () => {
   const mobileNav = useDisclosure()
   const router = useRouter()
   const path = usePathname()
+  
+  // Only use scrollspy if there are links with ids
+  const scrollSpySelectors = siteConfig.header.links
+    .filter((link: any) => link.id)
+    .map((link: any) => `[id="${link.id}"]`)
+  
   const activeId = useScrollSpy(
-    siteConfig.header.links
-      .filter(({ id }) => id)
-      .map(({ id }) => `[id="${id}"]`),
+    scrollSpySelectors.length > 0 ? scrollSpySelectors : [],
     {
       threshold: 0.75,
     },
@@ -35,7 +39,8 @@ const Navigation: React.FC = () => {
 
   return (
     <HStack spacing="2" flexShrink={0}>
-      {siteConfig.header.links.map(({ href, id, ...props }, i) => {
+      {siteConfig.header.links.map((link: any, i) => {
+        const { href, id, isAction, ...props } = link
         return (
           <NavLink
             display={['none', null, 'block']}
@@ -47,6 +52,7 @@ const Navigation: React.FC = () => {
                 (href && !!path?.match(new RegExp(href)))
               )
             }
+            ml={isAction ? '19' : '0'}
             {...props}
           >
             {props.label}

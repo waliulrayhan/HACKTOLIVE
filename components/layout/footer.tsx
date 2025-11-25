@@ -172,8 +172,8 @@ export const Footer: React.FC<FooterProps> = (props) => {
                 </Box>
               </Flex>
               <Stack spacing="4">
-                {siteConfig.footer.logoLinks?.map(({ href, label }) => (
-                  <FooterLink key={href} href={href}>
+                {siteConfig.footer.logoLinks?.map(({ href, label }, index) => (
+                  <FooterLink key={`logo-${index}`} href={href}>
                     {label}
                   </FooterLink>
                 ))}
@@ -199,8 +199,8 @@ export const Footer: React.FC<FooterProps> = (props) => {
               Resources
             </Text>
               <Stack spacing="4">
-                {siteConfig.footer.resources?.map(({ href, label }) => (
-                  <FooterLink key={href} href={href}>
+                {siteConfig.footer.resources?.map(({ href, label }, index) => (
+                  <FooterLink key={`resource-${index}`} href={href}>
                     {label}
                   </FooterLink>
                 ))}
@@ -226,8 +226,8 @@ export const Footer: React.FC<FooterProps> = (props) => {
               Contact
             </Text>
               <Stack spacing="4">
-                {siteConfig.footer.contact?.map(({ href, label }) => (
-                  <FooterLink key={href} href={href}>
+                {siteConfig.footer.contact?.map(({ href, label }, index) => (
+                  <FooterLink key={`contact-${index}`} href={href}>
                     {label}
                   </FooterLink>
                 ))}
@@ -253,8 +253,8 @@ export const Footer: React.FC<FooterProps> = (props) => {
               Legal
             </Text>
               <Stack spacing="4">
-                {siteConfig.footer.legal?.map(({ href, label }) => (
-                  <FooterLink key={href} href={href}>
+                {siteConfig.footer.legal?.map(({ href, label }, index) => (
+                  <FooterLink key={`legal-${index}`} href={href}>
                     {label}
                   </FooterLink>
                 ))}
@@ -280,8 +280,8 @@ export const Footer: React.FC<FooterProps> = (props) => {
               Press
             </Text>
               <Stack spacing="4">
-                {siteConfig.footer.press?.map(({ href, label }) => (
-                  <FooterLink key={href} href={href}>
+                {siteConfig.footer.press?.map(({ href, label }, index) => (
+                  <FooterLink key={`press-${index}`} href={href}>
                     {label}
                   </FooterLink>
                 ))}
