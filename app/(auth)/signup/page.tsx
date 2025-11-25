@@ -172,11 +172,11 @@ const Signup: NextPage = () => {
           spacing={{ base: '8', lg: '20' }}
           flexDirection={{ base: 'column', lg: 'row' }}
           justifyContent="center"
-          py={{ base: '8', md: '0' }}
+          py={{ base: '0', md: '0' }}
         >
           {/* Left Side - Features (Desktop only) */}
           <Box pe={{ base: '0', lg: '20' }} width={{ base: '100%', lg: 'auto' }}>
-            <NextLink href="/">
+            {/* <NextLink href="/">
               <Box
                 as={siteConfig.logo}
                 width="160px"
@@ -184,7 +184,7 @@ const Signup: NextPage = () => {
                 mb={{ base: '8', lg: 16 }}
                 mx={{ base: 'auto', lg: '0' }}
               />
-            </NextLink>
+            </NextLink> */}
             <Features
               display={{ base: 'none', lg: 'flex' }}
               columns={1}

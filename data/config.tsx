@@ -33,7 +33,7 @@ const siteConfig = {
         href: '/login',
       },
       {
-        label: 'Enroll Now',
+        label: 'Get Started',
         href: '/signup',
         variant: 'primary',
       },
