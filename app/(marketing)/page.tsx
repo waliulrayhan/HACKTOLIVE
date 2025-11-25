@@ -90,7 +90,11 @@ const HeroSection: React.FC = () => {
   const videoFilter = useColorModeValue('brightness(1.2) contrast(0.9)', 'brightness(0.7)')
   
   return (
-    <Box position="relative" overflow="hidden">
+    <Box 
+      position="relative" 
+      overflow="hidden"
+      height="100vh"
+    >
       {/* Background Video */}
       <Box
         position="absolute"
@@ -130,7 +134,14 @@ const HeroSection: React.FC = () => {
           bg={overlayBg}
         />
       </Box>
-      <Container maxW="container.xl" pt={{ base: 52, lg: 72 }} pb="40">
+      <Container 
+        maxW="container.xl" 
+        pt={{ base: '120px', md: '140px', lg: '180px' }} 
+        pb={{ base: '60px', md: '80px', lg: '100px' }}
+        height="100%"
+        display="flex"
+        alignItems="center"
+      >
         <Stack direction={{ base: 'column', lg: 'row' }} alignItems="center">
           <Hero
             id="home"
