@@ -50,7 +50,7 @@ const Login: NextPage = () => {
   const [errors, setErrors] = useState({ email: '', password: '', captcha: '' })
   const recaptchaRef = useRef<ReCAPTCHA>(null)
   const captchaTheme = useColorModeValue('light', 'dark')
-  const leftBgColor = useColorModeValue('blue.600', 'blue.900')
+  const leftBgColor = useColorModeValue('#4d7c0f', '#365314')
   const rightBgColor = useColorModeValue('white', 'gray.800')
   const { colorMode, toggleColorMode } = useColorMode()
 
@@ -235,7 +235,7 @@ const Login: NextPage = () => {
             fontSize="6xl" 
             fontWeight="bold" 
             color="white"
-            bg="blue.500"
+            bg="#65a30d"
             px={6}
             py={4}
             borderRadius="xl"
