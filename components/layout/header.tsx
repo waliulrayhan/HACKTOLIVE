@@ -8,6 +8,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 import { useScroll } from 'framer-motion'
+import { usePathname } from 'next/navigation'
 
 import * as React from 'react'
 
@@ -20,13 +21,20 @@ export const Header = (props: HeaderProps) => {
   const ref = React.useRef<HTMLHeadingElement>(null)
   const [y, setY] = React.useState(0)
   const { height = 0 } = ref.current?.getBoundingClientRect() ?? {}
+  const pathname = usePathname()
 
   const { scrollY } = useScroll()
   React.useEffect(() => {
     return scrollY.on('change', () => setY(scrollY.get()))
   }, [scrollY])
 
-  const bg = useColorModeValue('whiteAlpha.700', 'rgba(29, 32, 37, 0.7)')
+  // Check if we're on an auth page
+  const isAuthPage = pathname?.startsWith('/login') || 
+                     pathname?.startsWith('/signup') || 
+                     pathname?.startsWith('/reset-password')
+
+  const bgScrolled = useColorModeValue('whiteAlpha.800', 'rgba(29, 32, 37, 0.7)')
+  const bgDefault = useColorModeValue('whiteAlpha.700', 'transparent')
 
   return (
     <Box
@@ -40,9 +48,9 @@ export const Header = (props: HeaderProps) => {
       borderColor="whiteAlpha.100"
       transitionProperty="common"
       transitionDuration="normal"
-      bg={y > height ? bg : ''}
-      boxShadow={y > height ? 'md' : ''}
-      borderBottomWidth={y > height ? '1px' : ''}
+      bg={isAuthPage ? 'transparent' : (y > height ? bgScrolled : bgDefault)}
+      boxShadow={isAuthPage ? '' : (y > height ? 'md' : '')}
+      borderBottomWidth={isAuthPage ? '' : (y > height ? '1px' : '')}
       {...props}
     >
       <Container maxW="container.2xl" px={{ base: '8', md: '12', lg: '20' }} py="4">
