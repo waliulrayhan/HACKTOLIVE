@@ -488,7 +488,7 @@ const Login: NextPage = () => {
                       </Checkbox>
                       <Link
                         as={NextLink}
-                        href="/forgot-password"
+                        href="/reset-password"
                         fontSize="sm"
                         color="blue.500"
                         _hover={{ color: 'blue.600', textDecoration: 'underline' }}
