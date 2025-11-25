@@ -432,7 +432,8 @@ const Signup: NextPage = () => {
             alignItems="center" 
             justifyContent="center" 
             px={{ base: 6, sm: 8, md: 12, lg: 16, xl: 20 }}
-            py={{ base: 20, lg: 12 }}
+            py={{ base: 20, md: 24, lg: 12 }}
+            pt={{ base: 24, md: 28, lg: 20 }}
           >
             <PageTransition width="100%">
               <Box maxW="md" w="full" mx="auto">
