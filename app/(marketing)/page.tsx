@@ -95,8 +95,8 @@ const HeroSection: React.FC = () => {
   const [animationData, setAnimationData] = React.useState<any>(null)
 
   React.useEffect(() => {
-    // Fetch cybersecurity animation
-    fetch('https://assets10.lottiefiles.com/packages/lf20_V9t630.json')
+    // Load local astronaut animation
+    fetch('/astronaut-with-space-shuttle.json')
       .then((response) => response.json())
       .then((data) => setAnimationData(data))
       .catch((error) => console.error('Animation error:', error))
@@ -163,7 +163,7 @@ const HeroSection: React.FC = () => {
             spacing={{ base: '6', md: '8' }}
             maxW={{ base: '100%', lg: '50%' }}
             width="100%"
-            px={{ base: '4', sm: '6', md: '0' }}
+            px={{ base: '2', sm: '3', md: '0' }}
           >
             <FallInPlace>
               <Heading
@@ -184,23 +184,25 @@ const HeroSection: React.FC = () => {
                 fontWeight="medium"
                 textAlign={{ base: 'center', md: 'left' }}
               >
-                Bangladesh's premier cybersecurity platform offering professional 
-                security services and ethical hacking education in Bengali.
+                HackToLive is <Em>Bangladesh's premier cybersecurity platform</Em>
+                offering professional security services and
+                ethical hacking education in Bengali.
               </Text>
             </FallInPlace>
 
             <FallInPlace delay={0.4}>
-              <ButtonGroup 
-                spacing={{ base: '3', sm: '4' }} 
-                flexDirection={{ base: 'column', sm: 'row' }}
-                width={{ base: '100%', sm: 'auto' }}
+              <Flex 
+                gap={{ base: '2', sm: '4' }} 
+                flexDirection={{ base: 'row', sm: 'row' }}
+                width="100%"
+                justifyContent={{ base: 'center', md: 'flex-start' }}
               >
                 <ButtonLink 
                   colorScheme="primary" 
                   size={{ base: 'md', md: 'lg' }}
                   href="/signup"
                   rightIcon={<Icon as={FiArrowRight} />}
-                  width={{ base: '100%', sm: 'auto' }}
+                  flex={{ base: '1', sm: 'none' }}
                 >
                   Start Learning
                 </ButtonLink>
@@ -208,64 +210,64 @@ const HeroSection: React.FC = () => {
                   size={{ base: 'md', md: 'lg' }}
                   href="#features"
                   variant="outline"
-                  width={{ base: '100%', sm: 'auto' }}
+                  flex={{ base: '1', sm: 'none' }}
                 >
                   Explore Courses
                 </ButtonLink>
-              </ButtonGroup>
+              </Flex>
             </FallInPlace>
 
             <FallInPlace delay={0.6}>
-              <Stack 
-                direction={{ base: 'column', sm: 'row' }} 
-                spacing={{ base: '4', sm: '6', md: '8' }} 
+              <Flex 
+                direction={{ base: 'row', sm: 'row' }} 
+                gap={{ base: '8', sm: '10', md: '12' }} 
                 pt="4"
                 width="100%"
                 justify={{ base: 'center', md: 'flex-start' }}
               >
-                <VStack alignItems={{ base: 'center', md: 'flex-start' }} spacing="1">
+                <VStack alignItems="center" spacing="1" flex={{ base: '1', sm: 'none' }}>
                   <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                     5000+
                   </Text>
-                  <Text fontSize={{ base: 'xs', md: 'sm' }} textAlign="center">
+                  <Text fontSize={{ base: 'xs', md: 'sm' }} textAlign="center" whiteSpace="nowrap">
                     Students Trained
                   </Text>
                 </VStack>
-                <VStack alignItems={{ base: 'center', md: 'flex-start' }} spacing="1">
+                <VStack alignItems="center" spacing="1" flex={{ base: '1', sm: 'none' }}>
                   <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                     50+
                   </Text>
-                  <Text fontSize={{ base: 'xs', md: 'sm' }} textAlign="center">
+                  <Text fontSize={{ base: 'xs', md: 'sm' }} textAlign="center" whiteSpace="nowrap">
                     Security Audits
                   </Text>
                 </VStack>
-                <VStack alignItems={{ base: 'center', md: 'flex-start' }} spacing="1">
+                <VStack alignItems="center" spacing="1" flex={{ base: '1', sm: 'none' }}>
                   <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                     100%
                   </Text>
-                  <Text fontSize={{ base: 'xs', md: 'sm' }} textAlign="center">
+                  <Text fontSize={{ base: 'xs', md: 'sm' }} textAlign="center" whiteSpace="nowrap">
                     Bengali Content
                   </Text>
                 </VStack>
-              </Stack>
+              </Flex>
             </FallInPlace>
           </VStack>
           <Box
-            height="600px"
             position="absolute"
-            display={{ base: 'none', lg: 'block' }}
-            left={{ lg: '60%', xl: '55%' }}
-            width="80vw"
-            maxW="1100px"
-            margin="0 auto"
+            display={{ base: 'none', lg: 'flex' }}
+            right={{ lg: '5%', xl: '8%' }}
+            top="50%"
+            transform="translateY(-50%)"
+            alignItems="center"
+            justifyContent="center"
           >
             <FallInPlace delay={1}>
-              <Box overflow="hidden" height="100%">
+              <Box>
                 {animationData && (
                   <Lottie
                     animationData={animationData}
                     loop={true}
-                    style={{ width: '100%', height: '100%', maxWidth: '800px' }}
+                    style={{ width: '600px', height: '600px' }}
                   />
                 )}
               </Box>
