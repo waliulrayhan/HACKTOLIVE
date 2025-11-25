@@ -84,10 +84,7 @@ export default function TermsOfService() {
         pt={{ base: 32, md: 40 }}
         pb={{ base: 16, md: 20 }}
         overflow="hidden"
-        bgImage={{
-          base: "url('https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=1200')",
-          md: "url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=2000')"
-        }}
+        bgImage="url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=2000')"
         bgPosition="center"
         bgSize="cover"
         bgRepeat="no-repeat"
@@ -100,7 +97,7 @@ export default function TermsOfService() {
           bottom: 0,
           bg: useColorModeValue(
             'linear-gradient(135deg, rgba(26, 32, 44, 0.85) 0%, rgba(45, 55, 72, 0.90) 100%)',
-            'linear-gradient(135deg, rgba(26, 32, 44, 0.95) 0%, rgba(45, 55, 72, 0.98) 100%)'
+            'linear-gradient(135deg, rgba(26, 32, 44, 0.70) 0%, rgba(45, 55, 72, 0.75) 100%)'
           ),
           zIndex: 1,
         }}
