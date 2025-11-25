@@ -4,6 +4,7 @@ import './globals.css'
 
 import { SidebarProvider } from '@/context/SidebarContext'
 import { ThemeProvider } from '@/context/ThemeContext'
+import { GlobalLoading } from '#components/global-loading'
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -42,6 +43,7 @@ export default function RootLayout({
         <link rel="manifest" href="/static/favicons/manifest.json" />
       </head>
       <body className={`${outfit.className} dark:bg-gray-900`}>
+        <GlobalLoading />
         <ThemeProvider>
           <SidebarProvider>{children}</SidebarProvider>
         </ThemeProvider>
