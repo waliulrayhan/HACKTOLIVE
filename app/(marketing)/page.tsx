@@ -9,6 +9,7 @@ import {
   Heading,
   Icon,
   IconButton,
+  SimpleGrid,
   Stack,
   Tag,
   Text,
@@ -20,6 +21,7 @@ import {
 import { Br, Link } from '@saas-ui/react'
 import type { Metadata, NextPage } from 'next'
 import Image from 'next/image'
+import Lottie from 'lottie-react'
 import {
   FiArrowRight,
   FiBox,
@@ -88,6 +90,17 @@ const Home: NextPage = () => {
 const HeroSection: React.FC = () => {
   const overlayBg = useColorModeValue('whiteAlpha.800', 'blackAlpha.700')
   const videoFilter = useColorModeValue('brightness(1.2) contrast(0.9)', 'brightness(0.7)')
+  const accentColor = useColorModeValue('green.500', 'green.400')
+  
+  const [animationData, setAnimationData] = React.useState<any>(null)
+
+  React.useEffect(() => {
+    // Fetch cybersecurity animation
+    fetch('https://assets10.lottiefiles.com/packages/lf20_V9t630.json')
+      .then((response) => response.json())
+      .then((data) => setAnimationData(data))
+      .catch((error) => console.error('Animation error:', error))
+  }, [])
   
   return (
     <Box 
@@ -134,6 +147,7 @@ const HeroSection: React.FC = () => {
           bg={overlayBg}
         />
       </Box>
+      
       <Container 
         maxW="container.xl" 
         pt={{ base: '120px', md: '140px', lg: '180px' }} 
@@ -142,56 +156,100 @@ const HeroSection: React.FC = () => {
         display="flex"
         alignItems="center"
       >
-        <Stack direction={{ base: 'column', lg: 'row' }} alignItems="center">
-          <Hero
-            id="home"
-            justifyContent="flex-start"
-            px="0"
-            title={
-              <FallInPlace>
-                Master Cybersecurity
-                <Br /> Defend Bangladesh
-              </FallInPlace>
-            }
-            description={
-              <FallInPlace delay={0.4} fontWeight="medium">
-                HackToLive is <Em>Bangladesh's premier cybersecurity platform</Em>
-                <Br /> offering professional security services and <Br />{' '}
-                ethical hacking education in Bengali.
-              </FallInPlace>
-            }
+        <Stack direction={{ base: 'column', lg: 'row' }} alignItems="center" width="100%" spacing={{ base: '8', lg: '12' }}>
+          <VStack 
+            flex="1" 
+            alignItems={{ base: 'center', md: 'flex-start' }} 
+            spacing={{ base: '6', md: '8' }}
+            maxW={{ base: '100%', lg: '50%' }}
+            width="100%"
+            px={{ base: '4', sm: '6', md: '0' }}
           >
-            <FallInPlace delay={0.8}>
-              <HStack pt="4" pb="12" spacing="8">
-                <NextjsLogo height="28px" /> <ChakraLogo height="20px" />
-              </HStack>
+            <FallInPlace>
+              <Heading
+                fontSize={{ base: '3xl', sm: '4xl', md: '5xl', lg: '6xl' }}
+                fontWeight="bold"
+                lineHeight="1.2"
+                textAlign={{ base: 'center', md: 'left' }}
+              >
+                Master Cybersecurity
+                <Br />
+                Defend Bangladesh
+              </Heading>
+            </FallInPlace>
 
-              <ButtonGroup spacing={4} alignItems="center">
-                <ButtonLink colorScheme="primary" size="lg" href="/signup">
-                  Enroll Now
+            <FallInPlace delay={0.2}>
+              <Text 
+                fontSize={{ base: 'md', sm: 'lg', md: 'xl' }} 
+                fontWeight="medium"
+                textAlign={{ base: 'center', md: 'left' }}
+              >
+                Bangladesh's premier cybersecurity platform offering professional 
+                security services and ethical hacking education in Bengali.
+              </Text>
+            </FallInPlace>
+
+            <FallInPlace delay={0.4}>
+              <ButtonGroup 
+                spacing={{ base: '3', sm: '4' }} 
+                flexDirection={{ base: 'column', sm: 'row' }}
+                width={{ base: '100%', sm: 'auto' }}
+              >
+                <ButtonLink 
+                  colorScheme="primary" 
+                  size={{ base: 'md', md: 'lg' }}
+                  href="/signup"
+                  rightIcon={<Icon as={FiArrowRight} />}
+                  width={{ base: '100%', sm: 'auto' }}
+                >
+                  Start Learning
                 </ButtonLink>
                 <ButtonLink
-                  size="lg"
+                  size={{ base: 'md', md: 'lg' }}
                   href="#features"
                   variant="outline"
-                  rightIcon={
-                    <Icon
-                      as={FiArrowRight}
-                      sx={{
-                        transitionProperty: 'common',
-                        transitionDuration: 'normal',
-                        '.chakra-button:hover &': {
-                          transform: 'translate(5px)',
-                        },
-                      }}
-                    />
-                  }
+                  width={{ base: '100%', sm: 'auto' }}
                 >
-                  Our Services
+                  Explore Courses
                 </ButtonLink>
               </ButtonGroup>
             </FallInPlace>
-          </Hero>
+
+            <FallInPlace delay={0.6}>
+              <Stack 
+                direction={{ base: 'column', sm: 'row' }} 
+                spacing={{ base: '4', sm: '6', md: '8' }} 
+                pt="4"
+                width="100%"
+                justify={{ base: 'center', md: 'flex-start' }}
+              >
+                <VStack alignItems={{ base: 'center', md: 'flex-start' }} spacing="1">
+                  <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
+                    5000+
+                  </Text>
+                  <Text fontSize={{ base: 'xs', md: 'sm' }} textAlign="center">
+                    Students Trained
+                  </Text>
+                </VStack>
+                <VStack alignItems={{ base: 'center', md: 'flex-start' }} spacing="1">
+                  <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
+                    50+
+                  </Text>
+                  <Text fontSize={{ base: 'xs', md: 'sm' }} textAlign="center">
+                    Security Audits
+                  </Text>
+                </VStack>
+                <VStack alignItems={{ base: 'center', md: 'flex-start' }} spacing="1">
+                  <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
+                    100%
+                  </Text>
+                  <Text fontSize={{ base: 'xs', md: 'sm' }} textAlign="center">
+                    Bengali Content
+                  </Text>
+                </VStack>
+              </Stack>
+            </FallInPlace>
+          </VStack>
           <Box
             height="600px"
             position="absolute"
@@ -203,14 +261,13 @@ const HeroSection: React.FC = () => {
           >
             <FallInPlace delay={1}>
               <Box overflow="hidden" height="100%">
-                <Image
-                  src="/static/screenshots/list.png"
-                  width={1200}
-                  height={762}
-                  alt="Screenshot of a ListPage in Saas UI Pro"
-                  quality="75"
-                  priority
-                />
+                {animationData && (
+                  <Lottie
+                    animationData={animationData}
+                    loop={true}
+                    style={{ width: '100%', height: '100%', maxWidth: '800px' }}
+                  />
+                )}
               </Box>
             </FallInPlace>
           </Box>
