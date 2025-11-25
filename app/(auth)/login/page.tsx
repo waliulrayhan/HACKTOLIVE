@@ -26,6 +26,7 @@ import {
 import { Link } from '@saas-ui/react'
 import { BackgroundGradient } from 'components/gradients/background-gradient'
 import { PageTransition } from 'components/motion/page-transition'
+import { Header } from 'components/layout/header'
 import { NextPage } from 'next'
 import { FaGoogle, FaEye, FaEyeSlash, FaMoon, FaSun, FaHome } from 'react-icons/fa'
 import { useState, useRef } from 'react'
@@ -100,9 +101,11 @@ const Login: NextPage = () => {
   }
 
   return (
-    <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} minH="100vh">
-      {/* Left Column - Logo Section */}
-      <GridItem 
+    <>
+      <Header />
+      <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} minH="100vh">
+        {/* Left Column - Logo Section */}
+        <GridItem 
         bg={leftBgColor}
         display={{ base: 'none', lg: 'flex' }}
         alignItems="center"
@@ -211,7 +214,7 @@ const Login: NextPage = () => {
         </Box>
         
         {/* Back to Home Button */}
-        <Button
+        {/* <Button
           as={NextLink}
           href="/"
           leftIcon={<FaHome />}
@@ -225,7 +228,7 @@ const Login: NextPage = () => {
           zIndex={2}
         >
           Back to Home
-        </Button>
+        </Button> */}
         
         <VStack spacing={4} zIndex={1} px={8}>
           <Box 
@@ -390,7 +393,7 @@ const Login: NextPage = () => {
           align="center"
           zIndex={10}
         >
-          <Button
+          {/* <Button
             as={NextLink}
             href="/"
             leftIcon={<FaHome />}
@@ -406,7 +409,7 @@ const Login: NextPage = () => {
             onClick={toggleColorMode}
             variant="ghost"
             size="md"
-          />
+          /> */}
         </Flex>
 
         {/* Form Content */}
@@ -557,6 +560,7 @@ const Login: NextPage = () => {
         </Flex>
       </GridItem>
     </Grid>
+    </>
   )
 }
 
