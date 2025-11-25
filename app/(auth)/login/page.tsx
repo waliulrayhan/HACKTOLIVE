@@ -120,6 +120,7 @@ const Login: NextPage = () => {
           zIndex={0}
           pointerEvents="none"
           overflow="hidden"
+          opacity={{ base: 0.3, lg: 1 }}
         >
           {/* Rotating geometric shapes */}
           <Box
@@ -262,6 +263,7 @@ const Login: NextPage = () => {
           zIndex={0}
           pointerEvents="none"
           overflow="hidden"
+          opacity={{ base: 0.1, md: 0.5, lg: 1 }}
         >
           {/* Rotating geometric shapes */}
           <Box
