@@ -123,7 +123,7 @@ export default function PrivacyPolicy() {
             <Box>
               <Heading
                 as="h1"
-                size="3xl"
+                fontSize={{ base: "3xl", sm: "4xl", md: "5xl", lg: "6xl" }}
                 mb={4}
                 color="white"
                 fontWeight="extrabold"
