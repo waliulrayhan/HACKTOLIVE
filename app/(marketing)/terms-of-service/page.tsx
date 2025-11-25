@@ -56,14 +56,14 @@ export default function TermsOfService() {
   const bgColor = useColorModeValue('gray.50', 'gray.900')
   const cardBg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
-  const accentColor = useColorModeValue('blue.500', 'blue.300')
+  const accentColor = useColorModeValue('primary.500', 'primary.400')
 
   return (
     <Box>
       {/* Hero Section with Background Image */}
       <Box
         position="relative"
-        pt={{ base: 24, md: 32 }}
+        pt={{ base: 32, md: 40 }}
         pb={{ base: 16, md: 20 }}
         overflow="hidden"
         bgImage={{
@@ -95,8 +95,8 @@ export default function TermsOfService() {
           width="200px"
           height="200px"
           borderRadius="full"
-          bg="blue.400"
-          opacity={0.1}
+          bg="primary.400"
+          opacity={0.15}
           filter="blur(60px)"
           animation={`${floatingAnimation} 8s ease-in-out infinite`}
           zIndex={1}
@@ -108,8 +108,8 @@ export default function TermsOfService() {
           width="250px"
           height="250px"
           borderRadius="full"
-          bg="green.400"
-          opacity={0.1}
+          bg="secondary.400"
+          opacity={0.15}
           filter="blur(60px)"
           animation={`${floatingAnimation} 10s ease-in-out infinite 2s`}
           zIndex={1}
@@ -117,33 +117,34 @@ export default function TermsOfService() {
         
         <Container maxW="container.xl" position="relative" zIndex={2}>
           <VStack spacing={6} align="center" textAlign="center">
-            <Flex justify="center" mb={2}>
-              <Icon 
-                as={FiFileText} 
-                w={16} 
-                h={16} 
-                color="green.400"
+            <Box>
+              <Heading
+                as="h1"
+                size="3xl"
+                mb={4}
+                color="white"
+                fontWeight="extrabold"
+                lineHeight="1.2"
+              >
+                Terms of Service
+              </Heading>
+              <Box
+                width="120px"
+                height="4px"
+                bg="primary.400"
+                mx="auto"
+                borderRadius="full"
               />
-            </Flex>
-            <Heading
-              as="h1"
-              size="3xl"
-              mb={4}
-              color="white"
-              fontWeight="extrabold"
-              lineHeight="1.2"
-            >
-              Terms of Service
-            </Heading>
+            </Box>
             <Text 
               color="gray.300"
               fontSize="lg"
               maxW="2xl"
               mx="auto"
             >
-              Last Updated: November 25, 2025
+              Last Update: 13/09/2025
             </Text>
-            <Text 
+                        <Text 
               color="gray.400"
               fontSize="md"
               mt={2}

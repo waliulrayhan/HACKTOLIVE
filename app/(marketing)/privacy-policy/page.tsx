@@ -68,14 +68,14 @@ export default function PrivacyPolicy() {
   const bgColor = useColorModeValue('gray.50', 'gray.900')
   const cardBg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
-  const accentColor = useColorModeValue('blue.500', 'blue.300')
+  const accentColor = useColorModeValue('primary.500', 'primary.400')
 
   return (
     <Box>
       {/* Hero Section with Background Image */}
       <Box
         position="relative"
-        pt={{ base: 24, md: 32 }}
+        pt={{ base: 32, md: 40 }}
         pb={{ base: 16, md: 20 }}
         overflow="hidden"
         bgImage={{
@@ -99,58 +99,28 @@ export default function PrivacyPolicy() {
           zIndex: 1,
         }}
       >
-        {/* Geometric Shapes in Hero */}
-        <Box
-          position="absolute"
-          top="15%"
-          right="5%"
-          width="300px"
-          height="300px"
-          border="2px solid"
-          borderColor="blue.400"
-          borderRadius="20%"
-          opacity={0.1}
-          sx={{
-            animation: `${rotateAnimation} 30s linear infinite, ${pulseAnimation} 8s ease-in-out infinite`,
-          }}
-          zIndex={1}
-        />
-        <Box
-          position="absolute"
-          bottom="20%"
-          left="8%"
-          width="250px"
-          height="250px"
-          border="2px solid"
-          borderColor="green.400"
-          borderRadius="30%"
-          opacity={0.1}
-          sx={{
-            animation: `${rotateAnimation} 25s linear infinite reverse 1s, ${pulseAnimation} 6s ease-in-out infinite 1s`,
-          }}
-          zIndex={1}
-        />
         
         <Container maxW="container.xl" position="relative" zIndex={2}>
           <VStack spacing={6} align="center" textAlign="center">
-            <Flex justify="center" mb={2}>
-              <Icon 
-                as={FiShield} 
-                w={16} 
-                h={16} 
-                color="green.400"
+            <Box>
+              <Heading
+                as="h1"
+                size="3xl"
+                mb={4}
+                color="white"
+                fontWeight="extrabold"
+                lineHeight="1.2"
+              >
+                Privacy Policy
+              </Heading>
+              <Box
+                width="120px"
+                height="4px"
+                bg="primary.400"
+                mx="auto"
+                borderRadius="full"
               />
-            </Flex>
-            <Heading
-              as="h1"
-              size="3xl"
-              mb={4}
-              color="white"
-              fontWeight="extrabold"
-              lineHeight="1.2"
-            >
-              Privacy Policy
-            </Heading>
+            </Box>
             <Text 
               color="gray.300"
               fontSize="lg"
