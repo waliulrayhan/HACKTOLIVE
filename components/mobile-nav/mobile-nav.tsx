@@ -35,15 +35,15 @@ function NavLink({ href, children, isActive, ...rest }: NavLinkProps) {
   
   // Background colors
   const bgDefault = useColorModeValue('transparent', 'transparent')
-  const bgHover = useColorModeValue('purple.50', 'whiteAlpha.200')
-  const bgActive = useColorModeValue('purple.100', 'purple.900')
+  const bgHover = useColorModeValue('green.50', 'whiteAlpha.200')
+  const bgActive = useColorModeValue('green.100', 'green.900')
   
   // Text colors
   const textDefault = useColorModeValue('gray.700', 'gray.300')
-  const textActive = useColorModeValue('purple.700', 'purple.200')
+  const textActive = useColorModeValue('green.700', 'green.200')
   
   // Border colors
-  const borderActive = useColorModeValue('purple.500', 'purple.400')
+  const borderActive = useColorModeValue('green.500', 'green.400')
 
   const [, group] = href?.split('/') || []
   isActive = isActive ?? pathname?.includes(group)

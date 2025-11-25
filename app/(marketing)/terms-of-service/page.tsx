@@ -73,7 +73,7 @@ export default function TermsOfService() {
         left="0"
         right="0"
         bottom="0"
-        bgGradient="linear(45deg, purple.500, pink.500, blue.500, purple.500)"
+        bgGradient="linear(45deg, green.500, cyan.500, blue.500, green.500)"
         backgroundSize="400% 400%"
         sx={{
           animation: `${gradientAnimation} 15s ease infinite`,
@@ -103,7 +103,7 @@ export default function TermsOfService() {
         width="250px"
         height="250px"
         borderRadius="full"
-        bg={useColorModeValue('purple.100', 'purple.900')}
+        bg={useColorModeValue('green.100', 'green.900')}
         opacity={0.3}
         filter="blur(60px)"
         animation={`${floatingAnimation} 10s ease-in-out infinite 2s`}
@@ -140,7 +140,7 @@ export default function TermsOfService() {
               as="h1"
               size="3xl"
               mb={4}
-              bgGradient="linear(to-r, blue.400, purple.500)"
+              bgGradient="linear(to-r, blue.400, green.500)"
               bgClip="text"
               fontWeight="extrabold"
               lineHeight="1.2"
@@ -526,8 +526,8 @@ export default function TermsOfService() {
               borderWidth="2px"
               borderColor={accentColor}
               shadow="xl"
-              bgGradient="linear(to-br, blue.50, purple.50)"
-              _dark={{ bgGradient: 'linear(to-br, blue.900, purple.900)' }}
+              bgGradient="linear(to-br, blue.50, green.50)"
+              _dark={{ bgGradient: 'linear(to-br, blue.900, green.900)' }}
             >
               <Flex align="center" mb={4}>
                 <Icon as={FiMail} w={8} h={8} color={accentColor} mr={3} />

@@ -78,10 +78,10 @@ export const Footer: React.FC<FooterProps> = (props) => {
       },
       particles: {
         color: {
-          value: colorMode === 'dark' ? ['#6366f1', '#8b5cf6', '#3b82f6'] : ['#6366f1', '#8b5cf6', '#3b82f6'],
+          value: colorMode === 'dark' ? ['#a3ea2a', '#84cc16', '#06b6d4'] : ['#84cc16', '#6ba80f', '#06b6d4'],
         },
         links: {
-          color: colorMode === 'dark' ? '#6366f1' : '#3b82f6',
+          color: colorMode === 'dark' ? '#a3ea2a' : '#84cc16',
           distance: 120,
           enable: true,
           opacity: 0.4,
@@ -356,7 +356,7 @@ export const Footer: React.FC<FooterProps> = (props) => {
           aria-label="Back to top"
           icon={<FaArrowUp />}
           size="md"
-          colorScheme="blue"
+          colorScheme="primary"
           onClick={scrollToTop}
           boxShadow="lg"
           _hover={{

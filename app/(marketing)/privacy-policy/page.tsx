@@ -94,7 +94,7 @@ export default function PrivacyPolicy() {
           left="0"
           right="0"
           bottom="0"
-          bgGradient="radial(circle, blue.400 0%, purple.500 50%, transparent 70%)"
+          bgGradient="radial(circle, blue.400 0%, green.500 50%, transparent 70%)"
           animation={`${waveAnimation} 20s ease-in-out infinite`}
         />
       </Box>
@@ -122,7 +122,7 @@ export default function PrivacyPolicy() {
         width="300px"
         height="300px"
         border="2px solid"
-        borderColor={useColorModeValue('purple.200', 'purple.800')}
+        borderColor={useColorModeValue('green.200', 'green.800')}
         borderRadius="30%"
         opacity={0.2}
         sx={{
@@ -170,7 +170,7 @@ export default function PrivacyPolicy() {
         width="200px"
         height="200px"
         borderRadius="full"
-        bgGradient="radial(circle, purple.300, transparent)"
+        bgGradient="radial(circle, green.300, transparent)"
         opacity={0.4}
         filter="blur(40px)"
         sx={{
@@ -196,7 +196,7 @@ export default function PrivacyPolicy() {
               as="h1"
               size="3xl"
               mb={4}
-              bgGradient="linear(to-r, blue.400, purple.500)"
+              bgGradient="linear(to-r, blue.400, green.500)"
               bgClip="text"
               fontWeight="extrabold"
               lineHeight="1.2"
@@ -726,8 +726,8 @@ export default function PrivacyPolicy() {
               borderWidth="2px"
               borderColor={accentColor}
               shadow="xl"
-              bgGradient="linear(to-br, blue.50, purple.50)"
-              _dark={{ bgGradient: 'linear(to-br, blue.900, purple.900)' }}
+              bgGradient="linear(to-br, blue.50, green.50)"
+              _dark={{ bgGradient: 'linear(to-br, blue.900, green.900)' }}
             >
               <Flex align="center" mb={4}>
                 <Icon as={FiMail} w={8} h={8} color={accentColor} mr={3} />

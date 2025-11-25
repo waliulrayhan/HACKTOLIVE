@@ -262,7 +262,7 @@ const HighlightsSection = () => {
         name="Sarah Begum"
         description="Security Analyst"
         avatar="/static/images/avatar.jpg"
-        gradient={['pink.200', 'purple.500']}
+        gradient={['pink.200', 'green.500']}
       >
         "HackToLive Academy gave me the skills I needed to break into cybersecurity. 
         The Bengali instruction made complex topics clear, and the hands-on labs 
@@ -299,7 +299,7 @@ const HighlightsSection = () => {
             <Tag
               key={value}
               variant="subtle"
-              colorScheme="purple"
+              colorScheme="green"
               rounded="full"
               px="3"
             >
