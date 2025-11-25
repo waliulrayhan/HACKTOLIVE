@@ -31,6 +31,7 @@ import { FaGoogle, FaEye, FaEyeSlash, FaMoon, FaSun, FaHome } from 'react-icons/
 import { useState, useRef } from 'react'
 import ReCAPTCHA from 'react-google-recaptcha'
 import NextLink from 'next/link'
+import Image from 'next/image'
 
 const providers = {
   google: {
@@ -109,7 +110,104 @@ const Login: NextPage = () => {
         position="relative"
         overflow="hidden"
       >
-        <BackgroundGradient zIndex="0" opacity={0.3} />
+        {/* Animated Geometric Background */}
+        <Box
+          position="absolute"
+          top="0"
+          left="0"
+          right="0"
+          bottom="0"
+          zIndex={0}
+          pointerEvents="none"
+          overflow="hidden"
+        >
+          {/* Rotating geometric shapes */}
+          <Box
+            position="absolute"
+            top="15%"
+            left="15%"
+            w="150px"
+            h="150px"
+            border="2px solid"
+            borderColor="whiteAlpha.300"
+            transform="rotate(45deg)"
+            animation="rotateShape 20s linear infinite"
+          />
+          <Box
+            position="absolute"
+            top="60%"
+            right="20%"
+            w="100px"
+            h="100px"
+            borderRadius="50%"
+            border="2px solid"
+            borderColor="whiteAlpha.200"
+            animation="float 15s ease-in-out infinite"
+          />
+          <Box
+            position="absolute"
+            bottom="20%"
+            left="25%"
+            w="80px"
+            h="80px"
+            border="2px solid"
+            borderColor="whiteAlpha.300"
+            transform="rotate(30deg)"
+            animation="rotateShapeReverse 25s linear infinite"
+          />
+          {/* Animated lines */}
+          <Box
+            position="absolute"
+            top="30%"
+            left="0"
+            right="0"
+            h="1px"
+            bg="linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)"
+            animation="slideRight 8s linear infinite"
+          />
+          <Box
+            position="absolute"
+            top="70%"
+            left="0"
+            right="0"
+            h="1px"
+            bg="linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)"
+            animation="slideLeft 10s linear infinite"
+          />
+          {/* Floating dots */}
+          <Box
+            position="absolute"
+            top="25%"
+            right="30%"
+            w="8px"
+            h="8px"
+            borderRadius="full"
+            bg="whiteAlpha.400"
+            animation="floatDot 6s ease-in-out infinite"
+          />
+          <Box
+            position="absolute"
+            top="45%"
+            left="40%"
+            w="6px"
+            h="6px"
+            borderRadius="full"
+            bg="whiteAlpha.300"
+            animation="floatDot 8s ease-in-out infinite"
+            sx={{ animationDelay: '-2s' }}
+          />
+          <Box
+            position="absolute"
+            bottom="35%"
+            right="15%"
+            w="10px"
+            h="10px"
+            borderRadius="full"
+            bg="whiteAlpha.500"
+            animation="floatDot 7s ease-in-out infinite"
+            sx={{ animationDelay: '-4s' }}
+          />
+        </Box>
         
         {/* Back to Home Button */}
         <Button
@@ -154,21 +252,169 @@ const Login: NextPage = () => {
       <GridItem bg={rightBgColor} position="relative">
         <BackgroundGradient zIndex="-1" opacity={0.1} />
         
-        {/* Theme Toggle */}
-        <IconButton
-          aria-label="Toggle theme"
-          icon={colorMode === 'light' ? <FaMoon /> : <FaSun />}
-          onClick={toggleColorMode}
-          variant="ghost"
-          size="md"
+        {/* Animated Geometric Background for right column */}
+        <Box
+          position="absolute"
+          top="0"
+          left="0"
+          right="0"
+          bottom="0"
+          zIndex={0}
+          pointerEvents="none"
+          overflow="hidden"
+        >
+          {/* Rotating geometric shapes */}
+          <Box
+            position="absolute"
+            top="20%"
+            right="10%"
+            w="120px"
+            h="120px"
+            border="2px solid"
+            borderColor={colorMode === 'light' ? 'blue.200' : 'blue.500'}
+            borderRadius="20px"
+            transform="rotate(25deg)"
+            animation="rotateShape 18s linear infinite"
+            opacity={0.4}
+          />
+          <Box
+            position="absolute"
+            bottom="25%"
+            left="15%"
+            w="90px"
+            h="90px"
+            border="2px solid"
+            borderColor={colorMode === 'light' ? 'purple.200' : 'purple.500'}
+            borderRadius="50%"
+            animation="floatReverse 20s ease-in-out infinite"
+            opacity={0.3}
+          />
+          <Box
+            position="absolute"
+            top="50%"
+            left="5%"
+            w="60px"
+            h="60px"
+            border="2px solid"
+            borderColor={colorMode === 'light' ? 'cyan.200' : 'cyan.500'}
+            transform="rotate(60deg)"
+            animation="rotateShapeReverse 22s linear infinite"
+            opacity={0.35}
+          />
+          {/* Diagonal lines */}
+          <Box
+            position="absolute"
+            top="10%"
+            left="-10%"
+            w="150%"
+            h="1px"
+            bg={colorMode === 'light' 
+              ? 'linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent)'
+              : 'linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent)'
+            }
+            transform="rotate(-15deg)"
+            animation="slideRight 12s linear infinite"
+          />
+          <Box
+            position="absolute"
+            bottom="20%"
+            left="-10%"
+            w="150%"
+            h="1px"
+            bg={colorMode === 'light'
+              ? 'linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.2), transparent)'
+              : 'linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.3), transparent)'
+            }
+            transform="rotate(15deg)"
+            animation="slideLeft 15s linear infinite"
+          />
+          {/* Floating dots grid pattern */}
+          <Box
+            position="absolute"
+            top="15%"
+            left="20%"
+            w="6px"
+            h="6px"
+            borderRadius="full"
+            bg={colorMode === 'light' ? 'blue.300' : 'blue.400'}
+            animation="floatDot 5s ease-in-out infinite"
+            opacity={0.4}
+          />
+          <Box
+            position="absolute"
+            top="35%"
+            right="25%"
+            w="8px"
+            h="8px"
+            borderRadius="full"
+            bg={colorMode === 'light' ? 'purple.300' : 'purple.400'}
+            animation="floatDot 7s ease-in-out infinite"
+            sx={{ animationDelay: '-2s' }}
+            opacity={0.4}
+          />
+          <Box
+            position="absolute"
+            bottom="30%"
+            left="30%"
+            w="7px"
+            h="7px"
+            borderRadius="full"
+            bg={colorMode === 'light' ? 'cyan.300' : 'cyan.400'}
+            animation="floatDot 6s ease-in-out infinite"
+            sx={{ animationDelay: '-4s' }}
+            opacity={0.4}
+          />
+          <Box
+            position="absolute"
+            top="60%"
+            right="15%"
+            w="5px"
+            h="5px"
+            borderRadius="full"
+            bg={colorMode === 'light' ? 'pink.300' : 'pink.400'}
+            animation="floatDot 8s ease-in-out infinite"
+            sx={{ animationDelay: '-1s' }}
+            opacity={0.4}
+          />
+        </Box>
+        
+        {/* Header - Back to Home (mobile) and Theme Toggle */}
+        <Flex
           position="absolute"
           top={6}
+          left={{ base: 6, lg: 'auto' }}
           right={6}
+          justify={{ base: 'space-between', lg: 'flex-end' }}
+          align="center"
           zIndex={10}
-        />
+        >
+          <Button
+            as={NextLink}
+            href="/"
+            leftIcon={<FaHome />}
+            variant="ghost"
+            size="sm"
+            display={{ base: 'flex', lg: 'none' }}
+          >
+            Back to Home
+          </Button>
+          <IconButton
+            aria-label="Toggle theme"
+            icon={colorMode === 'light' ? <FaMoon /> : <FaSun />}
+            onClick={toggleColorMode}
+            variant="ghost"
+            size="md"
+          />
+        </Flex>
 
         {/* Form Content */}
-        <Flex minH="100vh" alignItems="center" justifyContent="center" px={{ base: 6, md: 12, lg: 16 }}>
+        <Flex 
+          minH="100vh" 
+          alignItems="center" 
+          justifyContent="center" 
+          px={{ base: 6, sm: 8, md: 12, lg: 16, xl: 20 }}
+          py={{ base: 20, lg: 12 }}
+        >
           <PageTransition width="100%">
             <Box maxW="md" w="full" mx="auto">
               <VStack spacing={6} align="stretch">
