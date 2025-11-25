@@ -289,7 +289,7 @@ const Signup: NextPage = () => {
           <BackgroundGradient zIndex="-1" opacity={0.1} />
           
           {/* Animated Geometric Background for right column */}
-          <Box
+          {/* <Box
             position="absolute"
             top="0"
             left="0"
@@ -299,9 +299,9 @@ const Signup: NextPage = () => {
             pointerEvents="none"
             overflow="hidden"
             opacity={{ base: 0.1, md: 0.5, lg: 1 }}
-          >
+          > */}
             {/* Rotating geometric shapes */}
-            <Box
+            {/* <Box
               position="absolute"
               top="20%"
               right="10%"
@@ -337,9 +337,9 @@ const Signup: NextPage = () => {
               transform="rotate(60deg)"
               animation="rotateShapeReverse 22s linear infinite"
               opacity={0.35}
-            />
+            /> */}
             {/* Diagonal lines */}
-            <Box
+            {/* <Box
               position="absolute"
               top="10%"
               left="-10%"
@@ -364,9 +364,9 @@ const Signup: NextPage = () => {
               }
               transform="rotate(15deg)"
               animation="slideLeft 15s linear infinite"
-            />
+            /> */}
             {/* Floating dots grid pattern */}
-            <Box
+            {/* <Box
               position="absolute"
               top="15%"
               left="20%"
@@ -413,7 +413,7 @@ const Signup: NextPage = () => {
               sx={{ animationDelay: '-1s' }}
               opacity={0.4}
             />
-          </Box>
+          </Box> */}
           
           <Flex
             position="absolute"

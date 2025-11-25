@@ -254,10 +254,10 @@ const Login: NextPage = () => {
 
       {/* Right Column - Form Section */}
       <GridItem bg={rightBgColor} position="relative">
-        <BackgroundGradient zIndex="-1" opacity={0.1} />
+        {/* <BackgroundGradient zIndex="-1" opacity={0.1} /> */}
         
         {/* Animated Geometric Background for right column */}
-        <Box
+        {/* <Box
           position="absolute"
           top="0"
           left="0"
@@ -267,9 +267,9 @@ const Login: NextPage = () => {
           pointerEvents="none"
           overflow="hidden"
           opacity={{ base: 0.1, md: 0.5, lg: 1 }}
-        >
+        > */}
           {/* Rotating geometric shapes */}
-          <Box
+          {/* <Box
             position="absolute"
             top="20%"
             right="10%"
@@ -305,9 +305,9 @@ const Login: NextPage = () => {
             transform="rotate(60deg)"
             animation="rotateShapeReverse 22s linear infinite"
             opacity={0.35}
-          />
+          /> */}
           {/* Diagonal lines */}
-          <Box
+          {/* <Box
             position="absolute"
             top="10%"
             left="-10%"
@@ -332,9 +332,9 @@ const Login: NextPage = () => {
             }
             transform="rotate(15deg)"
             animation="slideLeft 15s linear infinite"
-          />
+          /> */}
           {/* Floating dots grid pattern */}
-          <Box
+          {/* <Box
             position="absolute"
             top="15%"
             left="20%"
@@ -344,8 +344,8 @@ const Login: NextPage = () => {
             bg={colorMode === 'light' ? 'blue.300' : 'blue.400'}
             animation="floatDot 5s ease-in-out infinite"
             opacity={0.4}
-          />
-          <Box
+          /> */}
+          {/* <Box
             position="absolute"
             top="35%"
             right="25%"
@@ -356,8 +356,8 @@ const Login: NextPage = () => {
             animation="floatDot 7s ease-in-out infinite"
             sx={{ animationDelay: '-2s' }}
             opacity={0.4}
-          />
-          <Box
+          /> */}
+          {/* <Box
             position="absolute"
             bottom="30%"
             left="30%"
@@ -368,8 +368,8 @@ const Login: NextPage = () => {
             animation="floatDot 6s ease-in-out infinite"
             sx={{ animationDelay: '-4s' }}
             opacity={0.4}
-          />
-          <Box
+          /> */}
+          {/* <Box
             position="absolute"
             top="60%"
             right="15%"
@@ -380,8 +380,8 @@ const Login: NextPage = () => {
             animation="floatDot 8s ease-in-out infinite"
             sx={{ animationDelay: '-1s' }}
             opacity={0.4}
-          />
-        </Box>
+          /> */}
+        {/* </Box> */}
         
         {/* Header - Back to Home (mobile) and Theme Toggle */}
         <Flex
