@@ -15,6 +15,7 @@ import {
   VStack,
   Wrap,
   useClipboard,
+  useColorModeValue,
 } from '@chakra-ui/react'
 import { Br, Link } from '@saas-ui/react'
 import type { Metadata, NextPage } from 'next'
@@ -69,6 +70,8 @@ const Home: NextPage = () => {
     <Box>
       <HeroSection />
 
+      <BenefitsSection />
+
       <HighlightsSection />
 
       <FeaturesSection />
@@ -83,6 +86,9 @@ const Home: NextPage = () => {
 }
 
 const HeroSection: React.FC = () => {
+  const overlayBg = useColorModeValue('whiteAlpha.800', 'blackAlpha.700')
+  const videoFilter = useColorModeValue('brightness(1.2) contrast(0.9)', 'brightness(0.7)')
+  
   return (
     <Box position="relative" overflow="hidden">
       {/* Background Video */}
@@ -110,20 +116,20 @@ const HeroSection: React.FC = () => {
           height="auto"
           transform="translate(-50%, -50%)"
           objectFit="cover"
+          filter={videoFilter}
         >
           <source src="/sample vedio.mp4" type="video/mp4" />
         </Box>
-        {/* Dark overlay for better text readability */}
+        {/* Adaptive overlay for better text readability */}
         <Box
           position="absolute"
           top="0"
           left="0"
           width="100%"
           height="100%"
-          bg="blackAlpha.600"
+          bg={overlayBg}
         />
       </Box>
-      <BackgroundGradient height="100%" zIndex="-1" opacity="0.3" />
       <Container maxW="container.xl" pt={{ base: 52, lg: 72 }} pb="40">
         <Stack direction={{ base: 'column', lg: 'row' }} alignItems="center">
           <Hero
@@ -199,13 +205,18 @@ const HeroSection: React.FC = () => {
           </Box>
         </Stack>
       </Container>
+    </Box>
+  )
+}
 
+const BenefitsSection = () => {
+  return (
+    <Box py="20">
       <Features
         id="benefits"
         columns={[1, 2, 4]}
         iconSize={4}
         innerWidth="container.xl"
-        pt="20"
         features={[
           {
             title: 'Bengali Learning',
