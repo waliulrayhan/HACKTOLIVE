@@ -15,6 +15,7 @@ import {
   Flex,
 } from '@chakra-ui/react'
 import { keyframes } from '@emotion/react'
+import { useEffect } from 'react'
 import { 
   FiShield, 
   FiDatabase, 
@@ -69,6 +70,23 @@ export default function PrivacyPolicy() {
   const cardBg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
   const accentColor = useColorModeValue('primary.500', 'primary.400')
+  const headerBg = useColorModeValue('white', 'rgba(29, 32, 37, 0.95)')
+
+  useEffect(() => {
+    const header = document.querySelector('header')
+    if (header) {
+      header.style.backgroundColor = headerBg
+      header.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+      header.style.borderBottomWidth = '1px'
+    }
+    return () => {
+      if (header) {
+        header.style.backgroundColor = ''
+        header.style.boxShadow = ''
+        header.style.borderBottomWidth = ''
+      }
+    }
+  }, [headerBg])
 
   return (
     <Box>
