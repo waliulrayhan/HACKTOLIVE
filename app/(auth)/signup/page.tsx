@@ -18,19 +18,20 @@ import {
   Divider,
   Text,
   Heading,
-  Stack,
+  useColorMode,
+  Grid,
+  GridItem,
+  Flex,
 } from '@chakra-ui/react'
 import { Link } from '@saas-ui/react'
 import { BackgroundGradient } from 'components/gradients/background-gradient'
 import { PageTransition } from 'components/motion/page-transition'
-import { Section } from 'components/section'
-import { Features } from 'components/features'
+import { Header } from 'components/layout/header'
 import { NextPage } from 'next'
 import { FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { useState, useRef } from 'react'
 import ReCAPTCHA from 'react-google-recaptcha'
 import NextLink from 'next/link'
-import siteConfig from 'data/config'
 
 const Signup: NextPage = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -53,6 +54,9 @@ const Signup: NextPage = () => {
   })
   const recaptchaRef = useRef<ReCAPTCHA>(null)
   const captchaTheme = useColorModeValue('light', 'dark')
+  const leftBgColor = useColorModeValue('blue.600', 'blue.900')
+  const rightBgColor = useColorModeValue('white', 'gray.800')
+  const { colorMode, toggleColorMode } = useColorMode()
 
   const handleCaptchaChange = (value: string | null) => {
     setCaptchaValue(value)
@@ -146,255 +150,480 @@ const Signup: NextPage = () => {
   }
 
   return (
-    <Section 
-      minHeight="calc(100vh - 200px)" 
-      innerWidth="container.xl" 
-      display="flex" 
-      alignItems="center" 
-      justifyContent="center"
-    >
-      <BackgroundGradient 
-        zIndex="-1"
-        width={{ base: 'full', lg: '50%' }}
-        left="auto"
-        right="0"
-        borderLeftWidth="1px"
-        borderColor="gray.200"
-        _dark={{
-          borderColor: 'gray.700',
-        }}
-      />
-
-      <PageTransition width="100%" display="flex" alignItems="center" justifyContent="center">
-        <Stack
-          width="100%"
+    <>
+      <Header />
+      <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} minH="100vh">
+        {/* Left Column - Logo Section */}
+        <GridItem 
+          bg={leftBgColor}
+          display={{ base: 'none', lg: 'flex' }}
           alignItems="center"
-          spacing={{ base: '8', lg: '20' }}
-          flexDirection={{ base: 'column', lg: 'row' }}
           justifyContent="center"
-          py={{ base: '0', md: '0' }}
+          position="relative"
+          overflow="hidden"
         >
-          {/* Left Side - Features (Desktop only) */}
-          <Box pe={{ base: '0', lg: '20' }} width={{ base: '100%', lg: 'auto' }}>
-            {/* <NextLink href="/">
-              <Box
-                as={siteConfig.logo}
-                width="160px"
-                ms={{ base: '0', lg: '4' }}
-                mb={{ base: '8', lg: 16 }}
-                mx={{ base: 'auto', lg: '0' }}
-              />
-            </NextLink> */}
-            <Features
-              display={{ base: 'none', lg: 'flex' }}
-              columns={1}
-              iconSize={4}
-              flex="1"
-              py="0"
-              ps="0"
-              maxW={{ base: '100%', xl: '80%' }}
-              features={siteConfig.signup.features.map((feature) => ({
-                iconPosition: 'left',
-                variant: 'left-icon',
-                ...feature,
-              }))}
+          {/* Animated Geometric Background */}
+          <Box
+            position="absolute"
+            top="0"
+            left="0"
+            right="0"
+            bottom="0"
+            zIndex={0}
+            pointerEvents="none"
+            overflow="hidden"
+            opacity={{ base: 0.3, lg: 1 }}
+          >
+            {/* Rotating geometric shapes */}
+            <Box
+              position="absolute"
+              top="15%"
+              left="15%"
+              w="150px"
+              h="150px"
+              border="2px solid"
+              borderColor="whiteAlpha.300"
+              transform="rotate(45deg)"
+              animation="rotateShape 20s linear infinite"
+            />
+            <Box
+              position="absolute"
+              top="60%"
+              right="20%"
+              w="100px"
+              h="100px"
+              borderRadius="50%"
+              border="2px solid"
+              borderColor="whiteAlpha.200"
+              animation="float 15s ease-in-out infinite"
+            />
+            <Box
+              position="absolute"
+              bottom="20%"
+              left="25%"
+              w="80px"
+              h="80px"
+              border="2px solid"
+              borderColor="whiteAlpha.300"
+              transform="rotate(30deg)"
+              animation="rotateShapeReverse 25s linear infinite"
+            />
+            {/* Animated lines */}
+            <Box
+              position="absolute"
+              top="30%"
+              left="0"
+              right="0"
+              h="1px"
+              bg="linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)"
+              animation="slideRight 8s linear infinite"
+            />
+            <Box
+              position="absolute"
+              top="70%"
+              left="0"
+              right="0"
+              h="1px"
+              bg="linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)"
+              animation="slideLeft 10s linear infinite"
+            />
+            {/* Floating dots */}
+            <Box
+              position="absolute"
+              top="25%"
+              right="30%"
+              w="8px"
+              h="8px"
+              borderRadius="full"
+              bg="whiteAlpha.400"
+              animation="floatDot 6s ease-in-out infinite"
+            />
+            <Box
+              position="absolute"
+              top="45%"
+              left="40%"
+              w="6px"
+              h="6px"
+              borderRadius="full"
+              bg="whiteAlpha.300"
+              animation="floatDot 8s ease-in-out infinite"
+              sx={{ animationDelay: '-2s' }}
+            />
+            <Box
+              position="absolute"
+              bottom="35%"
+              right="15%"
+              w="10px"
+              h="10px"
+              borderRadius="full"
+              bg="whiteAlpha.500"
+              animation="floatDot 7s ease-in-out infinite"
+              sx={{ animationDelay: '-4s' }}
             />
           </Box>
-
-          {/* Right Side - Signup Form */}
-          <Center height="100%" flex="1" width="100%">
+          
+          <VStack spacing={4} zIndex={1} px={8}>
             <Box 
-              width={{ base: '100%', sm: 'container.sm' }} 
-              maxW="100%"
-              pt={{ base: '0', md: '8' }}
+              fontSize="6xl" 
+              fontWeight="bold" 
+              color="white"
+              bg="blue.500"
+              px={6}
+              py={4}
+              borderRadius="xl"
+              boxShadow="2xl"
             >
-              <VStack spacing={6} align="stretch">
-                {/* Title */}
-                <Heading size="lg" textAlign="center">
-                  Sign up
-                </Heading>
+              |||
+            </Box>
+            <Heading size="2xl" color="white" textAlign="center">
+              TailAdmin
+            </Heading>
+            <Text color="whiteAlpha.900" fontSize="lg" textAlign="center" maxW="md">
+              Free and Open-Source Tailwind CSS Admin Dashboard Template
+            </Text>
+          </VStack>
+        </GridItem>
 
-                {/* Signup Form */}
-                <form onSubmit={handleSubmit}>
-                <VStack spacing={4}>
-                  {/* Name Field */}
-                  <FormControl isInvalid={!!errors.name}>
-                    <FormLabel htmlFor="name">Name</FormLabel>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="Enter your full name"
-                      value={formData.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
-                      size="lg"
-                    />
-                    <FormErrorMessage>{errors.name}</FormErrorMessage>
-                  </FormControl>
+        {/* Right Column - Form Section */}
+        <GridItem bg={rightBgColor} position="relative">
+          <BackgroundGradient zIndex="-1" opacity={0.1} />
+          
+          {/* Animated Geometric Background for right column */}
+          <Box
+            position="absolute"
+            top="0"
+            left="0"
+            right="0"
+            bottom="0"
+            zIndex={0}
+            pointerEvents="none"
+            overflow="hidden"
+            opacity={{ base: 0.1, md: 0.5, lg: 1 }}
+          >
+            {/* Rotating geometric shapes */}
+            <Box
+              position="absolute"
+              top="20%"
+              right="10%"
+              w="120px"
+              h="120px"
+              border="2px solid"
+              borderColor={colorMode === 'light' ? 'blue.200' : 'blue.500'}
+              borderRadius="20px"
+              transform="rotate(25deg)"
+              animation="rotateShape 18s linear infinite"
+              opacity={0.4}
+            />
+            <Box
+              position="absolute"
+              bottom="25%"
+              left="15%"
+              w="90px"
+              h="90px"
+              border="2px solid"
+              borderColor={colorMode === 'light' ? 'purple.200' : 'purple.500'}
+              borderRadius="50%"
+              animation="floatReverse 20s ease-in-out infinite"
+              opacity={0.3}
+            />
+            <Box
+              position="absolute"
+              top="50%"
+              left="5%"
+              w="60px"
+              h="60px"
+              border="2px solid"
+              borderColor={colorMode === 'light' ? 'cyan.200' : 'cyan.500'}
+              transform="rotate(60deg)"
+              animation="rotateShapeReverse 22s linear infinite"
+              opacity={0.35}
+            />
+            {/* Diagonal lines */}
+            <Box
+              position="absolute"
+              top="10%"
+              left="-10%"
+              w="150%"
+              h="1px"
+              bg={colorMode === 'light' 
+                ? 'linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent)'
+                : 'linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent)'
+              }
+              transform="rotate(-15deg)"
+              animation="slideRight 12s linear infinite"
+            />
+            <Box
+              position="absolute"
+              bottom="20%"
+              left="-10%"
+              w="150%"
+              h="1px"
+              bg={colorMode === 'light'
+                ? 'linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.2), transparent)'
+                : 'linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.3), transparent)'
+              }
+              transform="rotate(15deg)"
+              animation="slideLeft 15s linear infinite"
+            />
+            {/* Floating dots grid pattern */}
+            <Box
+              position="absolute"
+              top="15%"
+              left="20%"
+              w="6px"
+              h="6px"
+              borderRadius="full"
+              bg={colorMode === 'light' ? 'blue.300' : 'blue.400'}
+              animation="floatDot 5s ease-in-out infinite"
+              opacity={0.4}
+            />
+            <Box
+              position="absolute"
+              top="35%"
+              right="25%"
+              w="8px"
+              h="8px"
+              borderRadius="full"
+              bg={colorMode === 'light' ? 'purple.300' : 'purple.400'}
+              animation="floatDot 7s ease-in-out infinite"
+              sx={{ animationDelay: '-2s' }}
+              opacity={0.4}
+            />
+            <Box
+              position="absolute"
+              bottom="30%"
+              left="30%"
+              w="7px"
+              h="7px"
+              borderRadius="full"
+              bg={colorMode === 'light' ? 'cyan.300' : 'cyan.400'}
+              animation="floatDot 6s ease-in-out infinite"
+              sx={{ animationDelay: '-4s' }}
+              opacity={0.4}
+            />
+            <Box
+              position="absolute"
+              top="60%"
+              right="15%"
+              w="5px"
+              h="5px"
+              borderRadius="full"
+              bg={colorMode === 'light' ? 'pink.300' : 'pink.400'}
+              animation="floatDot 8s ease-in-out infinite"
+              sx={{ animationDelay: '-1s' }}
+              opacity={0.4}
+            />
+          </Box>
+          
+          <Flex
+            position="absolute"
+            top={6}
+            left={{ base: 6, lg: 'auto' }}
+            right={6}
+            justify={{ base: 'space-between', lg: 'flex-end' }}
+            align="center"
+            zIndex={10}
+          >
+          </Flex>
 
-                  {/* Email Field */}
-                  <FormControl isInvalid={!!errors.email}>
-                    <FormLabel htmlFor="email">Email</FormLabel>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      size="lg"
-                    />
-                    <FormErrorMessage>{errors.email}</FormErrorMessage>
-                  </FormControl>
+          {/* Form Content */}
+          <Flex 
+            minH="100vh" 
+            alignItems="center" 
+            justifyContent="center" 
+            px={{ base: 6, sm: 8, md: 12, lg: 16, xl: 20 }}
+            py={{ base: 20, lg: 12 }}
+          >
+            <PageTransition width="100%">
+              <Box maxW="md" w="full" mx="auto">
+                <VStack spacing={6} align="stretch">
+                  {/* Title */}
+                  <Heading size="lg" textAlign="center">
+                    Create your account
+                  </Heading>
 
-                  {/* Password Field */}
-                  <FormControl isInvalid={!!errors.password}>
-                    <FormLabel htmlFor="password">Password</FormLabel>
-                    <InputGroup size="lg">
-                      <Input
-                        id="password"
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder="Create a password"
-                        value={formData.password}
-                        onChange={(e) => handleInputChange('password', e.target.value)}
-                      />
-                      <InputRightElement>
-                        <IconButton
-                          aria-label={showPassword ? 'Hide password' : 'Show password'}
-                          icon={showPassword ? <FaEyeSlash /> : <FaEye />}
-                          onClick={() => setShowPassword(!showPassword)}
-                          variant="ghost"
-                          size="sm"
-                          _hover={{ bg: 'transparent' }}
+                  {/* Signup Form */}
+                  <form onSubmit={handleSubmit}>
+                    <VStack spacing={4}>
+                      {/* Name Field */}
+                      <FormControl isInvalid={!!errors.name}>
+                        <FormLabel htmlFor="name">Name</FormLabel>
+                        <Input
+                          id="name"
+                          type="text"
+                          placeholder="Enter your full name"
+                          value={formData.name}
+                          onChange={(e) => handleInputChange('name', e.target.value)}
+                          size="lg"
                         />
-                      </InputRightElement>
-                    </InputGroup>
-                    <FormErrorMessage>{errors.password}</FormErrorMessage>
-                  </FormControl>
+                        <FormErrorMessage>{errors.name}</FormErrorMessage>
+                      </FormControl>
 
-                  {/* Confirm Password Field */}
-                  <FormControl isInvalid={!!errors.confirmPassword}>
-                    <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
-                    <InputGroup size="lg">
-                      <Input
-                        id="confirmPassword"
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        placeholder="Confirm your password"
-                        value={formData.confirmPassword}
-                        onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                      />
-                      <InputRightElement>
-                        <IconButton
-                          aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                          icon={showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          variant="ghost"
-                          size="sm"
-                          _hover={{ bg: 'transparent' }}
+                      {/* Email Field */}
+                      <FormControl isInvalid={!!errors.email}>
+                        <FormLabel htmlFor="email">Email</FormLabel>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="Enter your email"
+                          value={formData.email}
+                          onChange={(e) => handleInputChange('email', e.target.value)}
+                          size="lg"
                         />
-                      </InputRightElement>
-                    </InputGroup>
-                    <FormErrorMessage>{errors.confirmPassword}</FormErrorMessage>
-                  </FormControl>
+                        <FormErrorMessage>{errors.email}</FormErrorMessage>
+                      </FormControl>
 
-                  {/* reCAPTCHA */}
-                  {/* <FormControl isInvalid={!!errors.captcha}>
-                    <Box display="flex" justifyContent="center" my={2}>
-                      <ReCAPTCHA
-                        ref={recaptchaRef}
-                        sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
-                        onChange={handleCaptchaChange}
-                        theme={captchaTheme}
-                      />
-                    </Box>
-                    <FormErrorMessage justifyContent="center">{errors.captcha}</FormErrorMessage>
-                  </FormControl> */}
+                      {/* Password Field */}
+                      <FormControl isInvalid={!!errors.password}>
+                        <FormLabel htmlFor="password">Password</FormLabel>
+                        <InputGroup size="lg">
+                          <Input
+                            id="password"
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Create a password"
+                            value={formData.password}
+                            onChange={(e) => handleInputChange('password', e.target.value)}
+                          />
+                          <InputRightElement>
+                            <IconButton
+                              aria-label={showPassword ? 'Hide password' : 'Show password'}
+                              icon={showPassword ? <FaEyeSlash /> : <FaEye />}
+                              onClick={() => setShowPassword(!showPassword)}
+                              variant="ghost"
+                              size="sm"
+                              _hover={{ bg: 'transparent' }}
+                            />
+                          </InputRightElement>
+                        </InputGroup>
+                        <FormErrorMessage>{errors.password}</FormErrorMessage>
+                      </FormControl>
 
-                  {/* Terms and Conditions */}
-                  <FormControl isInvalid={!!errors.terms}>
-                    <Checkbox
-                      isChecked={agreeToTerms}
-                      onChange={(e) => {
-                        setAgreeToTerms(e.target.checked)
-                        if (e.target.checked) {
-                          setErrors(prev => ({ ...prev, terms: '' }))
-                        }
-                      }}
-                      size="md"
-                    >
-                      <Text fontSize="sm">
-                        I agree to the{' '}
-                        <Link
-                          as={NextLink}
-                          href="/terms"
-                          color="blue.500"
-                          _hover={{ color: 'blue.600', textDecoration: 'underline' }}
+                      {/* Confirm Password Field */}
+                      <FormControl isInvalid={!!errors.confirmPassword}>
+                        <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
+                        <InputGroup size="lg">
+                          <Input
+                            id="confirmPassword"
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            placeholder="Confirm your password"
+                            value={formData.confirmPassword}
+                            onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                          />
+                          <InputRightElement>
+                            <IconButton
+                              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                              icon={showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              variant="ghost"
+                              size="sm"
+                              _hover={{ bg: 'transparent' }}
+                            />
+                          </InputRightElement>
+                        </InputGroup>
+                        <FormErrorMessage>{errors.confirmPassword}</FormErrorMessage>
+                      </FormControl>
+
+                      {/* reCAPTCHA */}
+                      {/* <FormControl isInvalid={!!errors.captcha}>
+                        <Box display="flex" justifyContent="center" my={2}>
+                          <ReCAPTCHA
+                            ref={recaptchaRef}
+                            sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+                            onChange={handleCaptchaChange}
+                            theme={captchaTheme}
+                          />
+                        </Box>
+                        <FormErrorMessage justifyContent="center">{errors.captcha}</FormErrorMessage>
+                      </FormControl> */}
+
+                      {/* Terms and Conditions */}
+                      <FormControl isInvalid={!!errors.terms}>
+                        <Checkbox
+                          isChecked={agreeToTerms}
+                          onChange={(e) => {
+                            setAgreeToTerms(e.target.checked)
+                            if (e.target.checked) {
+                              setErrors(prev => ({ ...prev, terms: '' }))
+                            }
+                          }}
+                          size="md"
                         >
-                          Terms of Service
-                        </Link>
-                        {' '}and{' '}
-                        <Link
-                          as={NextLink}
-                          href="/privacy"
-                          color="blue.500"
-                          _hover={{ color: 'blue.600', textDecoration: 'underline' }}
-                        >
-                          Privacy Policy
-                        </Link>
-                      </Text>
-                    </Checkbox>
-                    <FormErrorMessage>{errors.terms}</FormErrorMessage>
-                  </FormControl>
+                          <Text fontSize="sm">
+                            I agree to the{' '}
+                            <Link
+                              as={NextLink}
+                              href="/terms"
+                              color="blue.500"
+                              _hover={{ color: 'blue.600', textDecoration: 'underline' }}
+                            >
+                              Terms of Service
+                            </Link>
+                            {' '}and{' '}
+                            <Link
+                              as={NextLink}
+                              href="/privacy"
+                              color="blue.500"
+                              _hover={{ color: 'blue.600', textDecoration: 'underline' }}
+                            >
+                              Privacy Policy
+                            </Link>
+                          </Text>
+                        </Checkbox>
+                        <FormErrorMessage>{errors.terms}</FormErrorMessage>
+                      </FormControl>
 
-                  {/* Signup Button */}
+                      {/* Signup Button */}
+                      <Button
+                        type="submit"
+                        colorScheme="primary"
+                        size="lg"
+                        w="full"
+                      >
+                        Sign up
+                      </Button>
+                    </VStack>
+                  </form>
+
+                  {/* Divider */}
+                  <HStack>
+                    <Divider />
+                    <Text fontSize="sm" color="muted" whiteSpace="nowrap">
+                      or continue with
+                    </Text>
+                    <Divider />
+                  </HStack>
+
+                  {/* Google Sign Up Button */}
                   <Button
-                    type="submit"
-                    colorScheme="primary"
+                    leftIcon={<FaGoogle />}
+                    onClick={handleGoogleSignup}
+                    variant="outline"
                     size="lg"
                     w="full"
                   >
-                    Sign up
+                    Continue with Google
                   </Button>
+
+                  {/* Login Link */}
+                  <Text textAlign="center" fontSize="sm" color="muted">
+                    Already have an account?{' '}
+                    <Link
+                      as={NextLink}
+                      href="/login"
+                      color="blue.500"
+                      fontWeight="semibold"
+                      _hover={{ color: 'blue.600', textDecoration: 'underline' }}
+                    >
+                      Log in
+                    </Link>
+                  </Text>
                 </VStack>
-              </form>
-
-              {/* Divider */}
-              <HStack>
-                <Divider />
-                <Text fontSize="sm" color="muted" whiteSpace="nowrap">
-                  or continue with
-                </Text>
-                <Divider />
-              </HStack>
-
-              {/* Google Sign Up Button */}
-              <Button
-                leftIcon={<FaGoogle />}
-                onClick={handleGoogleSignup}
-                variant="outline"
-                size="lg"
-                w="full"
-              >
-                Continue with Google
-              </Button>
-
-              {/* Login Link */}
-              <Text textAlign="center" fontSize="sm" color="muted">
-                Already have an account?{' '}
-                <Link
-                  as={NextLink}
-                  href="/login"
-                  color="blue.500"
-                  fontWeight="semibold"
-                  _hover={{ color: 'blue.600', textDecoration: 'underline' }}
-                >
-                  Log in
-                </Link>
-              </Text>
-            </VStack>
-          </Box>
-        </Center>
-      </Stack>
-    </PageTransition>
-    </Section>
+              </Box>
+            </PageTransition>
+          </Flex>
+        </GridItem>
+      </Grid>
+    </>
   )
 }
 
