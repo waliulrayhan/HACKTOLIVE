@@ -33,6 +33,7 @@ import { FaGoogle, FaEye, FaEyeSlash, FaMoon, FaSun, FaHome } from 'react-icons/
 import { useState, useRef } from 'react'
 import ReCAPTCHA from 'react-google-recaptcha'
 import NextLink from 'next/link'
+import { useRouter } from 'next/navigation'
 
 const providers = {
   google: {
@@ -42,6 +43,7 @@ const providers = {
 }
 
 const Login: NextPage = () => {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [keepSignedIn, setKeepSignedIn] = useState(false)
   const [captchaValue, setCaptchaValue] = useState<string | null>(null)
@@ -81,10 +83,11 @@ const Login: NextPage = () => {
       hasError = true
     }
 
-    if (!captchaValue) {
-      newErrors.captcha = 'Please complete the captcha'
-      hasError = true
-    }
+    // Captcha validation removed for dummy login
+    // if (!captchaValue) {
+    //   newErrors.captcha = 'Please complete the captcha'
+    //   hasError = true
+    // }
 
     if (hasError) {
       setErrors(newErrors)
@@ -93,6 +96,9 @@ const Login: NextPage = () => {
 
     // Handle login logic here
     console.log('Login:', { email, password, keepSignedIn, captchaValue })
+    
+    // Redirect to dashboard
+    router.push('/dashboard')
   }
 
   const handleGoogleLogin = () => {
