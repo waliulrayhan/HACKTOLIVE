@@ -304,26 +304,28 @@ const AppSidebar: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`py-8 flex  ${
-          !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+        className={`py-8 hidden lg:flex  ${
+          !isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-center"
         }`}
       >
-        <Link href="/">
-          {isExpanded || isHovered || isMobileOpen ? (
+        <Link href="/" className="flex items-center justify-center">
+          {isExpanded || isHovered ? (
             <>
               <Image
-                className="dark:hidden"
-                src="/images/logo/logo.svg"
-                alt="Logo"
-                width={150}
-                height={40}
+                src="/logo_black.png"
+                alt="HackToLive Logo"
+                width={120}
+                height={30}
+                className="dark:hidden object-contain w-auto h-[30px]"
+                priority
               />
               <Image
-                className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
-                alt="Logo"
-                width={150}
-                height={40}
+                src="/logo_white.png"
+                alt="HackToLive Logo"
+                width={120}
+                height={30}
+                className="hidden dark:block object-contain w-auto h-[30px]"
+                priority
               />
             </>
           ) : (
@@ -332,6 +334,7 @@ const AppSidebar: React.FC = () => {
               alt="Logo"
               width={32}
               height={32}
+              className="w-8 h-8"
             />
           )}
         </Link>
@@ -341,7 +344,7 @@ const AppSidebar: React.FC = () => {
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-4 mt-4 lg:mt-0 text-xs uppercase flex leading-[20px] text-gray-400 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"

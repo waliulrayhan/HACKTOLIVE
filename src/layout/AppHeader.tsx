@@ -87,16 +87,18 @@ const AppHeader: React.FC = () => {
             <Image
               width={154}
               height={32}
-              className="dark:hidden"
-              src="./images/logo/logo.svg"
-              alt="Logo"
+              className="dark:hidden object-contain h-[25px] w-auto"
+              src="/logo_black.png"
+              alt="HackToLive Logo"
+              priority
             />
             <Image
               width={154}
               height={32}
-              className="hidden dark:block"
-              src="./images/logo/logo-dark.svg"
-              alt="Logo"
+              className="hidden dark:block object-contain h-[25px] w-auto"
+              src="/logo_white.png"
+              alt="HackToLive Logo"
+              priority
             />
           </Link>
 
