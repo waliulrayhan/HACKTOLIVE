@@ -51,11 +51,13 @@ export default function ContactPage() {
 
   const cardBg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
-  const iconBg = useColorModeValue('green.50', 'green.900')
-  const iconColor = useColorModeValue('green.500', 'green.400')
+  const iconBg = useColorModeValue('primary.50', 'primary.900')
+  const iconColor = useColorModeValue('primary.500', 'primary.400')
   const mutedColor = useColorModeValue('gray.600', 'gray.400')
   const inputBg = useColorModeValue('white', 'gray.700')
   const inputBorder = useColorModeValue('gray.300', 'gray.600')
+  const accentBg = useColorModeValue('primary.500', 'primary.400')
+  const dividerColor = useColorModeValue('primary.500', 'primary.400')
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -128,14 +130,25 @@ export default function ContactPage() {
         <Container maxW="container.xl" position="relative" zIndex={1}>
           <FallInPlace>
             <VStack spacing={4} textAlign="center" maxW="3xl" mx="auto">
-              <Heading
-                as="h1"
-                fontSize={{ base: '4xl', md: '5xl', lg: '6xl' }}
-                fontWeight="bold"
-                lineHeight="1.2"
-              >
-                Get in Touch
-              </Heading>
+              <Box>
+                <Heading
+                  as="h1"
+                  fontSize={{ base: '4xl', md: '5xl', lg: '6xl' }}
+                  fontWeight="bold"
+                  lineHeight="1.2"
+                  mb={4}
+                  mt={{ base: 10, md: 0 }}
+                >
+                  Get in Touch
+                </Heading>
+                <Box
+                  width="120px"
+                  height="4px"
+                  bg={dividerColor}
+                  mx="auto"
+                  borderRadius="full"
+                />
+              </Box>
               <Text fontSize={{ base: 'lg', md: 'xl' }} color={mutedColor}>
                 Have questions about our services or courses? We're here to help.
                 Reach out to our team and we'll respond as soon as possible.
@@ -147,7 +160,15 @@ export default function ContactPage() {
 
       {/* Contact Cards Section */}
       <Container maxW="container.xl" py={{ base: 8, md: 12 }}>
-        <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} mb={16}>
+        <Grid 
+          templateColumns={{ 
+            base: '1fr', 
+            sm: 'repeat(2, 1fr)', 
+            md: 'repeat(4, 1fr)' 
+          }} 
+          gap={6} 
+          mb={16}
+        >
           <FallInPlace delay={0.1}>
             <Card
               bg={cardBg}
@@ -155,31 +176,36 @@ export default function ContactPage() {
               borderColor={borderColor}
               p={6}
               borderRadius="lg"
+              height="100%"
+              display="flex"
+              flexDirection="column"
               _hover={{
                 transform: 'translateY(-4px)',
                 shadow: 'lg',
+                borderColor: iconColor,
                 transition: 'all 0.3s',
               }}
               transition="all 0.3s"
             >
-              <VStack spacing={4} align="center">
+              <VStack spacing={4} align="center" justify="center" flex="1">
                 <Flex
-                  w={12}
-                  h={12}
+                  w={14}
+                  h={14}
                   align="center"
                   justify="center"
                   borderRadius="full"
                   bg={iconBg}
                 >
-                  <Icon as={FiPhone} boxSize={6} color={iconColor} />
+                  <Icon as={FiPhone} boxSize={7} color={iconColor} />
                 </Flex>
                 <Heading size="sm" textAlign="center">
                   Call Us
                 </Heading>
-                <VStack spacing={2}>
+                <VStack spacing={1}>
                   <Link
                     href="tel:+8801521416287"
                     fontSize="sm"
+                    color={mutedColor}
                     _hover={{ color: iconColor }}
                   >
                     +880 1521-416287
@@ -187,6 +213,7 @@ export default function ContactPage() {
                   <Link
                     href="tel:+8801601020699"
                     fontSize="sm"
+                    color={mutedColor}
                     _hover={{ color: iconColor }}
                   >
                     +880 1601-020699
@@ -203,23 +230,27 @@ export default function ContactPage() {
               borderColor={borderColor}
               p={6}
               borderRadius="lg"
+              height="100%"
+              display="flex"
+              flexDirection="column"
               _hover={{
                 transform: 'translateY(-4px)',
                 shadow: 'lg',
+                borderColor: iconColor,
                 transition: 'all 0.3s',
               }}
               transition="all 0.3s"
             >
-              <VStack spacing={4} align="center">
+              <VStack spacing={4} align="center" justify="center" flex="1">
                 <Flex
-                  w={12}
-                  h={12}
+                  w={14}
+                  h={14}
                   align="center"
                   justify="center"
                   borderRadius="full"
                   bg={iconBg}
                 >
-                  <Icon as={FiMail} boxSize={6} color={iconColor} />
+                  <Icon as={FiMail} boxSize={7} color={iconColor} />
                 </Flex>
                 <Heading size="sm" textAlign="center">
                   Email Us
@@ -228,6 +259,7 @@ export default function ContactPage() {
                   href="mailto:contact@hacktolive.net"
                   fontSize="sm"
                   textAlign="center"
+                  color={mutedColor}
                   _hover={{ color: iconColor }}
                 >
                   contact@hacktolive.net
@@ -243,23 +275,27 @@ export default function ContactPage() {
               borderColor={borderColor}
               p={6}
               borderRadius="lg"
+              height="100%"
+              display="flex"
+              flexDirection="column"
               _hover={{
                 transform: 'translateY(-4px)',
                 shadow: 'lg',
+                borderColor: iconColor,
                 transition: 'all 0.3s',
               }}
               transition="all 0.3s"
             >
-              <VStack spacing={4} align="center">
+              <VStack spacing={4} align="center" justify="center" flex="1">
                 <Flex
-                  w={12}
-                  h={12}
+                  w={14}
+                  h={14}
                   align="center"
                   justify="center"
                   borderRadius="full"
                   bg={iconBg}
                 >
-                  <Icon as={FiMapPin} boxSize={6} color={iconColor} />
+                  <Icon as={FiMapPin} boxSize={7} color={iconColor} />
                 </Flex>
                 <Heading size="sm" textAlign="center">
                   Visit Us
@@ -280,23 +316,27 @@ export default function ContactPage() {
               borderColor={borderColor}
               p={6}
               borderRadius="lg"
+              height="100%"
+              display="flex"
+              flexDirection="column"
               _hover={{
                 transform: 'translateY(-4px)',
                 shadow: 'lg',
+                borderColor: iconColor,
                 transition: 'all 0.3s',
               }}
               transition="all 0.3s"
             >
-              <VStack spacing={4} align="center">
+              <VStack spacing={4} align="center" justify="center" flex="1">
                 <Flex
-                  w={12}
-                  h={12}
+                  w={14}
+                  h={14}
                   align="center"
                   justify="center"
                   borderRadius="full"
                   bg={iconBg}
                 >
-                  <Icon as={FiClock} boxSize={6} color={iconColor} />
+                  <Icon as={FiClock} boxSize={7} color={iconColor} />
                 </Flex>
                 <Heading size="sm" textAlign="center">
                   Working Hours
@@ -309,7 +349,7 @@ export default function ContactPage() {
               </VStack>
             </Card>
           </FallInPlace>
-        </SimpleGrid>
+        </Grid>
 
         {/* Main Contact Section */}
         <Grid
@@ -416,7 +456,7 @@ export default function ContactPage() {
 
                       <Button
                         type="submit"
-                        colorScheme="green"
+                        colorScheme="primary"
                         size="lg"
                         rightIcon={<Icon as={FiSend} />}
                         isLoading={isSubmitting}
