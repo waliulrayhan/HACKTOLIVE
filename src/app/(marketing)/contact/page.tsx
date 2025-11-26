@@ -159,7 +159,7 @@ export default function ContactPage() {
       </Box>
 
       {/* Contact Cards Section */}
-      <Container maxW="container.xl" py={{ base: 8, md: 12 }}>
+      <Container maxW="container.xl" py={{ base: 0, md: 0 }}>
         <Grid 
           templateColumns={{ 
             base: '1fr', 
@@ -263,6 +263,8 @@ export default function ContactPage() {
                   _hover={{ color: iconColor }}
                 >
                   contact@hacktolive.net
+                  <br />
+                  support@hacktolive.net
                 </Link>
               </VStack>
             </Card>
@@ -660,7 +662,7 @@ export default function ContactPage() {
         </Grid>
 
         {/* Map Section */}
-        <Box mt={16}>
+        <Box mt={16} mb={{ base: 8, md: 0 }}>
           <FallInPlace delay={0.9}>
             <Card
               bg={cardBg}
