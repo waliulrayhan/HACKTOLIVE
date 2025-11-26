@@ -13,6 +13,7 @@ import {
   Divider,
   IconButton,
   useColorMode,
+  Image,
 } from '@chakra-ui/react'
 import { Link, LinkProps } from '@saas-ui/react'
 import { FaGithub, FaFacebook, FaTwitter, FaLinkedin, FaYoutube, FaInstagram, FaDribbble, FaBehance, FaRss, FaArrowUp } from 'react-icons/fa'
@@ -168,7 +169,15 @@ export const Footer: React.FC<FooterProps> = (props) => {
                   whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.2 } as any}
                 >
-                  <Box as={siteConfig.logo} height="32px" />
+                  <Link href="/">
+                    <Image 
+                      src={colorMode === 'dark' ? '/logo_white.png' : '/logo_black.png'}
+                      alt={siteConfig.seo?.title}
+                      height={{ base: '22px', sm: '20px', md: '22px', lg: '25px' }}
+                      width="auto"
+                      objectFit="contain"
+                    />
+                  </Link>
                 </Box>
               </Flex>
               <Stack spacing="4">

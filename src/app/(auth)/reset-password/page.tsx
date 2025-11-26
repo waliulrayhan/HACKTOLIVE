@@ -16,6 +16,7 @@ import {
   GridItem,
   Flex,
   Icon,
+  Image,
 } from '@chakra-ui/react'
 import { Link } from '@saas-ui/react'
 import { BackgroundGradient } from '@/components/shared/gradients/background-gradient'
@@ -175,27 +176,19 @@ const ResetPassword: NextPage = () => {
             />
           </Box>
           
-          <VStack spacing={4} zIndex={1} px={8}>
-            <Box 
-              fontSize="6xl" 
-              fontWeight="bold" 
-              color="white"
-              bg="#65a30d"
-              px={6}
-              py={4}
-              borderRadius="xl"
-              boxShadow="2xl"
-            >
-              |||
-            </Box>
-            <Heading size="2xl" color="white" textAlign="center">
-              TailAdmin
-            </Heading>
-            <Text color="whiteAlpha.900" fontSize="lg" textAlign="center" maxW="md">
-              Free and Open-Source Tailwind CSS Admin Dashboard Template
-            </Text>
-          </VStack>
-        </GridItem>
+        <VStack spacing={4} zIndex={1} px={8}>
+          <Image 
+            src="/logo_white.png"
+            alt="HackToLive Logo"
+            height={{ base: '20px', md: '25px', lg: '30px' }}
+            width="auto"
+            objectFit="contain"
+          />
+          <Text color="whiteAlpha.900" fontSize="lg" textAlign="center" maxW="md">
+            Bangladesh's Premier Cybersecurity & Ethical Hacking Platform
+          </Text>
+        </VStack>
+      </GridItem>
 
         {/* Right Column - Form Section */}
         <GridItem bg={rightBgColor} position="relative">
