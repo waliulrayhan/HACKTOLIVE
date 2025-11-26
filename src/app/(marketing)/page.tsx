@@ -150,7 +150,7 @@ const HeroSection: React.FC = () => {
       
       <Container 
         maxW="container.xl" 
-        pt={{ base: '120px', md: '140px', lg: '180px' }} 
+        pt={{ base: '80px', md: '140px', lg: '180px' }} 
         pb={{ base: '60px', md: '80px', lg: '100px' }}
         height="100%"
         display="flex"
@@ -160,7 +160,7 @@ const HeroSection: React.FC = () => {
           <VStack 
             flex="1" 
             alignItems={{ base: 'center', md: 'flex-start' }} 
-            spacing={{ base: '6', md: '8' }}
+            spacing={{ base: '4', md: '8' }}
             maxW={{ base: '100%', lg: '50%' }}
             width="100%"
             px={{ base: '2', sm: '3', md: '0' }}
@@ -252,6 +252,8 @@ const HeroSection: React.FC = () => {
               </Flex>
             </FallInPlace>
           </VStack>
+
+          {/* Lottie Animation - Desktop (absolute positioned) */}
           <Box
             position="absolute"
             display={{ base: 'none', lg: 'flex' }}
@@ -268,6 +270,27 @@ const HeroSection: React.FC = () => {
                     animationData={animationData}
                     loop={true}
                     style={{ width: '600px', height: '600px' }}
+                  />
+                )}
+              </Box>
+            </FallInPlace>
+          </Box>
+
+          {/* Lottie Animation - Mobile (bottom, small, centered) */}
+          <Box
+            display={{ base: 'flex', lg: 'none' }}
+            alignItems="center"
+            justifyContent="center"
+            width="100%"
+            mt="4"
+          >
+            <FallInPlace delay={1}>
+              <Box>
+                {animationData && (
+                  <Lottie
+                    animationData={animationData}
+                    loop={true}
+                    style={{ width: '250px', height: '250px' }}
                   />
                 )}
               </Box>
