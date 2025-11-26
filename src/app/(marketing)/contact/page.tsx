@@ -325,9 +325,9 @@ export default function ContactPage() {
                 transform: 'translateY(-4px)',
                 shadow: 'lg',
                 borderColor: iconColor,
-                transition: 'all 0.3s',
               }}
-              transition="all 0.3s"
+              transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+              style={{ willChange: 'transform, box-shadow' }}
             >
               <VStack spacing={4} align="center" justify="center" flex="1">
                 <Flex
@@ -553,7 +553,8 @@ export default function ContactPage() {
                         href="https://facebook.com/hacktolive"
                         isExternal
                         _hover={{ transform: 'translateY(-2px)' }}
-                        transition="all 0.2s"
+                        transition="transform 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+                        style={{ willChange: 'transform' }}
                       >
                         <Flex
                           w={10}
@@ -564,7 +565,8 @@ export default function ContactPage() {
                           bg={iconBg}
                           color={iconColor}
                           _hover={{ bg: iconColor, color: 'white' }}
-                          transition="all 0.2s"
+                          transition="all 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+                          style={{ willChange: 'background-color, color' }}
                         >
                           <Icon as={FaFacebook} boxSize={5} />
                         </Flex>
@@ -573,7 +575,8 @@ export default function ContactPage() {
                         href="https://twitter.com/hacktolive"
                         isExternal
                         _hover={{ transform: 'translateY(-2px)' }}
-                        transition="all 0.2s"
+                        transition="transform 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+                        style={{ willChange: 'transform' }}
                       >
                         <Flex
                           w={10}
@@ -584,7 +587,8 @@ export default function ContactPage() {
                           bg={iconBg}
                           color={iconColor}
                           _hover={{ bg: iconColor, color: 'white' }}
-                          transition="all 0.2s"
+                          transition="all 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+                          style={{ willChange: 'background-color, color' }}
                         >
                           <Icon as={FaTwitter} boxSize={5} />
                         </Flex>
@@ -593,7 +597,8 @@ export default function ContactPage() {
                         href="https://linkedin.com/company/hacktolive"
                         isExternal
                         _hover={{ transform: 'translateY(-2px)' }}
-                        transition="all 0.2s"
+                        transition="transform 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+                        style={{ willChange: 'transform' }}
                       >
                         <Flex
                           w={10}
@@ -604,7 +609,8 @@ export default function ContactPage() {
                           bg={iconBg}
                           color={iconColor}
                           _hover={{ bg: iconColor, color: 'white' }}
-                          transition="all 0.2s"
+                          transition="all 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+                          style={{ willChange: 'background-color, color' }}
                         >
                           <Icon as={FaLinkedin} boxSize={5} />
                         </Flex>
@@ -613,7 +619,8 @@ export default function ContactPage() {
                         href="https://github.com/hacktolive"
                         isExternal
                         _hover={{ transform: 'translateY(-2px)' }}
-                        transition="all 0.2s"
+                        transition="transform 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+                        style={{ willChange: 'transform' }}
                       >
                         <Flex
                           w={10}
@@ -624,7 +631,8 @@ export default function ContactPage() {
                           bg={iconBg}
                           color={iconColor}
                           _hover={{ bg: iconColor, color: 'white' }}
-                          transition="all 0.2s"
+                          transition="all 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+                          style={{ willChange: 'background-color, color' }}
                         >
                           <Icon as={FaGithub} boxSize={5} />
                         </Flex>
@@ -633,7 +641,8 @@ export default function ContactPage() {
                         href="https://youtube.com/@hacktolive"
                         isExternal
                         _hover={{ transform: 'translateY(-2px)' }}
-                        transition="all 0.2s"
+                        transition="transform 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+                        style={{ willChange: 'transform' }}
                       >
                         <Flex
                           w={10}
@@ -644,7 +653,8 @@ export default function ContactPage() {
                           bg={iconBg}
                           color={iconColor}
                           _hover={{ bg: iconColor, color: 'white' }}
-                          transition="all 0.2s"
+                          transition="all 0.15s cubic-bezier(0.4, 0, 0.2, 1)"
+                          style={{ willChange: 'background-color, color' }}
                         >
                           <Icon as={FaYoutube} boxSize={5} />
                         </Flex>

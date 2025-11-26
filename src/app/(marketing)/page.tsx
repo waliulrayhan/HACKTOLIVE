@@ -134,6 +134,7 @@ const HeroSection: React.FC = () => {
           transform="translate(-50%, -50%)"
           objectFit="cover"
           filter={videoFilter}
+          style={{ willChange: 'filter' }}
         >
           <source src="/sample vedio.mp4" type="video/mp4" />
         </Box>
@@ -145,6 +146,7 @@ const HeroSection: React.FC = () => {
           width="100%"
           height="100%"
           bg={overlayBg}
+          style={{ willChange: 'background-color' }}
         />
       </Box>
       
@@ -217,13 +219,14 @@ const HeroSection: React.FC = () => {
               </Flex>
             </FallInPlace>
 
-            <FallInPlace delay={0.6}>
+            <FallInPlace delay={0.3}>
               <Flex 
                 direction={{ base: 'row', sm: 'row' }} 
                 gap={{ base: '8', sm: '10', md: '12' }} 
                 pt="4"
                 width="100%"
                 justify={{ base: 'center', md: 'flex-start' }}
+                style={{ willChange: 'transform, opacity' }}
               >
                 <VStack alignItems="center" spacing="1" flex={{ base: '1', sm: 'none' }}>
                   <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
@@ -262,14 +265,19 @@ const HeroSection: React.FC = () => {
             transform="translateY(-50%)"
             alignItems="center"
             justifyContent="center"
+            style={{ willChange: 'transform, opacity' }}
           >
-            <FallInPlace delay={1}>
-              <Box>
+            <FallInPlace delay={0.4}>
+              <Box style={{ willChange: 'transform' }}>
                 {animationData && (
                   <Lottie
                     animationData={animationData}
                     loop={true}
-                    style={{ width: '600px', height: '600px' }}
+                    style={{ width: '600px', height: '600px', willChange: 'transform' }}
+                    rendererSettings={{
+                      preserveAspectRatio: 'xMidYMid slice',
+                      progressiveLoad: true,
+                    }}
                   />
                 )}
               </Box>
@@ -283,14 +291,19 @@ const HeroSection: React.FC = () => {
             justifyContent="center"
             width="100%"
             mt="4"
+            style={{ willChange: 'transform, opacity' }}
           >
-            <FallInPlace delay={1}>
-              <Box>
+            <FallInPlace delay={0.3}>
+              <Box style={{ willChange: 'transform' }}>
                 {animationData && (
                   <Lottie
                     animationData={animationData}
                     loop={true}
-                    style={{ width: '250px', height: '250px' }}
+                    style={{ width: '250px', height: '250px', willChange: 'transform' }}
+                    rendererSettings={{
+                      preserveAspectRatio: 'xMidYMid slice',
+                      progressiveLoad: true,
+                    }}
                   />
                 )}
               </Box>
