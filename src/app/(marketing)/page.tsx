@@ -17,6 +17,20 @@ import {
   Wrap,
   useClipboard,
   useColorModeValue,
+  Badge,
+  Card,
+  CardBody,
+  CardHeader,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
+  Avatar,
+  AvatarGroup,
+  Divider,
+  Grid,
+  GridItem,
+  useBreakpointValue,
 } from '@chakra-ui/react'
 import { Br, Link } from '@saas-ui/react'
 import type { Metadata, NextPage } from 'next'
@@ -39,6 +53,16 @@ import {
   FiToggleLeft,
   FiTrendingUp,
   FiUserPlus,
+  FiShield,
+  FiAward,
+  FiUsers,
+  FiTarget,
+  FiBookOpen,
+  FiZap,
+  FiGlobe,
+  FiActivity,
+  FiStar,
+  FiTool,
 } from 'react-icons/fi'
 
 import * as React from 'react'
@@ -72,17 +96,23 @@ const Home: NextPage = () => {
     <Box>
       <HeroSection />
 
-      <BenefitsSection />
+      <ServicesOverviewSection />
 
-      <HighlightsSection />
+      <AcademyProgramsSection />
 
-      <FeaturesSection />
+      <KeyAchievementsSection />
 
       <TestimonialsSection />
+
+      <TrustedBySection />
+
+      <FeaturesSection />
 
       <PricingSection />
 
       <FaqSection />
+
+      <FinalCTASection />
     </Box>
   )
 }
@@ -193,30 +223,30 @@ const HeroSection: React.FC = () => {
             </FallInPlace>
 
             <FallInPlace delay={0.4}>
-              <Flex 
-                gap={{ base: '2', sm: '4' }} 
+                <Flex 
+                  gap={{ base: '2', sm: '4' }} 
                 flexDirection={{ base: 'row', sm: 'row' }}
-                width="100%"
-                justifyContent={{ base: 'center', md: 'flex-start' }}
-              >
-                <ButtonLink 
-                  colorScheme="primary" 
-                  size={{ base: 'md', md: 'lg' }}
+                  width="100%"
+                  justifyContent={{ base: 'center', md: 'flex-start' }}
+                >
+                  <ButtonLink 
+                    colorScheme="primary" 
+                    size={{ base: 'md', md: 'lg' }}
                   href="/signup"
                   rightIcon={<Icon as={FiArrowRight} />}
-                  flex={{ base: '1', sm: 'none' }}
-                >
+                    flex={{ base: '1', sm: 'none' }}
+                  >
                   Start Learning
-                </ButtonLink>
-                <ButtonLink
-                  size={{ base: 'md', md: 'lg' }}
+                  </ButtonLink>
+                  <ButtonLink
+                    size={{ base: 'md', md: 'lg' }}
                   href="#features"
-                  variant="outline"
-                  flex={{ base: '1', sm: 'none' }}
-                >
+                    variant="outline"
+                    flex={{ base: '1', sm: 'none' }}
+                  >
                   Explore Courses
-                </ButtonLink>
-              </Flex>
+                  </ButtonLink>
+                </Flex>
             </FallInPlace>
 
             <FallInPlace delay={0.3}>
@@ -315,157 +345,653 @@ const HeroSection: React.FC = () => {
   )
 }
 
-const BenefitsSection = () => {
+const ServicesOverviewSection = () => {
+  const bgColor = useColorModeValue('gray.50', 'gray.900')
+  const cardBg = useColorModeValue('white', 'gray.800')
+  const borderColor = useColorModeValue('gray.200', 'gray.700')
+  const accentColor = useColorModeValue('green.500', 'green.400')
+  const hoverBg = useColorModeValue('green.50', 'green.900')
+  const hoverBorder = useColorModeValue('green.500', 'green.400')
+
+  const services = [
+    {
+      icon: FiShield,
+      title: 'Penetration Testing',
+      description: 'Comprehensive security testing for web and mobile applications to identify vulnerabilities.',
+      color: 'blue',
+      features: ['Web App Testing', 'Mobile Security', 'API Testing', 'Network Pentesting']
+    },
+    {
+      icon: FiSearch,
+      title: 'Vulnerability Assessment',
+      description: 'Thorough security evaluations with detailed remediation guidance and compliance reports.',
+      color: 'purple',
+      features: ['Infrastructure Audit', 'Code Review', 'Security Scanning', 'Risk Analysis']
+    },
+    {
+      icon: FiActivity,
+      title: 'SOC Services',
+      description: '24/7 security monitoring and incident response to protect your organization.',
+      color: 'red',
+      features: ['Threat Monitoring', 'Incident Response', 'Log Analysis', 'Security Alerts']
+    },
+    {
+      icon: FiGlobe,
+      title: 'OSINT & Forensics',
+      description: 'Intelligence gathering and digital forensics investigation services.',
+      color: 'cyan',
+      features: ['OSINT Investigation', 'Digital Forensics', 'Threat Intelligence', 'Evidence Analysis']
+    },
+  ]
+
   return (
-    <Box py="20">
-      <Features
-        id="benefits"
-        columns={[1, 2, 4]}
-        iconSize={4}
-        innerWidth="container.xl"
-        features={[
-          {
-            title: 'Bengali Learning',
-            icon: FiSmile,
-            description: 'All courses taught in Bengali for easy understanding and accessibility.',
-            iconPosition: 'left',
-            delay: 0.6,
-          },
-          {
-            title: 'Hands-on Training',
-            icon: FiSliders,
-            description:
-              'Practical labs and real-world scenarios with tools like Metasploit, BurpSuite, and Nmap.',
-            iconPosition: 'left',
-            delay: 0.8,
-          },
-          {
-            title: 'Expert Team',
-            icon: FiGrid,
-            description:
-              'Learn from experienced security professionals with extensive industry experience.',
-            iconPosition: 'left',
-            delay: 1,
-          },
-          {
-            title: 'CTF Competitions',
-            icon: FiThumbsUp,
-            description:
-              'Join H4K2LIV3_Academy team in competitive Capture-The-Flag challenges worldwide.',
-            iconPosition: 'left',
-            delay: 1.1,
-          },
-        ]}
-        reveal={FallInPlace}
+    <Box py={{ base: '16', md: '24' }} bg={bgColor} position="relative" overflow="hidden">
+      {/* Background decoration */}
+      <Box
+        position="absolute"
+        top="0"
+        right="0"
+        width="400px"
+        height="400px"
+        borderRadius="full"
+        bg={accentColor}
+        opacity="0.05"
+        filter="blur(100px)"
+        pointerEvents="none"
       />
+      
+      <Container maxW="container.xl">
+        <VStack spacing={{ base: '8', md: '12' }}>
+          <FallInPlace>
+            <VStack spacing="4" textAlign="center">
+              <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+                Professional Services
+              </Badge>
+              <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
+                Enterprise-Grade Security Solutions
+              </Heading>
+              <Text fontSize={{ base: 'lg', md: 'xl' }} color="muted" maxW="3xl">
+                Protect your business with our comprehensive cybersecurity services delivered by certified professionals
+              </Text>
+            </VStack>
+          </FallInPlace>
+
+          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: '6', md: '8' }} width="100%">
+            {services.map((service, index) => (
+              <FallInPlace key={service.title} delay={0.1 * index}>
+                <Card
+                  bg={cardBg}
+                  borderWidth="2px"
+                  borderColor={borderColor}
+                  borderRadius="xl"
+                  overflow="hidden"
+                  transition="all 0.3s ease"
+                  cursor="pointer"
+                  _hover={{
+                    transform: 'translateY(-8px)',
+                    borderColor: hoverBorder,
+                    bg: hoverBg,
+                    shadow: 'xl',
+                  }}
+                  height="100%"
+                >
+                  <CardBody p={{ base: '6', md: '8' }}>
+                    <VStack align="start" spacing="4" height="100%">
+                      <Flex
+                        width="60px"
+                        height="60px"
+                        borderRadius="xl"
+                        bg={`${service.color}.50`}
+                        _dark={{ bg: `${service.color}.900` }}
+                        align="center"
+                        justify="center"
+                      >
+                        <Icon as={service.icon} boxSize="8" color={`${service.color}.500`} />
+                      </Flex>
+                      
+                      <VStack align="start" spacing="2" flex="1">
+                        <Heading size="md">{service.title}</Heading>
+                        <Text color="muted" fontSize="md">
+                          {service.description}
+                        </Text>
+                      </VStack>
+
+                      <Wrap spacing="2">
+                        {service.features.map((feature) => (
+                          <Tag
+                            key={feature}
+                            size="sm"
+                            colorScheme={service.color}
+                            borderRadius="full"
+                          >
+                            {feature}
+                          </Tag>
+                        ))}
+                      </Wrap>
+                    </VStack>
+                  </CardBody>
+                </Card>
+              </FallInPlace>
+            ))}
+          </SimpleGrid>
+
+          <FallInPlace delay={0.5}>
+            <ButtonLink
+              colorScheme="primary"
+              size="lg"
+              href="/service"
+              rightIcon={<Icon as={FiArrowRight} />}
+            >
+              View All Services
+            </ButtonLink>
+          </FallInPlace>
+        </VStack>
+      </Container>
     </Box>
   )
 }
 
-const HighlightsSection = () => {
-  const { value, onCopy, hasCopied } = useClipboard('contact@hacktolive.net')
+const AcademyProgramsSection = () => {
+  const cardBg = useColorModeValue('white', 'gray.800')
+  const borderColor = useColorModeValue('gray.200', 'gray.700')
+  const accentColor = useColorModeValue('green.500', 'green.400')
+  const hoverBg = useColorModeValue('green.50', 'green.900')
+
+  const programs = [
+    {
+      icon: FiBookOpen,
+      title: 'Ethical Hacking Fundamentals',
+      level: 'Beginner',
+      duration: '8 Weeks',
+      students: '2000+',
+      description: 'Start your cybersecurity journey with comprehensive basics in Bengali.',
+      topics: ['Linux Basics', 'Networking', 'Basic Tools', 'Web Fundamentals'],
+      color: 'green'
+    },
+    {
+      icon: FiTool,
+      title: 'Web Application Pentesting',
+      level: 'Intermediate',
+      duration: '10 Weeks',
+      students: '1500+',
+      description: 'Master web application security testing with hands-on practice.',
+      topics: ['OWASP Top 10', 'BurpSuite', 'SQL Injection', 'XSS'],
+      color: 'blue'
+    },
+    {
+      icon: FiTarget,
+      title: 'Advanced Penetration Testing',
+      level: 'Advanced',
+      duration: '12 Weeks',
+      students: '800+',
+      description: 'Become an expert with advanced exploitation techniques.',
+      topics: ['Metasploit', 'Post Exploitation', 'Privilege Escalation', 'Red Teaming'],
+      color: 'purple'
+    },
+    {
+      icon: FiFlag,
+      title: 'CTF & Bug Bounty',
+      level: 'All Levels',
+      duration: 'Ongoing',
+      students: '1000+',
+      description: 'Join competitions and earn from bug bounty programs.',
+      topics: ['CTF Challenges', 'Bug Hunting', 'Write-ups', 'Live Practice'],
+      color: 'orange'
+    },
+  ]
 
   return (
-    <Highlights>
-      <HighlightsItem colSpan={[1, null, 2]} title="Professional Services">
-        <VStack alignItems="flex-start" spacing="8">
-          <Text color="muted" fontSize="xl">
-            Get enterprise-grade security with our <Em>comprehensive service offerings</Em>.
-            Including penetration testing, vulnerability assessments, and digital forensics.
-            Expert OSINT investigations and 24/7 SOC monitoring available.
-          </Text>
-
-          <Flex
-            rounded="full"
-            borderWidth="1px"
-            flexDirection="row"
-            alignItems="center"
-            py="1"
-            ps="8"
-            pe="2"
-            bg="primary.900"
-            _dark={{ bg: 'gray.900' }}
-          >
-            <Box>
-              <Text color="yellow.400" display="inline">
-                📞 Call:
-              </Text>{' '}
-              <Text color="cyan.300" display="inline">
-                +880 1521-416287
+    <Box py={{ base: '16', md: '24' }} position="relative">
+      <Container maxW="container.xl">
+        <VStack spacing={{ base: '8', md: '12' }}>
+          <FallInPlace>
+            <VStack spacing="4" textAlign="center">
+              <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+                Academy Programs
+              </Badge>
+              <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
+                Learn Cybersecurity in Bengali
+              </Heading>
+              <Text fontSize={{ base: 'lg', md: 'xl' }} color="muted" maxW="3xl">
+                Structured learning paths from beginner to expert with hands-on labs and real-world scenarios
               </Text>
-            </Box>
-            <IconButton
-              icon={hasCopied ? <FiCheck /> : <FiCopy />}
-              aria-label="Copy contact"
-              onClick={onCopy}
-              variant="ghost"
-              ms="4"
-              isRound
-              color="white"
-            />
-          </Flex>
-        </VStack>
-      </HighlightsItem>
-      <HighlightsItem title="Academy Programs">
-        <Text color="muted" fontSize="lg">
-          Our structured learning paths take you from beginner to expert. 
-          We combine theoretical knowledge with practical skills using industry-standard 
-          tools and real-world scenarios.
-        </Text>
-      </HighlightsItem>
-      <HighlightsTestimonialItem
-        name="Sarah Begum"
-        description="Security Analyst"
-        avatar="/static/images/avatar.jpg"
-        gradient={['pink.200', 'green.500']}
-      >
-        "HackToLive Academy gave me the skills I needed to break into cybersecurity. 
-        The Bengali instruction made complex topics clear, and the hands-on labs 
-        prepared me for real-world security challenges."
-      </HighlightsTestimonialItem>
-      <HighlightsItem
-        colSpan={[1, null, 2]}
-        title="Comprehensive Cybersecurity Coverage"
-      >
-        <Text color="muted" fontSize="lg">
-          From beginner fundamentals to advanced penetration testing, we cover 
-          everything you need to become a skilled ethical hacker and security professional.
-        </Text>
-        <Wrap mt="8">
-          {[
-            'network security',
-            'web pentesting',
-            'mobile security',
-            'linux mastery',
-            'osint',
-            'metasploit',
-            'burp suite',
-            'nmap',
-            'sql injection',
-            'xss attacks',
-            'cryptography',
-            'forensics',
-            'malware analysis',
-            'ctf challenges',
-            'bug bounty',
-            'soc operations',
-            'vulnerability assessment',
-          ].map((value) => (
-            <Tag
-              key={value}
-              variant="subtle"
-              colorScheme="green"
-              rounded="full"
-              px="3"
+            </VStack>
+          </FallInPlace>
+
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={{ base: '6', md: '6' }} width="100%">
+            {programs.map((program, index) => (
+              <FallInPlace key={program.title} delay={0.1 * index}>
+                <Card
+                  bg={cardBg}
+                  borderWidth="2px"
+                  borderColor={borderColor}
+                  borderRadius="xl"
+                  overflow="hidden"
+                  transition="all 0.3s ease"
+                  cursor="pointer"
+                  _hover={{
+                    transform: 'translateY(-8px)',
+                    borderColor: `${program.color}.500`,
+                    bg: hoverBg,
+                    shadow: 'xl',
+                  }}
+                  height="100%"
+                >
+                  <CardBody p={{ base: '5', md: '6' }}>
+                    <VStack align="start" spacing="4" height="100%">
+                      <Flex
+                        width="50px"
+                        height="50px"
+                        borderRadius="lg"
+                        bg={`${program.color}.50`}
+                        _dark={{ bg: `${program.color}.900` }}
+                        align="center"
+                        justify="center"
+                      >
+                        <Icon as={program.icon} boxSize="6" color={`${program.color}.500`} />
+                      </Flex>
+
+                      <VStack align="start" spacing="2" flex="1">
+                        <Heading size="sm" fontSize={{ base: 'md', md: 'lg' }}>
+                          {program.title}
+                        </Heading>
+                        
+                        <HStack spacing="2" flexWrap="wrap">
+                          <Badge colorScheme={program.color} fontSize="xs">
+                            {program.level}
+                          </Badge>
+                          <Badge colorScheme="gray" fontSize="xs">
+                            {program.duration}
+                          </Badge>
+                        </HStack>
+
+                        <Text color="muted" fontSize="sm">
+                          {program.description}
+                        </Text>
+
+                        <Wrap spacing="1" pt="2">
+                          {program.topics.map((topic) => (
+                            <Tag key={topic} size="sm" variant="subtle" colorScheme={program.color}>
+                              {topic}
+                            </Tag>
+                          ))}
+                        </Wrap>
+                      </VStack>
+
+                      <Divider />
+
+                      <HStack justify="space-between" width="100%">
+                        <HStack>
+                          <Icon as={FiUsers} color="muted" boxSize="4" />
+                          <Text fontSize="sm" color="muted">{program.students}</Text>
+                        </HStack>
+                        <Icon as={FiArrowRight} color={`${program.color}.500`} boxSize="5" />
+                      </HStack>
+                    </VStack>
+                  </CardBody>
+                </Card>
+              </FallInPlace>
+            ))}
+          </SimpleGrid>
+
+          <FallInPlace delay={0.5}>
+            <ButtonLink
+              colorScheme="primary"
+              size="lg"
+              href="/academy"
+              rightIcon={<Icon as={FiArrowRight} />}
             >
-              {value}
-            </Tag>
-          ))}
-        </Wrap>
-      </HighlightsItem>
-    </Highlights>
+              Explore All Courses
+            </ButtonLink>
+          </FallInPlace>
+        </VStack>
+      </Container>
+    </Box>
   )
 }
+
+const KeyAchievementsSection = () => {
+  const bgColor = useColorModeValue('green.50', 'gray.900')
+  const cardBg = useColorModeValue('white', 'gray.800')
+  const accentColor = useColorModeValue('green.500', 'green.400')
+  const borderColor = useColorModeValue('green.200', 'green.700')
+
+  const achievements = [
+    {
+      icon: FiAward,
+      number: '10+',
+      label: 'Certifications',
+      description: 'Industry-recognized credentials',
+      color: 'yellow',
+      details: ['OSCP', 'CEH', 'CISSP', 'Security+']
+    },
+    {
+      icon: FiTrendingUp,
+      number: '5+',
+      label: 'Years Experience',
+      description: 'In cybersecurity industry',
+      color: 'blue',
+      details: ['2019-Present', 'Growing Team', 'Trusted Partner']
+    },
+    {
+      icon: FiUsers,
+      number: '100+',
+      label: 'Clients Served',
+      description: 'Across various industries',
+      color: 'purple',
+      details: ['Banks', 'E-commerce', 'Telecom', 'Government']
+    },
+    {
+      icon: FiShield,
+      number: '500+',
+      label: 'Security Audits',
+      description: 'Successfully completed',
+      color: 'green',
+      details: ['Web Apps', 'Mobile Apps', 'Networks', 'APIs']
+    },
+    {
+      icon: FiTarget,
+      number: '5000+',
+      label: 'Students Trained',
+      description: 'In ethical hacking',
+      color: 'red',
+      details: ['Online', 'Offline', 'Corporate', 'University']
+    },
+    {
+      icon: FiFlag,
+      number: '50+',
+      label: 'CTF Wins',
+      description: 'Competition victories',
+      color: 'orange',
+      details: ['National', 'International', 'H4K2LIV3', 'Community']
+    },
+  ]
+
+  return (
+    <Box py={{ base: '16', md: '24' }} bg={bgColor} position="relative" overflow="hidden">
+      {/* Background decoration */}
+      <Box
+        position="absolute"
+        bottom="-100px"
+        left="-100px"
+        width="500px"
+        height="500px"
+        borderRadius="full"
+        bg={accentColor}
+        opacity="0.1"
+        filter="blur(120px)"
+        pointerEvents="none"
+      />
+      
+      <Container maxW="container.xl">
+        <VStack spacing={{ base: '8', md: '12' }}>
+          <FallInPlace>
+            <VStack spacing="4" textAlign="center">
+              <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+                Our Achievements
+              </Badge>
+              <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
+                Proven Track Record
+              </Heading>
+              <Text fontSize={{ base: 'lg', md: 'xl' }} color="muted" maxW="3xl">
+                Numbers that speak for our expertise and commitment to cybersecurity excellence
+              </Text>
+            </VStack>
+          </FallInPlace>
+
+          <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} spacing={{ base: '6', md: '8' }} width="100%">
+            {achievements.map((achievement, index) => (
+              <FallInPlace key={achievement.label} delay={0.1 * index}>
+                <Card
+                  bg={cardBg}
+                  borderWidth="2px"
+                  borderColor={borderColor}
+                  borderRadius="xl"
+                  overflow="hidden"
+                  transition="all 0.3s ease"
+                  _hover={{
+                    transform: 'scale(1.05)',
+                    borderColor: `${achievement.color}.500`,
+                    shadow: '2xl',
+                  }}
+                  height="100%"
+                >
+                  <CardBody p={{ base: '6', md: '8' }} textAlign="center">
+                    <VStack spacing="4">
+                      <Flex
+                        width="70px"
+                        height="70px"
+                        borderRadius="full"
+                        bg={`${achievement.color}.50`}
+                        _dark={{ bg: `${achievement.color}.900` }}
+                        align="center"
+                        justify="center"
+                        mx="auto"
+                      >
+                        <Icon as={achievement.icon} boxSize="8" color={`${achievement.color}.500`} />
+                      </Flex>
+
+                      <VStack spacing="2">
+                        <Text fontSize={{ base: '3xl', md: '4xl' }} fontWeight="bold" color={accentColor}>
+                          {achievement.number}
+                        </Text>
+                        <Heading size="sm" fontSize={{ base: 'lg', md: 'xl' }}>
+                          {achievement.label}
+                        </Heading>
+                        <Text color="muted" fontSize="sm">
+                          {achievement.description}
+                        </Text>
+                      </VStack>
+
+                      <Wrap spacing="2" justify="center">
+                        {achievement.details.map((detail) => (
+                          <Tag
+                            key={detail}
+                            size="sm"
+                            colorScheme={achievement.color}
+                            variant="subtle"
+                            borderRadius="full"
+                          >
+                            {detail}
+                          </Tag>
+                        ))}
+                      </Wrap>
+                    </VStack>
+                  </CardBody>
+                </Card>
+              </FallInPlace>
+            ))}
+          </SimpleGrid>
+        </VStack>
+      </Container>
+    </Box>
+  )
+}
+
+const TrustedBySection = () => {
+  const bgColor = useColorModeValue('white', 'gray.800')
+  const borderColor = useColorModeValue('gray.200', 'gray.700')
+  const logoFilter = useColorModeValue('grayscale(100%)', 'grayscale(100%) brightness(0.8)')
+  const logoHoverFilter = useColorModeValue('grayscale(0%)', 'grayscale(0%) brightness(1.2)')
+
+  // Sample partners/clients
+  const partners = [
+    { name: 'Government', category: 'Public Sector' },
+    { name: 'BRAC Bank', category: 'Financial' },
+    { name: 'Robi Axiata', category: 'Telecom' },
+    { name: 'Daraz', category: 'E-commerce' },
+    { name: 'BUET', category: 'Education' },
+    { name: 'City Bank', category: 'Financial' },
+    { name: 'Grameenphone', category: 'Telecom' },
+    { name: 'Pathao', category: 'Tech' },
+  ]
+
+  return (
+    <Box py={{ base: '12', md: '16' }} bg={bgColor} borderY="1px" borderColor={borderColor}>
+      <Container maxW="container.xl">
+        <VStack spacing={{ base: '8', md: '10' }}>
+          <FallInPlace>
+            <VStack spacing="3" textAlign="center">
+              <Text fontSize="sm" fontWeight="semibold" color="muted" textTransform="uppercase" letterSpacing="wide">
+                Trusted By Leading Organizations
+              </Text>
+              <Heading fontSize={{ base: 'xl', md: '2xl' }}>
+                Protecting Bangladesh's Digital Infrastructure
+              </Heading>
+            </VStack>
+          </FallInPlace>
+
+          <SimpleGrid columns={{ base: 2, sm: 3, md: 4 }} spacing={{ base: '6', md: '8' }} width="100%">
+            {partners.map((partner, index) => (
+              <FallInPlace key={partner.name} delay={0.05 * index}>
+                <Card
+                  variant="outline"
+                  borderRadius="lg"
+                  transition="all 0.3s ease"
+                  cursor="pointer"
+                  _hover={{
+                    transform: 'translateY(-4px)',
+                    shadow: 'md',
+                    borderColor: 'green.500',
+                  }}
+                >
+                  <CardBody p={{ base: '4', md: '6' }} textAlign="center">
+                    <VStack spacing="2">
+                      <Flex
+                        width="60px"
+                        height="60px"
+                        borderRadius="lg"
+                        bg="gray.100"
+                        _dark={{ bg: 'gray.700' }}
+                        align="center"
+                        justify="center"
+                        mx="auto"
+                      >
+                        <Icon as={FiShield} boxSize="8" color="green.500" />
+                      </Flex>
+                      <Text fontWeight="bold" fontSize={{ base: 'sm', md: 'md' }}>
+                        {partner.name}
+                      </Text>
+                      <Badge colorScheme="green" fontSize="xs">
+                        {partner.category}
+                      </Badge>
+                    </VStack>
+                  </CardBody>
+                </Card>
+              </FallInPlace>
+            ))}
+          </SimpleGrid>
+
+          <FallInPlace delay={0.5}>
+            <HStack spacing="4" pt="4">
+              <Icon as={FiCheck} color="green.500" boxSize="5" />
+              <Text color="muted" fontSize={{ base: 'sm', md: 'md' }}>
+                Protecting 100+ organizations across Bangladesh since 2019
+              </Text>
+            </HStack>
+          </FallInPlace>
+        </VStack>
+      </Container>
+    </Box>
+  )
+}
+
+const FinalCTASection = () => {
+  const bgGradient = useColorModeValue(
+    'linear(to-br, green.400, green.600)',
+    'linear(to-br, green.600, green.800)'
+  )
+  const overlayBg = useColorModeValue('whiteAlpha.900', 'blackAlpha.700')
+
+  return (
+    <Box position="relative" overflow="hidden">
+      {/* Background with gradient */}
+      <Box bgGradient={bgGradient} py={{ base: '16', md: '24' }}>
+        {/* Decorative elements */}
+        <Box
+          position="absolute"
+          top="-50px"
+          right="-50px"
+          width="300px"
+          height="300px"
+          borderRadius="full"
+          bg="whiteAlpha.100"
+          filter="blur(60px)"
+          pointerEvents="none"
+        />
+        <Box
+          position="absolute"
+          bottom="-50px"
+          left="-50px"
+          width="300px"
+          height="300px"
+          borderRadius="full"
+          bg="whiteAlpha.100"
+          filter="blur(60px)"
+          pointerEvents="none"
+        />
+
+        <Container maxW="container.xl" position="relative" zIndex="1">
+          <FallInPlace>
+            <VStack spacing={{ base: '6', md: '8' }} textAlign="center" color="white">
+              <VStack spacing="4">
+                <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
+                  Ready to Secure Your Future?
+                </Heading>
+                <Text fontSize={{ base: 'lg', md: 'xl' }} maxW="3xl" opacity="0.9">
+                  Whether you need professional security services or want to start your cybersecurity journey,
+                  we're here to help you succeed.
+                </Text>
+              </VStack>
+
+              <HStack spacing={{ base: '3', md: '4' }} flexWrap="wrap" justify="center">
+                <ButtonLink
+                  size="lg"
+                  bg="white"
+                  color="green.600"
+                  _hover={{ bg: 'whiteAlpha.900', transform: 'translateY(-2px)' }}
+                  rightIcon={<Icon as={FiArrowRight} />}
+                  href="/signup"
+                  px={{ base: '6', md: '8' }}
+                >
+                  Get Started Today
+                </ButtonLink>
+                <ButtonLink
+                  size="lg"
+                  variant="outline"
+                  borderColor="white"
+                  color="white"
+                  _hover={{ bg: 'whiteAlpha.200', borderColor: 'white' }}
+                  href="/contact"
+                  px={{ base: '6', md: '8' }}
+                >
+                  Contact Us
+                </ButtonLink>
+              </HStack>
+
+              <HStack spacing="8" pt="4" flexWrap="wrap" justify="center">
+                <HStack>
+                  <Icon as={FiShield} boxSize="5" />
+                  <Text fontSize="sm">Trusted Security</Text>
+                </HStack>
+                <HStack>
+                  <Icon as={FiUsers} boxSize="5" />
+                  <Text fontSize="sm">5000+ Students</Text>
+                </HStack>
+                <HStack>
+                  <Icon as={FiAward} boxSize="5" />
+                  <Text fontSize="sm">Certified Experts</Text>
+                </HStack>
+              </HStack>
+            </VStack>
+          </FallInPlace>
+        </Container>
+      </Box>
+    </Box>
+  )
+}
+
+
 
 const FeaturesSection = () => {
   return (
