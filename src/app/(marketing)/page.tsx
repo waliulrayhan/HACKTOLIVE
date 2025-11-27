@@ -68,7 +68,6 @@ import {
 import * as React from 'react'
 
 import { ButtonLink } from '@/components/shared/button-link/button-link'
-import { keyframes } from '@chakra-ui/react'
 import { Faq } from '@/components/marketing/faq'
 import { Features } from '@/components/marketing/features'
 import { BackgroundGradient } from '@/components/shared/gradients/background-gradient'
