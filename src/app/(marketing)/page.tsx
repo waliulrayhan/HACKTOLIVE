@@ -236,15 +236,15 @@ const HeroSection: React.FC = () => {
                   rightIcon={<Icon as={FiArrowRight} />}
                     flex={{ base: '1', sm: 'none' }}
                   >
-                  Start Learning
+                  Get Started
                   </ButtonLink>
                   <ButtonLink
                     size={{ base: 'md', md: 'lg' }}
-                  href="#features"
+                  href="/academy"
                     variant="outline"
                     flex={{ base: '1', sm: 'none' }}
                   >
-                  Explore Courses
+                  Enroll in Academy
                   </ButtonLink>
                 </Flex>
             </FallInPlace>
