@@ -262,13 +262,13 @@ const HeroSection: React.FC = () => {
                   alignItems="center" 
                   spacing="1" 
                   flex={{ base: '1', sm: 'none' }}
-                  animation="float 3s ease-in-out infinite"
-                  sx={{
-                    '@keyframes float': {
-                      '0%, 100%': { transform: 'translateY(0px)' },
-                      '50%': { transform: 'translateY(-10px)' },
-                    },
-                  }}
+                  // animation="float 3s ease-in-out infinite"
+                  // sx={{
+                  //   '@keyframes float': {
+                  //     '0%, 100%': { transform: 'translateY(0px)' },
+                  //     '50%': { transform: 'translateY(-10px)' },
+                  //   },
+                  // }}
                 >
                   <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                     5000+
@@ -281,14 +281,14 @@ const HeroSection: React.FC = () => {
                   alignItems="center" 
                   spacing="1" 
                   flex={{ base: '1', sm: 'none' }}
-                  animation="float 3s ease-in-out infinite"
-                  sx={{
-                    '@keyframes float': {
-                      '0%, 100%': { transform: 'translateY(0px)' },
-                      '50%': { transform: 'translateY(-10px)' },
-                    },
-                    animationDelay: '0.5s',
-                  }}
+                  // animation="float 3s ease-in-out infinite"
+                  // sx={{
+                  //   '@keyframes float': {
+                  //     '0%, 100%': { transform: 'translateY(0px)' },
+                  //     '50%': { transform: 'translateY(-10px)' },
+                  //   },
+                  //   animationDelay: '0.5s',
+                  // }}
                 >
                   <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                     50+
@@ -301,14 +301,14 @@ const HeroSection: React.FC = () => {
                   alignItems="center" 
                   spacing="1" 
                   flex={{ base: '1', sm: 'none' }}
-                  animation="float 3s ease-in-out infinite"
-                  sx={{
-                    '@keyframes float': {
-                      '0%, 100%': { transform: 'translateY(0px)' },
-                      '50%': { transform: 'translateY(-10px)' },
-                    },
-                    animationDelay: '1s',
-                  }}
+                  // animation="float 3s ease-in-out infinite"
+                  // sx={{
+                  //   '@keyframes float': {
+                  //     '0%, 100%': { transform: 'translateY(0px)' },
+                  //     '50%': { transform: 'translateY(-10px)' },
+                  //   },
+                  //   animationDelay: '1s',
+                  // }}
                 >
                   <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                     100%
