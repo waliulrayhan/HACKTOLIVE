@@ -155,127 +155,105 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
           <Box gridColumn={{ base: "span 1", lg: "span 8" }} order={{ base: 1, lg: 2 }}>
             <Card
               bg={cardBg}
-              borderWidth="2px"
+              borderWidth="1px"
               borderColor={borderColor}
               borderRadius="xl"
               overflow="hidden"
-              boxShadow="lg"
+              boxShadow="sm"
             >
-              <CardBody p={{ base: "6", md: "10" }}>
-                <VStack align="stretch" spacing={{ base: "6", md: "8" }}>
-                  {/* Meta Information */}
+              <CardBody p={{ base: "6", md: "12" }}>
+                <VStack align="stretch" spacing={{ base: "8", md: "10" }}>
+                  {/* Author & Meta Information - Minimalistic */}
                   <FallInPlace delay={0.1}>
-                    <Wrap spacing={{ base: "4", md: "6" }} color={mutedColor}>
-                      <HStack spacing="2">
-                        <Icon as={FiUser} />
-                        <Text fontSize="sm" fontWeight="medium">{blog.author.name}</Text>
-                      </HStack>
-                      <HStack spacing="2">
-                        <Icon as={FiCalendar} />
-                        <Text fontSize="sm">{blog.publishDate}</Text>
-                      </HStack>
-                      <HStack spacing="2">
-                        <Icon as={FiClock} />
-                        <Text fontSize="sm">{blog.readTime}</Text>
-                      </HStack>
-                    </Wrap>
-                  </FallInPlace>
-
-                  <Divider />
-
-                  {/* Author Profile */}
-                  <FallInPlace delay={0.2}>
-                    <Card
-                      bg={bgColor}
-                      borderWidth="1px"
-                      borderColor={borderColor}
-                      borderRadius="lg"
-                    >
-                      <CardBody p="6">
-                        <HStack spacing="4" align="start">
-                          {blog.author.avatar && (
-                            <Avatar
-                              size="xl"
-                              name={blog.author.name}
-                              src={blog.author.avatar}
-                            />
+                    <HStack spacing="4" justify="space-between" flexWrap="wrap">
+                      <HStack spacing="3">
+                        {blog.author.avatar && (
+                          <Avatar
+                            size="md"
+                            name={blog.author.name}
+                            src={blog.author.avatar}
+                          />
+                        )}
+                        <VStack align="start" spacing="0">
+                          <Text fontSize="sm" fontWeight="semibold">
+                            {blog.author.name}
+                          </Text>
+                          {blog.author.role && (
+                            <Text fontSize="xs" color={mutedColor}>
+                              {blog.author.role}
+                            </Text>
                           )}
-                          <VStack align="start" spacing="2" flex="1">
-                            <Heading size="md">{blog.author.name}</Heading>
-                            {blog.author.role && (
-                              <Text fontSize="sm" color={accentColor} fontWeight="semibold">
-                                {blog.author.role}
-                              </Text>
-                            )}
-                            {blog.author.bio && (
-                              <Text fontSize="sm" color={mutedColor}>
-                                {blog.author.bio}
-                              </Text>
-                            )}
-                            {/* Social Links */}
-                            <HStack spacing="3" pt="2">
-                              {blog.author.twitter && (
-                                <Link
-                                  href={`https://twitter.com/${blog.author.twitter}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  <Icon
-                                    as={FiTwitter}
-                                    boxSize="5"
-                                    color={mutedColor}
-                                    _hover={{ color: accentColor }}
-                                    transition="color 0.2s"
-                                  />
-                                </Link>
-                              )}
-                              {blog.author.linkedin && (
-                                <Link
-                                  href={`https://linkedin.com/in/${blog.author.linkedin}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  <Icon
-                                    as={FiLinkedin}
-                                    boxSize="5"
-                                    color={mutedColor}
-                                    _hover={{ color: accentColor }}
-                                    transition="color 0.2s"
-                                  />
-                                </Link>
-                              )}
-                              {blog.author.github && (
-                                <Link
-                                  href={`https://github.com/${blog.author.github}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  <Icon
-                                    as={FiGithub}
-                                    boxSize="5"
-                                    color={mutedColor}
-                                    _hover={{ color: accentColor }}
-                                    transition="color 0.2s"
-                                  />
-                                </Link>
-                              )}
-                            </HStack>
-                          </VStack>
-                        </HStack>
-                      </CardBody>
-                    </Card>
+                        </VStack>
+                      </HStack>
+                      
+                      <HStack spacing="4" fontSize="xs" color={mutedColor} divider={<Text>•</Text>}>
+                        <Text>{blog.publishDate}</Text>
+                        <Text>{blog.readTime}</Text>
+                      </HStack>
+                    </HStack>
+
+                    {/* Social Links - Minimalistic */}
+                    {(blog.author.twitter || blog.author.linkedin || blog.author.github) && (
+                      <HStack spacing="2" pt="3" pl={{ base: "0", md: "52px" }}>
+                        {blog.author.twitter && (
+                          <Link
+                            href={`https://twitter.com/${blog.author.twitter}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Icon
+                              as={FiTwitter}
+                              boxSize="4"
+                              color={mutedColor}
+                              _hover={{ color: accentColor }}
+                              transition="color 0.2s"
+                            />
+                          </Link>
+                        )}
+                        {blog.author.linkedin && (
+                          <Link
+                            href={`https://linkedin.com/in/${blog.author.linkedin}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Icon
+                              as={FiLinkedin}
+                              boxSize="4"
+                              color={mutedColor}
+                              _hover={{ color: accentColor }}
+                              transition="color 0.2s"
+                            />
+                          </Link>
+                        )}
+                        {blog.author.github && (
+                          <Link
+                            href={`https://github.com/${blog.author.github}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Icon
+                              as={FiGithub}
+                              boxSize="4"
+                              color={mutedColor}
+                              _hover={{ color: accentColor }}
+                              transition="color 0.2s"
+                            />
+                          </Link>
+                        )}
+                      </HStack>
+                    )}
                   </FallInPlace>
 
-                  <Divider />
+                  <Divider opacity={0.3} />
 
-                  {/* Article Content */}
-                  <FallInPlace delay={0.3}>
-                    <VStack align="stretch" spacing="6">
-                      <Text fontSize="xl" lineHeight="tall" fontWeight="medium" color={accentColor}>
+                  {/* Article Content - Cleaner Layout */}
+                  <FallInPlace delay={0.2}>
+                    <VStack align="stretch" spacing="8">
+                      <Text fontSize="lg" lineHeight="1.8" color={mutedColor}>
                         {blog.metadata}
                       </Text>
 
-                      <Text fontSize="md" lineHeight="tall">
+                      <Text fontSize="md" lineHeight="1.8">
                         In today's rapidly evolving digital landscape, cybersecurity
                         has become more critical than ever. Organizations face an
                         unprecedented array of threats, from sophisticated ransomware
@@ -283,7 +261,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                         undetected for months or even years.
                       </Text>
 
-                      <Text fontSize="md" lineHeight="tall">
+                      <Text fontSize="md" lineHeight="1.8">
                         This comprehensive guide explores the latest developments in
                         the field, providing actionable insights and practical
                         strategies that security professionals can implement
@@ -292,8 +270,8 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                         proven effective across various industries.
                       </Text>
 
-                      <SimpleGrid columns={{ base: 1, md: 2 }} spacing="6" py="4">
-                        <Box position="relative" height="250px" borderRadius="lg" overflow="hidden" boxShadow="md">
+                      <SimpleGrid columns={{ base: 1, md: 2 }} spacing="4" py="2">
+                        <Box position="relative" height="220px" borderRadius="md" overflow="hidden">
                           <Image
                             src={blog.mainImage}
                             alt="Security illustration 1"
@@ -301,7 +279,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                             style={{ objectFit: "cover" }}
                           />
                         </Box>
-                        <Box position="relative" height="250px" borderRadius="lg" overflow="hidden" boxShadow="md">
+                        <Box position="relative" height="220px" borderRadius="md" overflow="hidden">
                           <Image
                             src="/images/grid-image/image-06.png"
                             alt="Security illustration 2"
@@ -311,11 +289,11 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                         </Box>
                       </SimpleGrid>
 
-                      <Heading size="lg" pt="4" color={accentColor}>
+                      <Heading size="md" pt="4" fontWeight="semibold">
                         Key Takeaways
                       </Heading>
 
-                      <Text fontSize="md" lineHeight="tall">
+                      <Text fontSize="md" lineHeight="1.8">
                         Understanding the evolving threat landscape is crucial for
                         maintaining a robust security posture. Whether you're dealing
                         with zero-day vulnerabilities, implementing new security
@@ -325,13 +303,12 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                       </Text>
 
                       <Box
-                        bg={bgColor}
-                        p="6"
-                        borderRadius="lg"
-                        borderLeft="4px solid"
+                        py="4"
+                        px="6"
+                        borderLeft="3px solid"
                         borderColor={accentColor}
                       >
-                        <Text fontSize="md" lineHeight="tall" fontStyle="italic">
+                        <Text fontSize="md" lineHeight="1.8" fontStyle="italic" color={mutedColor}>
                           "By staying informed about the latest security trends,
                           leveraging modern security tools, and fostering a
                           security-conscious culture within your organization, you can
@@ -340,7 +317,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                         </Text>
                       </Box>
 
-                      <Text fontSize="md" lineHeight="tall">
+                      <Text fontSize="md" lineHeight="1.8">
                         The cybersecurity landscape continues to evolve, and staying ahead
                         requires constant vigilance, continuous learning, and adaptation.
                         Organizations that prioritize security and invest in robust
@@ -350,50 +327,46 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                     </VStack>
                   </FallInPlace>
 
-                  <Divider />
+                  <Divider opacity={0.3} />
 
-                  {/* Tags */}
-                  <FallInPlace delay={0.4}>
-                    <Box>
-                      <Heading size="md" mb="4">
-                        Related Tags
-                      </Heading>
-                      <Wrap spacing="3">
+                  {/* Tags - Simplified */}
+                  <FallInPlace delay={0.3}>
+                    <VStack align="start" spacing="3">
+                      <Text fontSize="xs" fontWeight="semibold" color={mutedColor} textTransform="uppercase" letterSpacing="wide">
+                        Tags
+                      </Text>
+                      <Wrap spacing="2">
                         {blog.tags.map((tag, index) => (
                           <Tag
                             key={index}
-                            size="lg"
+                            size="md"
                             colorScheme="green"
-                            borderRadius="full"
-                            px="4"
-                            py="2"
+                            variant="subtle"
+                            borderRadius="md"
                             fontWeight="medium"
                           >
-                            #{tag}
+                            {tag}
                           </Tag>
                         ))}
                       </Wrap>
-                    </Box>
+                    </VStack>
                   </FallInPlace>
 
-                  <Divider />
+                  <Divider opacity={0.3} />
 
-                  {/* Share and Like Section */}
-                  <FallInPlace delay={0.5}>
+                  {/* Share and Like Section - Cleaner */}
+                  <FallInPlace delay={0.4}>
                     <HStack 
                       spacing="6" 
                       align="center"
                       justify="space-between"
                       flexWrap="wrap"
-                      py="2"
                     >
-                      {/* Like Button */}
                       <LikeButton initialLikes={42} articleId={blog.slug} />
-
-                      {/* Share Post */}
-                      <HStack spacing="2">
-                        <Text fontSize="sm" fontWeight="medium" color={mutedColor}>
-                          Share:
+                      
+                      <HStack spacing="3">
+                        <Text fontSize="xs" fontWeight="medium" color={mutedColor}>
+                          SHARE
                         </Text>
                         <SharePost title={blog.title} />
                       </HStack>
