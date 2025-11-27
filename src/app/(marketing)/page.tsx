@@ -68,19 +68,19 @@ import {
 import * as React from 'react'
 
 import { ButtonLink } from '@/components/shared/button-link/button-link'
-import { Faq } from '@/components/marketing/faq'
-import { Features } from '@/components/marketing/features'
+import { Faq } from './_components/faq'
+import { Features } from './_components/features'
 import { BackgroundGradient } from '@/components/shared/gradients/background-gradient'
-import { Hero } from '@/components/marketing/hero'
+import { Hero } from './_components/hero'
 import {
   Highlights,
   HighlightsItem,
   HighlightsTestimonialItem,
-} from '@/components/marketing/highlights'
-import { ChakraLogo, NextjsLogo } from '@/components/marketing/logos'
+} from './_components/highlights'
+import { ChakraLogo, NextjsLogo } from './_components/logos'
 import { FallInPlace } from '@/components/shared/motion/fall-in-place'
-import { Pricing } from '@/components/marketing/pricing/pricing'
-import { Testimonial, Testimonials } from '@/components/marketing/testimonials'
+import { Pricing } from './_components/pricing/pricing'
+import { Testimonial, Testimonials } from './_components/testimonials'
 import { Em } from '@/components/shared/typography'
 import faq from '@/lib/config/data/faq'
 import pricing from '@/lib/config/data/pricing'

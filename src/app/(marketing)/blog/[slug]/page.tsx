@@ -1,7 +1,7 @@
-import RelatedPost from "@/components/Blog/RelatedPost";
-import SharePost from "@/components/Blog/SharePost";
-import { getBlogBySlug } from "@/components/Blog/blogData";
-import BlogData from "@/components/Blog/blogData";
+import RelatedPost from "../_components/RelatedPost";
+import SharePost from "../_components/SharePost";
+import { getBlogBySlug } from "../_components/blogData";
+import BlogData from "../_components/blogData";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -52,9 +52,9 @@ const SingleBlogPage = async ({ params }: Props) => {
   }
 
   // Import the client component dynamically
-  const SingleBlogContent = (await import("@/components/Blog/SingleBlogContent")).default;
+  const SingleBlogContent = (await import("../_components/SingleBlogContent")).default;
 
-  return <SingleBlogContent blog={blog} />;
+  return <SingleBlogContent blog={blog as any} />;
 };
 
 export default SingleBlogPage;

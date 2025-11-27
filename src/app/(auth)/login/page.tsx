@@ -27,7 +27,7 @@ import {
 import { Link } from '@saas-ui/react'
 import { BackgroundGradient } from '@/components/shared/gradients/background-gradient'
 import { PageTransition } from '@/components/shared/motion/page-transition'
-import { Header } from '@/components/marketing/layout/header'
+import { Header } from '../../(marketing)/_components/layout/header'
 import { NextPage } from 'next'
 import { FaGoogle, FaEye, FaEyeSlash, FaMoon, FaSun, FaHome } from 'react-icons/fa'
 import { useState, useRef } from 'react'

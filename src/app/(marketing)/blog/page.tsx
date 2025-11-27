@@ -17,8 +17,8 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { FiSearch } from "react-icons/fi";
-import BlogData from "@/components/Blog/blogData";
-import BlogItem from "@/components/Blog/BlogItem";
+import BlogData from "./_components/blogData";
+import BlogItem from "./_components/BlogItem";
 import { useState, useMemo } from "react";
 import { BlogCategory, BlogType } from "@/types/blog";
 import { FallInPlace } from "@/components/shared/motion/fall-in-place";

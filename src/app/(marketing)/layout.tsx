@@ -1,4 +1,4 @@
-import { MarketingLayout } from '@/components/marketing/layout'
+import { MarketingLayout } from './_components/layout'
 import { ChakraProvider } from '../chakra-provider'
 
 export default function Layout(props: { children: React.ReactNode }) {
