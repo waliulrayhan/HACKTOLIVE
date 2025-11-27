@@ -24,6 +24,14 @@ import {
   Avatar,
   LinkBox,
   LinkOverlay,
+  Drawer,
+  DrawerBody,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  useDisclosure,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { FiSearch, FiArrowRight, FiMail } from "react-icons/fi";
 import BlogData from "./_components/blogData";
@@ -40,6 +48,9 @@ const BlogPage = () => {
   const [selectedType, setSelectedType] = useState<BlogType | "All">("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const isDesktop = useBreakpointValue({ base: false, lg: true });
 
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
@@ -154,89 +165,98 @@ const BlogPage = () => {
       <Box py={{ base: "10", md: "12", lg: "16" }} bg={bgColor}>
         <Container maxW="container.xl">
           <Grid
-            templateColumns={{ base: "1fr", lg: "280px 1fr" }}
+            templateColumns={isDesktop ? "280px 1fr" : "1fr"}
             gap={{ base: "8", lg: "10" }}
           >
             {/* Left Sidebar - Filters */}
-            <GridItem>
-              <VStack spacing="4" align="stretch" position="sticky" top="24">
-                {/* Category Filter */}
-                <Box>
-                  <Text 
-                    fontSize="xs" 
-                    fontWeight="bold" 
-                    textTransform="uppercase" 
-                    letterSpacing="wider"
-                    mb="3"
-                    color="muted"
-                  >
-                    Categories
-                  </Text>
-                  <Stack spacing="1">
-                    {categories.map((category) => (
-                      <Button
-                        key={category}
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setSelectedCategory(category)}
-                        justifyContent="flex-start"
-                        fontWeight={selectedCategory === category ? "semibold" : "normal"}
-                        color={selectedCategory === category ? accentColor : undefined}
-                        px="2"
-                        _hover={{ bg: hoverBg, pl: "3" }}
-                        transition="all 0.2s"
-                        borderLeftWidth="2px"
-                        borderLeftColor={selectedCategory === category ? accentColor : "transparent"}
-                        borderRadius="0"
-                      >
-                        {category}
-                      </Button>
-                    ))}
-                  </Stack>
-                </Box>
+            {isDesktop && (
+              <GridItem>
+                <VStack spacing="4" align="stretch" position="sticky" top="24">
+                  {/* Category Filter */}
+                  <Box>
+                    <Text 
+                      fontSize="xs" 
+                      fontWeight="bold" 
+                      textTransform="uppercase" 
+                      letterSpacing="wider"
+                      mb="3"
+                      color="muted"
+                    >
+                      Categories
+                    </Text>
+                    <Stack spacing="1">
+                      {categories.map((category) => (
+                        <Button
+                          key={category}
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setSelectedCategory(category)}
+                          justifyContent="flex-start"
+                          fontWeight={selectedCategory === category ? "semibold" : "normal"}
+                          color={selectedCategory === category ? accentColor : undefined}
+                          px="2"
+                          _hover={{ bg: hoverBg, pl: "3" }}
+                          transition="all 0.2s"
+                          borderLeftWidth="2px"
+                          borderLeftColor={selectedCategory === category ? accentColor : "transparent"}
+                          borderRadius="0"
+                        >
+                          {category}
+                        </Button>
+                      ))}
+                    </Stack>
+                  </Box>
 
-                <Divider />
+                  <Divider />
 
-                {/* Blog Type Filter */}
-                <Box>
-                  <Text 
-                    fontSize="xs" 
-                    fontWeight="bold" 
-                    textTransform="uppercase" 
-                    letterSpacing="wider"
-                    mb="3"
-                    color="muted"
-                  >
-                    Blog Types
-                  </Text>
-                  <Stack spacing="1">
-                    {blogTypes.map((type) => (
-                      <Button
-                        key={type}
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setSelectedType(type)}
-                        justifyContent="flex-start"
-                        fontWeight={selectedType === type ? "semibold" : "normal"}
-                        color={selectedType === type ? accentColor : undefined}
-                        px="2"
-                        _hover={{ bg: hoverBg, pl: "3" }}
-                        transition="all 0.2s"
-                        borderLeftWidth="2px"
-                        borderLeftColor={selectedType === type ? accentColor : "transparent"}
-                        borderRadius="0"
-                      >
-                        {type}
-                      </Button>
-                    ))}
-                  </Stack>
-                </Box>
-              </VStack>
-            </GridItem>
+                  {/* Blog Type Filter */}
+                  <Box>
+                    <Text 
+                      fontSize="xs" 
+                      fontWeight="bold" 
+                      textTransform="uppercase" 
+                      letterSpacing="wider"
+                      mb="3"
+                      color="muted"
+                    >
+                      Blog Types
+                    </Text>
+                    <Stack spacing="1">
+                      {blogTypes.map((type) => (
+                        <Button
+                          key={type}
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setSelectedType(type)}
+                          justifyContent="flex-start"
+                          fontWeight={selectedType === type ? "semibold" : "normal"}
+                          color={selectedType === type ? accentColor : undefined}
+                          px="2"
+                          _hover={{ bg: hoverBg, pl: "3" }}
+                          transition="all 0.2s"
+                          borderLeftWidth="2px"
+                          borderLeftColor={selectedType === type ? accentColor : "transparent"}
+                          borderRadius="0"
+                        >
+                          {type}
+                        </Button>
+                      ))}
+                    </Stack>
+                  </Box>
+                </VStack>
+              </GridItem>
+            )}
 
             {/* Right Panel - Blog List */}
             <GridItem>
               <VStack spacing="6" align="stretch">
+                {/* Filters Button for Mobile */}
+                <Box display={{ base: "block", lg: "none" }}>
+                  <Button onClick={onOpen} variant="outline" colorScheme="green" size="sm">
+                    Open Filters
+                  </Button>
+                </Box>
+
                 {/* Search Bar */}
                 <FallInPlace delay={0.3}>
                   <InputGroup size="lg">
@@ -335,6 +355,90 @@ const BlogPage = () => {
           </Grid>
         </Container>
       </Box>
+
+      {/* Drawer for Mobile Filters */}
+      <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Filters</DrawerHeader>
+          <DrawerBody>
+            <VStack spacing="4" align="stretch">
+              {/* Category Filter */}
+              <Box>
+                <Text 
+                  fontSize="xs" 
+                  fontWeight="bold" 
+                  textTransform="uppercase" 
+                  letterSpacing="wider"
+                  mb="3"
+                  color="muted"
+                >
+                  Categories
+                </Text>
+                <Stack spacing="1">
+                  {categories.map((category) => (
+                    <Button
+                      key={category}
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => { setSelectedCategory(category); onClose(); }}
+                      justifyContent="flex-start"
+                      fontWeight={selectedCategory === category ? "semibold" : "normal"}
+                      color={selectedCategory === category ? accentColor : undefined}
+                      px="2"
+                      _hover={{ bg: hoverBg, pl: "3" }}
+                      transition="all 0.2s"
+                      borderLeftWidth="2px"
+                      borderLeftColor={selectedCategory === category ? accentColor : "transparent"}
+                      borderRadius="0"
+                    >
+                      {category}
+                    </Button>
+                  ))}
+                </Stack>
+              </Box>
+
+              <Divider />
+
+              {/* Blog Type Filter */}
+              <Box>
+                <Text 
+                  fontSize="xs" 
+                  fontWeight="bold" 
+                  textTransform="uppercase" 
+                  letterSpacing="wider"
+                  mb="3"
+                  color="muted"
+                >
+                  Blog Types
+                </Text>
+                <Stack spacing="1">
+                  {blogTypes.map((type) => (
+                    <Button
+                      key={type}
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => { setSelectedType(type); onClose(); }}
+                      justifyContent="flex-start"
+                      fontWeight={selectedType === type ? "semibold" : "normal"}
+                      color={selectedType === type ? accentColor : undefined}
+                      px="2"
+                      _hover={{ bg: hoverBg, pl: "3" }}
+                      transition="all 0.2s"
+                      borderLeftWidth="2px"
+                      borderLeftColor={selectedType === type ? accentColor : "transparent"}
+                      borderRadius="0"
+                    >
+                      {type}
+                    </Button>
+                  ))}
+                </Stack>
+              </Box>
+            </VStack>
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
 
       {/* CTA Section */}
       <Box 
