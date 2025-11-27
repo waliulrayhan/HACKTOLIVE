@@ -18,6 +18,7 @@ import {
   useClipboard,
   useColorModeValue,
   Badge,
+  Button,
   Card,
   CardBody,
   CardHeader,
@@ -30,6 +31,11 @@ import {
   Divider,
   Grid,
   GridItem,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalCloseButton,
+  ModalBody,
   useBreakpointValue,
 } from '@chakra-ui/react'
 import { Br, Link } from '@saas-ui/react'
@@ -1133,6 +1139,7 @@ const VideoShowcaseSection = () => {
   const borderColor = useColorModeValue('gray.200', 'gray.700')
   const [isPlaying, setIsPlaying] = React.useState(false)
   const [activeVideo, setActiveVideo] = React.useState('/sample vedio.mp4')
+  const videoRef = React.useRef<HTMLVideoElement | null>(null)
 
   const videos = [
     { 
@@ -1140,26 +1147,26 @@ const VideoShowcaseSection = () => {
       duration: '5:30', 
       views: '2.3K',
       url: '/sample vedio.mp4',
-      thumbnail: '/images/video-thumb/thumb-16.png'
+      thumbnail: '/images/grid-image/image-01.png'
     },
     { 
       title: 'Student Success Stories', 
       duration: '3:45', 
       views: '1.8K',
-      url: '/sample vedio.mp4',
-      thumbnail: '/images/video-thumb/thumb-16.png'
+      url: '/sample vedio 2.mp4',
+      thumbnail: '/images/grid-image/image-02.png'
     },
     { 
       title: 'CTF Competition Highlights', 
       duration: '4:20', 
       views: '3.1K',
-      url: '/sample vedio.mp4',
-      thumbnail: '/images/video-thumb/thumb-16.png'
+      url: '/sample vedio 3.mp4',
+      thumbnail: '/images/grid-image/image-03.png'
     },
   ]
 
   return (
-    <Box py={{ base: '16', md: '24' }} position="relative">
+    <Box py={{ base: '16', md: '24' }} position="relative" bg={useColorModeValue('gray.50', 'transparent')}>
       <Container maxW="container.xl">
         <VStack spacing={{ base: '8', md: '12' }}>
           <FallInPlace>
@@ -1193,17 +1200,19 @@ const VideoShowcaseSection = () => {
                 position="relative"
                 height={{ base: '300px', md: '400px', lg: '500px' }}
               >
-                <Box 
-                  width="100%" 
-                  height="100%"
+                <Box
                   as="video"
+                  ref={videoRef}
+                  width="100%"
+                  height="100%"
                   src={activeVideo}
                   controls
+                  poster={videos.find((v) => v.url === activeVideo)?.thumbnail}
                   autoPlay={isPlaying}
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}
                   borderRadius="16px"
-                  objectFit="cover"
+                  style={{ objectFit: 'cover' }}
                   sx={{
                     '&::-webkit-media-controls-panel': {
                       background: 'linear-gradient(180deg, transparent, rgba(0,0,0,0.8))',
@@ -1214,54 +1223,61 @@ const VideoShowcaseSection = () => {
             </FallInPlace>
 
             <VStack spacing="6" align="stretch">
-              {videos.map((video, index) => (
-                <FallInPlace key={video.title} delay={0.3 + index * 0.1}>
-                  <Card
-                    bg={cardBg}
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    borderRadius="lg"
-                    overflow="hidden"
-                    cursor="pointer"
-                    transition="all 0.3s ease"
-                    _hover={{
-                      transform: 'translateX(8px)',
-                      borderColor: 'green.500',
-                      shadow: 'md',
-                    }}
-                  >
-                    <CardBody p="4">
-                      <HStack spacing="4">
-                        <Flex
-                          width="60px"
-                          height="60px"
-                          borderRadius="lg"
-                          bg="green.50"
-                          _dark={{ bg: 'green.900' }}
-                          align="center"
-                          justify="center"
-                          flexShrink="0"
-                        >
-                          <Icon as={FiPlay} boxSize="6" color="green.500" />
-                        </Flex>
-                        <VStack align="start" spacing="1" flex="1">
-                          <Text fontWeight="semibold" fontSize="sm">{video.title}</Text>
-                          <HStack spacing="3" fontSize="xs" color="muted">
-                            <HStack spacing="1">
-                              <Icon as={FiClock} />
-                              <Text>{video.duration}</Text>
+              {videos.map((video, index) => {
+                const selected = activeVideo === video.url
+
+                return (
+                  <FallInPlace key={video.title} delay={0.3 + index * 0.1}>
+                    <Card
+                      bg={cardBg}
+                      borderWidth="1px"
+                      borderColor={selected ? 'green.500' : borderColor}
+                      borderRadius="lg"
+                      overflow="hidden"
+                      cursor="pointer"
+                      transition="all 0.2s ease"
+                      boxShadow={selected ? 'sm' : undefined}
+                      onClick={() => {
+                        setActiveVideo(video.url)
+                        setIsPlaying(true)
+                        // try to play programmatically to satisfy autoplay policies
+                        requestAnimationFrame(() => {
+                          if (videoRef.current) {
+                            try {
+                              videoRef.current.pause()
+                              videoRef.current.load()
+                              void videoRef.current.play()
+                            } catch (e) {
+                              setIsPlaying(false)
+                            }
+                          }
+                        })
+                      }}
+                    >
+                      <CardBody p="3">
+                        <HStack spacing="3">
+                          <Box flexShrink={0} width="72px" height="48px" borderRadius="md" overflow="hidden">
+                            <Image src={video.thumbnail} alt={video.title} width={72} height={48} style={{ objectFit: 'cover' }} />
+                          </Box>
+                          <VStack align="start" spacing="0" flex="1">
+                            <Text fontWeight="semibold" fontSize="sm">{video.title}</Text>
+                            <HStack spacing="3" fontSize="xs" color="muted">
+                              <HStack spacing="1">
+                                <Icon as={FiClock} />
+                                <Text>{video.duration}</Text>
+                              </HStack>
+                              <HStack spacing="1">
+                                <Icon as={FiUsers} />
+                                <Text>{video.views} views</Text>
+                              </HStack>
                             </HStack>
-                            <HStack spacing="1">
-                              <Icon as={FiUsers} />
-                              <Text>{video.views} views</Text>
-                            </HStack>
-                          </HStack>
-                        </VStack>
-                      </HStack>
-                    </CardBody>
-                  </Card>
-                </FallInPlace>
-              ))}
+                          </VStack>
+                        </HStack>
+                      </CardBody>
+                    </Card>
+                  </FallInPlace>
+                )
+              })}
             </VStack>
           </Grid>
         </VStack>
@@ -1272,185 +1288,345 @@ const VideoShowcaseSection = () => {
 
 const PhotoGallerySection = () => {
   const cardBg = useColorModeValue('white', 'gray.800')
-  const borderColor = useColorModeValue('gray.200', 'gray.700')
-  const overlayBg = useColorModeValue('blackAlpha.700', 'blackAlpha.800')
+  const borderColor = useColorModeValue('gray.100', 'gray.700')
+  const hoverBorderColor = useColorModeValue('green.400', 'green.500')
+  const overlayBg = useColorModeValue('rgba(255,255,255,0.95)', 'rgba(26,32,44,0.95)')
   const [selectedImage, setSelectedImage] = React.useState<number | null>(null)
+  const [startTouchX, setStartTouchX] = React.useState<number | null>(null)
 
   const galleryImages = [
-    { 
-      src: '/images/grid-image/image-01.png', 
-      title: 'Security Workshop 2024', 
-      category: 'Training',
-      description: 'Hands-on penetration testing workshop with 50+ participants',
-      tall: true
-    },
-    { 
-      src: '/images/grid-image/image-02.png', 
-      title: 'CTF Competition', 
-      category: 'Events',
-      description: 'National CTF championship finals',
-      tall: false
-    },
-    { 
-      src: '/images/grid-image/image-03.png', 
-      title: 'Client Presentation', 
-      category: 'Services',
-      description: 'Security audit results presentation for enterprise client',
-      tall: false
-    },
-    { 
-      src: '/images/grid-image/image-04.png', 
-      title: 'Team Building', 
-      category: 'Team',
-      description: 'Annual team retreat and strategy planning',
-      tall: true
-    },
-    { 
-      src: '/images/carousel/carousel-01.png', 
-      title: 'Academy Graduation', 
-      category: 'Training',
-      description: 'Batch 12 graduation ceremony',
-      tall: false
-    },
-    { 
-      src: '/images/carousel/carousel-02.png', 
-      title: 'Security Audit', 
-      category: 'Services',
-      description: 'On-site security assessment in progress',
-      tall: false
-    },
+    { src: '/images/grid-image/image-01.png', title: 'Security Workshop 2024', description: 'Hands-on penetration testing workshop with 50+ participants' },
+    { src: '/images/grid-image/image-02.png', title: 'CTF Competition', description: 'National CTF championship finals' },
+    { src: '/images/grid-image/image-03.png', title: 'Client Presentation', description: 'Security audit results presentation for enterprise client' },
+    { src: '/images/grid-image/image-04.png', title: 'Team Building', description: 'Annual team retreat and strategy planning' },
+    { src: '/images/carousel/carousel-01.png', title: 'Academy Graduation', description: 'Batch 12 graduation ceremony' },
+    { src: '/images/carousel/carousel-02.png', title: 'Security Audit', description: 'On-site security assessment in progress' },
   ]
 
+  // keyboard navigation for lightbox
+  React.useEffect(() => {
+    if (selectedImage == null) return
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedImage(null)
+      if (e.key === 'ArrowRight') setSelectedImage((s) => (s == null ? null : (s + 1) % galleryImages.length))
+      if (e.key === 'ArrowLeft') setSelectedImage((s) => (s == null ? null : (s - 1 + galleryImages.length) % galleryImages.length))
+    }
+
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [selectedImage])
+
+  // lightbox swipe handlers
+  const onTouchStart = (e: React.TouchEvent) => setStartTouchX(e.touches[0]?.clientX ?? null)
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (startTouchX == null) return
+    const endX = e.changedTouches[0]?.clientX ?? startTouchX
+    const delta = startTouchX - endX
+    const threshold = 50
+    if (Math.abs(delta) > threshold) {
+      if (delta > 0) setSelectedImage((s) => (s == null ? null : (s + 1) % galleryImages.length))
+      else setSelectedImage((s) => (s == null ? null : (s - 1 + galleryImages.length) % galleryImages.length))
+    }
+    setStartTouchX(null)
+  }
+
+  const goToPrevious = () => setSelectedImage((s) => (s == null ? null : (s - 1 + galleryImages.length) % galleryImages.length))
+  const goToNext = () => setSelectedImage((s) => (s == null ? null : (s + 1) % galleryImages.length))
+
   return (
-    <Box py={{ base: '16', md: '24' }} bg={useColorModeValue('gray.50', 'gray.900')}>
+    <Box py={{ base: '16', md: '24' }} bg={useColorModeValue('white', 'gray.900')}>
       <Container maxW="container.xl">
-        <VStack spacing={{ base: '8', md: '12' }}>
+        <VStack spacing={{ base: '10', md: '14' }}>
           <FallInPlace>
-            <VStack spacing="4" textAlign="center">
-              <Badge 
-                colorScheme="green" 
-                fontSize="sm" 
-                px="3" 
-                py="1" 
-                borderRadius="full"
-              >
+            <VStack spacing="3" textAlign="center">
+              <Badge colorScheme="green" fontSize="xs" px="3" py="1" borderRadius="full" fontWeight="medium">
                 Gallery
               </Badge>
-              <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
+              <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }} fontWeight="bold">
                 Moments That Matter
               </Heading>
-              <Text fontSize={{ base: 'lg', md: 'xl' }} color="muted" maxW="3xl">
+              <Text fontSize={{ base: 'md', md: 'lg' }} color="muted" maxW="2xl">
                 Explore our journey through training sessions, events, and successful projects
               </Text>
             </VStack>
           </FallInPlace>
 
-          {/* Masonry Gallery Layout */}
-          <Grid
-            templateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }}
-            gap="6"
-            width="100%"
-            autoFlow="dense"
-          >
-            {galleryImages.map((image, index) => (
-              <FallInPlace key={image.src} delay={0.1 * index}>
-                <GridItem rowSpan={{ base: 1, lg: image.tall ? 2 : 1 }}>
-                  <Card
-                    bg={cardBg}
-                    borderWidth="2px"
-                    borderColor={borderColor}
-                    borderRadius="2xl"
-                    overflow="hidden"
-                    cursor="pointer"
-                    position="relative"
-                    height={image.tall ? { base: '300px', lg: '620px' } : '300px'}
-                    transition="all 0.4s ease"
-                    onClick={() => setSelectedImage(index)}
-                    _hover={{
-                      transform: 'translateY(-8px)',
-                      shadow: '2xl',
-                      borderColor: 'green.500',
-                      '& .overlay': { opacity: 1 },
-                      '& img': { transform: 'scale(1.1)' },
-                    }}
-                  >
+          <Box width="100%">
+            <Box
+              as="div"
+              width="100%"
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: ['1fr', 'repeat(2, 1fr)', 'repeat(3, 1fr)'],
+                gap: { base: '4', md: '6' },
+              }}
+            >
+              {galleryImages.map((image, index) => (
+                <Box
+                  key={image.src}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSelectedImage(index)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') setSelectedImage(index) }}
+                  position="relative"
+                  borderRadius="xl"
+                  overflow="hidden"
+                  cursor="pointer"
+                  height={{ base: '240px', md: '280px' }}
+                  bg={cardBg}
+                  border="1px solid"
+                  borderColor={borderColor}
+                  transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                  _hover={{
+                    transform: 'translateY(-4px)',
+                    shadow: 'lg',
+                    borderColor: hoverBorderColor,
+                  }}
+                  _focus={{
+                    outline: 'none',
+                    borderColor: hoverBorderColor,
+                  }}
+                >
+                  <Box position="relative" width="100%" height="100%">
+                    <Image 
+                      src={image.src} 
+                      alt={image.title} 
+                      fill 
+                      style={{ objectFit: 'cover' }} 
+                    />
                     <Box
-                      position="relative"
-                      width="100%"
-                      height="100%"
-                      overflow="hidden"
-                    >
-                      <Image
-                        src={image.src}
-                        alt={image.title}
-                        fill
-                        style={{ 
-                          objectFit: 'cover',
-                          transition: 'transform 0.4s ease',
-                        }}
-                      />
-                    </Box>
-                    <Box
-                      className="overlay"
                       position="absolute"
-                      top="0"
-                      left="0"
-                      width="100%"
-                      height="100%"
-                      bgGradient="linear(to-t, blackAlpha.900, blackAlpha.300, transparent)"
-                      opacity="0"
-                      transition="opacity 0.4s ease"
-                      display="flex"
-                      flexDirection="column"
-                      justifyContent="space-between"
-                      p="6"
-                    >
-                      <HStack justify="space-between" align="start">
-                        <Badge 
-                          colorScheme="green" 
-                          fontSize="sm"
-                          px="3"
-                          py="1"
-                          borderRadius="full"
-                        >
-                          {image.category}
-                        </Badge>
-                        <IconButton
-                          aria-label="View fullscreen"
-                          icon={<Icon as={FiExternalLink} />}
-                          size="sm"
-                          colorScheme="whiteAlpha"
-                          borderRadius="full"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setSelectedImage(index)
-                          }}
-                        />
-                      </HStack>
-                      
-                      <VStack align="start" spacing="2" color="white">
-                        <Heading size="md">{image.title}</Heading>
-                        <Text fontSize="sm" opacity="0.9">
-                          {image.description}
-                        </Text>
-                      </VStack>
-                    </Box>
-                  </Card>
-                </GridItem>
-              </FallInPlace>
-            ))}
-          </Grid>
+                      inset={0}
+                      bgGradient="linear(to-t, blackAlpha.700, transparent)"
+                      opacity={0}
+                      transition="opacity 0.3s"
+                      _groupHover={{ opacity: 1 }}
+                    />
+                  </Box>
+                  <Box
+                    position="absolute"
+                    left={0}
+                    right={0}
+                    bottom={0}
+                    p={{ base: 4, md: 5 }}
+                    bgGradient="linear(to-t, blackAlpha.800, transparent)"
+                    color="white"
+                  >
+                    <Heading size="sm" mb={2} noOfLines={1}>
+                      {image.title}
+                    </Heading>
+                    <Text fontSize="xs" opacity={0.9} noOfLines={2}>
+                      {image.description}
+                    </Text>
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+          </Box>
 
-          <FallInPlace delay={0.6}>
-            <ButtonLink
-              variant="outline"
-              size="lg"
-              href="/gallery"
+          <FallInPlace delay={0.4}>
+            <ButtonLink 
+              variant="outline" 
+              size="lg" 
+              href="/gallery" 
               rightIcon={<Icon as={FiArrowRight} />}
+              colorScheme="green"
             >
               View Full Gallery
             </ButtonLink>
           </FallInPlace>
+
+          {/* Lightbox Modal */}
+          <Modal 
+            isOpen={selectedImage != null} 
+            onClose={() => setSelectedImage(null)} 
+            size={{ base: 'full', md: '6xl' }}
+            isCentered
+            scrollBehavior="inside"
+          >
+            <ModalOverlay 
+              bg="blackAlpha.900" 
+              backdropFilter="blur(8px)" 
+            />
+            <ModalContent
+              bg="transparent"
+              boxShadow="none"
+              maxW={{ base: '100vw', md: '90vw' }}
+              maxH={{ base: '100vh', md: '90vh' }}
+              m={0}
+              p={{ base: 0, md: 4 }}
+              overflow="hidden"
+            >
+              <ModalCloseButton
+                position="fixed"
+                top={{ base: 4, md: 6 }}
+                right={{ base: 4, md: 6 }}
+                color="white"
+                bg="blackAlpha.600"
+                _hover={{ bg: 'blackAlpha.700' }}
+                size="lg"
+                borderRadius="full"
+                zIndex={20}
+              />
+              
+              <ModalBody p={0} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} overflow="hidden">
+                {selectedImage != null && (
+                  <>
+                    {/* Mobile Layout */}
+                    <Flex
+                      direction="column"
+                      minH="100vh"
+                      width="100vw"
+                      display={{ base: 'flex', md: 'none' }}
+                      py={16}
+                      px={4}
+                    >
+                      <VStack spacing={4} flex={1} justify="center">
+                        <Box 
+                          position="relative" 
+                          width="100%"
+                          maxH="60vh"
+                          aspectRatio="4/3"
+                          bg={useColorModeValue('white', 'gray.800')}
+                          borderRadius="lg"
+                          overflow="hidden"
+                          boxShadow="xl"
+                        >
+                          <Image
+                            src={galleryImages[selectedImage].src}
+                            alt={galleryImages[selectedImage].title}
+                            fill
+                            style={{ objectFit: 'contain' }}
+                          />
+                        </Box>
+                        
+                        <VStack spacing={4} width="100%">
+                          <VStack spacing={2} width="100%" textAlign="center">
+                            <Heading size="md" color="white">
+                              {galleryImages[selectedImage].title}
+                            </Heading>
+                            <Text fontSize="sm" color="whiteAlpha.900">
+                              {galleryImages[selectedImage].description}
+                            </Text>
+                          </VStack>
+
+                          <HStack spacing={3} justify="center" align="center">
+                            <Button
+                              onClick={goToPrevious}
+                              size="md"
+                              colorScheme="green"
+                              variant="ghost"
+                              color="white"
+                              leftIcon={<Icon as={FiChevronLeft} />}
+                              _hover={{ bg: 'whiteAlpha.200' }}
+                            >
+                              Previous
+                            </Button>
+                            
+                            <Text fontSize="md" color="white" fontWeight="semibold" px={2}>
+                              {selectedImage + 1} / {galleryImages.length}
+                            </Text>
+                            
+                            <Button
+                              onClick={goToNext}
+                              size="md"
+                              colorScheme="green"
+                              variant="ghost"
+                              color="white"
+                              rightIcon={<Icon as={FiChevronRight} />}
+                              _hover={{ bg: 'whiteAlpha.200' }}
+                            >
+                              Next
+                            </Button>
+                          </HStack>
+                        </VStack>
+                      </VStack>
+                    </Flex>
+
+                    {/* Desktop Layout */}
+                    <Flex
+                      direction="column"
+                      align="center"
+                      justify="center"
+                      display={{ base: 'none', md: 'flex' }}
+                      minH="85vh"
+                    >
+                      <Box
+                        position="relative"
+                        width="100%"
+                        maxW="1200px"
+                        mx="auto"
+                      >
+                        {/* Image Container */}
+                        <Box
+                          position="relative"
+                          width="100%"
+                          height="70vh"
+                          bg={useColorModeValue('white', 'gray.800')}
+                          borderRadius="xl"
+                          overflow="hidden"
+                          boxShadow="2xl"
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <Image
+                            src={galleryImages[selectedImage].src}
+                            alt={galleryImages[selectedImage].title}
+                            fill
+                            style={{ objectFit: 'contain' }}
+                          />
+                        </Box>
+
+                        {/* Info Section */}
+                        <VStack spacing={4} mt={6}>
+                          <VStack spacing={2} textAlign="center">
+                            <Heading size="md" color="white">
+                              {galleryImages[selectedImage].title}
+                            </Heading>
+                            <Text fontSize="sm" color="whiteAlpha.900" maxW="2xl">
+                              {galleryImages[selectedImage].description}
+                            </Text>
+                          </VStack>
+
+                          <HStack spacing={4} justify="center" align="center">
+                            <Button
+                              onClick={goToPrevious}
+                              size="md"
+                              colorScheme="green"
+                              variant="ghost"
+                              color="white"
+                              leftIcon={<Icon as={FiChevronLeft} />}
+                              _hover={{ bg: 'whiteAlpha.200' }}
+                            >
+                              Previous
+                            </Button>
+                            
+                            <Text fontSize="md" color="white" fontWeight="semibold" px={3}>
+                              {selectedImage + 1} / {galleryImages.length}
+                            </Text>
+                            
+                            <Button
+                              onClick={goToNext}
+                              size="md"
+                              colorScheme="green"
+                              variant="ghost"
+                              color="white"
+                              rightIcon={<Icon as={FiChevronRight} />}
+                              _hover={{ bg: 'whiteAlpha.200' }}
+                            >
+                              Next
+                            </Button>
+                          </HStack>
+                        </VStack>
+                      </Box>
+                    </Flex>
+                  </>
+                )}
+              </ModalBody>
+            </ModalContent>
+          </Modal>
         </VStack>
       </Container>
     </Box>
@@ -1843,8 +2019,6 @@ const FinalCTASection = () => {
     </Box>
   )
 }
-
-
 
 const FeaturesSection = () => {
   return (
