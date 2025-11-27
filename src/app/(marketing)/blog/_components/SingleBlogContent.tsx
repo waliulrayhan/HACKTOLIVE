@@ -27,6 +27,8 @@ import RelatedPost from "./RelatedPost";
 import CategoriesSidebar from "./CategoriesSidebar";
 import BlogTypesSidebar from "./BlogTypesSidebar";
 import LikeButton from "./LikeButton";
+import NewsletterSection from "./NewsletterSection";
+import RecommendedPosts from "./RecommendedPosts";
 
 interface Blog {
   _id: string;
@@ -403,6 +405,18 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
           </Box>
         </SimpleGrid>
       </Container>
+
+      {/* Recommended Posts Section - Full Width */}
+      <Container maxW="container.xl" py="12">
+        <FallInPlace delay={0.6}>
+          <RecommendedPosts currentBlogId={blog._id} />
+        </FallInPlace>
+      </Container>
+
+      {/* Newsletter Section - Full Width */}
+      <FallInPlace delay={0.7}>
+        <NewsletterSection />
+      </FallInPlace>
     </Box>
   );
 }

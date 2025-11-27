@@ -51,8 +51,8 @@ const RelatedPost = ({ currentBlogId }: RelatedPostProps) => {
               <HStack spacing="3" align="start">
                 <Box
                   position="relative"
-                  width="60px"
-                  height="45px"
+                  width="100px"
+                  height="60px"
                   flexShrink={0}
                   borderRadius="md"
                   overflow="hidden"
@@ -80,7 +80,7 @@ const RelatedPost = ({ currentBlogId }: RelatedPostProps) => {
                     {post.title}
                   </Text>
                   <Text color={mutedColor} fontSize="xs">
-                    {post.readTime}
+                    {post.author.name} · {post.readTime}
                   </Text>
                 </VStack>
               </HStack>
