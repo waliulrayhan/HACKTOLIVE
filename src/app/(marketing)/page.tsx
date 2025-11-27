@@ -68,6 +68,7 @@ import {
 import * as React from 'react'
 
 import { ButtonLink } from '@/components/shared/button-link/button-link'
+import { keyframes } from '@chakra-ui/react'
 import { Faq } from '@/components/marketing/faq'
 import { Features } from '@/components/marketing/features'
 import { BackgroundGradient } from '@/components/shared/gradients/background-gradient'
@@ -258,7 +259,18 @@ const HeroSection: React.FC = () => {
                 justify={{ base: 'center', md: 'flex-start' }}
                 style={{ willChange: 'transform, opacity' }}
               >
-                <VStack alignItems="center" spacing="1" flex={{ base: '1', sm: 'none' }}>
+                <VStack 
+                  alignItems="center" 
+                  spacing="1" 
+                  flex={{ base: '1', sm: 'none' }}
+                  animation="float 3s ease-in-out infinite"
+                  sx={{
+                    '@keyframes float': {
+                      '0%, 100%': { transform: 'translateY(0px)' },
+                      '50%': { transform: 'translateY(-10px)' },
+                    },
+                  }}
+                >
                   <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                     5000+
                   </Text>
@@ -266,7 +278,19 @@ const HeroSection: React.FC = () => {
                     Students Trained
                   </Text>
                 </VStack>
-                <VStack alignItems="center" spacing="1" flex={{ base: '1', sm: 'none' }}>
+                <VStack 
+                  alignItems="center" 
+                  spacing="1" 
+                  flex={{ base: '1', sm: 'none' }}
+                  animation="float 3s ease-in-out infinite"
+                  sx={{
+                    '@keyframes float': {
+                      '0%, 100%': { transform: 'translateY(0px)' },
+                      '50%': { transform: 'translateY(-10px)' },
+                    },
+                    animationDelay: '0.5s',
+                  }}
+                >
                   <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                     50+
                   </Text>
@@ -274,7 +298,19 @@ const HeroSection: React.FC = () => {
                     Security Audits
                   </Text>
                 </VStack>
-                <VStack alignItems="center" spacing="1" flex={{ base: '1', sm: 'none' }}>
+                <VStack 
+                  alignItems="center" 
+                  spacing="1" 
+                  flex={{ base: '1', sm: 'none' }}
+                  animation="float 3s ease-in-out infinite"
+                  sx={{
+                    '@keyframes float': {
+                      '0%, 100%': { transform: 'translateY(0px)' },
+                      '50%': { transform: 'translateY(-10px)' },
+                    },
+                    animationDelay: '1s',
+                  }}
+                >
                   <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                     100%
                   </Text>
@@ -404,7 +440,20 @@ const ServicesOverviewSection = () => {
         <VStack spacing={{ base: '8', md: '12' }}>
           <FallInPlace>
             <VStack spacing="4" textAlign="center">
-              <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+              <Badge 
+                colorScheme="green" 
+                fontSize="sm" 
+                px="3" 
+                py="1" 
+                borderRadius="full"
+                animation="slideInDown 0.5s ease-out"
+                sx={{
+                  '@keyframes slideInDown': {
+                    '0%': { transform: 'translateY(-20px)', opacity: 0 },
+                    '100%': { transform: 'translateY(0)', opacity: 1 },
+                  },
+                }}
+              >
                 Professional Services
               </Badge>
               <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
@@ -445,6 +494,13 @@ const ServicesOverviewSection = () => {
                         _dark={{ bg: `${service.color}.900` }}
                         align="center"
                         justify="center"
+                        animation="pulse 2s ease-in-out infinite"
+                        sx={{
+                          '@keyframes pulse': {
+                            '0%, 100%': { transform: 'scale(1)', opacity: 1 },
+                            '50%': { transform: 'scale(1.05)', opacity: 0.9 },
+                          },
+                        }}
                       >
                         <Icon as={service.icon} boxSize="8" color={`${service.color}.500`} />
                       </Flex>
@@ -546,7 +602,20 @@ const AcademyProgramsSection = () => {
         <VStack spacing={{ base: '8', md: '12' }}>
           <FallInPlace>
             <VStack spacing="4" textAlign="center">
-              <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+              <Badge 
+                colorScheme="green" 
+                fontSize="sm" 
+                px="3" 
+                py="1" 
+                borderRadius="full"
+                animation="slideInDown 0.5s ease-out"
+                sx={{
+                  '@keyframes slideInDown': {
+                    '0%': { transform: 'translateY(-20px)', opacity: 0 },
+                    '100%': { transform: 'translateY(0)', opacity: 1 },
+                  },
+                }}
+              >
                 Academy Programs
               </Badge>
               <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
@@ -587,6 +656,10 @@ const AcademyProgramsSection = () => {
                         _dark={{ bg: `${program.color}.900` }}
                         align="center"
                         justify="center"
+                        transition="all 0.3s ease"
+                        _hover={{
+                          transform: 'rotate(10deg) scale(1.1)',
+                        }}
                       >
                         <Icon as={program.icon} boxSize="6" color={`${program.color}.500`} />
                       </Flex>
@@ -727,7 +800,20 @@ const KeyAchievementsSection = () => {
         <VStack spacing={{ base: '8', md: '12' }}>
           <FallInPlace>
             <VStack spacing="4" textAlign="center">
-              <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+              <Badge 
+                colorScheme="green" 
+                fontSize="sm" 
+                px="3" 
+                py="1" 
+                borderRadius="full"
+                animation="slideInDown 0.5s ease-out"
+                sx={{
+                  '@keyframes slideInDown': {
+                    '0%': { transform: 'translateY(-20px)', opacity: 0 },
+                    '100%': { transform: 'translateY(0)', opacity: 1 },
+                  },
+                }}
+              >
                 Our Achievements
               </Badge>
               <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
@@ -772,7 +858,19 @@ const KeyAchievementsSection = () => {
                       </Flex>
 
                       <VStack spacing="2">
-                        <Text fontSize={{ base: '3xl', md: '4xl' }} fontWeight="bold" color={accentColor}>
+                        <Text 
+                          fontSize={{ base: '3xl', md: '4xl' }} 
+                          fontWeight="bold" 
+                          color={accentColor}
+                          animation="countUp 1s ease-out"
+                          sx={{
+                            '@keyframes countUp': {
+                              '0%': { transform: 'scale(0.5)', opacity: 0 },
+                              '60%': { transform: 'scale(1.1)' },
+                              '100%': { transform: 'scale(1)', opacity: 1 },
+                            },
+                          }}
+                        >
                           {achievement.number}
                         </Text>
                         <Heading size="sm" fontSize={{ base: 'lg', md: 'xl' }}>
@@ -849,10 +947,28 @@ const TrustedBySection = () => {
                   borderRadius="lg"
                   transition="all 0.3s ease"
                   cursor="pointer"
+                  position="relative"
+                  overflow="hidden"
                   _hover={{
                     transform: 'translateY(-4px)',
                     shadow: 'md',
                     borderColor: 'green.500',
+                  }}
+                  _before={{
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: '-100%',
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, transparent, rgba(72, 187, 120, 0.1), transparent)',
+                    animation: 'shimmer 3s infinite',
+                  }}
+                  sx={{
+                    '@keyframes shimmer': {
+                      '0%': { left: '-100%' },
+                      '100%': { left: '100%' },
+                    },
                   }}
                 >
                   <CardBody p={{ base: '4', md: '6' }} textAlign="center">
@@ -866,6 +982,8 @@ const TrustedBySection = () => {
                         align="center"
                         justify="center"
                         mx="auto"
+                        transition="transform 0.3s ease"
+                        _groupHover={{ transform: 'scale(1.1)' }}
                       >
                         <Icon as={FiShield} boxSize="8" color="green.500" />
                       </Flex>
@@ -918,6 +1036,13 @@ const FinalCTASection = () => {
           bg="whiteAlpha.100"
           filter="blur(60px)"
           pointerEvents="none"
+          animation="floatSlow 6s ease-in-out infinite"
+          sx={{
+            '@keyframes floatSlow': {
+              '0%, 100%': { transform: 'translate(0, 0)' },
+              '50%': { transform: 'translate(-20px, -20px)' },
+            },
+          }}
         />
         <Box
           position="absolute"
@@ -929,6 +1054,13 @@ const FinalCTASection = () => {
           bg="whiteAlpha.100"
           filter="blur(60px)"
           pointerEvents="none"
+          animation="floatSlow 8s ease-in-out infinite"
+          sx={{
+            '@keyframes floatSlow': {
+              '0%, 100%': { transform: 'translate(0, 0)' },
+              '50%': { transform: 'translate(20px, 20px)' },
+            },
+          }}
         />
 
         <Container maxW="container.xl" position="relative" zIndex="1">
