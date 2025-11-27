@@ -260,23 +260,23 @@ const BlogPage = () => {
                 {/* Search Bar */}
                 <FallInPlace delay={0.3}>
                   <InputGroup size="lg">
-                    <Input
-                      placeholder="Search articles, tags, or topics..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      bg={cardBg}
-                      borderColor={borderColor}
-                      borderWidth="2px"
-                      borderRadius="xl"
-                      _hover={{ borderColor: accentColor }}
-                      _focus={{ borderColor: accentColor, boxShadow: "lg" }}
-                      fontSize={{ base: "md", md: "lg" }}
-                      py={{ base: "6", md: "7" }}
-                    />
-                    <InputRightElement h="full" pr="4">
-                      <Icon as={FiSearch} boxSize="5" color="gray.400" />
-                    </InputRightElement>
-                  </InputGroup>
+                      <Input
+                        placeholder="Search articles, tags, or topics..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        bg={cardBg}
+                        borderColor={borderColor}
+                        borderWidth="2px"
+                        borderRadius="xl"
+                        _hover={{ borderColor: accentColor }}
+                        _focus={{ borderColor: accentColor, boxShadow: "lg" }}
+                        fontSize={{ base: "md", md: "lg" }}
+                        py={{ base: "6", md: "7" }}
+                      />
+                      <InputRightElement h="full" pr="4">
+                        <Icon as={FiSearch} boxSize="5" color="gray.400" />
+                      </InputRightElement>
+                    </InputGroup>
                 </FallInPlace>
 
                 {/* Results Header */}
@@ -498,7 +498,7 @@ const BlogPage = () => {
   );
 };
 
-// Blog List Item Component (Row Layout)
+// Blog List Item Component (Responsive Layout)
 const BlogListItem = ({ blog }: { blog: Blog }) => {
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
@@ -508,22 +508,27 @@ const BlogListItem = ({ blog }: { blog: Blog }) => {
   return (
     <LinkBox as={Card}
       bg={cardBg}
-      borderWidth="2px"
+      borderWidth={{ base: "1px", md: "2px" }}
       borderColor={borderColor}
-      borderRadius="xl"
+      borderRadius={{ base: "lg", md: "xl" }}
       overflow="hidden"
       transition="all 0.3s ease"
       cursor="pointer"
       _hover={{
-        transform: "translateY(-4px)",
+        transform: { base: "none", md: "translateY(-4px)" },
         borderColor: accentColor,
-        shadow: "xl",
+        shadow: { base: "md", md: "xl" },
       }}
     >
       <CardBody p="0">
-        <Grid templateColumns={{ base: "1fr", md: "280px 1fr" }} gap="0">
+        <Flex direction={{ base: "column", md: "row" }}>
           {/* Image */}
-          <Box position="relative" height={{ base: "200px", md: "220px" }}>
+          <Box 
+            position="relative" 
+            width={{ base: "100%", md: "280px" }}
+            height={{ base: "170px", sm: "220px", md: "220px" }}
+            flexShrink={0}
+          >
             <Image 
               src={blog.mainImage} 
               alt={blog.title} 
@@ -546,8 +551,13 @@ const BlogListItem = ({ blog }: { blog: Blog }) => {
           </Box>
 
           {/* Content */}
-          <VStack align="stretch" spacing="4" p={{ base: "5", md: "6" }}>
-            <VStack align="stretch" spacing="3">
+          <VStack 
+            align="stretch" 
+            spacing={{ base: "3", md: "4" }} 
+            p={{ base: "4", sm: "5", md: "6" }}
+            flex="1"
+          >
+            <VStack align="stretch" spacing={{ base: "3", md: "3" }}>
               <HStack spacing="2" flexWrap="wrap">
                 <Badge colorScheme="green" fontSize="xs">
                   {blog.category}
@@ -559,38 +569,61 @@ const BlogListItem = ({ blog }: { blog: Blog }) => {
 
               <LinkOverlay as={Link} href={`/blog/${blog.slug}`}>
                 <Heading 
-                  size={{ base: "md", md: "lg" }}
+                  size={{ base: "sm", sm: "md", md: "lg" , lg: "lg" }}
                   noOfLines={2}
                   _hover={{ color: accentColor }}
                   transition="color 0.2s"
+                  lineHeight="shorter"
                 >
                   {blog.title}
                 </Heading>
               </LinkOverlay>
 
-              <Text color={mutedColor} noOfLines={2} fontSize="sm">
+              <Text 
+                color={mutedColor} 
+                noOfLines={{ base: 3, md: 2 }} 
+                fontSize={{ base: "xs", sm: "sm" }}
+                lineHeight="short"
+              >
                 {blog.metadata}
               </Text>
             </VStack>
 
-            <HStack spacing="4" pt="2" borderTopWidth="1px" borderColor={borderColor}>
-              <HStack spacing="3">
-                <Avatar size="sm" name={blog.author.name} src={blog.author.avatar} />
+            {/* Author Info - Responsive Layout */}
+            <Stack 
+              direction={{ base: "column", sm: "row" }}
+              spacing={{ base: "2", sm: "4" }} 
+              pt={{ base: "2", md: "2" }} 
+              borderTopWidth="1px" 
+              borderColor={borderColor}
+              align={{ base: "flex-start", sm: "center" }}
+            >
+              <HStack spacing="3" flex={{ base: "auto", sm: "1" }}>
+                <Avatar 
+                  size={{ base: "xs", sm: "sm" }} 
+                  name={blog.author.name} 
+                  src={blog.author.avatar} 
+                />
                 <VStack align="start" spacing="0">
-                  <Text fontSize="sm" fontWeight="semibold">
+                  <Text fontSize={{ base: "xs", sm: "sm" }} fontWeight="semibold" noOfLines={1}>
                     {blog.author.name}
                   </Text>
-                  <Text fontSize="xs" color={mutedColor}>
+                  <Text fontSize="xs" color={mutedColor} display={{ base: "xs", sm: "block" }}>
                     {blog.author.role}
                   </Text>
                 </VStack>
               </HStack>
-              <Text fontSize="xs" color={mutedColor} ml="auto">
+              <Text 
+                fontSize="xs" 
+                color={mutedColor} 
+                flexShrink={0}
+                whiteSpace={{ base: "normal", sm: "nowrap" }}
+              >
                 {blog.publishDate} • {blog.readTime}
               </Text>
-            </HStack>
+            </Stack>
           </VStack>
-        </Grid>
+        </Flex>
       </CardBody>
     </LinkBox>
   );
