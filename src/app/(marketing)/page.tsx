@@ -663,9 +663,10 @@ const ServicesOverviewSection = () => {
 
 const AcademyProgramsSection = () => {
   const cardBg = useColorModeValue('white', 'gray.800')
-  const borderColor = useColorModeValue('gray.200', 'gray.700')
+  const borderColor = useColorModeValue('gray.200', 'gray.600')
   const accentColor = useColorModeValue('green.500', 'green.400')
   const hoverBg = useColorModeValue('green.50', 'green.900')
+  const mutedColor = useColorModeValue('gray.600', 'gray.300')
 
   const programs = [
     {
@@ -747,7 +748,14 @@ const AcademyProgramsSection = () => {
   ]
 
   return (
-    <Box py={{ base: '16', md: '24' }} position="relative">
+    <Box
+      py={{ base: '16', md: '24' }}
+      position="relative"
+      bgGradient={useColorModeValue(
+        'linear(to-br, green.100, white)',
+        'linear(to-br, gray.900, green.900)'
+      )}
+    >
       <Container maxW="container.xl">
         <VStack spacing={{ base: '8', md: '12' }}>
           <FallInPlace>
@@ -788,10 +796,15 @@ const AcademyProgramsSection = () => {
                   overflow="hidden"
                   transition="all 0.3s ease"
                   cursor="pointer"
+                  boxShadow={useColorModeValue('sm', '0 8px 30px rgba(0,0,0,0.6)')}
                   _hover={{
                     transform: 'translateY(-8px)',
                     borderColor: `${program.color}.500`,
                     shadow: 'xl',
+                  }}
+                  _dark={{
+                    bg: 'gray.800',
+                    borderColor: 'gray.600',
                   }}
                   height="100%"
                 >
@@ -826,10 +839,10 @@ const AcademyProgramsSection = () => {
                             <Icon as={FiStar} color="yellow.400" boxSize="4" fill="currentColor" />
                             <Text fontWeight="bold" fontSize="sm">{program.rating}</Text>
                           </HStack>
-                          <Text fontSize="xs" color="muted">({program.reviews} reviews)</Text>
+                          <Text fontSize="xs" color={mutedColor}>({program.reviews} reviews)</Text>
                         </HStack>
 
-                        <Text color="muted" fontSize="sm" noOfLines={2}>
+                        <Text color={mutedColor} fontSize="sm" noOfLines={2}>
                           {program.description}
                         </Text>
 
@@ -852,10 +865,13 @@ const AcademyProgramsSection = () => {
                           size="sm"
                         />
                         <VStack align="start" spacing="0" flex="1">
-                          <Text fontSize="xs" fontWeight="semibold" noOfLines={1}>
+                          <Text fontSize="xs" color={mutedColor} fontWeight="medium">
+                            Instructed by
+                          </Text>
+                          <Text fontSize={{ base: 'xs', md: 'sm', lg: 'md' }} fontWeight="semibold" noOfLines={1}>
                             {program.instructor.name}
                           </Text>
-                          <Text fontSize="xs" color="muted" noOfLines={1}>
+                          <Text fontSize={{ base: 'xs', md: 'sm', lg: 'md' }} color={mutedColor} noOfLines={1}>
                             {program.instructor.title}
                           </Text>
                         </VStack>
