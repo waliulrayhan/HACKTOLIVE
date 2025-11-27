@@ -439,9 +439,44 @@ const ServicesOverviewSection = () => {
   React.useEffect(() => {
     const interval = setInterval(() => {
       setActiveService((prev) => (prev + 1) % services.length)
-    }, 5000)
+    }, 60000)
     return () => clearInterval(interval)
   }, [])
+
+  // Touch handlers for mobile swipe support
+  const touchStartXRef = React.useRef<number | null>(null)
+  const touchCurrentXRef = React.useRef<number | null>(null)
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0]?.clientX ?? null
+    touchCurrentXRef.current = touchStartXRef.current
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchCurrentXRef.current = e.touches[0]?.clientX ?? touchCurrentXRef.current
+  }
+
+  const handleTouchEnd = () => {
+    const start = touchStartXRef.current
+    const end = touchCurrentXRef.current
+    if (start == null || end == null) return
+
+    const delta = start - end
+    const threshold = 50 // px
+
+    if (Math.abs(delta) > threshold) {
+      if (delta > 0) {
+        // swiped left -> next
+        setActiveService((prev) => (prev + 1) % services.length)
+      } else {
+        // swiped right -> previous
+        setActiveService((prev) => (prev - 1 + services.length) % services.length)
+      }
+    }
+
+    touchStartXRef.current = null
+    touchCurrentXRef.current = null
+  }
 
   return (
     <Box py={{ base: '16', md: '24' }} bg={bgColor} position="relative" overflow="hidden">
@@ -489,11 +524,20 @@ const ServicesOverviewSection = () => {
           </FallInPlace>
 
           {/* Featured Service Carousel */}
-          <Box width="100%" position="relative" mb="8">
+          <Box
+            width="100%"
+            position="relative"
+            mb="8"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            role="region"
+            aria-label="Featured services carousel"
+          >
             <Card
               bg={cardBg}
               borderWidth="2px"
-              borderColor={activeService === 0 ? hoverBorder : borderColor}
+              borderColor={`${services[activeService].color}.500`}
               borderRadius="2xl"
               overflow="hidden"
               transition="all 0.5s ease"
@@ -582,6 +626,7 @@ const ServicesOverviewSection = () => {
               _hover={{ bg: 'blackAlpha.800' }}
               size="lg"
               borderRadius="full"
+              display={{ base: 'none', md: 'flex' }}
             />
             <IconButton
               aria-label="Next service"
@@ -596,59 +641,9 @@ const ServicesOverviewSection = () => {
               _hover={{ bg: 'blackAlpha.800' }}
               size="lg"
               borderRadius="full"
+              display={{ base: 'none', md: 'flex' }}
             />
           </Box>
-
-          {/* Service Grid */}
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={{ base: '6', md: '6' }} width="100%">
-            {services.map((service, index) => (
-              <FallInPlace key={service.title} delay={0.1 * index}>
-                <Card
-                  bg={cardBg}
-                  borderWidth="2px"
-                  borderColor={activeService === index ? hoverBorder : borderColor}
-                  borderRadius="xl"
-                  overflow="hidden"
-                  transition="all 0.3s ease"
-                  cursor="pointer"
-                  onClick={() => setActiveService(index)}
-                  _hover={{
-                    transform: 'translateY(-8px)',
-                    borderColor: hoverBorder,
-                    shadow: 'xl',
-                  }}
-                  height="100%"
-                  opacity={activeService === index ? 1 : 0.7}
-                >
-                  <Box position="relative" height="150px">
-                    <Image
-                      src={service.image}
-                      alt={service.title}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                    />
-                  </Box>
-                  <CardBody p={{ base: '5', md: '6' }}>
-                    <VStack align="start" spacing="3">
-                      <Flex
-                        width="50px"
-                        height="50px"
-                        borderRadius="lg"
-                        bg={`${service.color}.50`}
-                        _dark={{ bg: `${service.color}.900` }}
-                        align="center"
-                        justify="center"
-                      >
-                        <Icon as={service.icon} boxSize="6" color={`${service.color}.500`} />
-                      </Flex>
-                      
-                      <Heading size="sm" fontSize="md">{service.title}</Heading>
-                    </VStack>
-                  </CardBody>
-                </Card>
-              </FallInPlace>
-            ))}
-          </SimpleGrid>
 
           <FallInPlace delay={0.5}>
             <ButtonLink
