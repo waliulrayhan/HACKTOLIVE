@@ -1,13 +1,12 @@
 "use client";
 import {
-  Box,
-  Heading,
-  HStack,
   Icon,
   IconButton,
   useColorModeValue,
+  HStack,
 } from "@chakra-ui/react";
-import { FiFacebook, FiTwitter, FiLinkedin, FiMail } from "react-icons/fi";
+import { FiFacebook, FiTwitter, FiLinkedin, FiLink } from "react-icons/fi";
+import { useState } from "react";
 
 interface SharePostProps {
   title?: string;
@@ -15,71 +14,76 @@ interface SharePostProps {
 }
 
 const SharePost = ({ title = "Check out this article", url }: SharePostProps) => {
+  const [copied, setCopied] = useState(false);
   const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
   const encodedUrl = encodeURIComponent(shareUrl);
   const encodedTitle = encodeURIComponent(title);
   
-  const iconColor = useColorModeValue("gray.400", "gray.500");
+  const iconColor = useColorModeValue("gray.500", "gray.400");
   const accentColor = useColorModeValue("green.500", "green.400");
 
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  const socialButtons = [
+    {
+      label: "Facebook",
+      icon: FiFacebook,
+      href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+    },
+    {
+      label: "Twitter",
+      icon: FiTwitter,
+      href: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
+    },
+    {
+      label: "LinkedIn",
+      icon: FiLinkedin,
+      href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+    },
+  ];
+
   return (
-    <Box>
-      <Heading size="sm" mb="4">
-        Share This Article
-      </Heading>
-      <HStack spacing="3">
+    <HStack spacing="2">
+      {socialButtons.map((button, index) => (
         <IconButton
+          key={index}
           as="a"
-          href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
+          href={button.href}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Share on Facebook"
-          icon={<Icon as={FiFacebook} boxSize="5" />}
+          aria-label={button.label}
+          icon={<Icon as={button.icon} boxSize="4" />}
+          size="sm"
           variant="ghost"
-          colorScheme="gray"
           color={iconColor}
-          _hover={{ color: accentColor, transform: "translateY(-2px)" }}
+          _hover={{ 
+            color: accentColor,
+          }}
           transition="all 0.2s"
         />
-        <IconButton
-          as="a"
-          href={`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Share on Twitter"
-          icon={<Icon as={FiTwitter} boxSize="5" />}
-          variant="ghost"
-          colorScheme="gray"
-          color={iconColor}
-          _hover={{ color: accentColor, transform: "translateY(-2px)" }}
-          transition="all 0.2s"
-        />
-        <IconButton
-          as="a"
-          href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Share on LinkedIn"
-          icon={<Icon as={FiLinkedin} boxSize="5" />}
-          variant="ghost"
-          colorScheme="gray"
-          color={iconColor}
-          _hover={{ color: accentColor, transform: "translateY(-2px)" }}
-          transition="all 0.2s"
-        />
-        <IconButton
-          as="a"
-          href={`mailto:?subject=${encodedTitle}&body=Check out this article: ${encodedUrl}`}
-          aria-label="Share via Email"
-          icon={<Icon as={FiMail} boxSize="5" />}
-          variant="ghost"
-          colorScheme="gray"
-          color={iconColor}
-          _hover={{ color: accentColor, transform: "translateY(-2px)" }}
-          transition="all 0.2s"
-        />
-      </HStack>
-    </Box>
+      ))}
+      
+      <IconButton
+        aria-label="Copy link"
+        icon={<Icon as={FiLink} boxSize="4" />}
+        size="sm"
+        variant="ghost"
+        color={copied ? accentColor : iconColor}
+        onClick={handleCopyLink}
+        _hover={{ 
+          color: accentColor,
+        }}
+        transition="all 0.2s"
+      />
+    </HStack>
   );
 };
 

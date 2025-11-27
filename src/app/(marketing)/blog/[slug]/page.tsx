@@ -1,10 +1,6 @@
-import RelatedPost from "../_components/RelatedPost";
-import SharePost from "../_components/SharePost";
-import { getBlogBySlug } from "../_components/blogData";
+import { getBlogBySlug, SingleBlogContent } from "../_components";
 import BlogData from "../_components/blogData";
 import { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -50,9 +46,6 @@ const SingleBlogPage = async ({ params }: Props) => {
   if (!blog) {
     notFound();
   }
-
-  // Import the client component dynamically
-  const SingleBlogContent = (await import("../_components/SingleBlogContent")).default;
 
   return <SingleBlogContent blog={blog as any} />;
 };

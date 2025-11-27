@@ -2,6 +2,16 @@ import React from "react";
 import BlogItem from "./BlogItem";
 import { getFeaturedBlogs } from "./blogData";
 
+// Export all components
+export { default as BlogItem } from "./BlogItem";
+export { default as RelatedPost } from "./RelatedPost";
+export { default as SharePost } from "./SharePost";
+export { default as SingleBlogContent } from "./SingleBlogContent";
+export { default as CategoriesSidebar } from "./CategoriesSidebar";
+export { default as BlogTypesSidebar } from "./BlogTypesSidebar";
+export { default as LikeButton } from "./LikeButton";
+export * from "./blogData";
+
 const Blog = async () => {
   // Get featured blogs or latest 3 if no featured blogs
   const featuredBlogs = getFeaturedBlogs();

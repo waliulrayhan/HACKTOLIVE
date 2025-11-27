@@ -5,9 +5,6 @@ import Link from "next/link";
 import BlogData from "./blogData";
 import {
   Box,
-  Card,
-  CardBody,
-  Heading,
   Text,
   HStack,
   VStack,
@@ -19,10 +16,9 @@ interface RelatedPostProps {
 }
 
 const RelatedPost = ({ currentBlogId }: RelatedPostProps) => {
-  const cardBg = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.700");
   const accentColor = useColorModeValue("green.500", "green.400");
   const mutedColor = useColorModeValue("gray.600", "gray.400");
+  const hoverBg = useColorModeValue("gray.50", "gray.700");
   
   // Filter out current blog and get 3 related posts
   const relatedPosts = BlogData
@@ -30,32 +26,33 @@ const RelatedPost = ({ currentBlogId }: RelatedPostProps) => {
     .slice(0, 3);
 
   return (
-    <Card
-      bg={cardBg}
-      borderWidth="2px"
-      borderColor={borderColor}
-      borderRadius="xl"
-      overflow="hidden"
-      width="100%"
-    >
-      <CardBody p="6">
-        <Heading size="md" mb="6">
-          Related Posts
-        </Heading>
+    <Box>
+      <Text 
+        fontSize="xs" 
+        fontWeight="bold" 
+        textTransform="uppercase" 
+        letterSpacing="wider"
+        mb="3"
+        color={mutedColor}
+      >
+        Related Posts
+      </Text>
 
-        <VStack spacing="6" align="stretch">
-          {relatedPosts.map((post, key) => (
-            <Link key={key} href={`/blog/${post.slug}`}>
-              <HStack 
-                spacing="4" 
-                align="start"
-                transition="all 0.2s"
-                _hover={{ transform: "translateX(4px)" }}
-              >
+      <VStack spacing="4" align="stretch">
+        {relatedPosts.map((post, key) => (
+          <Link key={key} href={`/blog/${post.slug}`}>
+            <Box
+              p="2"
+              transition="all 0.2s"
+              _hover={{ 
+                bg: hoverBg,
+              }}
+            >
+              <HStack spacing="3" align="start">
                 <Box
                   position="relative"
-                  width="80px"
-                  height="60px"
+                  width="60px"
+                  height="45px"
                   flexShrink={0}
                   borderRadius="md"
                   overflow="hidden"
@@ -76,21 +73,22 @@ const RelatedPost = ({ currentBlogId }: RelatedPostProps) => {
                     fontSize="sm"
                     fontWeight="medium"
                     noOfLines={2}
+                    lineHeight="1.3"
                     transition="color 0.2s"
                     _hover={{ color: accentColor }}
                   >
                     {post.title}
                   </Text>
-                  <Text fontSize="xs" color={mutedColor}>
-                    {post.publishDate}
+                  <Text color={mutedColor} fontSize="xs">
+                    {post.readTime}
                   </Text>
                 </VStack>
               </HStack>
-            </Link>
-          ))}
-        </VStack>
-      </CardBody>
-    </Card>
+            </Box>
+          </Link>
+        ))}
+      </VStack>
+    </Box>
   );
 };
 
