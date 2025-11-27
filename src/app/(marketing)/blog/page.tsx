@@ -360,7 +360,7 @@ const BlogPage = () => {
       <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerCloseButton />
+          <DrawerCloseButton top="4" />
           <DrawerHeader>Filters</DrawerHeader>
           <DrawerBody>
             <VStack spacing="4" align="stretch">
