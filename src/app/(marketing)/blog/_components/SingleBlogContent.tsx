@@ -66,10 +66,10 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
   return (
     <Box bg={bgColor} minH="100vh">
       {/* Hero Section with Image */}
-      <Box position="relative" overflow="hidden" mb={{ base: "8", md: "12" }}>
+      <Box position="relative" overflow="hidden" mb={{ base: "6", md: "8", lg: "12" }}>
         <Box 
           position="relative" 
-          height={{ base: "300px", md: "400px", lg: "500px" }}
+          height={{ base: "300px", sm: "450px", md: "500px", lg: "500px" }}
           width="100%"
         >
           <Image
@@ -93,32 +93,33 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
             bottom="0" 
             left="0" 
             right="0"
-            pb="8"
+            pb={{ base: "6", md: "8" }}
+            px={{ base: "4", sm: "6", md: "8" }}
           >
             <FallInPlace>
-              <VStack align="start" spacing="4" color="white">
-                <Wrap spacing="3">
+              <VStack align="start" spacing={{ base: "3", md: "4" }} color="white">
+                <Wrap spacing={{ base: "2", md: "3" }}>
                   <Badge
                     colorScheme="green"
-                    fontSize="md"
-                    px="4"
-                    py="2"
+                    fontSize={{ base: "xs", sm: "sm", md: "md" }}
+                    px={{ base: "3", md: "4" }}
+                    py={{ base: "1", md: "2" }}
                     borderRadius="full"
                   >
                     {blog.category}
                   </Badge>
                   <Badge
                     colorScheme="gray"
-                    fontSize="md"
-                    px="4"
-                    py="2"
+                    fontSize={{ base: "xs", sm: "sm", md: "md" }}
+                    px={{ base: "3", md: "4" }}
+                    py={{ base: "1", md: "2" }}
                     borderRadius="full"
                   >
                     {blog.blogType}
                   </Badge>
                 </Wrap>
                 <Heading
-                  fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}
+                  fontSize={{ base: "xl", sm: "2xl", md: "3xl", lg: "4xl" }}
                   fontWeight="bold"
                   lineHeight="1.2"
                   textShadow="2px 2px 4px rgba(0,0,0,0.5)"
@@ -163,85 +164,278 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
             >
               <CardBody p={{ base: "6", md: "12" }}>
                 <VStack align="stretch" spacing={{ base: "8", md: "10" }}>
-                  {/* Author & Meta Information - Minimalistic */}
+                  {/* Author & Meta Information - Redesigned */}
                   <FallInPlace delay={0.1}>
-                    <HStack spacing="4" justify="space-between" flexWrap="wrap">
-                      <HStack spacing="3">
-                        {blog.author.avatar && (
-                          <Avatar
-                            size="md"
-                            name={blog.author.name}
-                            src={blog.author.avatar}
-                          />
-                        )}
-                        <VStack align="start" spacing="0">
-                          <Text fontSize="sm" fontWeight="semibold">
-                            {blog.author.name}
-                          </Text>
-                          {blog.author.role && (
-                            <Text fontSize="xs" color={mutedColor}>
-                              {blog.author.role}
-                            </Text>
+                    <VStack 
+                      spacing={{ base: "3", lg: "0" }} 
+                      align="stretch"
+                    >
+                      {/* Base Device: Stacked Layout */}
+                      <Box display={{ base: "block", lg: "none" }}>
+                        <VStack spacing="3" align="stretch">
+                          <HStack spacing="2.5">
+                            {blog.author.avatar && (
+                              <Avatar
+                                size="md"
+                                name={blog.author.name}
+                                src={blog.author.avatar}
+                                borderWidth="2px"
+                                borderColor={accentColor}
+                              />
+                            )}
+                            <VStack align="start" spacing="0.5" flex="1">
+                              <Text fontSize="sm" fontWeight="bold">
+                                {blog.author.name}
+                              </Text>
+                              {blog.author.role && (
+                                <Text fontSize="xs" color={mutedColor}>
+                                  {blog.author.role}
+                                </Text>
+                              )}
+                              <HStack spacing="2" fontSize="2xs" color={mutedColor} pt="0.5">
+                                <HStack spacing="1">
+                                  <Icon as={FiCalendar} boxSize="2.5" />
+                                  <Text>{blog.publishDate}</Text>
+                                </HStack>
+                                <Text>•</Text>
+                                <HStack spacing="1">
+                                  <Icon as={FiClock} boxSize="2.5" />
+                                  <Text>{blog.readTime}</Text>
+                                </HStack>
+                              </HStack>
+                            </VStack>
+                          </HStack>
+                          
+                          {/* Social Links for Base */}
+                          {(blog.author.twitter || blog.author.linkedin || blog.author.github) && (
+                            <HStack 
+                              spacing="2" 
+                              justify="space-between"
+                              align="center"
+                              py="2"
+                              px="3"
+                              borderRadius="md"
+                              bg={useColorModeValue("gray.50", "gray.700")}
+                            >
+                              <Text fontSize="2xs" fontWeight="semibold" color={mutedColor} textTransform="uppercase" letterSpacing="wide">
+                                Follow on
+                              </Text>
+                              <HStack spacing="2">
+                                {blog.author.twitter && (
+                                  <Link
+                                    href={`https://twitter.com/${blog.author.twitter}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <HStack spacing="1" align="center">
+                                      <Box
+                                        p="1.5"
+                                        borderRadius="md"
+                                        bg={cardBg}
+                                        _hover={{ bg: accentColor, transform: "translateY(-2px)" }}
+                                        transition="all 0.3s"
+                                      >
+                                        <Icon
+                                          as={FiTwitter}
+                                          boxSize="3.5"
+                                          color={mutedColor}
+                                          _hover={{ color: "white" }}
+                                        />
+                                      </Box>
+                                      <Text fontSize="2xs" color={mutedColor} display={{ base: "none", sm: "block" }}>
+                                        Twitter
+                                      </Text>
+                                    </HStack>
+                                  </Link>
+                                )}
+                                {blog.author.linkedin && (
+                                  <Link
+                                    href={`https://linkedin.com/in/${blog.author.linkedin}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <HStack spacing="1" align="center">
+                                      <Box
+                                        p="1.5"
+                                        borderRadius="md"
+                                        bg={cardBg}
+                                        _hover={{ bg: accentColor, transform: "translateY(-2px)" }}
+                                        transition="all 0.3s"
+                                      >
+                                        <Icon
+                                          as={FiLinkedin}
+                                          boxSize="3.5"
+                                          color={mutedColor}
+                                          _hover={{ color: "white" }}
+                                        />
+                                      </Box>
+                                      <Text fontSize="2xs" color={mutedColor} display={{ base: "none", sm: "block" }}>
+                                        LinkedIn
+                                      </Text>
+                                    </HStack>
+                                  </Link>
+                                )}
+                                {blog.author.github && (
+                                  <Link
+                                    href={`https://github.com/${blog.author.github}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <HStack spacing="1" align="center">
+                                      <Box
+                                        p="1.5"
+                                        borderRadius="md"
+                                        bg={cardBg}
+                                        _hover={{ bg: accentColor, transform: "translateY(-2px)" }}
+                                        transition="all 0.3s"
+                                      >
+                                        <Icon
+                                          as={FiGithub}
+                                          boxSize="3.5"
+                                          color={mutedColor}
+                                          _hover={{ color: "white" }}
+                                        />
+                                      </Box>
+                                      <Text fontSize="2xs" color={mutedColor} display={{ base: "none", sm: "block" }}>
+                                        GitHub
+                                      </Text>
+                                    </HStack>
+                                  </Link>
+                                )}
+                              </HStack>
+                            </HStack>
                           )}
                         </VStack>
-                      </HStack>
-                      
-                      <HStack spacing="4" fontSize="xs" color={mutedColor} divider={<Text>•</Text>}>
-                        <Text>{blog.publishDate}</Text>
-                        <Text>{blog.readTime}</Text>
-                      </HStack>
-                    </HStack>
+                      </Box>
 
-                    {/* Social Links - Minimalistic */}
-                    {(blog.author.twitter || blog.author.linkedin || blog.author.github) && (
-                      <HStack spacing="2" pt="3" pl={{ base: "0", md: "52px" }}>
-                        {blog.author.twitter && (
-                          <Link
-                            href={`https://twitter.com/${blog.author.twitter}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <Icon
-                              as={FiTwitter}
-                              boxSize="4"
-                              color={mutedColor}
-                              _hover={{ color: accentColor }}
-                              transition="color 0.2s"
-                            />
-                          </Link>
-                        )}
-                        {blog.author.linkedin && (
-                          <Link
-                            href={`https://linkedin.com/in/${blog.author.linkedin}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <Icon
-                              as={FiLinkedin}
-                              boxSize="4"
-                              color={mutedColor}
-                              _hover={{ color: accentColor }}
-                              transition="color 0.2s"
-                            />
-                          </Link>
-                        )}
-                        {blog.author.github && (
-                          <Link
-                            href={`https://github.com/${blog.author.github}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <Icon
-                              as={FiGithub}
-                              boxSize="4"
-                              color={mutedColor}
-                              _hover={{ color: accentColor }}
-                              transition="color 0.2s"
-                            />
-                          </Link>
-                        )}
-                      </HStack>
-                    )}
+                      {/* Large Device: Horizontal Layout */}
+                      <Box display={{ base: "none", lg: "flex" }}>
+                        <HStack spacing="6" justify="space-between" w="full" align="center">
+                          <HStack spacing="4" flex="1">
+                            {blog.author.avatar && (
+                              <Avatar
+                                size="xl"
+                                name={blog.author.name}
+                                src={blog.author.avatar}
+                                borderWidth="3px"
+                                borderColor={accentColor}
+                              />
+                            )}
+                            <VStack align="start" spacing="1">
+                              <Text fontSize="lg" fontWeight="bold">
+                                {blog.author.name}
+                              </Text>
+                              {blog.author.role && (
+                                <Text fontSize="md" color={mutedColor}>
+                                  {blog.author.role}
+                                </Text>
+                              )}
+                              <HStack spacing="4" fontSize="sm" color={mutedColor} pt="1">
+                                <HStack spacing="2">
+                                  <Icon as={FiCalendar} boxSize="4" />
+                                  <Text>{blog.publishDate}</Text>
+                                </HStack>
+                                <Text>•</Text>
+                                <HStack spacing="2">
+                                  <Icon as={FiClock} boxSize="4" />
+                                  <Text>{blog.readTime}</Text>
+                                </HStack>
+                              </HStack>
+                            </VStack>
+                          </HStack>
+
+                          {/* Social Links for Large Device */}
+                          {(blog.author.twitter || blog.author.linkedin || blog.author.github) && (
+                            <HStack spacing="3">
+                              {blog.author.twitter && (
+                                <Link
+                                  href={`https://twitter.com/${blog.author.twitter}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <Box
+                                    p="3"
+                                    borderRadius="lg"
+                                    borderWidth="1px"
+                                    borderColor={borderColor}
+                                    _hover={{ 
+                                      borderColor: accentColor, 
+                                      bg: accentColor,
+                                      transform: "translateY(-3px)",
+                                      boxShadow: "lg"
+                                    }}
+                                    transition="all 0.3s"
+                                  >
+                                    <Icon
+                                      as={FiTwitter}
+                                      boxSize="5"
+                                      color={mutedColor}
+                                      _hover={{ color: "white" }}
+                                    />
+                                  </Box>
+                                </Link>
+                              )}
+                              {blog.author.linkedin && (
+                                <Link
+                                  href={`https://linkedin.com/in/${blog.author.linkedin}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <Box
+                                    p="3"
+                                    borderRadius="lg"
+                                    borderWidth="1px"
+                                    borderColor={borderColor}
+                                    _hover={{ 
+                                      borderColor: accentColor, 
+                                      bg: accentColor,
+                                      transform: "translateY(-3px)",
+                                      boxShadow: "lg"
+                                    }}
+                                    transition="all 0.3s"
+                                  >
+                                    <Icon
+                                      as={FiLinkedin}
+                                      boxSize="5"
+                                      color={mutedColor}
+                                      _hover={{ color: "white" }}
+                                    />
+                                  </Box>
+                                </Link>
+                              )}
+                              {blog.author.github && (
+                                <Link
+                                  href={`https://github.com/${blog.author.github}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <Box
+                                    p="3"
+                                    borderRadius="lg"
+                                    borderWidth="1px"
+                                    borderColor={borderColor}
+                                    _hover={{ 
+                                      borderColor: accentColor, 
+                                      bg: accentColor,
+                                      transform: "translateY(-3px)",
+                                      boxShadow: "lg"
+                                    }}
+                                    transition="all 0.3s"
+                                  >
+                                    <Icon
+                                      as={FiGithub}
+                                      boxSize="5"
+                                      color={mutedColor}
+                                      _hover={{ color: "white" }}
+                                    />
+                                  </Box>
+                                </Link>
+                              )}
+                            </HStack>
+                          )}
+                        </HStack>
+                      </Box>
+                    </VStack>
                   </FallInPlace>
 
                   <Divider opacity={0.3} />
