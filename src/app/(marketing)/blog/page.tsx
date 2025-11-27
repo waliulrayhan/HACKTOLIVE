@@ -458,11 +458,13 @@ const BlogPage = () => {
             <Text fontSize="lg" color="muted" maxW="xl">
               Get the latest cybersecurity insights, threat alerts, and tutorials delivered directly to your inbox.
             </Text>
-            <HStack 
+            <Stack 
               as="form" 
               w="full" 
               maxW="md" 
               spacing="3"
+              direction={{ base: "column", md: "row" }}
+              px={{ base: "4", md: "0" }}
               onSubmit={(e) => e.preventDefault()}
             >
               <Input
@@ -473,18 +475,19 @@ const BlogPage = () => {
                 borderWidth="2px"
                 _focus={{ borderColor: accentColor }}
                 h="12"
+                flex={{ base: "auto", md: "1" }}
               />
               <Button
                 type="submit"
                 colorScheme="green"
                 size="lg"
                 rightIcon={<Icon as={FiMail} />}
-                flexShrink={0}
                 h="12"
+                flexShrink={{ base: "auto", md: 0 }}
               >
                 Subscribe
               </Button>
-            </HStack>
+            </Stack>
             <Text fontSize="sm" color="muted">
               Join 10,000+ security professionals. Unsubscribe anytime.
             </Text>
