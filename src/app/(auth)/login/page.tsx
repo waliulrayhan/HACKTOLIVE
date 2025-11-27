@@ -49,6 +49,7 @@ const Login: NextPage = () => {
   const [captchaValue, setCaptchaValue] = useState<string | null>(null)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState({ email: '', password: '', captcha: '' })
   const recaptchaRef = useRef<ReCAPTCHA>(null)
   const captchaTheme = useColorModeValue('light', 'dark')
@@ -95,10 +96,20 @@ const Login: NextPage = () => {
     }
 
     // Handle login logic here
-    console.log('Login:', { email, password, keepSignedIn, captchaValue })
+    setIsLoading(true)
     
-    // Redirect to dashboard
-    router.push('/dashboard')
+    try {
+      console.log('Login:', { email, password, keepSignedIn, captchaValue })
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Redirect to dashboard
+      router.push('/dashboard')
+    } catch (error) {
+      console.error('Login error:', error)
+      setIsLoading(false)
+    }
   }
 
   const handleGoogleLogin = () => {
@@ -514,6 +525,8 @@ const Login: NextPage = () => {
                       colorScheme="primary"
                       size="lg"
                       w="full"
+                      isLoading={isLoading}
+                      loadingText="Logging in..."
                     >
                       Log in
                     </Button>

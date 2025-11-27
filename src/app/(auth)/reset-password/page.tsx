@@ -31,6 +31,7 @@ const ResetPassword: NextPage = () => {
   const [email, setEmail] = useState('')
   const [errors, setErrors] = useState({ email: '' })
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const leftBgColor = useColorModeValue('#4d7c0f', '#365314')
   const rightBgColor = useColorModeValue('white', 'gray.800')
   const { colorMode } = useColorMode()
@@ -59,8 +60,20 @@ const ResetPassword: NextPage = () => {
     }
 
     // Handle reset password logic here
-    console.log('Reset password for:', email)
-    setIsSubmitted(true)
+    setIsLoading(true)
+    
+    try {
+      console.log('Reset password for:', email)
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      setIsSubmitted(true)
+    } catch (error) {
+      console.error('Reset password error:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -382,6 +395,8 @@ const ResetPassword: NextPage = () => {
                             colorScheme="primary"
                             size="lg"
                             w="full"
+                            isLoading={isLoading}
+                            loadingText="Sending..."
                           >
                             Send reset link
                           </Button>

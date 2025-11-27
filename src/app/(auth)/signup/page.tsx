@@ -39,6 +39,7 @@ const Signup: NextPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [agreeToTerms, setAgreeToTerms] = useState(false)
   const [captchaValue, setCaptchaValue] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -142,7 +143,21 @@ const Signup: NextPage = () => {
     }
 
     // Handle signup logic here
-    console.log('Signup:', { ...formData, captchaValue, agreeToTerms })
+    setIsLoading(true)
+    
+    try {
+      console.log('Signup:', { ...formData, captchaValue, agreeToTerms })
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Redirect to login or dashboard after successful signup
+      // router.push('/login')
+    } catch (error) {
+      console.error('Signup error:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleGoogleSignup = () => {
@@ -572,6 +587,8 @@ const Signup: NextPage = () => {
                         colorScheme="primary"
                         size="lg"
                         w="full"
+                        isLoading={isLoading}
+                        loadingText="Creating account..."
                       >
                         Sign up
                       </Button>
