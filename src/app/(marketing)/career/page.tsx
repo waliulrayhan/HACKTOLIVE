@@ -267,9 +267,28 @@ export default function CareerPage() {
   return (
     <Box>
       {/* Hero Section */}
-      <Box position="relative" overflow="hidden" py={{ base: 16, md: 24 }}>
-        <BackgroundGradient height="100%" zIndex={0} />
-
+      <Box 
+        position="relative" 
+        overflow="hidden" 
+        pt={{ base: 32, md: 40 }}
+        pb={{ base: 16, md: 20 }}
+        bgImage="url('https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?q=80&w=2000')"
+        bgPosition="center"
+        bgSize="cover"
+        bgRepeat="no-repeat"
+        _before={{
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          bg: useColorModeValue(
+            'linear-gradient(135deg, rgba(26, 32, 44, 0.85) 0%, rgba(45, 55, 72, 0.90) 100%)',
+            'linear-gradient(135deg, rgba(26, 32, 44, 0.70) 0%, rgba(45, 55, 72, 0.75) 100%)'
+          ),
+        }}
+      >
         <Container maxW="container.xl" position="relative" zIndex={1}>
           <FallInPlace>
             <VStack spacing={4} textAlign="center" maxW="3xl" mx="auto">
@@ -280,7 +299,7 @@ export default function CareerPage() {
                   fontWeight="bold"
                   lineHeight="1.2"
                   mb={4}
-                  mt={{ base: 10, md: 0 }}
+                  color="white"
                 >
                   Join Our Team
                 </Heading>
@@ -292,7 +311,7 @@ export default function CareerPage() {
                   borderRadius="full"
                 />
               </Box>
-              <Text fontSize={{ base: 'lg', md: 'xl' }} color={mutedColor}>
+              <Text fontSize={{ base: 'lg', md: 'xl' }} color="whiteAlpha.900">
                 Help shape the future of cybersecurity in Bangladesh. Join our
                 passionate team of security professionals and educators.
               </Text>

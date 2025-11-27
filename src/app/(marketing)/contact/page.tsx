@@ -124,9 +124,28 @@ export default function ContactPage() {
   return (
     <Box>
       {/* Hero Section */}
-      <Box position="relative" overflow="hidden" py={{ base: 16, md: 24 }}>
-        <BackgroundGradient height="100%" zIndex={0} />
-        
+      <Box 
+        position="relative" 
+        overflow="hidden" 
+        pt={{ base: 32, md: 40 }}
+        pb={{ base: 16, md: 20 }}
+        bgImage="url('https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=2000')"
+        bgPosition="center"
+        bgSize="cover"
+        bgRepeat="no-repeat"
+        _before={{
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          bg: useColorModeValue(
+            'linear-gradient(135deg, rgba(26, 32, 44, 0.85) 0%, rgba(45, 55, 72, 0.90) 100%)',
+            'linear-gradient(135deg, rgba(26, 32, 44, 0.70) 0%, rgba(45, 55, 72, 0.75) 100%)'
+          ),
+        }}
+      >
         <Container maxW="container.xl" position="relative" zIndex={1}>
           <FallInPlace>
             <VStack spacing={4} textAlign="center" maxW="3xl" mx="auto">
@@ -137,7 +156,7 @@ export default function ContactPage() {
                   fontWeight="bold"
                   lineHeight="1.2"
                   mb={4}
-                  mt={{ base: 10, md: 0 }}
+                  color="white"
                 >
                   Get in Touch
                 </Heading>
@@ -149,7 +168,7 @@ export default function ContactPage() {
                   borderRadius="full"
                 />
               </Box>
-              <Text fontSize={{ base: 'lg', md: 'xl' }} color={mutedColor}>
+              <Text fontSize={{ base: 'lg', md: 'xl' }} color="whiteAlpha.900">
                 Have questions about our services or courses? We're here to help.
                 Reach out to our team and we'll respond as soon as possible.
               </Text>
@@ -167,6 +186,7 @@ export default function ContactPage() {
             md: 'repeat(4, 1fr)' 
           }} 
           gap={6} 
+          mt={{ base: 6, md: 8 }}
           mb={16}
         >
           <FallInPlace delay={0.1}>
@@ -672,7 +692,7 @@ export default function ContactPage() {
         </Grid>
 
         {/* Map Section */}
-        <Box mt={16} mb={{ base: 8, md: 0 }}>
+        <Box mt={16} mb={{ base: 12, md: 16 }}>
           <FallInPlace delay={0.9}>
             <Card
               bg={cardBg}
