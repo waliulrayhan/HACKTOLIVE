@@ -1550,19 +1550,26 @@ const PhotoGallerySection = () => {
                       align="center"
                       justify="center"
                       display={{ base: 'none', md: 'flex' }}
-                      minH="85vh"
+                      h="100%"
+                      maxH="calc(100vh - 120px)"
+                      py={4}
                     >
                       <Box
                         position="relative"
                         width="100%"
                         maxW="1200px"
                         mx="auto"
+                        h="100%"
+                        display="flex"
+                        alignItems="center"
+                        flexDirection="column"
+                        justifyContent="center"
                       >
                         {/* Image Container */}
                         <Box
                           position="relative"
-                          width="100%"
-                          height="70vh"
+                          width="80%"
+                          height="60vh"
                           bg={useColorModeValue('white', 'gray.800')}
                           borderRadius="xl"
                           overflow="hidden"
@@ -1570,17 +1577,19 @@ const PhotoGallerySection = () => {
                           display="flex"
                           alignItems="center"
                           justifyContent="center"
+                          flexShrink={0}
                         >
                           <Image
                             src={galleryImages[selectedImage].src}
                             alt={galleryImages[selectedImage].title}
                             fill
+                            priority
                             style={{ objectFit: 'contain' }}
                           />
                         </Box>
 
                         {/* Info Section */}
-                        <VStack spacing={4} mt={6}>
+                        <VStack spacing={4} mt={6} flexShrink={0}>
                           <VStack spacing={2} textAlign="center">
                             <Heading size="md" color="white">
                               {galleryImages[selectedImage].title}
