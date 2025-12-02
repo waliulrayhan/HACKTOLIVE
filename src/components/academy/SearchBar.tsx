@@ -1,0 +1,47 @@
+"use client";
+
+import { useState } from "react";
+import { Input, InputGroup, InputLeftElement, Icon } from "@chakra-ui/react";
+import { FaSearch } from "react-icons/fa";
+
+interface SearchBarProps {
+  placeholder?: string;
+  onSearch?: (query: string) => void;
+  defaultValue?: string;
+}
+
+export default function SearchBar({
+  placeholder = "Search courses...",
+  onSearch,
+  defaultValue = "",
+}: SearchBarProps) {
+  const [query, setQuery] = useState(defaultValue);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+    if (onSearch) {
+      onSearch(value);
+    }
+  };
+
+  return (
+    <InputGroup size="lg">
+      <InputLeftElement pointerEvents="none">
+        <Icon as={FaSearch} color="gray.400" />
+      </InputLeftElement>
+      <Input
+        placeholder={placeholder}
+        value={query}
+        onChange={handleChange}
+        borderRadius="full"
+        bg="white"
+        _dark={{ bg: "gray.800" }}
+        _focus={{
+          borderColor: "blue.500",
+          boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)",
+        }}
+      />
+    </InputGroup>
+  );
+}

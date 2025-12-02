@@ -1,0 +1,494 @@
+"use client";
+
+import {
+  Box,
+  Container,
+  Heading,
+  Text,
+  VStack,
+  HStack,
+  SimpleGrid,
+  Badge,
+  Flex,
+  Icon,
+  useColorModeValue,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  List,
+  ListItem,
+  ListIcon,
+  Avatar,
+  Progress,
+} from "@chakra-ui/react";
+import Image from "next/image";
+import { courses } from "@/data/academy/courses";
+import { reviews } from "@/data/academy/reviews";
+import { ButtonLink } from "@/components/shared/button-link/button-link";
+import { FallInPlace } from "@/components/shared/motion/fall-in-place";
+import { Em } from "@/components/shared/typography";
+import {
+  FiClock,
+  FiUsers,
+  FiStar,
+  FiBook,
+  FiCheckCircle,
+  FiPlay,
+  FiAward,
+  FiTrendingUp,
+  FiBarChart2,
+  FiVideo,
+  FiCalendar,
+} from "react-icons/fi";
+import CurriculumAccordion from "@/components/academy/CurriculumAccordion";
+import ReviewCard from "@/components/academy/ReviewCard";
+import InstructorCard from "@/components/academy/InstructorCard";
+import RatingStars from "@/components/academy/RatingStars";
+
+interface CourseDetailsPageProps {
+  slug: string;
+}
+
+export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
+  const course = courses.find((c) => c.slug === slug);
+  const courseReviews = reviews.filter((r) => r.courseId === course?.id);
+  const bgColor = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
+
+  if (!course) {
+    return (
+      <Container maxW="container.xl" py="20">
+        <VStack spacing="4">
+          <Heading>Course Not Found</Heading>
+          <Text color="muted">The course you're looking for doesn't exist.</Text>
+          <ButtonLink href="/academy/courses" colorScheme="primary">
+            Browse All Courses
+          </ButtonLink>
+        </VStack>
+      </Container>
+    );
+  }
+
+  const levelColors = {
+    fundamental: "green",
+    intermediate: "blue",
+    advanced: "purple",
+  };
+
+  return (
+    <Box>
+      {/* Hero Section */}
+      <Box py={{ base: "12", md: "16" }} bg={bgColor} borderBottomWidth="1px" borderColor={borderColor}>
+        <Container maxW="container.xl">
+          <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={{ base: "8", md: "12" }} alignItems="center">
+            <FallInPlace>
+              <VStack align="start" spacing="6">
+                <HStack spacing="3" flexWrap="wrap">
+                  <Badge colorScheme={levelColors[course.level]} fontSize="sm" px="3" py="1" borderRadius="full">
+                    {course.level.charAt(0).toUpperCase() + course.level.slice(1)}
+                  </Badge>
+                  <Badge 
+                    colorScheme={course.tier === "premium" ? "purple" : "green"} 
+                    fontSize="sm" 
+                    px="3" 
+                    py="1" 
+                    borderRadius="full"
+                  >
+                    {course.tier.toUpperCase()}
+                  </Badge>
+                  {course.deliveryMode === "live" && (
+                    <Badge colorScheme="red" fontSize="sm" px="3" py="1" borderRadius="full">
+                      🔴 LIVE CLASSES
+                    </Badge>
+                  )}
+                  <Badge colorScheme="cyan" fontSize="sm" px="3" py="1" borderRadius="full">
+                    {course.category}
+                  </Badge>
+                </HStack>
+
+                <Heading fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}>
+                  {course.title}
+                </Heading>
+
+                <Text fontSize={{ base: "md", md: "lg" }} color="muted">
+                  {course.shortDescription}
+                </Text>
+
+                <HStack spacing="6" flexWrap="wrap">
+                  <HStack spacing="2">
+                    <Icon as={FiStar} color="yellow.500" />
+                    <Text fontWeight="semibold">{course.rating}</Text>
+                    <Text color="muted" fontSize="sm">
+                      ({course.totalRatings.toLocaleString()} ratings)
+                    </Text>
+                  </HStack>
+                  <HStack spacing="2">
+                    <Icon as={FiUsers} color="primary.500" />
+                    <Text fontWeight="medium">{course.totalStudents.toLocaleString()} students</Text>
+                  </HStack>
+                </HStack>
+
+                <HStack spacing="4" pt="2">
+                  <ButtonLink href={`/academy/enroll/${course.slug}`} colorScheme="primary" size="lg">
+                    {course.tier === "premium" ? `Enroll Now - ₹${course.price}` : "Start Free Course"}
+                  </ButtonLink>
+                  <ButtonLink href="#curriculum" variant="outline" colorScheme="primary" size="lg">
+                    View Curriculum
+                  </ButtonLink>
+                </HStack>
+              </VStack>
+            </FallInPlace>
+
+            <FallInPlace delay={0.2}>
+              <Box borderRadius="2xl" overflow="hidden" boxShadow="2xl">
+                <Image
+                  src={course.thumbnail}
+                  alt={course.title}
+                  width={600}
+                  height={400}
+                  style={{ width: "100%", height: "auto" }}
+                />
+              </Box>
+            </FallInPlace>
+          </SimpleGrid>
+        </Container>
+      </Box>
+
+      {/* Stats Bar */}
+      <Box py="8" bg={useColorModeValue("gray.50", "gray.900")}>
+        <Container maxW="container.xl">
+          <SimpleGrid columns={{ base: 2, md: 4 }} spacing="6">
+            <FallInPlace delay={0.1}>
+              <VStack spacing="2">
+                <Flex
+                  width="60px"
+                  height="60px"
+                  borderRadius="xl"
+                  bg="green.50"
+                  _dark={{ bg: "green.900" }}
+                  align="center"
+                  justify="center"
+                >
+                  <Icon as={FiClock} boxSize="6" color="green.500" />
+                </Flex>
+                <Text fontSize="xl" fontWeight="bold">
+                  {Math.floor(course.duration / 60)}h {course.duration % 60}m
+                </Text>
+                <Text fontSize="sm" color="muted">
+                  Total Duration
+                </Text>
+              </VStack>
+            </FallInPlace>
+
+            <FallInPlace delay={0.2}>
+              <VStack spacing="2">
+                <Flex
+                  width="60px"
+                  height="60px"
+                  borderRadius="xl"
+                  bg="blue.50"
+                  _dark={{ bg: "blue.900" }}
+                  align="center"
+                  justify="center"
+                >
+                  <Icon as={FiBook} boxSize="6" color="blue.500" />
+                </Flex>
+                <Text fontSize="xl" fontWeight="bold">
+                  {course.totalLessons}
+                </Text>
+                <Text fontSize="sm" color="muted">
+                  Lessons
+                </Text>
+              </VStack>
+            </FallInPlace>
+
+            <FallInPlace delay={0.3}>
+              <VStack spacing="2">
+                <Flex
+                  width="60px"
+                  height="60px"
+                  borderRadius="xl"
+                  bg="purple.50"
+                  _dark={{ bg: "purple.900" }}
+                  align="center"
+                  justify="center"
+                >
+                  <Icon as={FiBarChart2} boxSize="6" color="purple.500" />
+                </Flex>
+                <Text fontSize="xl" fontWeight="bold">
+                  {course.totalModules}
+                </Text>
+                <Text fontSize="sm" color="muted">
+                  Modules
+                </Text>
+              </VStack>
+            </FallInPlace>
+
+            <FallInPlace delay={0.4}>
+              <VStack spacing="2">
+                <Flex
+                  width="60px"
+                  height="60px"
+                  borderRadius="xl"
+                  bg="orange.50"
+                  _dark={{ bg: "orange.900" }}
+                  align="center"
+                  justify="center"
+                >
+                  <Icon as={FiAward} boxSize="6" color="orange.500" />
+                </Flex>
+                <Text fontSize="xl" fontWeight="bold">
+                  Certificate
+                </Text>
+                <Text fontSize="sm" color="muted">
+                  On Completion
+                </Text>
+              </VStack>
+            </FallInPlace>
+          </SimpleGrid>
+        </Container>
+      </Box>
+
+      {/* Main Content */}
+      <Box py={{ base: "16", md: "24" }}>
+        <Container maxW="container.xl">
+          <SimpleGrid columns={{ base: 1, lg: 3 }} spacing={{ base: "12", lg: "16" }}>
+            {/* Left Column - Course Info */}
+            <Box gridColumn={{ lg: "span 2" }}>
+              <Tabs colorScheme="primary" variant="enclosed">
+                <TabList>
+                  <Tab>Overview</Tab>
+                  <Tab id="curriculum">Curriculum</Tab>
+                  <Tab>Reviews</Tab>
+                </TabList>
+
+                <TabPanels>
+                  {/* Overview Tab */}
+                  <TabPanel px="0" py="8">
+                    <VStack spacing="8" align="stretch">
+                      <FallInPlace>
+                        <Box>
+                          <Heading size="lg" mb="4">
+                            About This Course
+                          </Heading>
+                          <Text color="muted" lineHeight="tall">
+                            {course.description}
+                          </Text>
+                        </Box>
+                      </FallInPlace>
+
+                      <FallInPlace delay={0.1}>
+                        <Box>
+                          <Heading size="lg" mb="4">
+                            What You'll Learn
+                          </Heading>
+                          <SimpleGrid columns={{ base: 1, md: 2 }} spacing="3">
+                            {course.learningOutcomes.map((outcome, index) => (
+                              <HStack key={index} align="start" spacing="3">
+                                <Icon as={FiCheckCircle} color="green.500" mt="1" flexShrink={0} />
+                                <Text color="muted">{outcome}</Text>
+                              </HStack>
+                            ))}
+                          </SimpleGrid>
+                        </Box>
+                      </FallInPlace>
+
+                      <FallInPlace delay={0.2}>
+                        <Box>
+                          <Heading size="lg" mb="4">
+                            Requirements
+                          </Heading>
+                          <List spacing="2">
+                            {course.requirements.map((req, index) => (
+                              <ListItem key={index} color="muted">
+                                <ListIcon as={FiCheckCircle} color="primary.500" />
+                                {req}
+                              </ListItem>
+                            ))}
+                          </List>
+                        </Box>
+                      </FallInPlace>
+                    </VStack>
+                  </TabPanel>
+
+                  {/* Curriculum Tab */}
+                  <TabPanel px="0" py="8">
+                    <FallInPlace>
+                      <CurriculumAccordion modules={course.modules} />
+                    </FallInPlace>
+                  </TabPanel>
+
+                  {/* Reviews Tab */}
+                  <TabPanel px="0" py="8">
+                    <VStack spacing="8" align="stretch">
+                      <FallInPlace>
+                        <HStack spacing="8" p="6" bg={bgColor} borderRadius="2xl" borderWidth="1px">
+                          <VStack>
+                            <Text fontSize="5xl" fontWeight="bold" color="primary.500">
+                              {course.rating}
+                            </Text>
+                            <RatingStars rating={course.rating} size="20px" />
+                            <Text fontSize="sm" color="muted">
+                              {course.totalRatings.toLocaleString()} ratings
+                            </Text>
+                          </VStack>
+                          <VStack align="stretch" flex="1" spacing="2">
+                            {[5, 4, 3, 2, 1].map((stars) => {
+                              const percentage = Math.floor(Math.random() * 100);
+                              return (
+                                <HStack key={stars} spacing="3">
+                                  <HStack spacing="1" w="60px">
+                                    <Text fontSize="sm">{stars}</Text>
+                                    <Icon as={FiStar} boxSize="3" color="yellow.500" />
+                                  </HStack>
+                                  <Progress
+                                    value={percentage}
+                                    colorScheme="primary"
+                                    flex="1"
+                                    borderRadius="full"
+                                    size="sm"
+                                  />
+                                  <Text fontSize="sm" color="muted" w="40px">
+                                    {percentage}%
+                                  </Text>
+                                </HStack>
+                              );
+                            })}
+                          </VStack>
+                        </HStack>
+                      </FallInPlace>
+
+                      <VStack spacing="6" align="stretch">
+                        {courseReviews.map((review, index) => (
+                          <FallInPlace key={review.id} delay={0.05 * index}>
+                            <ReviewCard review={review} />
+                          </FallInPlace>
+                        ))}
+                      </VStack>
+                    </VStack>
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
+            </Box>
+
+            {/* Right Column - Instructor & Sidebar */}
+            <VStack spacing="8" align="stretch">
+              {/* Live Class Info (if applicable) */}
+              {course.deliveryMode === "live" && course.liveSchedule && (
+                <FallInPlace delay={0.3}>
+                  <Box p="6" bg="red.50" _dark={{ bg: "red.900" }} borderRadius="2xl" borderWidth="2px" borderColor="red.500">
+                    <VStack spacing="4" align="stretch">
+                      <HStack spacing="2">
+                        <Icon as={FiVideo} color="red.500" boxSize="5" />
+                        <Heading size="md" color="red.600" _dark={{ color: "red.400" }}>
+                          Live Classes
+                        </Heading>
+                      </HStack>
+                      
+                      <VStack spacing="3" align="start" fontSize="sm">
+                        <HStack>
+                          <Icon as={FiCalendar} color="red.500" />
+                          <Text fontWeight="semibold">Schedule:</Text>
+                          <Text>{course.liveSchedule}</Text>
+                        </HStack>
+                        
+                        {course.startDate && (
+                          <HStack>
+                            <Icon as={FiClock} color="red.500" />
+                            <Text fontWeight="semibold">Starts:</Text>
+                            <Text>{new Date(course.startDate).toLocaleDateString()}</Text>
+                          </HStack>
+                        )}
+                        
+                        {course.maxStudents && course.enrolledStudents !== undefined && (
+                          <Box w="full">
+                            <HStack justify="space-between" mb="2">
+                              <Text fontWeight="semibold">Enrollment:</Text>
+                              <Text>
+                                {course.enrolledStudents}/{course.maxStudents}
+                              </Text>
+                            </HStack>
+                            <Progress 
+                              value={(course.enrolledStudents / course.maxStudents) * 100} 
+                              colorScheme="red" 
+                              borderRadius="full"
+                              size="sm"
+                            />
+                            {course.enrolledStudents >= course.maxStudents && (
+                              <Badge colorScheme="red" mt="2" fontSize="xs">
+                                FULLY BOOKED
+                              </Badge>
+                            )}
+                          </Box>
+                        )}
+                      </VStack>
+                    </VStack>
+                  </Box>
+                </FallInPlace>
+              )}
+
+              <FallInPlace delay={0.4}>
+                <Box>
+                  <Heading size="md" mb="6">
+                    Your Instructor
+                  </Heading>
+                  <InstructorCard instructor={course.instructor} showFullBio />
+                </Box>
+              </FallInPlace>
+
+              <FallInPlace delay={0.5}>
+                <Box p="6" bg={bgColor} borderRadius="2xl" borderWidth="1px">
+                  <VStack spacing="4" align="stretch">
+                    <Heading size="md">Course Includes</Heading>
+                    <VStack spacing="3" align="start">
+                      <HStack>
+                        <Icon as={FiPlay} color="primary.500" />
+                        <Text fontSize="sm">
+                          {course.totalLessons} on-demand video lessons
+                        </Text>
+                      </HStack>
+                      <HStack>
+                        <Icon as={FiBook} color="primary.500" />
+                        <Text fontSize="sm">Downloadable resources</Text>
+                      </HStack>
+                      <HStack>
+                        <Icon as={FiTrendingUp} color="primary.500" />
+                        <Text fontSize="sm">Hands-on labs & exercises</Text>
+                      </HStack>
+                      <HStack>
+                        <Icon as={FiAward} color="primary.500" />
+                        <Text fontSize="sm">Certificate of completion</Text>
+                      </HStack>
+                      <HStack>
+                        <Icon as={FiUsers} color="primary.500" />
+                        <Text fontSize="sm">Access to community</Text>
+                      </HStack>
+                    </VStack>
+                  </VStack>
+                </Box>
+              </FallInPlace>
+
+              <FallInPlace delay={0.5}>
+                <Box p="6" bg="primary.50" _dark={{ bg: "primary.900/20" }} borderRadius="2xl">
+                  <VStack spacing="4">
+                    <Icon as={FiAward} boxSize="12" color="primary.500" />
+                    <VStack spacing="2">
+                      <Heading size="sm" textAlign="center">
+                        Get Certified
+                      </Heading>
+                      <Text fontSize="sm" color="muted" textAlign="center">
+                        Earn a verified certificate upon completion to showcase your skills
+                      </Text>
+                    </VStack>
+                  </VStack>
+                </Box>
+              </FallInPlace>
+            </VStack>
+          </SimpleGrid>
+        </Container>
+      </Box>
+    </Box>
+  );
+}

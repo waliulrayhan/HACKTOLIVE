@@ -1,0 +1,116 @@
+import { Enrollment, Certificate, Student } from "@/types/academy";
+
+export const enrollments: Enrollment[] = [
+  {
+    id: "enroll-001",
+    studentId: "student-001",
+    courseId: "course-001",
+    enrolledAt: "2024-09-15T10:00:00Z",
+    status: "active",
+    progress: 65,
+    completedLessons: [
+      "lesson-001",
+      "lesson-002",
+      "lesson-003",
+      "lesson-004",
+      "lesson-005",
+    ],
+    lastAccessedLessonId: "lesson-006",
+  },
+  {
+    id: "enroll-002",
+    studentId: "student-001",
+    courseId: "course-002",
+    enrolledAt: "2024-08-01T12:30:00Z",
+    status: "completed",
+    progress: 100,
+    completedLessons: [], // All lessons completed
+    certificateId: "cert-001",
+  },
+  {
+    id: "enroll-003",
+    studentId: "student-001",
+    courseId: "course-006",
+    enrolledAt: "2024-11-01T09:15:00Z",
+    status: "active",
+    progress: 25,
+    completedLessons: ["lesson-001", "lesson-002"],
+    lastAccessedLessonId: "lesson-003",
+  },
+];
+
+export const certificates: Certificate[] = [
+  {
+    id: "cert-001",
+    studentId: "student-001",
+    studentName: "John Doe",
+    courseId: "course-002",
+    courseName: "Ethical Hacking & Penetration Testing for Beginners",
+    issuedAt: "2024-10-15T14:00:00Z",
+    verificationCode: "HACK-2024-ETH-12345",
+    certificateUrl: "/certificates/cert-001.pdf",
+  },
+  {
+    id: "cert-002",
+    studentId: "student-001",
+    studentName: "John Doe",
+    courseId: "course-006",
+    courseName: "Cryptography & Encryption Fundamentals",
+    issuedAt: "2024-09-20T16:30:00Z",
+    verificationCode: "HACK-2024-CRY-67890",
+    certificateUrl: "/certificates/cert-002.pdf",
+  },
+];
+
+export const students: Student[] = [
+  {
+    id: "student-001",
+    name: "John Doe",
+    email: "john.doe@example.com",
+    avatar: "/images/user/user-18.jpg",
+    enrolledCourses: 3,
+    completedCourses: 1,
+    certificatesEarned: 2,
+    joinedAt: "2024-07-10T08:00:00Z",
+  },
+  {
+    id: "student-002",
+    name: "Jane Smith",
+    email: "jane.smith@example.com",
+    avatar: "/images/user/user-19.jpg",
+    enrolledCourses: 5,
+    completedCourses: 3,
+    certificatesEarned: 3,
+    joinedAt: "2024-06-15T10:30:00Z",
+  },
+  {
+    id: "student-003",
+    name: "Mike Johnson",
+    email: "mike.johnson@example.com",
+    avatar: "/images/user/user-20.jpg",
+    enrolledCourses: 2,
+    completedCourses: 1,
+    certificatesEarned: 1,
+    joinedAt: "2024-08-22T14:15:00Z",
+  },
+  {
+    id: "student-004",
+    name: "Sarah Williams",
+    email: "sarah.williams@example.com",
+    avatar: "/images/user/user-21.jpg",
+    enrolledCourses: 4,
+    completedCourses: 2,
+    certificatesEarned: 2,
+    joinedAt: "2024-09-05T11:00:00Z",
+  },
+  {
+    id: "student-005",
+    name: "Alex Brown",
+    email: "alex.brown@example.com",
+    avatar: "/images/user/user-22.jpg",
+    enrolledCourses: 1,
+    completedCourses: 0,
+    certificatesEarned: 0,
+    joinedAt: "2024-11-01T09:45:00Z",
+  },
+];
