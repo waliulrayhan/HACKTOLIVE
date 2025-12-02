@@ -29,8 +29,8 @@ import {
   AlertDescription,
   Radio,
   RadioGroup,
-  useToast,
 } from "@chakra-ui/react";
+import { toast } from '@/components/ui/toast'
 import Image from "next/image";
 import { Course } from "@/types/academy";
 import { FallInPlace } from "@/components/shared/motion/fall-in-place";
@@ -62,7 +62,6 @@ export default function EnrollmentPage({ course }: EnrollmentPageProps) {
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const accentBg = useColorModeValue("green.50", "green.900");
   const accentColor = useColorModeValue("green.600", "green.300");
-  const toast = useToast();
   
   const isFree = course.price === 0;
   
@@ -87,33 +86,21 @@ export default function EnrollmentPage({ course }: EnrollmentPageProps) {
     e.preventDefault();
     
     if (isFree) {
-      toast({
-        title: "Enrollment Successful! 🎉",
+      toast.success("Enrollment Successful! 🎉", {
         description: "You're now enrolled in this free course. Check your email for access details.",
-        status: "success",
         duration: 5000,
-        isClosable: true,
-        position: "top",
       });
     } else {
-      toast({
-        title: "Processing Payment...",
+      toast.info("Processing Payment...", {
         description: "Please wait while we process your enrollment.",
-        status: "info",
         duration: 3000,
-        isClosable: true,
-        position: "top",
       });
       
       // Simulate payment processing
       setTimeout(() => {
-        toast({
-          title: "Payment Successful! 🎉",
+        toast.success("Payment Successful! 🎉", {
           description: "You're now enrolled! Check your email for course access.",
-          status: "success",
           duration: 5000,
-          isClosable: true,
-          position: "top",
         });
       }, 2000);
     }

@@ -875,3 +875,79 @@ span.flatpickr-weekday,
     transform: translate(-450px, -254px);
   }
 }
+
+/* Toast Styles */
+[data-sonner-toast] {
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  color: #111827 !important;
+}
+
+[data-sonner-toast][data-type="success"] {
+  background: #f0fdf4 !important;
+  border-color: #86efac !important;
+  color: #166534 !important;
+}
+
+[data-sonner-toast][data-type="error"] {
+  background: #fef2f2 !important;
+  border-color: #fca5a5 !important;
+  color: #991b1b !important;
+}
+
+[data-sonner-toast][data-type="warning"] {
+  background: #fefce8 !important;
+  border-color: #fde047 !important;
+  color: #854d0e !important;
+}
+
+[data-sonner-toast][data-type="info"] {
+  background: #eff6ff !important;
+  border-color: #93c5fd !important;
+  color: #1e40af !important;
+}
+
+/* Dark mode toast styles */
+.dark [data-sonner-toast] {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+.dark [data-sonner-toast][data-type="success"] {
+  background: #064e3b !important;
+  border-color: #059669 !important;
+  color: #d1fae5 !important;
+}
+
+.dark [data-sonner-toast][data-type="error"] {
+  background: #7f1d1d !important;
+  border-color: #dc2626 !important;
+  color: #fecaca !important;
+}
+
+.dark [data-sonner-toast][data-type="warning"] {
+  background: #713f12 !important;
+  border-color: #eab308 !important;
+  color: #fef08a !important;
+}
+
+.dark [data-sonner-toast][data-type="info"] {
+  background: #1e3a8a !important;
+  border-color: #3b82f6 !important;
+  color: #bfdbfe !important;
+}
+
+[data-sonner-toast] [data-content] {
+  color: inherit !important;
+}
+
+[data-sonner-toast] [data-title] {
+  color: inherit !important;
+  font-weight: 600;
+}
+
+[data-sonner-toast] [data-description] {
+  color: inherit !important;
+  opacity: 0.9;
+}

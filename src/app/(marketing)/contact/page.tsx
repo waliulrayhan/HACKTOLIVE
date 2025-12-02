@@ -21,8 +21,8 @@ import {
   Textarea,
   VStack,
   useColorModeValue,
-  useToast,
 } from '@chakra-ui/react'
+import { toast } from '@/components/ui/toast'
 import {
   FiPhone,
   FiMail,
@@ -47,7 +47,6 @@ export default function ContactPage() {
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const toast = useToast()
 
   const cardBg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
@@ -97,13 +96,9 @@ export default function ContactPage() {
     
     // Simulate API call
     setTimeout(() => {
-      toast({
-        title: 'Message sent successfully!',
+      toast.success('Message sent successfully!', {
         description: "We'll get back to you within 24 hours.",
-        status: 'success',
         duration: 5000,
-        isClosable: true,
-        position: 'top',
       })
       
       setFormData({ name: '', email: '', subject: '', message: '' })

@@ -29,7 +29,7 @@ import { FaMoon, FaSun } from 'react-icons/fa'
 import { useState, useEffect } from 'react'
 import NextLink from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import toast, { Toaster } from 'react-hot-toast'
+import { toast } from '@/components/ui/toast'
 
 const VerifyOTP: NextPage = () => {
   const router = useRouter()
@@ -84,16 +84,6 @@ const VerifyOTP: NextPage = () => {
       if (otp === '123456') {
         toast.success('Verification successful! Redirecting...', {
           duration: 3000,
-          position: 'top-center',
-          style: {
-            background: '#10b981',
-            color: '#fff',
-            fontWeight: '500',
-          },
-          iconTheme: {
-            primary: '#fff',
-            secondary: '#10b981',
-          },
         })
         
         setTimeout(() => {
@@ -109,16 +99,6 @@ const VerifyOTP: NextPage = () => {
         setError('Invalid verification code. Please try again.')
         toast.error('Invalid verification code. Please try again.', {
           duration: 4000,
-          position: 'top-center',
-          style: {
-            background: '#ef4444',
-            color: '#fff',
-            fontWeight: '500',
-          },
-          iconTheme: {
-            primary: '#fff',
-            secondary: '#ef4444',
-          },
         })
       }
     } catch (err) {
@@ -140,16 +120,6 @@ const VerifyOTP: NextPage = () => {
       
       toast.success(`A new verification code has been sent to ${contact}`, {
         duration: 4000,
-        position: 'top-center',
-        style: {
-          background: '#10b981',
-          color: '#fff',
-          fontWeight: '500',
-        },
-        iconTheme: {
-          primary: '#fff',
-          secondary: '#10b981',
-        },
       })
       
       setTimer(120)
@@ -157,16 +127,6 @@ const VerifyOTP: NextPage = () => {
     } catch (err) {
       toast.error('Failed to resend code. Please try again.', {
         duration: 4000,
-        position: 'top-center',
-        style: {
-          background: '#ef4444',
-          color: '#fff',
-          fontWeight: '500',
-        },
-        iconTheme: {
-          primary: '#fff',
-          secondary: '#ef4444',
-        },
       })
     } finally {
       setIsLoading(false)
@@ -175,7 +135,6 @@ const VerifyOTP: NextPage = () => {
 
   return (
     <>
-      <Toaster />
       <Header />
       <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} minH="100vh">
         {/* Left Column - Logo Section */}

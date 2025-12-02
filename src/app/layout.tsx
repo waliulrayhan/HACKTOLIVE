@@ -5,6 +5,7 @@ import '@/styles/globals.css'
 import { SidebarProvider } from '@/context/SidebarContext'
 import { ThemeProvider } from '@/context/ThemeContext'
 import { GlobalLoading } from '@/components/shared/global-loading'
+import { Toaster } from '@/components/ui/toast'
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -62,6 +63,7 @@ export default function RootLayout({
         <GlobalLoading />
         <ThemeProvider>
           <SidebarProvider>{children}</SidebarProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

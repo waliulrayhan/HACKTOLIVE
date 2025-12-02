@@ -25,10 +25,10 @@ import {
   ListItem,
   ListIcon,
   useColorModeValue,
-  useToast,
   HStack,
   Divider,
 } from '@chakra-ui/react'
+import { toast } from '@/components/ui/toast'
 import {
   FiTarget,
   FiHeart,
@@ -162,7 +162,6 @@ export default function CareerPage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedJob, setSelectedJob] = useState<string | null>(null)
-  const toast = useToast()
 
   const cardBg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
@@ -218,13 +217,9 @@ export default function CareerPage() {
 
     // Simulate API call
     setTimeout(() => {
-      toast({
-        title: 'Application submitted successfully!',
+      toast.success('Application submitted successfully!', {
         description: "We'll review your application and get back to you soon.",
-        status: 'success',
         duration: 5000,
-        isClosable: true,
-        position: 'top',
       })
 
       setFormData({
