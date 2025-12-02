@@ -31,7 +31,8 @@ export const Header = (props: HeaderProps) => {
   // Check if we're on an auth page
   const isAuthPage = pathname?.startsWith('/login') || 
                      pathname?.startsWith('/signup') || 
-                     pathname?.startsWith('/reset-password')
+                     pathname?.startsWith('/reset-password') ||
+                     pathname?.startsWith('/verify-otp')
 
   const bgScrolled = useColorModeValue('whiteAlpha.800', 'rgba(29, 32, 37, 0.7)')
   const bgDefault = useColorModeValue('whiteAlpha.700', 'transparent')
