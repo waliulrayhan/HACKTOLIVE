@@ -15,7 +15,7 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import { CourseModule } from "@/types/academy";
-import { FaPlayCircle, FaFileAlt, FaQuestionCircle, FaFileUpload, FaClock, FaLock } from "react-icons/fa";
+import { FaPlayCircle, FaFileAlt, FaQuestionCircle, FaFileUpload, FaClock, FaLock, FaBook } from "react-icons/fa";
 
 interface CurriculumAccordionProps {
   modules: CourseModule[];
@@ -24,6 +24,33 @@ interface CurriculumAccordionProps {
 
 export default function CurriculumAccordion({ modules, isEnrolled = false }: CurriculumAccordionProps) {
   const [expandedIndexes, setExpandedIndexes] = useState<number[]>([0]);
+
+  // Show fallback UI if no modules are available
+  if (!modules || modules.length === 0) {
+    return (
+      <Box
+        p="8"
+        textAlign="center"
+        borderWidth="1px"
+        borderRadius="xl"
+        borderColor="gray.200"
+        bg="gray.50"
+        _dark={{ borderColor: "gray.700", bg: "gray.800" }}
+      >
+        <VStack spacing="4">
+          <Icon as={FaBook} boxSize="12" color="gray.400" />
+          <VStack spacing="2">
+            <Text fontSize="lg" fontWeight="semibold" color="gray.700" _dark={{ color: "gray.300" }}>
+              Curriculum Coming Soon
+            </Text>
+            <Text fontSize="sm" color="gray.600" _dark={{ color: "gray.400" }} maxW="md">
+              We're currently preparing the detailed curriculum for this course. Check back soon or contact us for more information.
+            </Text>
+          </VStack>
+        </VStack>
+      </Box>
+    );
+  }
 
   const getLessonIcon = (type: string) => {
     switch (type) {

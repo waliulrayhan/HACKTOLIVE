@@ -22,6 +22,7 @@ import {
   ListIcon,
   Avatar,
   Progress,
+  Button,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import { courses } from "@/data/academy/courses";
@@ -56,6 +57,16 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
   const courseReviews = reviews.filter((r) => r.courseId === course?.id);
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
+
+  const scrollToCurriculum = () => {
+    const element = document.getElementById("curriculum-tab");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      // Trigger tab change by clicking the curriculum tab
+      const curriculumTabButton = document.querySelector('[aria-label="Curriculum"]') as HTMLElement;
+      if (curriculumTabButton) curriculumTabButton.click();
+    }
+  };
 
   if (!course) {
     return (
@@ -134,9 +145,9 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   <ButtonLink href={`/academy/enroll/${course.slug}`} colorScheme="primary" size="lg">
                     {course.tier === "premium" ? `Enroll Now - ₹${course.price}` : "Start Free Course"}
                   </ButtonLink>
-                  <ButtonLink href="#curriculum" variant="outline" colorScheme="primary" size="lg">
+                  <Button onClick={scrollToCurriculum} variant="outline" colorScheme="primary" size="lg">
                     View Curriculum
-                  </ButtonLink>
+                  </Button>
                 </HStack>
               </VStack>
             </FallInPlace>
@@ -257,10 +268,10 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
           <SimpleGrid columns={{ base: 1, lg: 3 }} spacing={{ base: "12", lg: "16" }}>
             {/* Left Column - Course Info */}
             <Box gridColumn={{ lg: "span 2" }}>
-              <Tabs colorScheme="primary" variant="enclosed">
+              <Tabs id="curriculum-tab" colorScheme="primary" variant="enclosed">
                 <TabList>
                   <Tab>Overview</Tab>
-                  <Tab id="curriculum">Curriculum</Tab>
+                  <Tab aria-label="Curriculum">Curriculum</Tab>
                   <Tab>Reviews</Tab>
                   <Tab>FAQ</Tab>
                 </TabList>
@@ -317,7 +328,54 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   {/* Curriculum Tab */}
                   <TabPanel px="0" py="8">
                     <FallInPlace>
-                      <CurriculumAccordion modules={course.modules} />
+                      {course.modules && course.modules.length > 0 ? (
+                        <CurriculumAccordion modules={course.modules} />
+                      ) : (
+                        <Box
+                          p="12"
+                          textAlign="center"
+                          borderWidth="2px"
+                          borderRadius="2xl"
+                          borderColor="primary.200"
+                          bg="primary.50"
+                          _dark={{ borderColor: "primary.700", bg: "primary.900/20" }}
+                          borderStyle="dashed"
+                        >
+                          <VStack spacing="6">
+                            <Flex
+                              width="80px"
+                              height="80px"
+                              borderRadius="full"
+                              bg="primary.100"
+                              _dark={{ bg: "primary.800" }}
+                              align="center"
+                              justify="center"
+                            >
+                              <Icon as={FiBook} boxSize="10" color="primary.500" />
+                            </Flex>
+                            <VStack spacing="3">
+                              <Heading size="md" color="primary.700" _dark={{ color: "primary.300" }}>
+                                Curriculum Under Development
+                              </Heading>
+                              <Text fontSize="md" color="muted" maxW="lg" lineHeight="tall">
+                                We're working hard to create comprehensive course content for you. 
+                                The detailed curriculum with lessons, quizzes, and hands-on labs will be available soon.
+                              </Text>
+                              <Text fontSize="sm" color="primary.600" _dark={{ color: "primary.400" }} fontWeight="medium" mt="2">
+                                💡 Enroll now to get notified when the curriculum is released!
+                              </Text>
+                            </VStack>
+                            <HStack spacing="4" pt="2">
+                              <ButtonLink href={`/academy/enroll/${course.slug}`} colorScheme="primary" size="md">
+                                Enroll & Get Notified
+                              </ButtonLink>
+                              <ButtonLink href="/contact" variant="outline" colorScheme="primary" size="md">
+                                Contact Us
+                              </ButtonLink>
+                            </HStack>
+                          </VStack>
+                        </Box>
+                      )}
                     </FallInPlace>
                   </TabPanel>
 
