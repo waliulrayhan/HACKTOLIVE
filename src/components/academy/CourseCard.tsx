@@ -153,7 +153,7 @@ export default function CourseCard({ course, variant = "default" }: CourseCardPr
         {/* Live Class Info */}
         {course.deliveryMode === "live" && course.liveSchedule && (
           <Box
-            bg="red.50"
+            bg="red.100"
             _dark={{ bg: "red.900" }}
             p="2"
             borderRadius="md"

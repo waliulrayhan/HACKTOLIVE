@@ -119,25 +119,26 @@ export default function AcademyHomePage() {
 
             <FallInPlace delay={0.3}>
               <Flex 
-                gap="4" 
-                flexDirection={{ base: 'column', sm: 'row' }}
-                width={{ base: '100%', sm: 'auto' }}
+                gap={{ base: '2', sm: '4' }}
+                flexDirection="row"
+                width="100%"
+                maxW={{ base: '100%', sm: 'auto' }}
                 pt="2"
               >
                 <ButtonLink 
                   colorScheme="primary" 
-                  size="lg"
+                  size={{ base: 'md', sm: 'lg' }}
                   href="/academy/courses"
                   rightIcon={<Icon as={FiArrowRight} />}
-                  flex={{ base: '1', sm: 'none' }}
+                  flex="1"
                 >
                   Browse All Courses
                 </ButtonLink>
                 <ButtonLink
-                  size="lg"
+                  size={{ base: 'md', sm: 'lg' }}
                   href="/signup"
                   variant="outline"
-                  flex={{ base: '1', sm: 'none' }}
+                  flex="1"
                   borderColor="whiteAlpha.400"
                   color="white"
                   _hover={{
@@ -467,62 +468,6 @@ export default function AcademyHomePage() {
         </Container>
       </Box>
 
-      {/* Upcoming Live Batches Section */}
-      {/* <Box py={{ base: '16', md: '24' }} position="relative" overflow="hidden">
-        <Box
-          position="absolute"
-          bottom="-10%"
-          left="-5%"
-          width="500px"
-          height="500px"
-          borderRadius="full"
-          bg={accentColor}
-          opacity="0.08"
-          filter="blur(100px)"
-          pointerEvents="none"
-        />
-        
-        <Container maxW="container.xl">
-          <VStack spacing={{ base: '8', md: '12' }} align="stretch">
-            <FallInPlace>
-              <Flex 
-                justify="space-between" 
-                align={{ base: "start", md: "center" }}
-                direction={{ base: "column", md: "row" }}
-                gap="4"
-              >
-                <VStack align="start" spacing="2">
-                  <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
-                    🔴 Live Training
-                  </Badge>
-                  <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
-                    Live Classes Available
-                  </Heading>
-                  <Text fontSize={{ base: 'md', md: 'lg' }} color="muted">
-                    Join live interactive sessions with expert instructors
-                  </Text>
-                </VStack>
-                <ButtonLink 
-                  href="/academy/courses?deliveryMode=live" 
-                  colorScheme="primary"
-                  rightIcon={<Icon as={FiArrowRight} />}
-                >
-                  View All Live Courses
-                </ButtonLink>
-              </Flex>
-            </FallInPlace>
-            
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="6">
-              {upcomingLiveCourses.map((course, index) => (
-                <FallInPlace key={course.id} delay={0.1 * index}>
-                  <CourseCard course={course} />
-                </FallInPlace>
-              ))}
-            </SimpleGrid>
-          </VStack>
-        </Container>
-      </Box> */}
-
       {/* How It Works Section */}
       <Box py={{ base: '16', md: '24' }} bg={bgColorAlt}>
         <Container maxW="container.xl">
@@ -548,7 +493,7 @@ export default function AcademyHomePage() {
                     w="100px"
                     h="100px"
                     borderRadius="2xl"
-                    bg="green.50"
+                    bg="green.100"
                     _dark={{ bg: "green.900" }}
                     align="center"
                     justify="center"
@@ -571,7 +516,7 @@ export default function AcademyHomePage() {
                     w="100px"
                     h="100px"
                     borderRadius="2xl"
-                    bg="blue.50"
+                    bg="blue.100"
                     _dark={{ bg: "blue.900" }}
                     align="center"
                     justify="center"
@@ -594,7 +539,7 @@ export default function AcademyHomePage() {
                     w="100px"
                     h="100px"
                     borderRadius="2xl"
-                    bg="purple.50"
+                    bg="purple.100"
                     _dark={{ bg: "purple.900" }}
                     align="center"
                     justify="center"
@@ -719,7 +664,7 @@ export default function AcademyHomePage() {
               </VStack>
             </FallInPlace>
             
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="6">
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="8">
               {courses.slice(0, 3).map((course, index) => (
                 <FallInPlace key={course.instructor.id} delay={0.1 * index}>
                   <ButtonLink
@@ -730,44 +675,115 @@ export default function AcademyHomePage() {
                   >
                     <Box
                       bg={cardBg}
-                      borderRadius="2xl"
+                      borderRadius="3xl"
                       overflow="hidden"
                       borderWidth="1px"
                       borderColor={borderColor}
-                      transition="all 0.3s"
+                      transition="all 0.4s ease"
+                      position="relative"
                       _hover={{
-                        transform: "translateY(-4px)",
-                        shadow: "xl",
-                        borderColor: "purple.500"
+                        transform: "translateY(-8px)",
+                        shadow: "2xl",
+                        borderColor: "purple.500",
+                        _before: {
+                          opacity: 1
+                        }
+                      }}
+                      _before={{
+                        content: '""',
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        bg: "linear-gradient(135deg, purple.500, pink.500)",
+                        opacity: 0,
+                        transition: "opacity 0.4s ease",
+                        borderRadius: "3xl",
+                        zIndex: -1,
+                        filter: "blur(20px)",
                       }}
                       cursor="pointer"
+                      h="full"
                     >
-                      <Image
-                        src={course.instructor.avatar}
-                        alt={course.instructor.name}
-                        width={400}
-                        height={400}
-                        style={{ width: "100%", height: "auto" }}
-                      />
-                      <VStack p="6" spacing="3" align="start">
-                        <Heading size="md">{course.instructor.name}</Heading>
-                        <Text fontSize="sm" color={textMuted} noOfLines={2}>
-                          {course.instructor.experience}
-                        </Text>
-                        <HStack spacing="4" fontSize="sm" color="muted">
-                          <HStack spacing="1">
-                            <Icon as={FiStar} color="yellow.500" />
-                            <Text fontWeight="semibold">{course.instructor.rating}</Text>
-                          </HStack>
-                          <HStack spacing="1">
-                            <Icon as={FiUsers} />
-                            <Text>{course.instructor.totalStudents.toLocaleString()}</Text>
-                          </HStack>
-                          <HStack spacing="1">
-                            <Icon as={FiBook} />
-                            <Text>{course.instructor.totalCourses} courses</Text>
-                          </HStack>
-                        </HStack>
+                      <Box position="relative" overflow="hidden">
+                        <Image
+                          src={course.instructor.avatar}
+                          alt={course.instructor.name}
+                          width={400}
+                          height={400}
+                          style={{ 
+                            width: "100%", 
+                            height: "280px",
+                            objectFit: "cover"
+                          }}
+                        />
+                        <Box
+                          position="absolute"
+                          bottom="0"
+                          left="0"
+                          right="0"
+                          bg="linear-gradient(to top, rgba(0,0,0,0.7), transparent)"
+                          p="4"
+                        >
+                          <Badge
+                            colorScheme="purple"
+                            fontSize="xs"
+                            px="3"
+                            py="1"
+                            borderRadius="full"
+                          >
+                            Expert Instructor
+                          </Badge>
+                        </Box>
+                      </Box>
+                      
+                      <VStack p="6" spacing="4" align="start">
+                        <VStack align="start" spacing="2" w="full">
+                          <Heading size="md" color={useColorModeValue('gray.800', 'white')}>
+                            {course.instructor.name}
+                          </Heading>
+                          <Text fontSize="sm" color={textMuted} noOfLines={2} lineHeight="tall">
+                            {course.instructor.experience}
+                          </Text>
+                        </VStack>
+                        
+                        <Box
+                          w="full"
+                          pt="4"
+                          borderTopWidth="1px"
+                          borderColor={borderColor}
+                        >
+                          <SimpleGrid columns={3} spacing="4" fontSize="sm">
+                            <VStack spacing="1">
+                              <HStack spacing="1" color="yellow.500">
+                                <Icon as={FiStar} />
+                                <Text fontWeight="bold">{course.instructor.rating}</Text>
+                              </HStack>
+                              <Text fontSize="xs" color={textMuted}>Rating</Text>
+                            </VStack>
+                            
+                            <VStack spacing="1">
+                              <HStack spacing="1" color="purple.500">
+                                <Icon as={FiUsers} />
+                                <Text fontWeight="bold">
+                                  {course.instructor.totalStudents > 999 
+                                    ? `${(course.instructor.totalStudents / 1000).toFixed(1)}k`
+                                    : course.instructor.totalStudents}
+                                </Text>
+                              </HStack>
+                              <Text fontSize="xs" color={textMuted}>Students</Text>
+                            </VStack>
+                            
+                            <VStack spacing="1">
+                              <HStack spacing="1" color="blue.500">
+                                <Icon as={FiBook} />
+                                <Text fontWeight="bold">{course.instructor.totalCourses}</Text>
+                              </HStack>
+                              <Text fontSize="xs" color={textMuted}>Courses</Text>
+                            </VStack>
+                          </SimpleGrid>
+                        </Box>
                       </VStack>
                     </Box>
                   </ButtonLink>
@@ -829,21 +845,19 @@ export default function AcademyHomePage() {
                   Join HACKTOLIVE Academy today and learn from the best. Get lifetime access to all
                   course materials and join our thriving community of cyber warriors.
                 </Text>
-                <Flex gap="4" flexDirection={{ base: 'column', sm: 'row' }} pt="4">
+                <Flex gap={{ base: '2', sm: '4' }} flexDirection="row" pt="4" width="100%" justify="center">
                   <ButtonLink
                     href="/academy/courses"
-                    size="lg"
+                    size={{ base: 'md', sm: 'lg' }}
                     colorScheme="primary"
                     rightIcon={<Icon as={FiArrowRight} />}
-                    flex={{ base: '1', sm: 'none' }}
                   >
                     Explore Courses
                   </ButtonLink>
                   <ButtonLink
                     href="/signup"
-                    size="lg"
+                    size={{ base: 'md', sm: 'lg' }}
                     variant="outline"
-                    flex={{ base: '1', sm: 'none' }}
                   >
                     Sign Up Free
                   </ButtonLink>
