@@ -47,6 +47,7 @@ import CurriculumAccordion from "@/components/academy/CurriculumAccordion";
 import ReviewCard from "@/components/academy/ReviewCard";
 import InstructorCard from "@/components/academy/InstructorCard";
 import RatingStars from "@/components/academy/RatingStars";
+import { color } from "framer-motion";
 
 interface CourseDetailsPageProps {
   slug: string;
@@ -347,29 +348,26 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                               height="80px"
                               borderRadius="full"
                               bg="primary.100"
-                              _dark={{ bg: "primary.800" }}
+                              _dark={{ bg: "primary.200" }}
                               align="center"
                               justify="center"
                             >
-                              <Icon as={FiBook} boxSize="10" color="primary.500" />
+                              <Icon as={FiBook} boxSize="10" color="primary.600" />
                             </Flex>
                             <VStack spacing="3">
-                              <Heading size="md" color="primary.700" _dark={{ color: "primary.300" }}>
+                              <Heading size="md" color="primary.700" _dark={{ color: "primary.700" }}>
                                 Curriculum Under Development
                               </Heading>
-                              <Text fontSize="md" color="muted" maxW="lg" lineHeight="tall">
+                              <Text fontSize="md" color="gray.500" maxW="lg" lineHeight="tall">
                                 We're working hard to create comprehensive course content for you. 
                                 The detailed curriculum with lessons, quizzes, and hands-on labs will be available soon.
-                              </Text>
-                              <Text fontSize="sm" color="primary.600" _dark={{ color: "primary.400" }} fontWeight="medium" mt="2">
-                                💡 Enroll now to get notified when the curriculum is released!
                               </Text>
                             </VStack>
                             <HStack spacing="4" pt="2">
                               <ButtonLink href={`/academy/enroll/${course.slug}`} colorScheme="primary" size="md">
                                 Enroll & Get Notified
                               </ButtonLink>
-                              <ButtonLink href="/contact" variant="outline" colorScheme="primary" size="md">
+                              <ButtonLink href="/contact" variant="outline" colorScheme="primary" size="md" color="primary.600" _dark={{ color: "primary.600" }}>
                                 Contact Us
                               </ButtonLink>
                             </HStack>
@@ -595,12 +593,12 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
               <FallInPlace delay={0.5}>
                 <Box p="6" bg="primary.50" _dark={{ bg: "primary.900/20" }} borderRadius="2xl">
                   <VStack spacing="4">
-                    <Icon as={FiAward} boxSize="12" color="primary.500" />
+                    <Icon as={FiAward} boxSize="12" color="primary.600" />
                     <VStack spacing="2">
-                      <Heading size="sm" textAlign="center">
+                      <Heading size="sm" textAlign="center" color="primary.600" _dark={{ color: "primary.600" }}>
                         Get Certified
                       </Heading>
-                      <Text fontSize="sm" color="muted" textAlign="center">
+                      <Text fontSize="sm" textAlign="center" color="gray.600" _dark={{ color: "gray.700" }}>
                         Earn a verified certificate upon completion to showcase your skills
                       </Text>
                     </VStack>
