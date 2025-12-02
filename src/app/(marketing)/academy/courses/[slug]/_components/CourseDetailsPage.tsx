@@ -166,7 +166,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   width="60px"
                   height="60px"
                   borderRadius="xl"
-                  bg="green.50"
+                  bg="green.100"
                   _dark={{ bg: "green.900" }}
                   align="center"
                   justify="center"
@@ -188,7 +188,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   width="60px"
                   height="60px"
                   borderRadius="xl"
-                  bg="blue.50"
+                  bg="blue.100"
                   _dark={{ bg: "blue.900" }}
                   align="center"
                   justify="center"
@@ -210,7 +210,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   width="60px"
                   height="60px"
                   borderRadius="xl"
-                  bg="purple.50"
+                  bg="purple.100"
                   _dark={{ bg: "purple.900" }}
                   align="center"
                   justify="center"
@@ -232,7 +232,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   width="60px"
                   height="60px"
                   borderRadius="xl"
-                  bg="orange.50"
+                  bg="orange.100"
                   _dark={{ bg: "orange.900" }}
                   align="center"
                   justify="center"
