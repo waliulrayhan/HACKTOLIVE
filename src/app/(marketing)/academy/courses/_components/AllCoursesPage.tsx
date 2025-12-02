@@ -588,9 +588,11 @@ export default function AllCoursesPage() {
       <Drawer isOpen={isOpen} placement="left" onClose={onClose} size="sm">
         <DrawerOverlay backdropFilter="blur(4px)" />
         <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader borderBottomWidth="1px" fontWeight="semibold">
-            Filter Courses
+          <DrawerHeader borderBottomWidth="1px" fontWeight="semibold" py="4">
+            <Flex align="center" justify="space-between">
+              <Text>Filter Courses</Text>
+              <DrawerCloseButton position="relative" top="0" right="0" />
+            </Flex>
           </DrawerHeader>
           <DrawerBody py="6">
             <FilterSection />
