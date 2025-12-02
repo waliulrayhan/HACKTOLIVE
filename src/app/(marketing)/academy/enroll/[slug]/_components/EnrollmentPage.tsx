@@ -195,7 +195,7 @@ export default function EnrollmentPage({ course }: EnrollmentPageProps) {
 
                 {/* Student Information */}
                 <FallInPlace>
-                  <Box bg={cardBg} p={{ base: "6", md: "8" }} borderRadius="2xl" borderWidth="1px" borderColor={borderColor}>
+                  <Box p={{ base: "2", md: "8" }}>
                     <VStack spacing="6" align="stretch">
                       <HStack>
                         <Icon as={FiUsers} boxSize="5" color="primary.500" />
@@ -265,7 +265,7 @@ export default function EnrollmentPage({ course }: EnrollmentPageProps) {
                 {/* Payment Section - Only for Paid Courses */}
                 {!isFree && (
                   <FallInPlace delay={0.1}>
-                    <Box bg={cardBg} p={{ base: "6", md: "8" }} borderRadius="2xl" borderWidth="1px" borderColor={borderColor}>
+                    <Box p={{ base: "2", md: "8" }}>
                       <VStack spacing="6" align="stretch">
                         <HStack>
                           <Icon as={FiCreditCard} boxSize="5" color="purple.500" />
