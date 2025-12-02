@@ -55,7 +55,7 @@ export default function AcademyHomePage() {
         pt={{ base: 32, md: 40 }}
         pb={{ base: 16, md: 20 }}
         overflow="hidden"
-        bgImage="url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2000')"
+        bgImage="url('https://images.unsplash.com/photo-1518770660439-4636190af475')"
         bgPosition="center"
         bgSize="cover"
         bgRepeat="no-repeat"
