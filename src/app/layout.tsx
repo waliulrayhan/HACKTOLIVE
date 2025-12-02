@@ -13,6 +13,22 @@ const outfit = Outfit({
 export const metadata = {
   title: 'HACKTOLIVE',
   description: 'Platform with landing page, authentication, and admin dashboard',
+  icons: {
+    icon: '/logo.svg',
+    apple: '/logo.svg',
+  },
+  openGraph: {
+    title: 'HACKTOLIVE',
+    description: 'Platform with landing page, authentication, and admin dashboard',
+    images: ['/logo.svg'],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'HACKTOLIVE',
+    description: 'Platform with landing page, authentication, and admin dashboard',
+    images: ['/logo.svg'],
+  },
 }
 
 export default function RootLayout({
