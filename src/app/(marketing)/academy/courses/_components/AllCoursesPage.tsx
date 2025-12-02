@@ -22,14 +22,15 @@ import {
   Stack,
   Checkbox,
   CheckboxGroup,
-  RangeSlider,
-  RangeSliderTrack,
-  RangeSliderFilledTrack,
-  RangeSliderThumb,
   useColorModeValue,
   Flex,
   Icon,
   chakra,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from "@chakra-ui/react";
 import { FiFilter, FiX } from "react-icons/fi";
 import { FallInPlace } from "@/components/shared/motion/fall-in-place";
@@ -44,21 +45,12 @@ export default function AllCoursesPage() {
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
   const [selectedTiers, setSelectedTiers] = useState<string[]>([]);
   const [selectedDeliveryModes, setSelectedDeliveryModes] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState([0, 10000]);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(10000);
   const [sortBy, setSortBy] = useState("popular");
-
-  const categories = [
-    { value: "web-security", label: "Web Security" },
-    { value: "network-security", label: "Network Security" },
-    { value: "penetration-testing", label: "Penetration Testing" },
-    { value: "malware-analysis", label: "Malware Analysis" },
-    { value: "cloud-security", label: "Cloud Security" },
-    { value: "cryptography", label: "Cryptography" },
-  ];
 
   const levels = [
     { value: "fundamental", label: "Fundamental" },
@@ -87,18 +79,13 @@ export default function AllCoursesPage() {
       return false;
     }
 
-    // Category filter
-    if (selectedCategories.length > 0 && !selectedCategories.includes(course.category)) {
-      return false;
-    }
-
     // Level filter
     if (selectedLevels.length > 0 && !selectedLevels.includes(course.level)) {
       return false;
     }
 
     // Price filter
-    if (course.price < priceRange[0] || course.price > priceRange[1]) {
+    if (course.price < minPrice || course.price > maxPrice) {
       return false;
     }
 
@@ -134,35 +121,16 @@ export default function AllCoursesPage() {
   });
 
   const resetFilters = () => {
-    setSelectedCategories([]);
     setSelectedLevels([]);
     setSelectedTiers([]);
     setSelectedDeliveryModes([]);
-    setPriceRange([0, 10000]);
+    setMinPrice(0);
+    setMaxPrice(10000);
     setSearchQuery("");
   };
 
   const FilterSection = () => (
     <VStack align="stretch" spacing="6">
-      {/* Categories */}
-      <Box>
-        <Text fontWeight="semibold" fontSize="sm" mb="4" color="muted" textTransform="uppercase" letterSpacing="wide">
-          Categories
-        </Text>
-        <CheckboxGroup
-          value={selectedCategories}
-          onChange={(values) => setSelectedCategories(values as string[])}
-        >
-          <Stack spacing="3">
-            {categories.map((cat) => (
-              <Checkbox key={cat.value} value={cat.value} colorScheme="primary">
-                {cat.label}
-              </Checkbox>
-            ))}
-          </Stack>
-        </CheckboxGroup>
-      </Box>
-
       {/* Levels */}
       <Box>
         <Text fontWeight="semibold" fontSize="sm" mb="4" color="muted" textTransform="uppercase" letterSpacing="wide">
@@ -184,26 +152,49 @@ export default function AllCoursesPage() {
 
       {/* Price Range */}
       <Box>
-        <Text fontWeight="semibold" fontSize="sm" mb="2" color="muted" textTransform="uppercase" letterSpacing="wide">
+        <Text fontWeight="semibold" fontSize="sm" mb="4" color="muted" textTransform="uppercase" letterSpacing="wide">
           Price Range
         </Text>
-        <Text fontSize="md" mb="4" fontWeight="medium">
-          ₹{priceRange[0]} - ₹{priceRange[1]}
-        </Text>
-        <RangeSlider
-          min={0}
-          max={10000}
-          step={500}
-          value={priceRange}
-          onChange={setPriceRange}
-          colorScheme="primary"
-        >
-          <RangeSliderTrack>
-            <RangeSliderFilledTrack />
-          </RangeSliderTrack>
-          <RangeSliderThumb index={0} />
-          <RangeSliderThumb index={1} />
-        </RangeSlider>
+        <VStack spacing="3" align="stretch">
+          <Box>
+            <Text fontSize="xs" mb="2" color="muted">
+              Minimum Price (Tk)
+            </Text>
+            <NumberInput
+              value={minPrice}
+              onChange={(_, value) => !isNaN(value) && setMinPrice(value)}
+              min={0}
+              max={maxPrice}
+              step={500}
+              focusBorderColor="primary.500"
+            >
+              <NumberInputField placeholder="Min" />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </Box>
+          <Box>
+            <Text fontSize="xs" mb="2" color="muted">
+              Maximum Price (Tk)
+            </Text>
+            <NumberInput
+              value={maxPrice}
+              onChange={(_, value) => !isNaN(value) && setMaxPrice(value)}
+              min={minPrice}
+              max={100000}
+              step={500}
+              focusBorderColor="primary.500"
+            >
+              <NumberInputField placeholder="Max" />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </Box>
+        </VStack>
       </Box>
 
       {/* Tier */}
@@ -253,23 +244,133 @@ export default function AllCoursesPage() {
 
   return (
     <Box>
-      {/* Header */}
-      <Box py={{ base: '12', md: '20' }} position="relative" overflow="hidden">
-        <Container maxW="container.xl">
+      {/* Hero Section */}
+      <Box 
+        position="relative" 
+        overflow="hidden" 
+        pt={{ base: 32, md: 40 }}
+        pb={{ base: 16, md: 20 }}
+        bgImage="url('https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=2000')"
+        bgPosition="center"
+        bgSize="cover"
+        bgRepeat="no-repeat"
+        _before={{
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          bg: useColorModeValue(
+            'linear-gradient(135deg, rgba(26, 32, 44, 0.88) 0%, rgba(45, 55, 72, 0.92) 100%)',
+            'linear-gradient(135deg, rgba(0, 0, 0, 0.75) 0%, rgba(26, 32, 44, 0.85) 100%)'
+          ),
+        }}
+      >
+        <Container maxW="container.xl" position="relative" zIndex={1}>
           <FallInPlace>
-            <VStack spacing="6" textAlign="center">
-              <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+            <VStack spacing={{ base: 4, md: 6 }} textAlign="center" maxW="4xl" mx="auto">
+              <Badge 
+                colorScheme="green" 
+                fontSize="sm" 
+                px="4" 
+                py="2" 
+                borderRadius="full"
+                textTransform="uppercase"
+                letterSpacing="wide"
+              >
                 Browse Courses
               </Badge>
-              <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }} maxW="4xl">
-                Explore Our Course Catalog
-              </Heading>
-              <Text fontSize={{ base: 'md', md: 'lg' }} color="muted" maxW="3xl">
+              
+              <Box>
+                <Heading
+                  as="h1"
+                  fontSize={{ base: '3xl', md: '4xl', lg: '5xl', xl: '6xl' }}
+                  fontWeight="bold"
+                  lineHeight="1.2"
+                  mb={4}
+                  color="white"
+                >
+                  Explore Our Course Catalog
+                </Heading>
+                <Box
+                  width="120px"
+                  height="4px"
+                  bg={useColorModeValue('green.400', 'green.500')}
+                  mx="auto"
+                  borderRadius="full"
+                />
+              </Box>
+              
+              <Text 
+                fontSize={{ base: 'md', md: 'lg', lg: 'xl' }} 
+                color="whiteAlpha.900" 
+                maxW="3xl"
+              >
                 Choose from 50+ expert-led cybersecurity courses designed to take you from beginner to advanced professional
               </Text>
+
+              {/* Stats */}
+              <HStack 
+                spacing={{ base: 6, md: 12 }} 
+                pt={4}
+                flexWrap="wrap"
+                justify="center"
+              >
+                <VStack spacing="1">
+                  <Text fontSize={{ base: 'xl', md: '2xl' }} fontWeight="bold" color="green.400">
+                    50+
+                  </Text>
+                  <Text fontSize="sm" color="whiteAlpha.800">
+                    Expert Courses
+                  </Text>
+                </VStack>
+                <VStack spacing="1">
+                  <Text fontSize={{ base: 'xl', md: '2xl' }} fontWeight="bold" color="green.400">
+                    10K+
+                  </Text>
+                  <Text fontSize="sm" color="whiteAlpha.800">
+                    Active Students
+                  </Text>
+                </VStack>
+                <VStack spacing="1">
+                  <Text fontSize={{ base: 'xl', md: '2xl' }} fontWeight="bold" color="green.400">
+                    4.8/5
+                  </Text>
+                  <Text fontSize="sm" color="whiteAlpha.800">
+                    Average Rating
+                  </Text>
+                </VStack>
+              </HStack>
             </VStack>
           </FallInPlace>
         </Container>
+
+        {/* Decorative floating elements */}
+        <Box
+          position="absolute"
+          top="10%"
+          right="5%"
+          width="150px"
+          height="150px"
+          borderRadius="full"
+          bg={useColorModeValue('green.400', 'green.500')}
+          opacity="0.1"
+          filter="blur(40px)"
+          display={{ base: 'none', md: 'block' }}
+        />
+        <Box
+          position="absolute"
+          bottom="15%"
+          left="8%"
+          width="200px"
+          height="200px"
+          borderRadius="full"
+          bg={useColorModeValue('blue.400', 'blue.500')}
+          opacity="0.1"
+          filter="blur(50px)"
+          display={{ base: 'none', md: 'block' }}
+        />
       </Box>
 
       {/* Filters & Content */}
@@ -278,26 +379,50 @@ export default function AllCoursesPage() {
         <VStack spacing="8" align="stretch">
 
           {/* Search & Filters */}
-          <Flex gap="4" align="start" direction={{ base: "column", sm: "row" }}>
-            <Box flex="1">
+          <Box>
+            {/* Search Bar - Full width on mobile */}
+            <Box mb="4">
               <SearchBar
                 placeholder="Search courses by title or description..."
                 onSearch={setSearchQuery}
               />
             </Box>
-            <Button
-              leftIcon={<Icon as={FiFilter} />}
-              onClick={onOpen}
+            
+            {/* Sort & Filter Row - Mobile */}
+            <Flex 
+              gap="3" 
               display={{ base: "flex", lg: "none" }}
-              colorScheme="primary"
-              variant="outline"
+              align="center"
             >
-              Filters
-            </Button>
-          </Flex>
+              <Select
+                size="sm"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                flex="1"
+                borderRadius="lg"
+                focusBorderColor="primary.500"
+              >
+                <option value="popular">Most Popular</option>
+                <option value="rating">Highest Rated</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="newest">Newest First</option>
+              </Select>
+              <Button
+                leftIcon={<Icon as={FiFilter} />}
+                onClick={onOpen}
+                colorScheme="primary"
+                variant="outline"
+                size="sm"
+                flexShrink={0}
+              >
+                Filters
+              </Button>
+            </Flex>
+          </Box>
 
-          {/* Results Header */}
-          <Flex justify="space-between" align="center" wrap="wrap" gap="4">
+          {/* Results Header - Desktop Only */}
+          <Flex justify="space-between" align="center" wrap="wrap" gap="4" display={{ base: "none", lg: "flex" }}>
             <Text fontSize="md" color="muted" fontWeight="medium">
               Showing <chakra.span color="primary.500" fontWeight="semibold">{sortedCourses.length}</chakra.span> of {courses.length} courses
             </Text>
@@ -321,6 +446,11 @@ export default function AllCoursesPage() {
               </Select>
             </HStack>
           </Flex>
+          
+          {/* Results Count - Mobile Only */}
+          <Text fontSize="sm" color="muted" fontWeight="medium" display={{ base: "block", lg: "none" }}>
+            Showing <chakra.span color="primary.500" fontWeight="semibold">{sortedCourses.length}</chakra.span> of {courses.length} courses
+          </Text>
 
           {/* Main Content */}
           <HStack align="start" spacing="8">
