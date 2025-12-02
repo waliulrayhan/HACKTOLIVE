@@ -123,10 +123,12 @@ export default function EnrollmentPage({ course }: EnrollmentPageProps) {
     <Box>
       {/* Header */}
       <Box 
-        py={{ base: "12", md: "16" }} 
+        mt={{ base: "14", md: "16" }}
+        py={{ base: "8", md: "12" }}
         bg={isFree ? accentBg : bgColor} 
         borderBottomWidth="1px"
         borderColor={borderColor}
+        sx={{ scrollMarginTop: "var(--navbar-height, 80px)" }}
       >
         <Container maxW="container.xl">
           <FallInPlace>
@@ -186,9 +188,6 @@ export default function EnrollmentPage({ course }: EnrollmentPageProps) {
                       <AlertIcon as={FiGift} boxSize="5" />
                       <Box flex="1">
                         <AlertTitle mb="1">Free Access - No Payment Required!</AlertTitle>
-                        <AlertDescription fontSize="sm">
-                          Get instant access to all course materials, certificate upon completion, and lifetime access.
-                        </AlertDescription>
                       </Box>
                     </Alert>
                   </FallInPlace>
@@ -365,7 +364,7 @@ export default function EnrollmentPage({ course }: EnrollmentPageProps) {
                                 borderRadius="lg"
                                 textTransform="uppercase"
                               />
-                              <Button colorScheme="green" size="lg" px="8">
+                              <Button colorScheme="green" size="md" px="8">
                                 Apply
                               </Button>
                             </HStack>
@@ -415,9 +414,8 @@ export default function EnrollmentPage({ course }: EnrollmentPageProps) {
                       <Button
                         type="submit"
                         form="enrollment-form"
-                        colorScheme={isFree ? "green" : "purple"}
-                        size="lg"
-                        height="60px"
+                        colorScheme={isFree ? "green" : "green"}
+                        size={{ base: "md", md: "xl", lg: "lg" }}
                         fontSize="lg"
                         fontWeight="bold"
                         leftIcon={isFree ? <FiZap /> : <FiLock />}
@@ -462,7 +460,7 @@ export default function EnrollmentPage({ course }: EnrollmentPageProps) {
                   borderWidth="2px" 
                   borderColor={isFree ? "green.500" : "purple.500"}
                   position="sticky"
-                  top="100px"
+                  top="calc(var(--navbar-height, 80px) + 20px)"
                 >
                   <Box 
                     position="relative" 
@@ -568,7 +566,7 @@ export default function EnrollmentPage({ course }: EnrollmentPageProps) {
                         <VStack 
                           spacing="2" 
                           p="4" 
-                          bg={useColorModeValue("purple.50", "purple.900")}
+                          bg={useColorModeValue("green.50", "green.900")}
                           borderRadius="lg"
                         >
                           <Text fontSize="xs" color="muted" textTransform="uppercase" fontWeight="bold">
