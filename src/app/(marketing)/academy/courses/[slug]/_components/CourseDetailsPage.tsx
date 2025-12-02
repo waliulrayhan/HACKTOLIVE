@@ -334,11 +334,22 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
             {/* Left Column - Course Info */}
             <Box gridColumn={{ lg: "span 2" }}>
               <Tabs id="curriculum-tab" colorScheme="primary" variant="enclosed">
-                <TabList>
-                  <Tab>Overview</Tab>
-                  <Tab aria-label="Curriculum">Curriculum</Tab>
-                  <Tab>Reviews</Tab>
-                  <Tab>FAQ</Tab>
+                <TabList 
+                  overflowX="auto"
+                  overflowY="hidden"
+                  sx={{
+                    scrollbarWidth: 'none',
+                    '::-webkit-scrollbar': { display: 'none' },
+                    display: 'flex',
+                    flexWrap: 'nowrap',
+                  }}
+                  borderBottom="1px"
+                  borderColor={borderColor}
+                >
+                  <Tab flexShrink={0} fontSize={{ base: "sm", md: "md" }}>Overview</Tab>
+                  <Tab flexShrink={0} fontSize={{ base: "sm", md: "md" }} aria-label="Curriculum">Curriculum</Tab>
+                  <Tab flexShrink={0} fontSize={{ base: "sm", md: "md" }}>Reviews</Tab>
+                  <Tab flexShrink={0} fontSize={{ base: "sm", md: "md" }}>FAQ</Tab>
                 </TabList>
 
                 <TabPanels>
