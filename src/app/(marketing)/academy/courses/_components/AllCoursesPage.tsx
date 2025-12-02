@@ -31,6 +31,13 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
+  RangeSlider,
+  RangeSliderTrack,
+  RangeSliderFilledTrack,
+  RangeSliderThumb,
+  Input,
+  InputGroup,
+  InputLeftAddon,
 } from "@chakra-ui/react";
 import { FiFilter, FiX } from "react-icons/fi";
 import { FallInPlace } from "@/components/shared/motion/fall-in-place";
@@ -51,6 +58,8 @@ export default function AllCoursesPage() {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(10000);
   const [sortBy, setSortBy] = useState("popular");
+  const [currentPage, setCurrentPage] = useState(1);
+  const coursesPerPage = 12;
 
   const levels = [
     { value: "fundamental", label: "Fundamental" },
@@ -120,6 +129,17 @@ export default function AllCoursesPage() {
     }
   });
 
+  // Pagination
+  const totalPages = Math.ceil(sortedCourses.length / coursesPerPage);
+  const indexOfLastCourse = currentPage * coursesPerPage;
+  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+  const currentCourses = sortedCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+
+  // Reset to page 1 when filters change
+  const handleFilterChange = () => {
+    setCurrentPage(1);
+  };
+
   const resetFilters = () => {
     setSelectedLevels([]);
     setSelectedTiers([]);
@@ -127,6 +147,7 @@ export default function AllCoursesPage() {
     setMinPrice(0);
     setMaxPrice(10000);
     setSearchQuery("");
+    setCurrentPage(1);
   };
 
   const FilterSection = () => (
@@ -155,44 +176,63 @@ export default function AllCoursesPage() {
         <Text fontWeight="semibold" fontSize="sm" mb="4" color="muted" textTransform="uppercase" letterSpacing="wide">
           Price Range
         </Text>
-        <VStack spacing="3" align="stretch">
+        <VStack spacing="4" align="stretch">
+          {/* Price Display */}
+          <HStack justify="space-between">
+            <InputGroup size="xs" maxW="120px">
+              <InputLeftAddon children="Min" />
+              <Input
+                type="number"
+                value={minPrice}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value) || 0;
+                  setMinPrice(Math.min(val, maxPrice));
+                  handleFilterChange();
+                }}
+                min={0}
+                max={maxPrice}
+                focusBorderColor="primary.500"
+              />
+            </InputGroup>
+            <Text fontSize="sm" color="muted">to</Text>
+            <InputGroup size="xs" maxW="120px">
+              <InputLeftAddon children="Max" />
+              <Input
+                type="number"
+                value={maxPrice}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value) || 10000;
+                  setMaxPrice(Math.max(val, minPrice));
+                  handleFilterChange();
+                }}
+                min={minPrice}
+                max={100000}
+                focusBorderColor="primary.500"
+              />
+            </InputGroup>
+          </HStack>
+          
+          {/* Range Slider */}
           <Box>
-            <Text fontSize="xs" mb="2" color="muted">
-              Minimum Price (Tk)
-            </Text>
-            <NumberInput
-              value={minPrice}
-              onChange={(_, value) => !isNaN(value) && setMinPrice(value)}
+            <Text fontSize="xs" mb="2" color="muted">{minPrice} Tk - {maxPrice} Tk</Text>
+            <RangeSlider
+              value={[minPrice, maxPrice]}
+              onChange={(val) => {
+                setMinPrice(val[0]);
+                setMaxPrice(val[1]);
+              }}
+              onChangeEnd={handleFilterChange}
               min={0}
-              max={maxPrice}
-              step={500}
-              focusBorderColor="primary.500"
+              max={10000}
+              step={100}
+              colorScheme="primary"
             >
-              <NumberInputField placeholder="Min" />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-          </Box>
-          <Box>
-            <Text fontSize="xs" mb="2" color="muted">
-              Maximum Price (Tk)
-            </Text>
-            <NumberInput
-              value={maxPrice}
-              onChange={(_, value) => !isNaN(value) && setMaxPrice(value)}
-              min={minPrice}
-              max={100000}
-              step={500}
-              focusBorderColor="primary.500"
-            >
-              <NumberInputField placeholder="Max" />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
+              <RangeSliderTrack>
+                <RangeSliderFilledTrack />
+              </RangeSliderTrack>
+              <RangeSliderThumb index={0} boxSize={5} />
+              <RangeSliderThumb index={1} boxSize={5} />
+            </RangeSlider>
           </Box>
         </VStack>
       </Box>
@@ -388,6 +428,17 @@ export default function AllCoursesPage() {
               />
             </Box>
             
+            {/* Results Count - Mobile Only (Above Sort/Filter) */}
+            <Text 
+              fontSize="sm" 
+              color="muted" 
+              fontWeight="medium" 
+              display={{ base: "block", lg: "none" }}
+              mb="3"
+            >
+              Showing <chakra.span color="primary.500" fontWeight="semibold">{currentCourses.length}</chakra.span> of {sortedCourses.length} courses
+            </Text>
+            
             {/* Sort & Filter Row - Mobile */}
             <Flex 
               gap="3" 
@@ -424,7 +475,7 @@ export default function AllCoursesPage() {
           {/* Results Header - Desktop Only */}
           <Flex justify="space-between" align="center" wrap="wrap" gap="4" display={{ base: "none", lg: "flex" }}>
             <Text fontSize="md" color="muted" fontWeight="medium">
-              Showing <chakra.span color="primary.500" fontWeight="semibold">{sortedCourses.length}</chakra.span> of {courses.length} courses
+              Showing <chakra.span color="primary.500" fontWeight="semibold">{currentCourses.length}</chakra.span> of {sortedCourses.length} courses
             </Text>
             <HStack spacing="3">
               <Text fontSize="sm" color="muted">
@@ -446,11 +497,6 @@ export default function AllCoursesPage() {
               </Select>
             </HStack>
           </Flex>
-          
-          {/* Results Count - Mobile Only */}
-          <Text fontSize="sm" color="muted" fontWeight="medium" display={{ base: "block", lg: "none" }}>
-            Showing <chakra.span color="primary.500" fontWeight="semibold">{sortedCourses.length}</chakra.span> of {courses.length} courses
-          </Text>
 
           {/* Main Content */}
           <HStack align="start" spacing="8">
@@ -482,13 +528,55 @@ export default function AllCoursesPage() {
                   onAction={resetFilters}
                 />
               ) : (
-                <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing="6">
-                  {sortedCourses.map((course, index) => (
-                    <FallInPlace key={course.id} delay={0.05 * index}>
-                      <CourseCard course={course} />
-                    </FallInPlace>
-                  ))}
-                </SimpleGrid>
+                <VStack spacing="8" align="stretch">
+                  <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing="6">
+                    {currentCourses.map((course, index) => (
+                      <FallInPlace key={course.id} delay={0.05 * index}>
+                        <CourseCard course={course} />
+                      </FallInPlace>
+                    ))}
+                  </SimpleGrid>
+                  
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <Flex justify="center" align="center" gap="2" flexWrap="wrap">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        colorScheme="primary"
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        isDisabled={currentPage === 1}
+                      >
+                        Previous
+                      </Button>
+                      
+                      <HStack spacing="1">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                          <Button
+                            key={page}
+                            size="sm"
+                            variant={currentPage === page ? "solid" : "ghost"}
+                            colorScheme="primary"
+                            onClick={() => setCurrentPage(page)}
+                            minW="40px"
+                          >
+                            {page}
+                          </Button>
+                        ))}
+                      </HStack>
+                      
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        colorScheme="primary"
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        isDisabled={currentPage === totalPages}
+                      >
+                        Next
+                      </Button>
+                    </Flex>
+                  )}
+                </VStack>
               )}
             </Box>
           </HStack>
