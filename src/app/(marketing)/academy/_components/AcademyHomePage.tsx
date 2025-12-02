@@ -28,7 +28,13 @@ import {
   FiUsers, 
   FiBook, 
   FiTrendingUp,
-  FiStar
+  FiStar,
+  FiGlobe,
+  FiShield,
+  FiTarget,
+  FiActivity,
+  FiCloud,
+  FiLock
 } from "react-icons/fi";
 
 export default function AcademyHomePage() {
@@ -163,7 +169,7 @@ export default function AcademyHomePage() {
                   width={{ base: '60px', md: '80px' }}
                   height={{ base: '60px', md: '80px' }}
                   borderRadius="2xl"
-                  bg="green.50"
+                  bg="green.100"
                   _dark={{ bg: "green.900" }}
                   align="center"
                   justify="center"
@@ -183,7 +189,7 @@ export default function AcademyHomePage() {
                   width={{ base: '60px', md: '80px' }}
                   height={{ base: '60px', md: '80px' }}
                   borderRadius="2xl"
-                  bg="blue.50"
+                  bg="blue.100"
                   _dark={{ bg: "blue.900" }}
                   align="center"
                   justify="center"
@@ -203,7 +209,7 @@ export default function AcademyHomePage() {
                   width={{ base: '60px', md: '80px' }}
                   height={{ base: '60px', md: '80px' }}
                   borderRadius="2xl"
-                  bg="purple.50"
+                  bg="purple.100"
                   _dark={{ bg: "purple.900" }}
                   align="center"
                   justify="center"
@@ -223,7 +229,7 @@ export default function AcademyHomePage() {
                   width={{ base: '60px', md: '80px' }}
                   height={{ base: '60px', md: '80px' }}
                   borderRadius="2xl"
-                  bg="orange.50"
+                  bg="orange.100"
                   _dark={{ bg: "orange.900" }}
                   align="center"
                   justify="center"
@@ -300,46 +306,72 @@ export default function AcademyHomePage() {
               </VStack>
             </FallInPlace>
 
-            <SimpleGrid columns={{ base: 2, md: 3, lg: 6 }} spacing="6">
+            <SimpleGrid columns={{ base: 2, md: 3, lg: 6 }} spacing={{ base: "4", md: "6" }}>
               {[
-                { name: "Web Security", icon: "🌐", count: courses.filter(c => c.category === "web-security").length, color: "blue" },
-                { name: "Network Security", icon: "🔒", count: courses.filter(c => c.category === "network-security").length, color: "purple" },
-                { name: "Penetration Testing", icon: "🎯", count: courses.filter(c => c.category === "penetration-testing").length, color: "red" },
-                { name: "Malware Analysis", icon: "🦠", count: courses.filter(c => c.category === "malware-analysis").length, color: "orange" },
-                { name: "Cloud Security", icon: "☁️", count: courses.filter(c => c.category === "cloud-security").length, color: "cyan" },
-                { name: "Cryptography", icon: "🔐", count: courses.filter(c => c.category === "cryptography").length, color: "green" },
+                { name: "Web Security", icon: FiGlobe, count: courses.filter(c => c.category === "web-security").length, color: "blue" },
+                { name: "Network Security", icon: FiShield, count: courses.filter(c => c.category === "network-security").length, color: "purple" },
+                { name: "Penetration Testing", icon: FiTarget, count: courses.filter(c => c.category === "penetration-testing").length, color: "red" },
+                { name: "Malware Analysis", icon: FiActivity, count: courses.filter(c => c.category === "malware-analysis").length, color: "orange" },
+                { name: "Cloud Security", icon: FiCloud, count: courses.filter(c => c.category === "cloud-security").length, color: "cyan" },
+                { name: "Cryptography", icon: FiLock, count: courses.filter(c => c.category === "cryptography").length, color: "green" },
               ].map((category, index) => (
                 <FallInPlace key={category.name} delay={0.1 * index}>
-                  <ButtonLink
-                    href={`/academy/courses?category=${category.name.toLowerCase().replace(" ", "-")}`}
-                    variant="unstyled"
-                    height="auto"
-                    display="block"
-                  >
-                    <VStack
-                      p="6"
-                      bg={cardBg}
-                      borderRadius="2xl"
-                      borderWidth="1px"
-                      borderColor={borderColor}
-                      spacing="3"
-                      transition="all 0.3s"
-                      _hover={{
-                        transform: "translateY(-4px)",
-                        shadow: "xl",
-                        borderColor: `${category.color}.500`,
-                      }}
-                      cursor="pointer"
+                  <Box position="relative" w="100%" h="100%">
+                    <ButtonLink
+                      href={`/academy/courses?category=${category.name.toLowerCase().replace(" ", "-")}`}
+                      variant="unstyled"
+                      height="100%"
+                      width="100%"
+                      display="block"
                     >
-                      <Text fontSize="3xl">{category.icon}</Text>
-                      <Text fontWeight="bold" fontSize="sm" textAlign="center" noOfLines={2}>
-                        {category.name}
-                      </Text>
-                      <Badge colorScheme={category.color} fontSize="xs">
-                        {category.count} {category.count === 1 ? "course" : "courses"}
-                      </Badge>
-                    </VStack>
-                  </ButtonLink>
+                      <VStack
+                        bg={cardBg}
+                        borderRadius="2xl"
+                        borderWidth="1px"
+                        borderColor={borderColor}
+                        transition="all 0.3s"
+                        _hover={{
+                          transform: "translateY(-4px)",
+                          shadow: "xl",
+                          borderColor: `${category.color}.500`,
+                        }}
+                        cursor="pointer"
+                        position="relative"
+                        w="100%"
+                        h="100%"
+                        aspectRatio="1"
+                        p={{ base: "4", md: "5" }}
+                        spacing="3"
+                        justify="center"
+                        align="center"
+                      >
+                        <Flex
+                          width={{ base: "45px", md: "55px" }}
+                          height={{ base: "45px", md: "55px" }}
+                          borderRadius="xl"
+                          bg={`${category.color}.100`}
+                          _dark={{ bg: `${category.color}.900` }}
+                          align="center"
+                          justify="center"
+                          flexShrink={0}
+                        >
+                          <Icon as={category.icon} boxSize={{ base: "5", md: "6" }} color={`${category.color}.500`} />
+                        </Flex>
+                        <Text 
+                          fontWeight="bold" 
+                          fontSize={{ base: "xs", md: "sm" }} 
+                          textAlign="center" 
+                          lineHeight="1.3"
+                          px="2"
+                        >
+                          {category.name}
+                        </Text>
+                        <Badge colorScheme={category.color} fontSize={{ base: "2xs", md: "xs" }} flexShrink={0}>
+                          {category.count} {category.count === 1 ? "course" : "courses"}
+                        </Badge>
+                      </VStack>
+                    </ButtonLink>
+                  </Box>
                 </FallInPlace>
               ))}
             </SimpleGrid>
