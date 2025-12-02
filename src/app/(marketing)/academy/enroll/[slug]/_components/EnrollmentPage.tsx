@@ -21,6 +21,15 @@ import {
   List,
   ListItem,
   ListIcon,
+  Flex,
+  Stack,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
+  Radio,
+  RadioGroup,
+  useToast,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import { Course } from "@/types/academy";
@@ -35,6 +44,11 @@ import {
   FiStar,
   FiVideo,
   FiCalendar,
+  FiCreditCard,
+  FiShield,
+  FiZap,
+  FiGift,
+  FiLock,
 } from "react-icons/fi";
 import { useState } from "react";
 
@@ -46,6 +60,11 @@ export default function EnrollmentPage({ course }: EnrollmentPageProps) {
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
+  const accentBg = useColorModeValue("green.50", "green.900");
+  const accentColor = useColorModeValue("green.600", "green.300");
+  const toast = useToast();
+  
+  const isFree = course.price === 0;
   
   const [formData, setFormData] = useState({
     name: "",
@@ -55,31 +74,93 @@ export default function EnrollmentPage({ course }: EnrollmentPageProps) {
     agreeToTerms: false,
   });
 
+  const [paymentData, setPaymentData] = useState({
+    paymentMethod: "card",
+    cardNumber: "",
+    cardName: "",
+    expiryDate: "",
+    cvv: "",
+    couponCode: "",
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle enrollment submission
-    console.log("Enrollment data:", formData);
-    alert("Enrollment request submitted! We'll contact you shortly.");
+    
+    if (isFree) {
+      toast({
+        title: "Enrollment Successful! 🎉",
+        description: "You're now enrolled in this free course. Check your email for access details.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+    } else {
+      toast({
+        title: "Processing Payment...",
+        description: "Please wait while we process your enrollment.",
+        status: "info",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+      });
+      
+      // Simulate payment processing
+      setTimeout(() => {
+        toast({
+          title: "Payment Successful! 🎉",
+          description: "You're now enrolled! Check your email for course access.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: "top",
+        });
+      }, 2000);
+    }
   };
 
   return (
     <Box>
       {/* Header */}
-      <Box py={{ base: "12", md: "16" }} bg={bgColor} borderBottomWidth="1px">
+      <Box 
+        py={{ base: "12", md: "16" }} 
+        bg={isFree ? accentBg : bgColor} 
+        borderBottomWidth="1px"
+        borderColor={borderColor}
+      >
         <Container maxW="container.xl">
           <FallInPlace>
             <VStack spacing="4" align="start">
               <ButtonLink href={`/academy/courses/${course.slug}`} variant="link" colorScheme="primary">
                 ← Back to Course
               </ButtonLink>
-              <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
-                Enrollment
-              </Badge>
+              <HStack spacing="3">
+                <Badge 
+                  colorScheme={isFree ? "green" : "purple"} 
+                  fontSize="sm" 
+                  px="3" 
+                  py="1" 
+                  borderRadius="md"
+                >
+                  {isFree ? "Free Course" : "Premium Course"}
+                </Badge>
+                {course.deliveryMode === "live" && (
+                  <Badge colorScheme="red" fontSize="sm" px="3" py="1" borderRadius="md">
+                    <HStack spacing="1">
+                      <Icon as={FiVideo} />
+                      <Text>Live Classes</Text>
+                    </HStack>
+                  </Badge>
+                )}
+              </HStack>
               <Heading fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}>
-                Enroll in {course.title}
+                {isFree ? "Start Learning Today" : "Complete Your Enrollment"}
               </Heading>
               <Text fontSize={{ base: "md", md: "lg" }} color="muted">
-                Complete the form below to enroll in this course
+                {isFree 
+                  ? "Fill in your details to get instant access to this free course"
+                  : "Secure your spot in this premium course and unlock expert-led content"
+                }
               </Text>
             </VStack>
           </FallInPlace>
@@ -92,167 +173,445 @@ export default function EnrollmentPage({ course }: EnrollmentPageProps) {
           <SimpleGrid columns={{ base: 1, lg: 3 }} spacing={{ base: "8", lg: "12" }}>
             {/* Enrollment Form */}
             <Box gridColumn={{ lg: "span 2" }}>
-              <FallInPlace>
-                <Box bg={cardBg} p={{ base: "6", md: "8" }} borderRadius="2xl" borderWidth="1px" borderColor={borderColor}>
-                  <VStack spacing="6" align="stretch">
-                    <Heading size="lg">Enrollment Details</Heading>
-                    
-                    <form onSubmit={handleSubmit}>
-                      <VStack spacing="4" align="stretch">
-                        <FormControl isRequired>
-                          <FormLabel>Full Name</FormLabel>
-                          <Input
-                            placeholder="Enter your full name"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          />
-                        </FormControl>
+              <VStack spacing="6" align="stretch">
+                {/* Benefits Alert for Free Courses */}
+                {isFree && (
+                  <FallInPlace>
+                    <Alert
+                      status="success"
+                      variant="subtle"
+                      borderRadius="xl"
+                      p="4"
+                    >
+                      <AlertIcon as={FiGift} boxSize="5" />
+                      <Box flex="1">
+                        <AlertTitle mb="1">Free Access - No Payment Required!</AlertTitle>
+                        <AlertDescription fontSize="sm">
+                          Get instant access to all course materials, certificate upon completion, and lifetime access.
+                        </AlertDescription>
+                      </Box>
+                    </Alert>
+                  </FallInPlace>
+                )}
 
-                        <FormControl isRequired>
-                          <FormLabel>Email Address</FormLabel>
-                          <Input
-                            type="email"
-                            placeholder="your.email@example.com"
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          />
-                        </FormControl>
+                {/* Student Information */}
+                <FallInPlace>
+                  <Box bg={cardBg} p={{ base: "6", md: "8" }} borderRadius="2xl" borderWidth="1px" borderColor={borderColor}>
+                    <VStack spacing="6" align="stretch">
+                      <HStack>
+                        <Icon as={FiUsers} boxSize="5" color="primary.500" />
+                        <Heading size="lg">Student Information</Heading>
+                      </HStack>
+                      
+                      <form onSubmit={handleSubmit} id="enrollment-form">
+                        <VStack spacing="5" align="stretch">
+                          <SimpleGrid columns={{ base: 1, md: 2 }} spacing="4">
+                            <FormControl isRequired>
+                              <FormLabel fontWeight="semibold">Full Name</FormLabel>
+                              <Input
+                                size="lg"
+                                placeholder="John Doe"
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                borderRadius="lg"
+                              />
+                            </FormControl>
 
-                        <FormControl isRequired>
-                          <FormLabel>Phone Number</FormLabel>
-                          <Input
-                            type="tel"
-                            placeholder="+880 1XXX-XXXXXX"
-                            value={formData.phone}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          />
-                        </FormControl>
+                            <FormControl isRequired>
+                              <FormLabel fontWeight="semibold">Phone Number</FormLabel>
+                              <Input
+                                size="lg"
+                                type="tel"
+                                placeholder="+1 (555) 000-0000"
+                                value={formData.phone}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                borderRadius="lg"
+                              />
+                            </FormControl>
+                          </SimpleGrid>
 
-                        <FormControl>
-                          <FormLabel>Message (Optional)</FormLabel>
-                          <Textarea
-                            placeholder="Any questions or special requirements?"
-                            rows={4}
-                            value={formData.message}
-                            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                          />
-                        </FormControl>
-
-                        <Divider />
-
-                        <FormControl isRequired>
-                          <Checkbox
-                            isChecked={formData.agreeToTerms}
-                            onChange={(e) => setFormData({ ...formData, agreeToTerms: e.target.checked })}
-                          >
-                            I agree to the{" "}
-                            <Text as="span" color="primary.500" textDecoration="underline">
-                              terms and conditions
+                          <FormControl isRequired>
+                            <FormLabel fontWeight="semibold">Email Address</FormLabel>
+                            <Input
+                              size="lg"
+                              type="email"
+                              placeholder="your.email@example.com"
+                              value={formData.email}
+                              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                              borderRadius="lg"
+                            />
+                            <Text fontSize="xs" color="muted" mt="1">
+                              We'll send course access and updates to this email
                             </Text>
-                          </Checkbox>
-                        </FormControl>
+                          </FormControl>
 
-                        <Button
-                          type="submit"
-                          colorScheme="primary"
-                          size="lg"
-                          width="full"
-                          isDisabled={!formData.agreeToTerms || !formData.name || !formData.email || !formData.phone}
-                        >
-                          Complete Enrollment - ₹{course.price === 0 ? "Free" : course.price}
-                        </Button>
+                          {!isFree && (
+                            <FormControl>
+                              <FormLabel fontWeight="semibold">Additional Notes (Optional)</FormLabel>
+                              <Textarea
+                                placeholder="Any questions or special requirements?"
+                                rows={3}
+                                value={formData.message}
+                                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                                borderRadius="lg"
+                              />
+                            </FormControl>
+                          )}
+                        </VStack>
+                      </form>
+                    </VStack>
+                  </Box>
+                </FallInPlace>
+
+                {/* Payment Section - Only for Paid Courses */}
+                {!isFree && (
+                  <FallInPlace delay={0.1}>
+                    <Box bg={cardBg} p={{ base: "6", md: "8" }} borderRadius="2xl" borderWidth="1px" borderColor={borderColor}>
+                      <VStack spacing="6" align="stretch">
+                        <HStack>
+                          <Icon as={FiCreditCard} boxSize="5" color="purple.500" />
+                          <Heading size="lg">Payment Details</Heading>
+                        </HStack>
+
+                        <VStack spacing="5" align="stretch">
+                          {/* Payment Method */}
+                          <FormControl>
+                            <FormLabel fontWeight="semibold">Payment Method</FormLabel>
+                            <RadioGroup 
+                              value={paymentData.paymentMethod}
+                              onChange={(value) => setPaymentData({ ...paymentData, paymentMethod: value })}
+                            >
+                              <Stack spacing="3">
+                                <Radio value="card" size="lg">
+                                  <HStack>
+                                    <Icon as={FiCreditCard} />
+                                    <Text>Credit / Debit Card</Text>
+                                  </HStack>
+                                </Radio>
+                                <Radio value="upi" size="lg">
+                                  <HStack>
+                                    <Icon as={FiZap} />
+                                    <Text>UPI / Net Banking</Text>
+                                  </HStack>
+                                </Radio>
+                              </Stack>
+                            </RadioGroup>
+                          </FormControl>
+
+                          {paymentData.paymentMethod === "card" && (
+                            <>
+                              <FormControl isRequired>
+                                <FormLabel fontWeight="semibold">Card Number</FormLabel>
+                                <Input
+                                  size="lg"
+                                  placeholder="1234 5678 9012 3456"
+                                  value={paymentData.cardNumber}
+                                  onChange={(e) => setPaymentData({ ...paymentData, cardNumber: e.target.value })}
+                                  borderRadius="lg"
+                                  maxLength={19}
+                                />
+                              </FormControl>
+
+                              <FormControl isRequired>
+                                <FormLabel fontWeight="semibold">Cardholder Name</FormLabel>
+                                <Input
+                                  size="lg"
+                                  placeholder="JOHN DOE"
+                                  value={paymentData.cardName}
+                                  onChange={(e) => setPaymentData({ ...paymentData, cardName: e.target.value })}
+                                  borderRadius="lg"
+                                  textTransform="uppercase"
+                                />
+                              </FormControl>
+
+                              <SimpleGrid columns={2} spacing="4">
+                                <FormControl isRequired>
+                                  <FormLabel fontWeight="semibold">Expiry Date</FormLabel>
+                                  <Input
+                                    size="lg"
+                                    placeholder="MM/YY"
+                                    value={paymentData.expiryDate}
+                                    onChange={(e) => setPaymentData({ ...paymentData, expiryDate: e.target.value })}
+                                    borderRadius="lg"
+                                    maxLength={5}
+                                  />
+                                </FormControl>
+
+                                <FormControl isRequired>
+                                  <FormLabel fontWeight="semibold">CVV</FormLabel>
+                                  <Input
+                                    size="lg"
+                                    type="password"
+                                    placeholder="123"
+                                    value={paymentData.cvv}
+                                    onChange={(e) => setPaymentData({ ...paymentData, cvv: e.target.value })}
+                                    borderRadius="lg"
+                                    maxLength={3}
+                                  />
+                                </FormControl>
+                              </SimpleGrid>
+                            </>
+                          )}
+
+                          {/* Coupon Code */}
+                          <FormControl>
+                            <FormLabel fontWeight="semibold">Coupon Code (Optional)</FormLabel>
+                            <HStack>
+                              <Input
+                                size="lg"
+                                placeholder="Enter coupon code"
+                                value={paymentData.couponCode}
+                                onChange={(e) => setPaymentData({ ...paymentData, couponCode: e.target.value })}
+                                borderRadius="lg"
+                                textTransform="uppercase"
+                              />
+                              <Button colorScheme="green" size="lg" px="8">
+                                Apply
+                              </Button>
+                            </HStack>
+                          </FormControl>
+
+                          {/* Security Notice */}
+                          <HStack 
+                            p="4" 
+                            bg={useColorModeValue("gray.50", "gray.700")} 
+                            borderRadius="lg"
+                            spacing="3"
+                          >
+                            <Icon as={FiShield} color="green.500" boxSize="5" />
+                            <Text fontSize="sm" color="muted">
+                              Your payment information is secured with 256-bit SSL encryption
+                            </Text>
+                          </HStack>
+                        </VStack>
                       </VStack>
-                    </form>
-                  </VStack>
-                </Box>
-              </FallInPlace>
+                    </Box>
+                  </FallInPlace>
+                )}
+
+                {/* Terms & Submit */}
+                <FallInPlace delay={isFree ? 0.1 : 0.2}>
+                  <Box bg={cardBg} p={{ base: "6", md: "8" }} borderRadius="2xl" borderWidth="1px" borderColor={borderColor}>
+                    <VStack spacing="5" align="stretch">
+                      <FormControl isRequired>
+                        <Checkbox
+                          size="lg"
+                          isChecked={formData.agreeToTerms}
+                          onChange={(e) => setFormData({ ...formData, agreeToTerms: e.target.checked })}
+                        >
+                          <Text fontSize="sm">
+                            I agree to the{" "}
+                            <Text as="span" color="primary.500" fontWeight="semibold" textDecoration="underline">
+                              Terms of Service
+                            </Text>
+                            {" "}and{" "}
+                            <Text as="span" color="primary.500" fontWeight="semibold" textDecoration="underline">
+                              Privacy Policy
+                            </Text>
+                          </Text>
+                        </Checkbox>
+                      </FormControl>
+
+                      <Button
+                        type="submit"
+                        form="enrollment-form"
+                        colorScheme={isFree ? "green" : "purple"}
+                        size="lg"
+                        height="60px"
+                        fontSize="lg"
+                        fontWeight="bold"
+                        leftIcon={isFree ? <FiZap /> : <FiLock />}
+                        isDisabled={
+                          !formData.agreeToTerms || 
+                          !formData.name || 
+                          !formData.email || 
+                          !formData.phone ||
+                          (!isFree && paymentData.paymentMethod === "card" && (
+                            !paymentData.cardNumber ||
+                            !paymentData.cardName ||
+                            !paymentData.expiryDate ||
+                            !paymentData.cvv
+                          ))
+                        }
+                      >
+                        {isFree 
+                          ? "Start Learning for Free" 
+                          : `Complete Payment - ₹${course.price.toLocaleString()}`
+                        }
+                      </Button>
+
+                      {!isFree && (
+                        <Text fontSize="xs" color="muted" textAlign="center">
+                          30-day money-back guarantee • Instant access after payment
+                        </Text>
+                      )}
+                    </VStack>
+                  </Box>
+                </FallInPlace>
+              </VStack>
             </Box>
 
             {/* Course Summary Sidebar */}
             <VStack spacing="6" align="stretch">
-              {/* Course Card */}
+              {/* Price Summary Card */}
               <FallInPlace delay={0.2}>
-                <Box bg={cardBg} borderRadius="2xl" overflow="hidden" borderWidth="1px" borderColor={borderColor}>
-                  <Image
-                    src={course.thumbnail}
-                    alt={course.title}
-                    width={400}
-                    height={250}
-                    style={{ width: "100%", height: "auto" }}
-                  />
+                <Box 
+                  bg={cardBg} 
+                  borderRadius="2xl" 
+                  overflow="hidden" 
+                  borderWidth="2px" 
+                  borderColor={isFree ? "green.500" : "purple.500"}
+                  position="sticky"
+                  top="100px"
+                >
+                  <Box 
+                    position="relative" 
+                    h="200px"
+                    overflow="hidden"
+                  >
+                    <Image
+                      src={course.thumbnail}
+                      alt={course.title}
+                      width={400}
+                      height={200}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                    <Box
+                      position="absolute"
+                      top="0"
+                      left="0"
+                      right="0"
+                      bottom="0"
+                      bg="blackAlpha.400"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <VStack spacing="2">
+                        <Text color="white" fontSize="sm" fontWeight="semibold">
+                          {isFree ? "FREE COURSE" : "PREMIUM COURSE"}
+                        </Text>
+                        <Text color="white" fontSize="3xl" fontWeight="bold">
+                          {isFree ? "₹0" : `₹${course.price.toLocaleString()}`}
+                        </Text>
+                      </VStack>
+                    </Box>
+                  </Box>
+                  
                   <VStack p="6" spacing="4" align="stretch">
-                    <Heading size="md">{course.title}</Heading>
+                    <Heading size="md" noOfLines={2}>{course.title}</Heading>
                     
-                    <HStack spacing="4" fontSize="sm" color="muted">
+                    <HStack spacing="4" fontSize="sm">
                       <HStack spacing="1">
                         <Icon as={FiStar} color="yellow.500" />
-                        <Text fontWeight="semibold">{course.rating}</Text>
-                      </HStack>
-                      <HStack spacing="1">
-                        <Icon as={FiUsers} />
-                        <Text>{course.totalStudents.toLocaleString()}</Text>
+                        <Text fontWeight="bold">{course.rating}</Text>
+                        <Text color="muted">({course.totalStudents.toLocaleString()})</Text>
                       </HStack>
                     </HStack>
 
                     <Divider />
 
-                    <VStack spacing="3" align="start" fontSize="sm">
-                      <HStack>
-                        <Icon as={FiClock} color="primary.500" />
-                        <Text>
-                          {Math.floor(course.duration / 60)}h {course.duration % 60}m total duration
+                    {/* Course Features */}
+                    <VStack spacing="3" align="stretch" fontSize="sm">
+                      <HStack justify="space-between">
+                        <HStack spacing="2" color="muted">
+                          <Icon as={FiClock} />
+                          <Text>Duration</Text>
+                        </HStack>
+                        <Text fontWeight="semibold">
+                          {Math.floor(course.duration / 60)}h {course.duration % 60}m
                         </Text>
                       </HStack>
-                      <HStack>
-                        <Icon as={FiBook} color="primary.500" />
-                        <Text>{course.totalLessons} video lessons</Text>
+                      
+                      <HStack justify="space-between">
+                        <HStack spacing="2" color="muted">
+                          <Icon as={FiBook} />
+                          <Text>Lessons</Text>
+                        </HStack>
+                        <Text fontWeight="semibold">{course.totalLessons} videos</Text>
                       </HStack>
-                      <HStack>
-                        <Icon as={FiAward} color="primary.500" />
-                        <Text>Certificate of completion</Text>
+
+                      <HStack justify="space-between">
+                        <HStack spacing="2" color="muted">
+                          <Icon as={FiVideo} />
+                          <Text>Mode</Text>
+                        </HStack>
+                        <Badge colorScheme={course.deliveryMode === "live" ? "red" : "blue"}>
+                          {course.deliveryMode === "live" ? "Live" : "Recorded"}
+                        </Badge>
                       </HStack>
-                      {course.deliveryMode === "live" && (
-                        <>
-                          <HStack>
-                            <Icon as={FiVideo} color="red.500" />
-                            <Text fontWeight="semibold" color="red.500">
-                              Live Classes
-                            </Text>
+
+                      {course.deliveryMode === "live" && course.liveSchedule && (
+                        <HStack justify="space-between">
+                          <HStack spacing="2" color="muted">
+                            <Icon as={FiCalendar} />
+                            <Text>Schedule</Text>
                           </HStack>
-                          {course.liveSchedule && (
-                            <HStack>
-                              <Icon as={FiCalendar} color="primary.500" />
-                              <Text>{course.liveSchedule}</Text>
-                            </HStack>
-                          )}
-                        </>
+                          <Text fontWeight="semibold" fontSize="xs" textAlign="right">
+                            {course.liveSchedule}
+                          </Text>
+                        </HStack>
                       )}
+
+                      <HStack justify="space-between">
+                        <HStack spacing="2" color="muted">
+                          <Icon as={FiAward} />
+                          <Text>Certificate</Text>
+                        </HStack>
+                        <Icon as={FiCheckCircle} color="green.500" />
+                      </HStack>
                     </VStack>
 
-                    <Divider />
-
-                    <HStack justify="space-between">
-                      <Text fontSize="sm" color="muted">
-                        Total Price
-                      </Text>
-                      <Text fontSize="2xl" fontWeight="bold" color="green.500">
-                        {course.price === 0 ? "Free" : `₹${course.price}`}
-                      </Text>
-                    </HStack>
+                    {!isFree && (
+                      <>
+                        <Divider />
+                        <VStack 
+                          spacing="2" 
+                          p="4" 
+                          bg={useColorModeValue("purple.50", "purple.900")}
+                          borderRadius="lg"
+                        >
+                          <Text fontSize="xs" color="muted" textTransform="uppercase" fontWeight="bold">
+                            This Course Includes
+                          </Text>
+                          <List spacing="2" fontSize="xs" w="full">
+                            <ListItem>
+                              <ListIcon as={FiCheckCircle} color="purple.500" />
+                              Lifetime access
+                            </ListItem>
+                            <ListItem>
+                              <ListIcon as={FiCheckCircle} color="purple.500" />
+                              30-day money-back guarantee
+                            </ListItem>
+                            <ListItem>
+                              <ListIcon as={FiCheckCircle} color="purple.500" />
+                              Certificate of completion
+                            </ListItem>
+                            <ListItem>
+                              <ListIcon as={FiCheckCircle} color="purple.500" />
+                              Direct instructor support
+                            </ListItem>
+                          </List>
+                        </VStack>
+                      </>
+                    )}
                   </VStack>
                 </Box>
               </FallInPlace>
 
-              {/* What's Included */}
+              {/* What You'll Learn */}
               <FallInPlace delay={0.3}>
                 <Box bg={cardBg} p="6" borderRadius="2xl" borderWidth="1px" borderColor={borderColor}>
                   <VStack spacing="4" align="stretch">
-                    <Heading size="md">What's Included</Heading>
-                    <List spacing="3">
-                      {course.learningOutcomes.slice(0, 5).map((outcome, index) => (
-                        <ListItem key={index} fontSize="sm">
-                          <ListIcon as={FiCheckCircle} color="green.500" />
-                          {outcome}
+                    <HStack>
+                      <Icon as={FiCheckCircle} color="green.500" boxSize="5" />
+                      <Heading size="md">What You'll Learn</Heading>
+                    </HStack>
+                    <List spacing="2.5">
+                      {course.learningOutcomes.slice(0, 6).map((outcome, index) => (
+                        <ListItem key={index} fontSize="sm" display="flex" alignItems="flex-start">
+                          <ListIcon as={FiCheckCircle} color="green.500" mt="0.5" />
+                          <Text flex="1">{outcome}</Text>
                         </ListItem>
                       ))}
                     </List>
@@ -264,26 +623,54 @@ export default function EnrollmentPage({ course }: EnrollmentPageProps) {
               <FallInPlace delay={0.4}>
                 <Box bg={cardBg} p="6" borderRadius="2xl" borderWidth="1px" borderColor={borderColor}>
                   <VStack spacing="4" align="stretch">
-                    <Heading size="md">Your Instructor</Heading>
-                    <HStack spacing="4">
+                    <HStack>
+                      <Icon as={FiUsers} color="primary.500" boxSize="5" />
+                      <Heading size="md">Your Instructor</Heading>
+                    </HStack>
+                    <Flex gap="4">
                       <Image
                         src={course.instructor.avatar}
                         alt={course.instructor.name}
-                        width={60}
-                        height={60}
-                        style={{ borderRadius: "50%" }}
+                        width={70}
+                        height={70}
+                        style={{ borderRadius: "12px", objectFit: "cover" }}
                       />
-                      <VStack align="start" spacing="1">
-                        <Text fontWeight="bold">{course.instructor.name}</Text>
-                        <Text fontSize="sm" color="muted" noOfLines={1}>
+                      <VStack align="start" spacing="1" flex="1">
+                        <Text fontWeight="bold" fontSize="lg">{course.instructor.name}</Text>
+                        <Text fontSize="sm" color="muted" noOfLines={2}>
                           {course.instructor.experience}
                         </Text>
-                        <HStack spacing="1" fontSize="xs">
-                          <Icon as={FiUsers} />
-                          <Text color="muted">{course.instructor.totalStudents.toLocaleString()} students</Text>
+                        <HStack spacing="4" fontSize="xs" color="muted" mt="1">
+                          <HStack spacing="1">
+                            <Icon as={FiStar} color="yellow.500" />
+                            <Text fontWeight="semibold">{course.instructor.rating}</Text>
+                          </HStack>
+                          <HStack spacing="1">
+                            <Icon as={FiUsers} />
+                            <Text>{course.instructor.totalStudents.toLocaleString()}</Text>
+                          </HStack>
                         </HStack>
                       </VStack>
-                    </HStack>
+                    </Flex>
+                  </VStack>
+                </Box>
+              </FallInPlace>
+
+              {/* Trust Indicators */}
+              <FallInPlace delay={0.5}>
+                <Box 
+                  bg={useColorModeValue("gray.50", "gray.700")} 
+                  p="6" 
+                  borderRadius="2xl"
+                  textAlign="center"
+                >
+                  <VStack spacing="3">
+                    <Icon as={FiShield} boxSize="8" color="green.500" />
+                    <Heading size="sm">Secure Enrollment</Heading>
+                    <Text fontSize="xs" color="muted">
+                      Your data is protected with enterprise-grade security. 
+                      {!isFree && " All payments are processed securely."}
+                    </Text>
                   </VStack>
                 </Box>
               </FallInPlace>
