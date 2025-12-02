@@ -9,6 +9,7 @@ import {
   Heading,
   Stack,
   Text,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { Link } from "@saas-ui/react";
 import { FaTwitter } from "react-icons/fa";
@@ -29,10 +30,12 @@ export const Testimonial = ({
   children,
   ...rest
 }: TestimonialProps) => {
+  const avatarBg = useColorModeValue('gray.200', 'gray.700');
+  
   return (
-    <Card position="relative" {...rest}>
+    <Card position="relative" height="full" {...rest}>
       <CardHeader display="flex" flexDirection="row" alignItems="center">
-        <Avatar name={name} src={avatar} size="sm" bg="transparent" />
+        <Avatar name={name} src={avatar} size="sm" bg={avatarBg} />
         <Stack spacing="1" ms="4">
           <Heading size="sm">{name}</Heading>
           <Text color="muted" size="xs">
