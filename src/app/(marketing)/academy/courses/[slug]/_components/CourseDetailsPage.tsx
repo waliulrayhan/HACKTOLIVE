@@ -92,79 +92,143 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
   return (
     <Box>
       {/* Hero Section */}
-      <Box py={{ base: "12", md: "16" }} bg={bgColor} borderBottomWidth="1px" borderColor={borderColor}>
+      <Box
+        as="section"
+        id="course-hero"
+        mt={{ base: "14", md: "16" }}
+        py={{ base: "8", md: "16" }}
+        bg={bgColor}
+        borderBottomWidth="1px"
+        borderColor={borderColor}
+        sx={{ scrollMarginTop: "var(--navbar-height, 80px)" }}
+      >
         <Container maxW="container.xl">
-          <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={{ base: "8", md: "12" }} alignItems="center">
-            <FallInPlace>
-              <VStack align="start" spacing="6">
-                <HStack spacing="3" flexWrap="wrap">
-                  <Badge colorScheme={levelColors[course.level]} fontSize="sm" px="3" py="1" borderRadius="full">
+          <Flex 
+            direction={{ base: "column", lg: "row" }} 
+            gap={{ base: "6", md: "12" }} 
+            alignItems="center"
+          >
+            {/* Image - Shows first on mobile */}
+            <Box 
+              width="100%"
+              maxW={{ base: "100%", lg: "500px" }}
+              order={{ base: -1, lg: 1 }}
+              flex={{ lg: "0 0 auto" }}
+            >
+              <FallInPlace delay={0.1}>
+                <Box 
+                  borderRadius={{ base: "xl", md: "2xl" }}
+                  overflow="hidden"
+                  boxShadow="lg"
+                  bg="gray.100"
+                  _dark={{ bg: "gray.700" }}
+                >
+                  <Image
+                    src={course.thumbnail}
+                    alt={course.title}
+                    width={500}
+                    height={340}
+                    style={{ 
+                      width: "100%", 
+                      height: "auto",
+                      display: "block"
+                    }}
+                  />
+                </Box>
+              </FallInPlace>
+            </Box>
+
+            {/* Content - Shows second on mobile */}
+            <Box width="100%" flex="1" order={{ base: 0, lg: 0 }}>
+              <FallInPlace>
+                <VStack align="start" spacing={{ base: "4", md: "6" }} width="100%">
+                <HStack spacing="2" flexWrap="wrap" gap="2">
+                  <Badge colorScheme={levelColors[course.level]} fontSize="xs" px="2" py="1" borderRadius="md">
                     {course.level.charAt(0).toUpperCase() + course.level.slice(1)}
                   </Badge>
                   <Badge 
                     colorScheme={course.tier === "premium" ? "purple" : "green"} 
-                    fontSize="sm" 
-                    px="3" 
+                    fontSize="xs" 
+                    px="2" 
                     py="1" 
-                    borderRadius="full"
+                    borderRadius="md"
                   >
                     {course.tier.toUpperCase()}
                   </Badge>
                   {course.deliveryMode === "live" && (
-                    <Badge colorScheme="red" fontSize="sm" px="3" py="1" borderRadius="full">
-                      🔴 LIVE CLASSES
+                    <Badge colorScheme="red" fontSize="xs" px="2" py="1" borderRadius="md">
+                      🔴 LIVE
                     </Badge>
                   )}
-                  <Badge colorScheme="cyan" fontSize="sm" px="3" py="1" borderRadius="full">
+                  <Badge colorScheme="cyan" fontSize="xs" px="2" py="1" borderRadius="md">
                     {course.category}
                   </Badge>
                 </HStack>
 
-                <Heading fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}>
+                <Heading 
+                  fontSize={{ base: "2xl", sm: "3xl", md: "4xl", lg: "5xl" }}
+                  lineHeight="shorter"
+                >
                   {course.title}
                 </Heading>
 
-                <Text fontSize={{ base: "md", md: "lg" }} color="muted">
+                <Text 
+                  fontSize={{ base: "sm", md: "md", lg: "lg" }} 
+                  color="muted"
+                  lineHeight="tall"
+                >
                   {course.shortDescription}
                 </Text>
 
-                <HStack spacing="6" flexWrap="wrap">
+                <Flex 
+                  direction={{ base: "column", sm: "row" }} 
+                  gap={{ base: "3", sm: "6" }}
+                  flexWrap="wrap"
+                  width="100%"
+                >
                   <HStack spacing="2">
-                    <Icon as={FiStar} color="yellow.500" />
-                    <Text fontWeight="semibold">{course.rating}</Text>
-                    <Text color="muted" fontSize="sm">
-                      ({course.totalRatings.toLocaleString()} ratings)
+                    <Icon as={FiStar} color="yellow.500" boxSize={{ base: "4", md: "5" }} />
+                    <Text fontWeight="semibold" fontSize={{ base: "sm", md: "md" }}>{course.rating}</Text>
+                    <Text color="muted" fontSize={{ base: "xs", md: "sm" }}>
+                      ({course.totalRatings.toLocaleString()})
                     </Text>
                   </HStack>
                   <HStack spacing="2">
-                    <Icon as={FiUsers} color="primary.500" />
-                    <Text fontWeight="medium">{course.totalStudents.toLocaleString()} students</Text>
+                    <Icon as={FiUsers} color="primary.500" boxSize={{ base: "4", md: "5" }} />
+                    <Text fontWeight="medium" fontSize={{ base: "sm", md: "md" }}>
+                      {course.totalStudents.toLocaleString()} students
+                    </Text>
                   </HStack>
-                </HStack>
+                </Flex>
 
-                <HStack spacing="4" pt="2">
-                  <ButtonLink href={`/academy/enroll/${course.slug}`} colorScheme="primary" size="lg">
+                <Flex 
+                  direction={{ base: "column", sm: "row" }} 
+                  gap="3" 
+                  pt="2"
+                  width="100%"
+                >
+                  <ButtonLink 
+                    href={`/academy/enroll/${course.slug}`} 
+                    colorScheme="primary" 
+                    size={{ base: "md", md: "lg" }}
+                    width={{ base: "100%", sm: "auto" }}
+                  >
                     {course.tier === "premium" ? `Enroll Now - ₹${course.price}` : "Start Free Course"}
                   </ButtonLink>
-                  <Button onClick={scrollToCurriculum} variant="outline" colorScheme="primary" size="lg">
+                  <Button 
+                    onClick={scrollToCurriculum} 
+                    variant="outline" 
+                    colorScheme="primary" 
+                    size={{ base: "md", md: "lg" }}
+                    width={{ base: "100%", sm: "auto" }}
+                  >
                     View Curriculum
                   </Button>
-                </HStack>
-              </VStack>
-            </FallInPlace>
-
-            <FallInPlace delay={0.2}>
-              <Box borderRadius="2xl" overflow="hidden" boxShadow="2xl">
-                <Image
-                  src={course.thumbnail}
-                  alt={course.title}
-                  width={600}
-                  height={400}
-                  style={{ width: "100%", height: "auto" }}
-                />
-              </Box>
-            </FallInPlace>
-          </SimpleGrid>
+                </Flex>
+                </VStack>
+              </FallInPlace>
+            </Box>
+          </Flex>
         </Container>
       </Box>
 
