@@ -190,7 +190,7 @@ export default function CourseCard({ course, variant = "default" }: CourseCardPr
         {/* Price & CTA */}
         <HStack justify="space-between" align="center" mt="auto" pt="3">
           <Text fontSize="2xl" fontWeight="bold" color="green.500">
-            {course.price === 0 ? "Free" : `₹${course.price}`}
+            {course.price === 0 ? "Free" : `৳${course.price}`}
           </Text>
           <ButtonLink
             href={`/academy/courses/${course.slug}`}
@@ -198,7 +198,7 @@ export default function CourseCard({ course, variant = "default" }: CourseCardPr
             size={variant === "compact" ? "sm" : "md"}
             rightIcon={<Icon as={FiArrowRight} boxSize="14px" />}
           >
-            View
+            Enroll Now
           </ButtonLink>
         </HStack>
       </VStack>

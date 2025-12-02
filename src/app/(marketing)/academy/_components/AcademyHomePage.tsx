@@ -33,9 +33,15 @@ import {
 
 export default function AcademyHomePage() {
   const bgColor = useColorModeValue('gray.50', 'gray.900');
+  const bgColorAlt = useColorModeValue('white', 'gray.800');
   const accentColor = useColorModeValue('green.500', 'green.400');
   const cardBg = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const borderColor = useColorModeValue('gray.200', 'gray.600');
+  const textMuted = useColorModeValue('gray.600', 'gray.400');
+  const heroOverlay = useColorModeValue(
+    'linear-gradient(135deg, rgba(26, 32, 44, 0.88) 0%, rgba(45, 55, 72, 0.92) 100%)',
+    'linear-gradient(135deg, rgba(0, 0, 0, 0.75) 0%, rgba(26, 32, 44, 0.80) 100%)'
+  );
   
   const freeCourses = courses.filter((c) => c.tier === "free").slice(0, 3);
   const premiumCourses = courses.filter((c) => c.tier === "premium").slice(0, 3);
@@ -46,53 +52,57 @@ export default function AcademyHomePage() {
       {/* Hero Section */}
       <Box
         position="relative"
+        pt={{ base: 32, md: 40 }}
+        pb={{ base: 16, md: 20 }}
         overflow="hidden"
-        py={{ base: '16', md: '24', lg: '32' }}
+        bgImage="url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2000')"
+        bgPosition="center"
+        bgSize="cover"
+        bgRepeat="no-repeat"
+        _before={{
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          bg: useColorModeValue(
+            'linear-gradient(135deg, rgba(26, 32, 44, 0.85) 0%, rgba(45, 55, 72, 0.90) 100%)',
+            'linear-gradient(135deg, rgba(26, 32, 44, 0.70) 0%, rgba(45, 55, 72, 0.75) 100%)'
+          ),
+        }}
       >
-        {/* Background decoration */}
-        <Box
-          position="absolute"
-          top="-10%"
-          right="-5%"
-          width="600px"
-          height="600px"
-          borderRadius="full"
-          bg={accentColor}
-          opacity="0.1"
-          filter="blur(100px)"
-          pointerEvents="none"
-        />
-        
-        <Container maxW="container.xl">
-          <VStack spacing={{ base: '8', md: '12' }} textAlign="center">
+        <Container maxW="container.xl" position="relative" zIndex={1}>
+          <VStack spacing={{ base: "4", md: "6" }} textAlign="center">
             <FallInPlace>
               <Badge 
                 colorScheme="green" 
                 fontSize="sm" 
-                px="3" 
-                py="1" 
+                px="4" 
+                py="2" 
                 borderRadius="full"
+                textTransform="uppercase"
+                letterSpacing="wide"
               >
-                🎓 World-Class Cybersecurity Education
+                Hack To Live Academy
               </Badge>
             </FallInPlace>
             
-            <FallInPlace delay={0.2}>
+            <FallInPlace delay={0.1}>
               <Heading 
-                fontSize={{ base: '4xl', md: '5xl', lg: '6xl' }}
+                fontSize={{ base: "3xl", md: "4xl", lg: "5xl", xl: "6xl" }}
                 fontWeight="bold"
+                color="white"
                 lineHeight="1.2"
-                maxW="5xl"
               >
-                Master Cybersecurity Skills{" "}
-                <Em>From Industry Experts</Em>
+                Master Cybersecurity Skills From Industry Experts
               </Heading>
             </FallInPlace>
 
-            <FallInPlace delay={0.3}>
+            <FallInPlace delay={0.2}>
               <Text 
                 fontSize={{ base: 'lg', md: 'xl' }} 
-                color="muted" 
+                color="whiteAlpha.900" 
                 maxW="3xl"
               >
                 Join thousands of students learning ethical hacking, penetration testing,
@@ -101,11 +111,12 @@ export default function AcademyHomePage() {
               </Text>
             </FallInPlace>
 
-            <FallInPlace delay={0.4}>
+            <FallInPlace delay={0.3}>
               <Flex 
                 gap="4" 
                 flexDirection={{ base: 'column', sm: 'row' }}
                 width={{ base: '100%', sm: 'auto' }}
+                pt="2"
               >
                 <ButtonLink 
                   colorScheme="primary" 
@@ -121,13 +132,19 @@ export default function AcademyHomePage() {
                   href="/signup"
                   variant="outline"
                   flex={{ base: '1', sm: 'none' }}
+                  borderColor="whiteAlpha.400"
+                  color="white"
+                  _hover={{
+                    bg: "whiteAlpha.200",
+                    borderColor: "whiteAlpha.600"
+                  }}
                 >
                   Sign Up Free
                 </ButtonLink>
               </Flex>
             </FallInPlace>
 
-            <FallInPlace delay={0.5}>
+            <FallInPlace delay={0.4}>
               <Box w="full" maxW="2xl" pt="4">
                 <SearchBar placeholder="Search cybersecurity courses..." />
               </Box>
@@ -137,7 +154,7 @@ export default function AcademyHomePage() {
       </Box>
 
       {/* Stats Section */}
-      <Box py={{ base: '12', md: '16' }} bg={bgColor}>
+      <Box py={{ base: '12', md: '16' }} bg={bgColorAlt}>
         <Container maxW="container.xl">
           <FallInPlace delay={0.2}>
             <SimpleGrid columns={{ base: 2, md: 4 }} spacing={{ base: '6', md: '8' }}>
@@ -156,7 +173,7 @@ export default function AcademyHomePage() {
                 <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                   50,000+
                 </Text>
-                <Text fontSize={{ base: 'xs', md: 'sm' }} color="muted" textAlign="center">
+                <Text fontSize={{ base: 'xs', md: 'sm' }} color={textMuted} textAlign="center">
                   Students Enrolled
                 </Text>
               </VStack>
@@ -176,7 +193,7 @@ export default function AcademyHomePage() {
                 <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                   50+
                 </Text>
-                <Text fontSize={{ base: 'xs', md: 'sm' }} color="muted" textAlign="center">
+                <Text fontSize={{ base: 'xs', md: 'sm' }} color={textMuted} textAlign="center">
                   Expert Courses
                 </Text>
               </VStack>
@@ -196,7 +213,7 @@ export default function AcademyHomePage() {
                 <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                   30,000+
                 </Text>
-                <Text fontSize={{ base: 'xs', md: 'sm' }} color="muted" textAlign="center">
+                <Text fontSize={{ base: 'xs', md: 'sm' }} color={textMuted} textAlign="center">
                   Certificates Issued
                 </Text>
               </VStack>
@@ -216,7 +233,7 @@ export default function AcademyHomePage() {
                 <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                   95%
                 </Text>
-                <Text fontSize={{ base: 'xs', md: 'sm' }} color="muted" textAlign="center">
+                <Text fontSize={{ base: 'xs', md: 'sm' }} color={textMuted} textAlign="center">
                   Success Rate
                 </Text>
               </VStack>
@@ -226,7 +243,7 @@ export default function AcademyHomePage() {
       </Box>
 
       {/* Popular Courses Carousel */}
-      <Box py={{ base: '16', md: '24' }}>
+      {/* <Box py={{ base: '16', md: '24' }}>
         <Container maxW="container.xl">
           <VStack spacing={{ base: '8', md: '12' }} align="stretch">
             <FallInPlace>
@@ -259,10 +276,14 @@ export default function AcademyHomePage() {
             </Box>
           </VStack>
         </Container>
-      </Box>
+      </Box> */}
 
       {/* Categories Section */}
-      <Box py={{ base: '16', md: '24' }} bg={bgColor}>
+      <Box 
+        py={{ base: '16', md: '24' }} 
+        bg={bgColor}
+        position="relative"
+      >
         <Container maxW="container.xl">
           <VStack spacing={{ base: '8', md: '12' }} align="stretch">
             <FallInPlace>
@@ -273,7 +294,7 @@ export default function AcademyHomePage() {
                 <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
                   Explore Course Categories
                 </Heading>
-                <Text fontSize={{ base: 'md', md: 'lg' }} color="muted" maxW="3xl">
+                <Text fontSize={{ base: 'md', md: 'lg' }} color={textMuted} maxW="3xl">
                   Choose from our comprehensive range of cybersecurity specializations
                 </Text>
               </VStack>
@@ -327,7 +348,7 @@ export default function AcademyHomePage() {
       </Box>
 
       {/* Free Courses Section */}
-      <Box py={{ base: '16', md: '24' }} position="relative" bg={bgColor}>
+      <Box py={{ base: '16', md: '24' }} position="relative" bg={bgColorAlt}>
         <Container maxW="container.xl">
           <VStack spacing={{ base: '8', md: '12' }} align="stretch">
             <FallInPlace>
@@ -344,7 +365,7 @@ export default function AcademyHomePage() {
                   <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
                     Start Learning For Free
                   </Heading>
-                  <Text fontSize={{ base: 'md', md: 'lg' }} color="muted">
+                  <Text fontSize={{ base: 'md', md: 'lg' }} color={textMuted}>
                     Begin your cybersecurity journey with our free courses
                   </Text>
                 </VStack>
@@ -388,7 +409,7 @@ export default function AcademyHomePage() {
                   <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
                     Advanced Training Programs
                   </Heading>
-                  <Text fontSize={{ base: 'md', md: 'lg' }} color="muted">
+                  <Text fontSize={{ base: 'md', md: 'lg' }} color={textMuted}>
                     Professional courses with industry-recognized certifications
                   </Text>
                 </VStack>
@@ -471,7 +492,7 @@ export default function AcademyHomePage() {
       </Box> */}
 
       {/* How It Works Section */}
-      <Box py={{ base: '16', md: '24' }} bg={bgColor}>
+      <Box py={{ base: '16', md: '24' }} bg={bgColorAlt}>
         <Container maxW="container.xl">
           <VStack spacing={{ base: '8', md: '12' }}>
             <FallInPlace>
@@ -505,7 +526,7 @@ export default function AcademyHomePage() {
                     </Text>
                   </Flex>
                   <Heading size="md">Choose Your Course</Heading>
-                  <Text color="muted">
+                  <Text color={textMuted}>
                     Browse our extensive catalog and select the course that matches your
                     goals and skill level.
                   </Text>
@@ -528,7 +549,7 @@ export default function AcademyHomePage() {
                     </Text>
                   </Flex>
                   <Heading size="md">Learn at Your Pace</Heading>
-                  <Text color="muted">
+                  <Text color={textMuted}>
                     Access high-quality video lectures, hands-on labs, and practical
                     exercises anytime, anywhere.
                   </Text>
@@ -551,7 +572,7 @@ export default function AcademyHomePage() {
                     </Text>
                   </Flex>
                   <Heading size="md">Get Certified</Heading>
-                  <Text color="muted">
+                  <Text color={textMuted}>
                     Complete the course, pass the assessments, and earn your industry-recognized
                     certificate.
                   </Text>
@@ -574,7 +595,7 @@ export default function AcademyHomePage() {
                 <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
                   What Our Students Say
                 </Heading>
-                <Text fontSize={{ base: 'md', md: 'lg' }} color="muted" maxW="3xl">
+                <Text fontSize={{ base: 'md', md: 'lg' }} color={textMuted} maxW="3xl">
                   Join thousands of satisfied students who have transformed their cybersecurity careers
                 </Text>
               </VStack>
@@ -619,7 +640,7 @@ export default function AcademyHomePage() {
                           <Icon key={i} as={FiStar} color="yellow.500" fill="yellow.500" />
                         ))}
                       </HStack>
-                      <Text color="muted" fontSize="sm" lineHeight="tall">
+                      <Text color={textMuted} fontSize="sm" lineHeight="tall">
                         "{testimonial.comment}"
                       </Text>
                       <HStack spacing="3" mt="auto">
@@ -649,7 +670,7 @@ export default function AcademyHomePage() {
       </Box>
 
       {/* Instructor Highlights Section */}
-      <Box py={{ base: '16', md: '24' }}>
+      <Box py={{ base: '16', md: '24' }} bg={bgColor}>
         <Container maxW="container.xl">
           <VStack spacing={{ base: '8', md: '12' }}>
             <FallInPlace>
@@ -660,7 +681,7 @@ export default function AcademyHomePage() {
                 <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
                   Meet Our Expert Instructors
                 </Heading>
-                <Text fontSize={{ base: 'md', md: 'lg' }} color="muted" maxW="3xl">
+                <Text fontSize={{ base: 'md', md: 'lg' }} color={textMuted} maxW="3xl">
                   Learn from industry professionals with years of real-world experience
                 </Text>
               </VStack>
@@ -698,7 +719,7 @@ export default function AcademyHomePage() {
                       />
                       <VStack p="6" spacing="3" align="start">
                         <Heading size="md">{course.instructor.name}</Heading>
-                        <Text fontSize="sm" color="muted" noOfLines={2}>
+                        <Text fontSize="sm" color={textMuted} noOfLines={2}>
                           {course.instructor.experience}
                         </Text>
                         <HStack spacing="4" fontSize="sm" color="muted">
@@ -738,18 +759,19 @@ export default function AcademyHomePage() {
       </Box>
 
       {/* CTA Section */}
-      <Box py={{ base: '16', md: '24' }}>
+      <Box py={{ base: '16', md: '24' }} bg={bgColorAlt}>
         <Container maxW="container.xl">
           <FallInPlace>
             <Box
-              bg={cardBg}
-              borderWidth="1px"
-              borderColor="green.500"
+              bg={useColorModeValue('green.50', 'gray.800')}
+              borderWidth="2px"
+              borderColor={useColorModeValue('green.400', 'green.600')}
               p={{ base: '8', md: '12', lg: '16' }}
               borderRadius="3xl"
               textAlign="center"
               position="relative"
               overflow="hidden"
+              shadow="xl"
             >
               <Box
                 position="absolute"
@@ -771,7 +793,7 @@ export default function AcademyHomePage() {
                 <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }} maxW="3xl">
                   Ready to Start Your <Em>Cybersecurity Journey?</Em>
                 </Heading>
-                <Text fontSize={{ base: 'md', md: 'lg' }} color="muted" maxW="2xl">
+                <Text fontSize={{ base: 'md', md: 'lg' }} color={textMuted} maxW="2xl">
                   Join HACKTOLIVE Academy today and learn from the best. Get lifetime access to all
                   course materials and join our thriving community of cyber warriors.
                 </Text>
