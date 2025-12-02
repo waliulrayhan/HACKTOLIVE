@@ -166,7 +166,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                 </HStack>
 
                 <Heading 
-                  fontSize={{ base: "2xl", sm: "3xl", md: "4xl", lg: "5xl" }}
+                  fontSize={{ base: "2xl", sm: "3xl", md: "4xl", lg: "3xl" }}
                   lineHeight="shorter"
                 >
                   {course.title}
