@@ -27,13 +27,15 @@ import {
   FiAward, 
   FiUsers, 
   FiBook, 
-  FiTrendingUp 
+  FiTrendingUp,
+  FiStar
 } from "react-icons/fi";
 
 export default function AcademyHomePage() {
   const bgColor = useColorModeValue('gray.50', 'gray.900');
   const accentColor = useColorModeValue('green.500', 'green.400');
   const cardBg = useColorModeValue('white', 'gray.800');
+  const borderColor = useColorModeValue('gray.200', 'gray.700');
   
   const freeCourses = courses.filter((c) => c.tier === "free").slice(0, 3);
   const premiumCourses = courses.filter((c) => c.tier === "premium").slice(0, 3);
@@ -116,11 +118,11 @@ export default function AcademyHomePage() {
                 </ButtonLink>
                 <ButtonLink
                   size="lg"
-                  href="/academy/live"
+                  href="/signup"
                   variant="outline"
                   flex={{ base: '1', sm: 'none' }}
                 >
-                  View Live Batches
+                  Sign Up Free
                 </ButtonLink>
               </Flex>
             </FallInPlace>
@@ -223,8 +225,109 @@ export default function AcademyHomePage() {
         </Container>
       </Box>
 
+      {/* Popular Courses Carousel */}
+      <Box py={{ base: '16', md: '24' }}>
+        <Container maxW="container.xl">
+          <VStack spacing={{ base: '8', md: '12' }} align="stretch">
+            <FallInPlace>
+              <Flex justify="space-between" align="center">
+                <VStack align="start" spacing="2">
+                  <Badge colorScheme="blue" fontSize="sm" px="3" py="1" borderRadius="full">
+                    Most Popular
+                  </Badge>
+                  <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
+                    Trending Courses
+                  </Heading>
+                  <Text fontSize={{ base: 'md', md: 'lg' }} color="muted">
+                    Join our most popular courses taken by thousands of students
+                  </Text>
+                </VStack>
+              </Flex>
+            </FallInPlace>
+            
+            <Box>
+              <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="6">
+                {courses
+                  .sort((a, b) => b.totalStudents - a.totalStudents)
+                  .slice(0, 6)
+                  .map((course, index) => (
+                    <FallInPlace key={course.id} delay={0.05 * index}>
+                      <CourseCard course={course} />
+                    </FallInPlace>
+                  ))}
+              </SimpleGrid>
+            </Box>
+          </VStack>
+        </Container>
+      </Box>
+
+      {/* Categories Section */}
+      <Box py={{ base: '16', md: '24' }} bg={bgColor}>
+        <Container maxW="container.xl">
+          <VStack spacing={{ base: '8', md: '12' }} align="stretch">
+            <FallInPlace>
+              <VStack spacing="4" textAlign="center">
+                <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+                  Browse by Category
+                </Badge>
+                <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
+                  Explore Course Categories
+                </Heading>
+                <Text fontSize={{ base: 'md', md: 'lg' }} color="muted" maxW="3xl">
+                  Choose from our comprehensive range of cybersecurity specializations
+                </Text>
+              </VStack>
+            </FallInPlace>
+
+            <SimpleGrid columns={{ base: 2, md: 3, lg: 6 }} spacing="6">
+              {[
+                { name: "Web Security", icon: "🌐", count: courses.filter(c => c.category === "web-security").length, color: "blue" },
+                { name: "Network Security", icon: "🔒", count: courses.filter(c => c.category === "network-security").length, color: "purple" },
+                { name: "Penetration Testing", icon: "🎯", count: courses.filter(c => c.category === "penetration-testing").length, color: "red" },
+                { name: "Malware Analysis", icon: "🦠", count: courses.filter(c => c.category === "malware-analysis").length, color: "orange" },
+                { name: "Cloud Security", icon: "☁️", count: courses.filter(c => c.category === "cloud-security").length, color: "cyan" },
+                { name: "Cryptography", icon: "🔐", count: courses.filter(c => c.category === "cryptography").length, color: "green" },
+              ].map((category, index) => (
+                <FallInPlace key={category.name} delay={0.1 * index}>
+                  <ButtonLink
+                    href={`/academy/courses?category=${category.name.toLowerCase().replace(" ", "-")}`}
+                    variant="unstyled"
+                    height="auto"
+                    display="block"
+                  >
+                    <VStack
+                      p="6"
+                      bg={cardBg}
+                      borderRadius="2xl"
+                      borderWidth="1px"
+                      borderColor={borderColor}
+                      spacing="3"
+                      transition="all 0.3s"
+                      _hover={{
+                        transform: "translateY(-4px)",
+                        shadow: "xl",
+                        borderColor: `${category.color}.500`,
+                      }}
+                      cursor="pointer"
+                    >
+                      <Text fontSize="3xl">{category.icon}</Text>
+                      <Text fontWeight="bold" fontSize="sm" textAlign="center" noOfLines={2}>
+                        {category.name}
+                      </Text>
+                      <Badge colorScheme={category.color} fontSize="xs">
+                        {category.count} {category.count === 1 ? "course" : "courses"}
+                      </Badge>
+                    </VStack>
+                  </ButtonLink>
+                </FallInPlace>
+              ))}
+            </SimpleGrid>
+          </VStack>
+        </Container>
+      </Box>
+
       {/* Free Courses Section */}
-      <Box py={{ base: '16', md: '24' }} position="relative">
+      <Box py={{ base: '16', md: '24' }} position="relative" bg={bgColor}>
         <Container maxW="container.xl">
           <VStack spacing={{ base: '8', md: '12' }} align="stretch">
             <FallInPlace>
@@ -340,18 +443,18 @@ export default function AcademyHomePage() {
                     🔴 Live Training
                   </Badge>
                   <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
-                    Upcoming Live Batches
+                    Live Classes Available
                   </Heading>
                   <Text fontSize={{ base: 'md', md: 'lg' }} color="muted">
                     Join live interactive sessions with expert instructors
                   </Text>
                 </VStack>
                 <ButtonLink 
-                  href="/academy/live" 
+                  href="/academy/courses?deliveryMode=live" 
                   colorScheme="primary"
                   rightIcon={<Icon as={FiArrowRight} />}
                 >
-                  View All Batches
+                  View All Live Courses
                 </ButtonLink>
               </Flex>
             </FallInPlace>
@@ -455,6 +558,181 @@ export default function AcademyHomePage() {
                 </VStack>
               </FallInPlace>
             </SimpleGrid>
+          </VStack>
+        </Container>
+      </Box>
+
+      {/* Student Reviews Section */}
+      <Box py={{ base: '16', md: '24' }} bg={bgColor}>
+        <Container maxW="container.xl">
+          <VStack spacing={{ base: '8', md: '12' }}>
+            <FallInPlace>
+              <VStack spacing="4" textAlign="center">
+                <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+                  Success Stories
+                </Badge>
+                <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
+                  What Our Students Say
+                </Heading>
+                <Text fontSize={{ base: 'md', md: 'lg' }} color="muted" maxW="3xl">
+                  Join thousands of satisfied students who have transformed their cybersecurity careers
+                </Text>
+              </VStack>
+            </FallInPlace>
+            
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="6">
+              {[
+                {
+                  name: "Alex Thompson",
+                  avatar: "/images/user/user-05.jpg",
+                  role: "Security Engineer",
+                  rating: 5,
+                  comment: "HACKTOLIVE Academy completely changed my career path. The hands-on approach and expert instructors helped me land my dream job in cybersecurity!"
+                },
+                {
+                  name: "Sarah Johnson",
+                  avatar: "/images/user/user-06.jpg",
+                  role: "Penetration Tester",
+                  rating: 5,
+                  comment: "The best investment I've made in my career. The courses are practical, up-to-date, and taught by industry professionals who actually know their stuff."
+                },
+                {
+                  name: "Rahul Sharma",
+                  avatar: "/images/user/user-07.jpg",
+                  role: "Cybersecurity Analyst",
+                  rating: 5,
+                  comment: "Learning in Bengali made complex concepts so much easier to understand. The community support and lifetime access make it worth every penny!"
+                }
+              ].map((testimonial, index) => (
+                <FallInPlace key={testimonial.name} delay={0.1 * index}>
+                  <Box
+                    bg={cardBg}
+                    p="6"
+                    borderRadius="2xl"
+                    borderWidth="1px"
+                    borderColor={borderColor}
+                    h="full"
+                  >
+                    <VStack spacing="4" align="start">
+                      <HStack spacing="1">
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <Icon key={i} as={FiStar} color="yellow.500" fill="yellow.500" />
+                        ))}
+                      </HStack>
+                      <Text color="muted" fontSize="sm" lineHeight="tall">
+                        "{testimonial.comment}"
+                      </Text>
+                      <HStack spacing="3" mt="auto">
+                        <Image
+                          src={testimonial.avatar}
+                          alt={testimonial.name}
+                          width={48}
+                          height={48}
+                          style={{ borderRadius: "50%" }}
+                        />
+                        <VStack align="start" spacing="0">
+                          <Text fontWeight="bold" fontSize="sm">
+                            {testimonial.name}
+                          </Text>
+                          <Text fontSize="xs" color="muted">
+                            {testimonial.role}
+                          </Text>
+                        </VStack>
+                      </HStack>
+                    </VStack>
+                  </Box>
+                </FallInPlace>
+              ))}
+            </SimpleGrid>
+          </VStack>
+        </Container>
+      </Box>
+
+      {/* Instructor Highlights Section */}
+      <Box py={{ base: '16', md: '24' }}>
+        <Container maxW="container.xl">
+          <VStack spacing={{ base: '8', md: '12' }}>
+            <FallInPlace>
+              <VStack spacing="4" textAlign="center">
+                <Badge colorScheme="purple" fontSize="sm" px="3" py="1" borderRadius="full">
+                  Learn from the Best
+                </Badge>
+                <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
+                  Meet Our Expert Instructors
+                </Heading>
+                <Text fontSize={{ base: 'md', md: 'lg' }} color="muted" maxW="3xl">
+                  Learn from industry professionals with years of real-world experience
+                </Text>
+              </VStack>
+            </FallInPlace>
+            
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="6">
+              {courses.slice(0, 3).map((course, index) => (
+                <FallInPlace key={course.instructor.id} delay={0.1 * index}>
+                  <ButtonLink
+                    href={`/academy/instructors/${course.instructor.id}`}
+                    variant="unstyled"
+                    height="auto"
+                    display="block"
+                  >
+                    <Box
+                      bg={cardBg}
+                      borderRadius="2xl"
+                      overflow="hidden"
+                      borderWidth="1px"
+                      borderColor={borderColor}
+                      transition="all 0.3s"
+                      _hover={{
+                        transform: "translateY(-4px)",
+                        shadow: "xl",
+                        borderColor: "purple.500"
+                      }}
+                      cursor="pointer"
+                    >
+                      <Image
+                        src={course.instructor.avatar}
+                        alt={course.instructor.name}
+                        width={400}
+                        height={400}
+                        style={{ width: "100%", height: "auto" }}
+                      />
+                      <VStack p="6" spacing="3" align="start">
+                        <Heading size="md">{course.instructor.name}</Heading>
+                        <Text fontSize="sm" color="muted" noOfLines={2}>
+                          {course.instructor.experience}
+                        </Text>
+                        <HStack spacing="4" fontSize="sm" color="muted">
+                          <HStack spacing="1">
+                            <Icon as={FiStar} color="yellow.500" />
+                            <Text fontWeight="semibold">{course.instructor.rating}</Text>
+                          </HStack>
+                          <HStack spacing="1">
+                            <Icon as={FiUsers} />
+                            <Text>{course.instructor.totalStudents.toLocaleString()}</Text>
+                          </HStack>
+                          <HStack spacing="1">
+                            <Icon as={FiBook} />
+                            <Text>{course.instructor.totalCourses} courses</Text>
+                          </HStack>
+                        </HStack>
+                      </VStack>
+                    </Box>
+                  </ButtonLink>
+                </FallInPlace>
+              ))}
+            </SimpleGrid>
+
+            <FallInPlace delay={0.4}>
+              <ButtonLink
+                href="/academy/instructors"
+                colorScheme="primary"
+                variant="outline"
+                size="lg"
+                rightIcon={<Icon as={FiArrowRight} />}
+              >
+                View All Instructors
+              </ButtonLink>
+            </FallInPlace>
           </VStack>
         </Container>
       </Box>

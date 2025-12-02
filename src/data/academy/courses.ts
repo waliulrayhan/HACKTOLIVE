@@ -95,6 +95,105 @@ export const instructors: Instructor[] = [
 ];
 
 // Sample Course Modules and Lessons
+const networkSecurityModules: CourseModule[] = [
+  {
+    id: "mod-ns-001",
+    title: "Network Security Fundamentals",
+    description: "Core concepts of network security and defense",
+    order: 1,
+    lessons: [
+      {
+        id: "lesson-ns-001",
+        title: "Introduction to Network Security",
+        description: "Overview of network security principles",
+        type: "video",
+        duration: 20,
+        videoUrl: "https://example.com/videos/network-security-intro.mp4",
+        resources: [],
+        isPreview: true,
+        order: 1,
+        moduleId: "mod-ns-001",
+      },
+      {
+        id: "lesson-ns-002",
+        title: "Network Architecture & Design",
+        description: "Secure network design principles",
+        type: "video",
+        duration: 30,
+        videoUrl: "https://example.com/videos/network-architecture.mp4",
+        resources: [],
+        isPreview: true,
+        order: 2,
+        moduleId: "mod-ns-001",
+      },
+    ],
+  },
+  {
+    id: "mod-ns-002",
+    title: "Firewall Configuration",
+    description: "Enterprise firewall setup and management",
+    order: 2,
+    lessons: [
+      {
+        id: "lesson-ns-003",
+        title: "Firewall Types & Technologies",
+        description: "Understanding different firewall solutions",
+        type: "video",
+        duration: 25,
+        videoUrl: "https://example.com/videos/firewall-types.mp4",
+        resources: [],
+        isPreview: false,
+        order: 1,
+        moduleId: "mod-ns-002",
+      },
+      {
+        id: "lesson-ns-004",
+        title: "Configuring pfSense Firewall",
+        description: "Hands-on firewall configuration lab",
+        type: "video",
+        duration: 45,
+        videoUrl: "https://example.com/videos/pfsense-config.mp4",
+        resources: [],
+        isPreview: false,
+        order: 2,
+        moduleId: "mod-ns-002",
+      },
+    ],
+  },
+  {
+    id: "mod-ns-003",
+    title: "Intrusion Detection Systems",
+    description: "IDS/IPS implementation and management",
+    order: 3,
+    lessons: [
+      {
+        id: "lesson-ns-005",
+        title: "IDS vs IPS",
+        description: "Understanding detection and prevention systems",
+        type: "video",
+        duration: 20,
+        videoUrl: "https://example.com/videos/ids-ips.mp4",
+        resources: [],
+        isPreview: false,
+        order: 1,
+        moduleId: "mod-ns-003",
+      },
+      {
+        id: "lesson-ns-006",
+        title: "Snort Configuration",
+        description: "Setting up and configuring Snort IDS",
+        type: "video",
+        duration: 40,
+        videoUrl: "https://example.com/videos/snort-setup.mp4",
+        resources: [],
+        isPreview: false,
+        order: 2,
+        moduleId: "mod-ns-003",
+      },
+    ],
+  },
+];
+
 const webSecurityModules: CourseModule[] = [
   {
     id: "mod-001",
@@ -361,7 +460,7 @@ export const courses: Course[] = [
     duration: 960,
     totalLessons: 58,
     totalModules: 10,
-    modules: [],
+    modules: networkSecurityModules,
     learningOutcomes: [
       "Design secure network architectures",
       "Configure enterprise firewalls and VPNs",

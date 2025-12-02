@@ -262,6 +262,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   <Tab>Overview</Tab>
                   <Tab id="curriculum">Curriculum</Tab>
                   <Tab>Reviews</Tab>
+                  <Tab>FAQ</Tab>
                 </TabList>
 
                 <TabPanels>
@@ -367,6 +368,69 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                           </FallInPlace>
                         ))}
                       </VStack>
+                    </VStack>
+                  </TabPanel>
+
+                  {/* FAQ Tab */}
+                  <TabPanel px="0" py="8">
+                    <VStack spacing="6" align="stretch">
+                      <FallInPlace>
+                        <Heading size="lg" mb="4">
+                          Frequently Asked Questions
+                        </Heading>
+                      </FallInPlace>
+
+                      {[
+                        {
+                          question: "What is the duration of this course?",
+                          answer: `This course includes ${Math.floor(course.duration / 60)} hours and ${course.duration % 60} minutes of video content, plus additional time for hands-on labs and practice exercises.`
+                        },
+                        {
+                          question: "Do I get a certificate upon completion?",
+                          answer: "Yes! Upon successful completion of all modules and assessments, you'll receive an industry-recognized certificate that you can share on LinkedIn and include in your resume."
+                        },
+                        {
+                          question: "Is this course suitable for beginners?",
+                          answer: course.level === "fundamental" 
+                            ? "Yes, this course is designed for complete beginners with no prior experience required."
+                            : `This is a${course.level === "advanced" ? "n advanced" : "n intermediate"} course. We recommend having some foundational knowledge before enrolling. Check the requirements section for details.`
+                        },
+                        {
+                          question: "What format is the course content?",
+                          answer: course.deliveryMode === "live"
+                            ? `This course features live interactive classes scheduled for ${course.liveSchedule}. All sessions are recorded so you can review them later.`
+                            : "This course is delivered through pre-recorded video lessons that you can access anytime. Learn at your own pace with lifetime access."
+                        },
+                        {
+                          question: "Do I get lifetime access to the course?",
+                          answer: "Yes! Once enrolled, you have lifetime access to all course materials, including any future updates and additions."
+                        },
+                        {
+                          question: "What if I need help or have questions?",
+                          answer: "You'll have access to our community forum where you can ask questions and get support from both instructors and fellow students. Premium courses also include direct instructor Q&A sessions."
+                        },
+                        {
+                          question: "Can I get a refund if I'm not satisfied?",
+                          answer: "We offer a 30-day money-back guarantee. If you're not satisfied with the course for any reason, contact us within 30 days for a full refund."
+                        }
+                      ].map((faq, index) => (
+                        <FallInPlace key={index} delay={0.05 * index}>
+                          <Box
+                            p="6"
+                            bg={bgColor}
+                            borderRadius="xl"
+                            borderWidth="1px"
+                            borderColor={borderColor}
+                          >
+                            <VStack align="start" spacing="3">
+                              <Heading size="sm">{faq.question}</Heading>
+                              <Text color="muted" fontSize="sm" lineHeight="tall">
+                                {faq.answer}
+                              </Text>
+                            </VStack>
+                          </Box>
+                        </FallInPlace>
+                      ))}
                     </VStack>
                   </TabPanel>
                 </TabPanels>
