@@ -290,7 +290,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+      className={`fixed mt-14 flex flex-col lg:mt-0 top-0 px-4.5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 scale-[0.9] origin-top-left lg:h-[111.111%]
         ${
           isExpanded || isMobileOpen
             ? "w-[290px]"
@@ -304,7 +304,7 @@ const AppSidebar: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`py-8 hidden lg:flex  ${
+        className={`py-7 hidden lg:flex  ${
           !isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-center"
         }`}
       >
@@ -314,27 +314,27 @@ const AppSidebar: React.FC = () => {
               <Image
                 src="/logo_black.png"
                 alt="HackToLive Logo"
-                width={120}
-                height={30}
-                className="dark:hidden object-contain w-auto h-[30px]"
+                width={108}
+                height={27}
+                className="dark:hidden object-contain w-auto h-[27px]"
                 priority
               />
               <Image
                 src="/logo_white.png"
                 alt="HackToLive Logo"
-                width={120}
-                height={30}
-                className="hidden dark:block object-contain w-auto h-[30px]"
+                width={108}
+                height={27}
+                className="hidden dark:block object-contain w-auto h-[27px]"
                 priority
               />
             </>
           ) : (
             <Image
-              src="/images/logo/logo-icon.svg"
-              alt="Logo"
-              width={32}
-              height={32}
-              className="w-8 h-8"
+              src="/logo.svg"
+              alt="HackToLive Logo"
+              width={29}
+              height={29}
+              className="w-7 h-7"
             />
           )}
         </Link>
@@ -344,7 +344,7 @@ const AppSidebar: React.FC = () => {
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-4 mt-4 lg:mt-0 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-4 mt-4 lg:mt-0 text-[11px] uppercase flex leading-[18px] text-gray-400 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
@@ -361,7 +361,7 @@ const AppSidebar: React.FC = () => {
 
             <div className="">
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-4 text-[11px] uppercase flex leading-[18px] text-gray-400 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
