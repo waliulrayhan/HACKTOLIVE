@@ -17,7 +17,6 @@ import {
   TableIcon,
   UserCircleIcon,
 } from "@/icons/index";
-import SidebarWidget from "./SidebarWidget";
 
 type NavItem = {
   name: string;
@@ -290,7 +289,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed mt-14 flex flex-col lg:mt-0 top-0 px-4.5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 scale-[0.9] origin-top-left lg:h-[111.111%]
+      className={`fixed mt-14 flex flex-col lg:mt-0 top-0 px-4.5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 lg:scale-[0.9] origin-top-left lg:h-[111.111%]
         ${
           isExpanded || isMobileOpen
             ? "w-[290px]"
@@ -377,7 +376,6 @@ const AppSidebar: React.FC = () => {
             </div>
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
       </div>
     </aside>
   );
