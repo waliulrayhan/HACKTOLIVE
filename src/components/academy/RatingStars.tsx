@@ -2,6 +2,7 @@
 
 import { HStack, Icon } from "@chakra-ui/react";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import { ReactElement } from "react";
 
 interface RatingStarsProps {
   rating: number;
@@ -16,7 +17,7 @@ export default function RatingStars({
   size = "16px",
   color = "#F59E0B",
 }: RatingStarsProps) {
-  const stars = [];
+  const stars: ReactElement[] = [];
 
   for (let i = 1; i <= maxRating; i++) {
     if (rating >= i) {

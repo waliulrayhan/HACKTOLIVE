@@ -21,10 +21,15 @@ export default function QuizQuestion({
 }: QuizQuestionProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | string[]>(userAnswer || (question.type === "multiple-select" ? [] : ""));
 
-  const handleAnswer = (answer: string | string[]) => {
-    setSelectedAnswer(answer);
+  const handleAnswer = (answer: string | string[] | (string | number)[]) => {
+    // Convert (string | number)[] to string[] for CheckboxGroup compatibility
+    const normalizedAnswer = Array.isArray(answer) 
+      ? answer.map(a => String(a)) 
+      : answer;
+    
+    setSelectedAnswer(normalizedAnswer);
     if (onAnswer) {
-      onAnswer(answer);
+      onAnswer(normalizedAnswer);
     }
   };
 

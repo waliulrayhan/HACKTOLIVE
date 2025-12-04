@@ -26,12 +26,12 @@ import { PageTransition } from '@/components/shared/motion/page-transition'
 import { Header } from '../../(marketing)/_components/layout/header'
 import { NextPage } from 'next'
 import { FaMoon, FaSun } from 'react-icons/fa'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import NextLink from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from '@/components/ui/toast'
 
-const VerifyOTP: NextPage = () => {
+const VerifyOTPContent = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [otp, setOtp] = useState('')
@@ -453,6 +453,14 @@ const VerifyOTP: NextPage = () => {
       </GridItem>
     </Grid>
     </>
+  )
+}
+
+const VerifyOTP: NextPage = () => {
+  return (
+    <Suspense fallback={<Box>Loading...</Box>}>
+      <VerifyOTPContent />
+    </Suspense>
   )
 }
 

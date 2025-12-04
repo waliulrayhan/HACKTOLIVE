@@ -114,12 +114,14 @@ export default function FileUpload({
         position="relative"
         border="2px dashed"
         borderColor={dragActive ? "blue.500" : "gray.300"}
-        _dark={{ borderColor: dragActive ? "blue.400" : "gray.600" }}
+        _dark={{ 
+          borderColor: dragActive ? "blue.400" : "gray.600",
+          bg: dragActive ? "blue.900" : "gray.800"
+        }}
         borderRadius="lg"
         p="8"
         textAlign="center"
         bg={dragActive ? "blue.50" : "gray.50"}
-        _dark={{ bg: dragActive ? "blue.900" : "gray.800" }}
         transition="all 0.3s"
         onDragEnter={handleDrag}
         onDragOver={handleDrag}
@@ -188,12 +190,14 @@ export default function FileUpload({
               key={index}
               p="3"
               bg="white"
-              _dark={{ bg: "gray.700" }}
+              _dark={{ 
+                bg: "gray.700",
+                borderColor: "gray.600"
+              }}
               borderRadius="md"
               justify="space-between"
               borderWidth="1px"
               borderColor="gray.200"
-              _dark={{ borderColor: "gray.600" }}
             >
               <HStack spacing="3" flex="1">
                 <Icon as={FaFile} color="blue.500" />
