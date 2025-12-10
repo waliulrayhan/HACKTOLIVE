@@ -1,0 +1,21 @@
+# Dependencies
+node_modules
+.pnp.js
+
+# Production
+dist
+build
+.next
+out
+
+# Logs
+*.log
+
+# Environment
+.env
+.env*.local
+
+# Misc
+*.tar
+.DS_Store
+Thumbs.db
