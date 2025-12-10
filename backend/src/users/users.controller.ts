@@ -4,11 +4,11 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   Delete,
+  Query,
   ParseIntPipe,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './user.dto';
 
@@ -26,39 +26,35 @@ export class UsersController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ status: 200, description: 'Returns all users' })
-  findAll() {
+  @ApiOperation({ summary: 'Get all users or a specific user by ID' })
+  @ApiQuery({ name: 'id', description: 'User ID', required: false, type: Number })
+  @ApiResponse({ status: 200, description: 'Returns all users or a specific user' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  findAll(@Query('id', new ParseIntPipe({ optional: true })) id?: number) {
+    if (id) {
+      return this.usersService.findOne(id);
+    }
     return this.usersService.findAll();
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get a user by ID' })
-  @ApiParam({ name: 'id', description: 'User ID' })
-  @ApiResponse({ status: 200, description: 'Returns the user' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.findOne(id);
-  }
-
-  @Patch(':id')
+  @Patch()
   @ApiOperation({ summary: 'Update a user' })
-  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiQuery({ name: 'id', description: 'User ID', required: true, type: Number })
   @ApiResponse({ status: 200, description: 'User updated successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Query('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.usersService.update(id, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete()
   @ApiOperation({ summary: 'Delete a user' })
-  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiQuery({ name: 'id', description: 'User ID', required: true, type: Number })
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Query('id', ParseIntPipe) id: number) {
     return this.usersService.remove(id);
   }
 }
