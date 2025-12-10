@@ -87,24 +87,14 @@ export default function DashboardLayout({
             path: "/admin/courses",
           },
           {
-            icon: <FileIcon />,
-            name: "All Courses",
-            path: "/admin/all-courses",
+            icon: <UserIcon />,
+            name: "Instructors",
+            path: "/admin/instructors",
           },
           {
             icon: <PieChartIcon />,
             name: "System Analytics",
             path: "/admin/analytics",
-          },
-          {
-            icon: <LockIcon />,
-            name: "Security",
-            path: "/admin/security",
-          },
-          {
-            icon: <BoxIcon />,
-            name: "Settings",
-            path: "/admin/settings",
           },
           {
             icon: <UserCircleIcon />,
