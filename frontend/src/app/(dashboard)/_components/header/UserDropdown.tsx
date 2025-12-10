@@ -4,9 +4,12 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { Dropdown } from "@/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
+import { toast } from "@/components/ui/toast";
+import { useRouter } from "next/navigation";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
 function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
   e.stopPropagation();
@@ -16,6 +19,23 @@ function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
   function closeDropdown() {
     setIsOpen(false);
   }
+
+  function handleSignOut(e: React.MouseEvent<HTMLAnchorElement>) {
+    e.preventDefault();
+    closeDropdown();
+    
+    // Show success toast
+    toast.success('Signed out successfully!', {
+      description: 'You have been logged out of your account.',
+      duration: 3000,
+    });
+    
+    // Redirect to login page after a short delay
+    setTimeout(() => {
+      router.push('/login');
+    }, 500);
+  }
+
   return (
     <div className="relative">
       <button
@@ -146,6 +166,7 @@ function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         </ul>
         <Link
           href="/login"
+          onClick={handleSignOut}
           className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
         >
           <svg
