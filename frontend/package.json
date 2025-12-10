@@ -36,6 +36,7 @@
     "@types/react-google-recaptcha": "^2.1.9",
     "apexcharts": "^4.7.0",
     "autoprefixer": "^10.4.22",
+    "axios": "^1.13.2",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "flatpickr": "^4.6.13",

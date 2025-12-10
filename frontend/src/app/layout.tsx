@@ -4,6 +4,7 @@ import '@/styles/globals.css'
 
 import { SidebarProvider } from '@/context/SidebarContext'
 import { ThemeProvider } from '@/context/ThemeContext'
+import { AuthProvider } from '@/context/AuthContext'
 import { GlobalLoading } from '@/components/shared/global-loading'
 import { Toaster } from '@/components/ui/toast'
 
@@ -62,7 +63,9 @@ export default function RootLayout({
       <body className={`${outfit.className} dark:bg-gray-900`}>
         <GlobalLoading />
         <ThemeProvider>
-          <SidebarProvider>{children}</SidebarProvider>
+          <AuthProvider>
+            <SidebarProvider>{children}</SidebarProvider>
+          </AuthProvider>
           <Toaster />
         </ThemeProvider>
       </body>

@@ -33,8 +33,13 @@ import { FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { useState, useRef } from 'react'
 import ReCAPTCHA from 'react-google-recaptcha'
 import NextLink from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
+import { toast } from '@/components/ui/toast'
 
 const Signup: NextPage = () => {
+  const router = useRouter()
+  const { signup } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [agreeToTerms, setAgreeToTerms] = useState(false)
@@ -127,11 +132,6 @@ const Signup: NextPage = () => {
       hasError = true
     }
 
-    if (!captchaValue) {
-      newErrors.captcha = 'Please complete the captcha'
-      hasError = true
-    }
-
     if (!agreeToTerms) {
       newErrors.terms = 'You must agree to the terms'
       hasError = true
@@ -142,20 +142,22 @@ const Signup: NextPage = () => {
       return
     }
 
-    // Handle signup logic here
     setIsLoading(true)
     
     try {
-      console.log('Signup:', { ...formData, captchaValue, agreeToTerms })
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // Redirect to login or dashboard after successful signup
-      // router.push('/login')
-    } catch (error) {
+      // Signup is only for students
+      await signup(formData.name, formData.email, formData.password)
+      toast.success('Account created successfully!', {
+        description: 'Welcome to HACKTOLIVE! Redirecting to your dashboard...',
+        duration: 3000,
+      })
+      // Router redirect is handled in AuthContext
+    } catch (error: any) {
       console.error('Signup error:', error)
-    } finally {
+      toast.error('Signup failed', {
+        description: error.response?.data?.message || 'Unable to create account. Please try again.',
+        duration: 5000,
+      })
       setIsLoading(false)
     }
   }

@@ -34,6 +34,8 @@ import { useState, useRef } from 'react'
 import ReCAPTCHA from 'react-google-recaptcha'
 import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
+import { toast } from '@/components/ui/toast'
 
 const providers = {
   google: {
@@ -44,6 +46,7 @@ const providers = {
 
 const Login: NextPage = () => {
   const router = useRouter()
+  const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [keepSignedIn, setKeepSignedIn] = useState(false)
   const [captchaValue, setCaptchaValue] = useState<string | null>(null)
@@ -77,37 +80,39 @@ const Login: NextPage = () => {
     if (!email) {
       newErrors.email = 'Email is required'
       hasError = true
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Please enter a valid email address'
+      hasError = true
     }
 
     if (!password) {
       newErrors.password = 'Password is required'
       hasError = true
+    } else if (password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters'
+      hasError = true
     }
-
-    // Captcha validation removed for dummy login
-    // if (!captchaValue) {
-    //   newErrors.captcha = 'Please complete the captcha'
-    //   hasError = true
-    // }
 
     if (hasError) {
       setErrors(newErrors)
       return
     }
 
-    // Handle login logic here
     setIsLoading(true)
     
     try {
-      console.log('Login:', { email, password, keepSignedIn, captchaValue })
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // Redirect to dashboard
-      router.push('/dashboard')
-    } catch (error) {
+      await login(email, password)
+      toast.success('Login successful!', {
+        description: 'Welcome back to HACKTOLIVE',
+        duration: 3000,
+      })
+      // Router redirect is handled in AuthContext based on role
+    } catch (error: any) {
       console.error('Login error:', error)
+      toast.error('Login failed', {
+        description: error.response?.data?.message || 'Invalid email or password. Please try again.',
+        duration: 5000,
+      })
       setIsLoading(false)
     }
   }
