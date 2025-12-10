@@ -150,7 +150,7 @@ const AppHeader: React.FC = () => {
                 />
 
                 <button className="absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center gap-0.5 rounded-lg border border-gray-200 bg-gray-50 px-[6px] py-[4px] text-[11px] -tracking-[0.18px] text-gray-500 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400">
-                  <span> ⌘ </span>
+                  <span> CTRL </span>
                   <span> K </span>
                 </button>
               </div>
