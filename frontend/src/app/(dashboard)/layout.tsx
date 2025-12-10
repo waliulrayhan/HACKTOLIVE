@@ -6,8 +6,21 @@ import AppHeader from "./_components/AppHeader";
 import AppSidebar from "./_components/AppSidebar";
 import Backdrop from "./_components/Backdrop";
 import React, { useMemo } from "react";
-import { GridIcon, UserCircleIcon } from "@/icons/index";
-import { FaBook, FaChartLine, FaCertificate, FaGraduationCap, FaUsers, FaCheckCircle, FaCog, FaShieldAlt, FaChartBar, FaUserGraduate, FaVideo, FaFileAlt } from "react-icons/fa";
+import {
+  GridIcon,
+  UserCircleIcon,
+  FileIcon,
+  PieChartIcon,
+  CheckCircleIcon,
+  BoxIconLine,
+  GroupIcon,
+  LockIcon,
+  BoxIcon,
+  TaskIcon,
+  DocsIcon,
+  VideoIcon,
+  UserIcon,
+} from "@/icons/index";
 
 export default function DashboardLayout({
   children,
@@ -28,22 +41,22 @@ export default function DashboardLayout({
             path: "/student/dashboard",
           },
           {
-            icon: <FaBook className="w-5 h-5" />,
+            icon: <FileIcon />,
             name: "My Courses",
             path: "/student/courses",
           },
           {
-            icon: <FaChartLine className="w-5 h-5" />,
+            icon: <PieChartIcon />,
             name: "Progress",
             path: "/student/progress",
           },
           {
-            icon: <FaCertificate className="w-5 h-5" />,
+            icon: <CheckCircleIcon />,
             name: "Certificates",
             path: "/student/certificates",
           },
           {
-            icon: <FaGraduationCap className="w-5 h-5" />,
+            icon: <BoxIconLine />,
             name: "Browse Courses",
             path: "/student/browse",
           },
@@ -64,32 +77,32 @@ export default function DashboardLayout({
             path: "/admin/dashboard",
           },
           {
-            icon: <FaUsers className="w-5 h-5" />,
+            icon: <GroupIcon />,
             name: "User Management",
             path: "/admin/users",
           },
           {
-            icon: <FaCheckCircle className="w-5 h-5" />,
+            icon: <CheckCircleIcon />,
             name: "Course Approval",
             path: "/admin/courses",
           },
           {
-            icon: <FaBook className="w-5 h-5" />,
+            icon: <FileIcon />,
             name: "All Courses",
             path: "/admin/all-courses",
           },
           {
-            icon: <FaChartLine className="w-5 h-5" />,
+            icon: <PieChartIcon />,
             name: "System Analytics",
             path: "/admin/analytics",
           },
           {
-            icon: <FaShieldAlt className="w-5 h-5" />,
+            icon: <LockIcon />,
             name: "Security",
             path: "/admin/security",
           },
           {
-            icon: <FaCog className="w-5 h-5" />,
+            icon: <BoxIcon />,
             name: "Settings",
             path: "/admin/settings",
           },
@@ -110,27 +123,27 @@ export default function DashboardLayout({
             path: "/instructor/dashboard",
           },
           {
-            icon: <FaBook className="w-5 h-5" />,
+            icon: <FileIcon />,
             name: "My Courses",
             path: "/instructor/courses",
           },
           {
-            icon: <FaUserGraduate className="w-5 h-5" />,
+            icon: <UserIcon />,
             name: "Students",
             path: "/instructor/students",
           },
           {
-            icon: <FaChartBar className="w-5 h-5" />,
+            icon: <PieChartIcon />,
             name: "Analytics",
             path: "/instructor/analytics",
           },
           {
-            icon: <FaFileAlt className="w-5 h-5" />,
+            icon: <TaskIcon />,
             name: "Assignments",
             path: "/instructor/assignments",
           },
           {
-            icon: <FaVideo className="w-5 h-5" />,
+            icon: <DocsIcon />,
             name: "Content Library",
             path: "/instructor/library",
           },
