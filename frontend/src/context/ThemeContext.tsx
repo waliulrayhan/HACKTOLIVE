@@ -21,7 +21,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     // This code will only run on the client side
     const savedTheme = localStorage.getItem("theme") as Theme | null;
-    const initialTheme = savedTheme || "light"; // Default to light theme
+    const chakraColorMode = localStorage.getItem("chakra-ui-color-mode") as Theme | null;
+    
+    // Prefer the custom theme, but fall back to Chakra's color mode if available
+    const initialTheme = savedTheme || chakraColorMode || "light"; // Default to light theme
 
     setTheme(initialTheme);
     setIsInitialized(true);
@@ -29,7 +32,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (isInitialized) {
+      // Update both localStorage keys to keep them in sync
       localStorage.setItem("theme", theme);
+      localStorage.setItem("chakra-ui-color-mode", theme);
+      
       if (theme === "dark") {
         document.documentElement.classList.add("dark");
       } else {

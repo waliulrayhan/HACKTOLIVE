@@ -24,6 +24,9 @@ function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.preventDefault();
     closeDropdown();
     
+    // Clear all localStorage data
+    localStorage.clear();
+    
     // Show success toast
     toast.success('Signed out successfully!', {
       description: 'You have been logged out of your account.',
