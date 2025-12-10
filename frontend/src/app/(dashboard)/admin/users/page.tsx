@@ -360,7 +360,7 @@ export default function UsersManagementPage() {
             className="inline-flex items-center gap-1.5 rounded-lg border border-brand-500 bg-brand-500 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-brand-600 hover:border-brand-600"
           >
             <HiOutlinePlus className="h-5 w-5" />
-            Add User
+            Add Users
           </button>
         </div>
 
