@@ -145,7 +145,7 @@ export class AdminService {
     return sanitized;
   }
 
-  async updateUser(userId: number, data: { name?: string; role?: UserRole }) {
+  async updateUser(userId: string, data: { name?: string; role?: UserRole }) {
     const user = await this.prisma.user.update({
       where: { id: userId },
       data,
@@ -155,7 +155,7 @@ export class AdminService {
     return sanitized;
   }
 
-  async deleteUser(userId: number) {
+  async deleteUser(userId: string) {
     await this.prisma.user.delete({
       where: { id: userId },
     });

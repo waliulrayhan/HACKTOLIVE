@@ -91,7 +91,7 @@ export class ReviewsService {
     });
   }
 
-  async findByUser(userId: number): Promise<Review[]> {
+  async findByUser(userId: string): Promise<Review[]> {
     return this.prisma.review.findMany({
       where: { userId },
       include: {

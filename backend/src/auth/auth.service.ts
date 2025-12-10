@@ -8,21 +8,11 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma.service';
 import * as bcrypt from 'bcryptjs';
 import { User, UserRole } from '@prisma/client';
-
-export interface SignupDto {
-  email: string;
-  password: string;
-  name: string;
-  role?: UserRole;
-}
-
-export interface LoginDto {
-  email: string;
-  password: string;
-}
+import { SignupDto } from './dto/signup.dto';
+import { LoginDto } from './dto/login.dto';
 
 export interface JwtPayload {
-  sub: number;
+  sub: string;
   email: string;
   role: UserRole;
 }
@@ -126,7 +116,7 @@ export class AuthService {
     };
   }
 
-  async validateUser(userId: number): Promise<User | null> {
+  async validateUser(userId: string): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -136,7 +126,7 @@ export class AuthService {
     });
   }
 
-  async getProfile(userId: number) {
+  async getProfile(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -169,7 +159,7 @@ export class AuthService {
     return this.sanitizeUser(user);
   }
 
-  async updateProfile(userId: number, data: { name?: string; avatar?: string; bio?: string }) {
+  async updateProfile(userId: string, data: { name?: string; avatar?: string; bio?: string }) {
     const user = await this.prisma.user.update({
       where: { id: userId },
       data: {
@@ -200,7 +190,7 @@ export class AuthService {
     return this.sanitizeUser(user);
   }
 
-  async changePassword(userId: number, oldPassword: string, newPassword: string) {
+  async changePassword(userId: string, oldPassword: string, newPassword: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });

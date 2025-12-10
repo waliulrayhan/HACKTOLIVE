@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma.service';
 export class StudentService {
   constructor(private prisma: PrismaService) {}
 
-  async getDashboard(userId: number) {
+  async getDashboard(userId: string) {
     const student = await this.prisma.student.findUnique({
       where: { userId },
       include: {
@@ -69,7 +69,7 @@ export class StudentService {
     };
   }
 
-  async getEnrolledCourses(userId: number) {
+  async getEnrolledCourses(userId: string) {
     const student = await this.prisma.student.findUnique({
       where: { userId },
     });
@@ -98,7 +98,7 @@ export class StudentService {
     });
   }
 
-  async getCourseProgress(userId: number, courseId: string) {
+  async getCourseProgress(userId: string, courseId: string) {
     const student = await this.prisma.student.findUnique({
       where: { userId },
     });
@@ -161,7 +161,7 @@ export class StudentService {
     };
   }
 
-  async markLessonComplete(userId: number, lessonId: string) {
+  async markLessonComplete(userId: string, lessonId: string) {
     const student = await this.prisma.student.findUnique({
       where: { userId },
     });
@@ -244,7 +244,7 @@ export class StudentService {
     return progress;
   }
 
-  async getCertificates(userId: number) {
+  async getCertificates(userId: string) {
     const student = await this.prisma.student.findUnique({
       where: { userId },
     });
@@ -268,7 +268,7 @@ export class StudentService {
     });
   }
 
-  async getQuizAttempts(userId: number) {
+  async getQuizAttempts(userId: string) {
     const student = await this.prisma.student.findUnique({
       where: { userId },
     });

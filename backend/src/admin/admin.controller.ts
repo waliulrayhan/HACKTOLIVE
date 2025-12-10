@@ -9,11 +9,14 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard, Roles } from '../auth/roles.guard';
 import { UserRole, CourseStatus } from '@prisma/client';
 
+@ApiTags('admin')
+@ApiBearerAuth()
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
@@ -57,12 +60,12 @@ export class AdminController {
     @Param('userId') userId: string,
     @Body() data: { name?: string; role?: UserRole },
   ) {
-    return this.adminService.updateUser(parseInt(userId), data);
+    return this.adminService.updateUser(userId, data);
   }
 
   @Delete('users/:userId')
   deleteUser(@Param('userId') userId: string) {
-    return this.adminService.deleteUser(parseInt(userId));
+    return this.adminService.deleteUser(userId);
   }
 
   // Course Management

@@ -59,7 +59,7 @@ export class InstructorsService {
     return instructor;
   }
 
-  async findByUserId(userId: number): Promise<Instructor | null> {
+  async findByUserId(userId: string): Promise<Instructor | null> {
     return this.prisma.instructor.findUnique({
       where: { userId },
       include: {

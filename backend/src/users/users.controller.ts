@@ -6,7 +6,6 @@ import {
   Patch,
   Delete,
   Query,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { UsersService } from './users.service';
@@ -27,10 +26,10 @@ export class UsersController {
 
   @Get()
   @ApiOperation({ summary: 'Get all users or a specific user by ID' })
-  @ApiQuery({ name: 'id', description: 'User ID', required: false, type: Number })
+  @ApiQuery({ name: 'id', description: 'User ID', required: false, type: String })
   @ApiResponse({ status: 200, description: 'Returns all users or a specific user' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  findAll(@Query('id', new ParseIntPipe({ optional: true })) id?: number) {
+  findAll(@Query('id') id?: string) {
     if (id) {
       return this.usersService.findOne(id);
     }
@@ -39,11 +38,11 @@ export class UsersController {
 
   @Patch()
   @ApiOperation({ summary: 'Update a user' })
-  @ApiQuery({ name: 'id', description: 'User ID', required: true, type: Number })
+  @ApiQuery({ name: 'id', description: 'User ID', required: true, type: String })
   @ApiResponse({ status: 200, description: 'User updated successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
   update(
-    @Query('id', ParseIntPipe) id: number,
+    @Query('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.usersService.update(id, updateUserDto);
@@ -51,10 +50,10 @@ export class UsersController {
 
   @Delete()
   @ApiOperation({ summary: 'Delete a user' })
-  @ApiQuery({ name: 'id', description: 'User ID', required: true, type: Number })
+  @ApiQuery({ name: 'id', description: 'User ID', required: true, type: String })
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  remove(@Query('id', ParseIntPipe) id: number) {
+  remove(@Query('id') id: string) {
     return this.usersService.remove(id);
   }
 }

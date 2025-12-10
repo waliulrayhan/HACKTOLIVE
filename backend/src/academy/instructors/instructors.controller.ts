@@ -8,9 +8,11 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { InstructorsService } from './instructors.service';
 import { Prisma } from '@prisma/client';
 
+@ApiTags('academy')
 @Controller('academy/instructors')
 export class InstructorsController {
   constructor(private readonly instructorsService: InstructorsService) {}
@@ -43,7 +45,7 @@ export class InstructorsController {
 
   @Get('user/:userId')
   findByUserId(@Param('userId') userId: string) {
-    return this.instructorsService.findByUserId(parseInt(userId));
+    return this.instructorsService.findByUserId(userId);
   }
 
   @Patch(':id')

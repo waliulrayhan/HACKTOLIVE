@@ -16,7 +16,7 @@ export interface AuthResponse {
 }
 
 export const authService = {
-  async signup(email: string, password: string, name: string, role?: string) {
+  async signup(name: string, email: string, password: string, role?: string) {
     const response = await api.post<AuthResponse>('/auth/signup', {
       email,
       password,

@@ -8,9 +8,11 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { QuizzesService } from './quizzes.service';
 import { Prisma } from '@prisma/client';
 
+@ApiTags('academy')
 @Controller('academy/quizzes')
 export class QuizzesController {
   constructor(private readonly quizzesService: QuizzesService) {}

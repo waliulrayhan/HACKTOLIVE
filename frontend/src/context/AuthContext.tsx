@@ -9,7 +9,7 @@ interface AuthContextType {
   loading: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, name: string, role?: string) => Promise<void>;
+  signup: (name: string, email: string, password: string, role?: string) => Promise<void>;
   logout: () => void;
   updateUser: (user: User) => void;
 }
@@ -69,9 +69,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signup = async (email: string, password: string, name: string, role?: string) => {
+  const signup = async (name: string, email: string, password: string, role?: string) => {
     try {
-      const data = await authService.signup(email, password, name, role);
+      const data = await authService.signup(name, email, password, role);
       authService.setToken(data.token);
       authService.setUser(data.user);
       setUser(data.user);

@@ -9,11 +9,14 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard, Roles } from '../auth/roles.guard';
 import { UserRole, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 
+@ApiTags('instructor')
+@ApiBearerAuth()
 @Controller('instructor')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.INSTRUCTOR)
