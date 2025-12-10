@@ -231,7 +231,7 @@ This project is private and proprietary.
 
 ## 👥 Team
 
-- **Repository Owner**: [ShabikunShahria](https://github.com/ShabikunShahria)
+- **Repository Owner**: [Md. Waliul Islam Rayhan](https://github.com/waliulrayhan)
 
 ---
 
