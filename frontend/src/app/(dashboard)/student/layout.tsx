@@ -3,10 +3,45 @@
 import { useSidebar } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
 import AppHeader from "../_components/AppHeader";
-import StudentSidebar from "./_components/StudentSidebar";
+import AppSidebar from "../_components/AppSidebar";
 import Backdrop from "../_components/Backdrop";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { GridIcon, UserCircleIcon } from "@/icons/index";
+import { FaBook, FaChartLine, FaCertificate, FaGraduationCap } from "react-icons/fa";
+
+const studentNavItems = [
+  {
+    icon: <GridIcon />,
+    name: "Dashboard",
+    path: "/student/dashboard",
+  },
+  {
+    icon: <FaBook className="w-5 h-5" />,
+    name: "My Courses",
+    path: "/student/courses",
+  },
+  {
+    icon: <FaChartLine className="w-5 h-5" />,
+    name: "Progress",
+    path: "/student/progress",
+  },
+  {
+    icon: <FaCertificate className="w-5 h-5" />,
+    name: "Certificates",
+    path: "/student/certificates",
+  },
+  {
+    icon: <FaGraduationCap className="w-5 h-5" />,
+    name: "Browse Courses",
+    path: "/student/browse",
+  },
+  {
+    icon: <UserCircleIcon />,
+    name: "Profile",
+    path: "/student/profile",
+  },
+];
 
 export default function StudentLayout({
   children,
@@ -43,7 +78,7 @@ export default function StudentLayout({
 
   return (
     <div className="min-h-screen xl:flex">
-      <StudentSidebar />
+      <AppSidebar navItems={studentNavItems} othersItems={[]} />
       <Backdrop />
       <div
         className={`flex-1 transition-all duration-300 ease-in-out ${mainContentMargin}`}

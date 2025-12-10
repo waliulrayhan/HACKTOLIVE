@@ -25,7 +25,7 @@ type NavItem = {
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
-const navItems: NavItem[] = [
+const defaultNavItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
@@ -62,7 +62,7 @@ const navItems: NavItem[] = [
   },
 ];
 
-const othersItems: NavItem[] = [
+const defaultOthersItems: NavItem[] = [
   {
     icon: <PieChartIcon />,
     name: "Charts",
@@ -93,7 +93,15 @@ const othersItems: NavItem[] = [
   },
 ];
 
-const AppSidebar: React.FC = () => {
+interface AppSidebarProps {
+  navItems?: NavItem[];
+  othersItems?: NavItem[];
+}
+
+const AppSidebar: React.FC<AppSidebarProps> = ({ 
+  navItems = defaultNavItems, 
+  othersItems = defaultOthersItems 
+}) => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
 
