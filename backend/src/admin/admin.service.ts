@@ -72,17 +72,33 @@ export class AdminService {
   }
 
   async getAllUsers(params?: {
-    skip?: number;
-    take?: number;
+    page?: number;
+    limit?: number;
     role?: UserRole;
+    search?: string;
   }) {
-    const { skip, take, role } = params || {};
-    const where = role ? { role } : {};
+    const { page = 1, limit = 10, role, search } = params || {};
+    
+    // Build where clause with search and role filter
+    const where: any = {};
+    
+    if (role) {
+      where.role = role;
+    }
+    
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    const skip = (page - 1) * limit;
 
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
         skip,
-        take,
+        take: limit,
         where,
         include: {
           student: true,
@@ -101,6 +117,9 @@ export class AdminService {
         return sanitized;
       }),
       total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
     };
   }
 

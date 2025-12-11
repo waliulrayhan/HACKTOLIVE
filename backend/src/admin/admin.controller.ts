@@ -31,14 +31,16 @@ export class AdminController {
   // User Management
   @Get('users')
   getAllUsers(
-    @Query('skip') skip?: string,
-    @Query('take') take?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
     @Query('role') role?: UserRole,
+    @Query('search') search?: string,
   ) {
     return this.adminService.getAllUsers({
-      skip: skip ? parseInt(skip) : undefined,
-      take: take ? parseInt(take) : undefined,
+      page: page ? parseInt(page) : 1,
+      limit: limit ? parseInt(limit) : 10,
       role,
+      search,
     });
   }
 
