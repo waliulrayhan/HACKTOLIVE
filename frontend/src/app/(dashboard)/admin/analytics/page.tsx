@@ -69,15 +69,15 @@ export default function AnalyticsPage() {
         }),
       ]);
 
-      if (!enrollmentRes.ok || !revenueRes.ok || !coursesRes.ok || !instructorsRes.ok) {
+      if (!enrollmentsRes.ok || !revenueRes.ok || !popularCoursesRes.ok || !topInstructorsRes.ok) {
         throw new Error('Failed to fetch analytics');
       }
 
       const [enrollment, revenue, courses, instructors] = await Promise.all([
-        enrollmentRes.json(),
+        enrollmentsRes.json(),
         revenueRes.json(),
-        coursesRes.json(),
-        instructorsRes.json(),
+        popularCoursesRes.json(),
+        topInstructorsRes.json(),
       ]);
 
       setEnrollmentStats(enrollment);
