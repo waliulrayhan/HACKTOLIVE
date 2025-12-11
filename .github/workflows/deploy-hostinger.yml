@@ -1,0 +1,221 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ============================================
+      # BUILD BACKEND
+      # ============================================
+      - name: Setup Node.js for Backend
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Build Backend
+        working-directory: ./backend
+        run: npm run build
+
+      - name: Prepare Backend for Deployment
+        working-directory: ./backend
+        run: |
+          # Create deployment directory
+          mkdir -p ../deploy/backend
+          
+          # Copy built files
+          cp -r dist ../deploy/backend/
+          
+          # Copy essential files
+          cp package.json ../deploy/backend/
+          cp package-lock.json ../deploy/backend/
+          
+          # Copy Prisma files
+          cp -r prisma ../deploy/backend/
+          
+          # Create production node_modules (only production dependencies)
+          cd ../deploy/backend
+          npm ci --omit=dev --legacy-peer-deps
+
+      # ============================================
+      # BUILD FRONTEND
+      # ============================================
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build Frontend
+        working-directory: ./frontend
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+        run: npm run build
+
+      - name: Prepare Frontend for Deployment
+        working-directory: ./frontend
+        run: |
+          # Create deployment directory
+          mkdir -p ../deploy/public_html
+          
+          # For Next.js standalone build
+          cp -r .next/standalone/* ../deploy/public_html/
+          cp -r .next/static ../deploy/public_html/.next/
+          cp -r public ../deploy/public_html/
+          
+          # Copy package files for production
+          cp package.json ../deploy/public_html/
+          cp package-lock.json ../deploy/public_html/
+          
+          # Install only production dependencies
+          cd ../deploy/public_html
+          npm ci --omit=dev --legacy-peer-deps
+
+      # ============================================
+      # PREPARE DEPLOYMENT FILES
+      # ============================================
+      - name: Create Backend Startup Script
+        run: |
+          cat > deploy/backend/start.sh << 'EOF'
+          #!/bin/bash
+          cd "$(dirname "$0")"
+          
+          # Load environment variables
+          if [ -f .env ]; then
+            export $(cat .env | grep -v '^#' | xargs)
+          fi
+          
+          # Run Prisma migrations
+          npx prisma migrate deploy
+          
+          # Start the application
+          node dist/main.js
+          EOF
+          chmod +x deploy/backend/start.sh
+
+      - name: Create Frontend Startup Script
+        run: |
+          cat > deploy/public_html/start.sh << 'EOF'
+          #!/bin/bash
+          cd "$(dirname "$0")"
+          
+          # Load environment variables
+          if [ -f .env ]; then
+            export $(cat .env | grep -v '^#' | xargs)
+          fi
+          
+          # Start Next.js
+          node server.js
+          EOF
+          chmod +x deploy/public_html/start.sh
+
+      - name: Create .htaccess for Frontend
+        run: |
+          cat > deploy/public_html/.htaccess << 'EOF'
+          # Enable Rewrite Engine
+          RewriteEngine On
+          
+          # Forward all requests to Node.js via proxy (if using Apache with mod_proxy)
+          # Note: This requires Node.js to be running on a specific port
+          RewriteCond %{REQUEST_FILENAME} !-f
+          RewriteCond %{REQUEST_FILENAME} !-d
+          RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
+          
+          # Alternative: If serving static build
+          # RewriteCond %{REQUEST_FILENAME} !-f
+          # RewriteCond %{REQUEST_FILENAME} !-d
+          # RewriteRule . /index.html [L]
+          
+          # Security headers
+          Header set X-Content-Type-Options "nosniff"
+          Header set X-Frame-Options "SAMEORIGIN"
+          Header set X-XSS-Protection "1; mode=block"
+          
+          # Compression
+          <IfModule mod_deflate.c>
+            AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+          </IfModule>
+          EOF
+
+      - name: Create Environment Template Files
+        run: |
+          # Backend .env.example
+          cat > deploy/backend/.env.example << 'EOF'
+          DATABASE_URL="your_mysql_connection_string"
+          JWT_SECRET="your_jwt_secret_here"
+          JWT_EXPIRES_IN="7d"
+          PORT=3001
+          NODE_ENV=production
+          EOF
+          
+          # Frontend .env.example
+          cat > deploy/public_html/.env.example << 'EOF'
+          NEXT_PUBLIC_API_URL=https://yourdomain.com/backend
+          NODE_ENV=production
+          PORT=3000
+          EOF
+
+      # ============================================
+      # DEPLOY VIA FTP
+      # ============================================
+      - name: Deploy Frontend to Hostinger
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./deploy/public_html/
+          server-dir: ./public_html/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.env
+
+      - name: Deploy Backend to Hostinger
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./deploy/backend/
+          server-dir: ./public_html/backend/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.env
+
+      # ============================================
+      # POST-DEPLOYMENT
+      # ============================================
+      - name: Deployment Summary
+        run: |
+          echo "✅ Deployment completed successfully!"
+          echo ""
+          echo "📦 Deployed Components:"
+          echo "  - Frontend: public_html/"
+          echo "  - Backend: public_html/backend/"
+          echo ""
+          echo "⚠️  Post-Deployment Steps Required:"
+          echo "  1. SSH into your Hostinger server"
+          echo "  2. Set up environment variables (.env files)"
+          echo "  3. Install/configure PM2 or similar process manager"
+          echo "  4. Start the applications"
+          echo ""
+          echo "📝 See DEPLOYMENT.md for detailed instructions"

@@ -11,6 +11,7 @@ Full-stack web application built with **NestJS** (Backend) and **Next.js** (Fron
 - [Development](#development)
 - [Docker Deployment](#docker-deployment)
 - [Scripts](#scripts)
+- [Automated Deployment](#automated-deployment)
 - [Environment Variables](#environment-variables)
 - [Contributing](#contributing)
 
@@ -194,6 +195,65 @@ See [DEPLOY.md](DEPLOY.md) for detailed deployment instructions.
 
 # Clean everything
 .\scripts\clean.ps1 -all
+```
+
+## 🌐 Automated Deployment
+
+### Hostinger CI/CD Pipeline
+
+The project includes automated deployment to Hostinger using GitHub Actions.
+
+**Features:**
+- ✅ Automatic deployment on push to `main` branch
+- 🏗️ Builds both frontend and backend automatically
+- 📦 Optimized production builds with standalone Next.js
+- 🚀 FTP deployment to Hostinger
+- 🔄 Zero-downtime deployment with PM2
+
+**Quick Start:**
+
+1. **Configure GitHub Secrets** (Repository → Settings → Secrets → Actions):
+   ```
+   FTP_SERVER=ftp.yourdomain.com
+   FTP_USERNAME=your-ftp-username
+   FTP_PASSWORD=your-ftp-password
+   NEXT_PUBLIC_API_URL=https://yourdomain.com/backend
+   ```
+
+2. **Push to main branch:**
+   ```powershell
+   git add .
+   git commit -m "Deploy to production"
+   git push origin main
+   ```
+
+3. **Monitor deployment** in GitHub Actions tab
+
+**Deployment Structure:**
+```
+Hostinger Server:
+public_html/              # Frontend (Next.js)
+├── .next/
+├── public/
+├── server.js
+└── backend/              # Backend (NestJS)
+    ├── dist/
+    ├── prisma/
+    └── node_modules/
+```
+
+**Documentation:**
+- 📖 [Complete Deployment Guide](DEPLOYMENT.md)
+- 🚀 [Quick Reference](DEPLOYMENT_QUICK_REFERENCE.md)
+- 🏗️ [Architecture Diagram](DEPLOYMENT_ARCHITECTURE.md)
+
+**Helper Scripts:**
+```powershell
+# Test deployment build locally
+.\scripts\test-deployment.ps1
+
+# Verify deployment readiness
+.\scripts\verify-deployment.ps1
 ```
 
 ## 🔐 Environment Variables
