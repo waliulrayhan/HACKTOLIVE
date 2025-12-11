@@ -87,9 +87,11 @@ export class AdminService {
     }
     
     if (search) {
+      // MySQL doesn't support mode: 'insensitive', so we remove it
+      // MySQL's LIKE is case-insensitive by default with utf8_general_ci collation
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search } },
+        { email: { contains: search } },
       ];
     }
 
