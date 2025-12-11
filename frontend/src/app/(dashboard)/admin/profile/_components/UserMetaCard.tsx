@@ -17,9 +17,8 @@ export default function UserMetaCard() {
     closeModal();
   };
   return (
-    <>
-      <div className="p-5 border border-gray-200 rounded-md dark:border-gray-800 lg:p-6">
-        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+    <div className="p-5 border border-gray-200 rounded-md dark:border-gray-800 lg:p-6">
+      <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex flex-col items-center w-full gap-6 xl:flex-row">
             <div className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800">
               <Image
@@ -136,7 +135,7 @@ export default function UserMetaCard() {
             Edit
           </button>
         </div>
-      </div>
+
       <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md" style={{ display: isOpen ? 'flex' : 'none' }}>
         <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
           {/* Header */}
@@ -218,6 +217,6 @@ export default function UserMetaCard() {
           </form>
         </div>
       </div>
-    </>
+    </div>
   );
 }
