@@ -156,6 +156,7 @@ export class AdminService {
         data: {
           userId: user.id,
           name,
+          skills: JSON.stringify([]),
         },
       });
     }

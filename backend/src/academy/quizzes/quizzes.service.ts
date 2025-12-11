@@ -140,7 +140,7 @@ export class QuizzesService {
         quiz: { connect: { id: quizId } },
         student: { connect: { id: studentId } },
         score,
-        answers,
+        answers: JSON.stringify(answers), // Stringify for MySQL TEXT field
         passed,
       },
       include: {

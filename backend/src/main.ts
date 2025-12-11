@@ -9,10 +9,12 @@ async function bootstrap() {
   // Enable CORS for frontend - support multiple origins
   const allowedOrigins = process.env.FRONTEND_URL 
     ? process.env.FRONTEND_URL.split(',')
-    : ['http://localhost:3000'];
+    : ['http://localhost:3000', 'http://192.168.0.166:3000'];
   
   app.enableCors({
     origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     credentials: true,
   });
 

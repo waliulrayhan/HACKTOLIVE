@@ -71,6 +71,7 @@ export class AuthService {
           name: user.name || 'Instructor',
           avatar: '/images/user/default-avatar.jpg',
           bio: 'New instructor',
+          skills: JSON.stringify([]),
         },
       });
     }

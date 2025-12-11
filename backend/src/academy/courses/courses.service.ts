@@ -163,9 +163,9 @@ export class CoursesService {
     return this.prisma.course.findMany({
       where: {
         OR: [
-          { title: { contains: query, mode: 'insensitive' } },
-          { description: { contains: query, mode: 'insensitive' } },
-          { shortDescription: { contains: query, mode: 'insensitive' } },
+          { title: { contains: query } },
+          { description: { contains: query } },
+          { shortDescription: { contains: query } },
         ],
       },
       include: {
