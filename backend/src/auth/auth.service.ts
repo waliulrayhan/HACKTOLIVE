@@ -160,11 +160,25 @@ export class AuthService {
     return this.sanitizeUser(user);
   }
 
-  async updateProfile(userId: string, data: { name?: string; avatar?: string; bio?: string }) {
+  async updateProfile(userId: string, data: { 
+    name?: string; 
+    avatar?: string; 
+    bio?: string;
+    phone?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+  }) {
     const user = await this.prisma.user.update({
       where: { id: userId },
       data: {
         name: data.name,
+        avatar: data.avatar,
+        bio: data.bio,
+        phone: data.phone,
+        city: data.city,
+        state: data.state,
+        country: data.country,
       },
     });
 
@@ -187,6 +201,25 @@ export class AuthService {
         },
       });
     }
+
+    return this.sanitizeUser(user);
+  }
+
+  async updateSocialLinks(userId: string, data: {
+    facebookUrl?: string;
+    twitterUrl?: string;
+    linkedinUrl?: string;
+    instagramUrl?: string;
+  }) {
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        facebookUrl: data.facebookUrl,
+        twitterUrl: data.twitterUrl,
+        linkedinUrl: data.linkedinUrl,
+        instagramUrl: data.instagramUrl,
+      },
+    });
 
     return this.sanitizeUser(user);
   }

@@ -13,6 +13,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
+import { UpdateProfileDto, UpdateSocialLinksDto, ChangePasswordDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
 @ApiTags('auth')
@@ -54,9 +55,21 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Profile updated successfully' })
   async updateProfile(
     @Request() req: any,
-    @Body() updateData: { name?: string; avatar?: string; bio?: string },
+    @Body() updateProfileDto: UpdateProfileDto,
   ) {
-    return this.authService.updateProfile(req.user.id, updateData);
+    return this.authService.updateProfile(req.user.id, updateProfileDto);
+  }
+
+  @Patch('profile/social-links')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update user social media links' })
+  @ApiResponse({ status: 200, description: 'Social links updated successfully' })
+  async updateSocialLinks(
+    @Request() req: any,
+    @Body() updateSocialLinksDto: UpdateSocialLinksDto,
+  ) {
+    return this.authService.updateSocialLinks(req.user.id, updateSocialLinksDto);
   }
 
   @Post('change-password')
@@ -67,12 +80,12 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid old password' })
   async changePassword(
     @Request() req: any,
-    @Body() body: { oldPassword: string; newPassword: string },
+    @Body() changePasswordDto: ChangePasswordDto,
   ) {
     return this.authService.changePassword(
       req.user.id,
-      body.oldPassword,
-      body.newPassword,
+      changePasswordDto.oldPassword,
+      changePasswordDto.newPassword,
     );
   }
 

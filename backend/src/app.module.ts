@@ -7,9 +7,18 @@ import { AuthModule } from './auth/auth.module';
 import { StudentModule } from './student/student.module';
 import { InstructorModule } from './instructor/instructor.module';
 import { AdminModule } from './admin/admin.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
-  imports: [UsersModule, AcademyModule, AuthModule, StudentModule, InstructorModule, AdminModule],
+  imports: [
+    UsersModule,
+    AcademyModule,
+    AuthModule,
+    StudentModule,
+    InstructorModule,
+    AdminModule,
+    UploadModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

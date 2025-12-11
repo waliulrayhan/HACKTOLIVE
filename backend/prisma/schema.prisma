@@ -8,16 +8,26 @@ datasource db {
 }
 
 model User {
-  id         String      @id @default(uuid())
-  email      String      @unique
-  name       String?
-  password   String
-  role       UserRole    @default(STUDENT)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  instructor Instructor?
-  reviews    Review[]
-  student    Student?
+  id          String      @id @default(uuid())
+  email       String      @unique
+  name        String?
+  password    String
+  role        UserRole    @default(STUDENT)
+  phone       String?
+  bio         String?
+  avatar      String?     @db.VarChar(500)
+  city        String?
+  state       String?
+  country     String?
+  facebookUrl String?     @db.VarChar(500)
+  twitterUrl  String?     @db.VarChar(500)
+  linkedinUrl String?     @db.VarChar(500)
+  instagramUrl String?    @db.VarChar(500)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  instructor  Instructor?
+  reviews     Review[]
+  student     Student?
 }
 
 model Instructor {
