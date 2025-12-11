@@ -146,10 +146,10 @@ const AppHeader: React.FC = () => {
                   ref={inputRef}
                   type="text"
                   placeholder="Search or type command..."
-                  className="dark:bg-dark-900 h-10 w-full rounded-lg border border-gray-200 bg-transparent py-2 pl-11 pr-13 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[387px]"
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-transparent py-2 pl-11 pr-13 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-white/3 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[387px]"
                 />
 
-                <button className="absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center gap-0.5 rounded-lg border border-gray-200 bg-gray-50 px-[6px] py-[4px] text-[11px] -tracking-[0.18px] text-gray-500 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400">
+                <button className="absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center gap-0.5 rounded-lg border border-gray-200 bg-gray-50 px-1.5 py-1 text-[11px] -tracking-[0.18px] text-gray-500 dark:border-gray-800 dark:bg-white/3 dark:text-gray-400">
                   <span> CTRL </span>
                   <span> K </span>
                 </button>
