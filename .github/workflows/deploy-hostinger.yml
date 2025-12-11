@@ -186,7 +186,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./deploy/public_html/
-          server-dir: ./public_html/
+          server-dir: ./domains/hacktolive.io/public_html/
           dangerous-clean-slate: false
           exclude: |
             **/.git*
@@ -201,7 +201,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./deploy/backend/
-          server-dir: ./public_html/backend/
+          server-dir: ./domains/hacktolive.io/public_html/backend/
           dangerous-clean-slate: false
           exclude: |
             **/.git*
