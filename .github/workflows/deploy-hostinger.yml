@@ -30,10 +30,14 @@ jobs:
 
       - name: Generate Prisma Client
         working-directory: ./backend
+        env:
+          DATABASE_URL: "mysql://dummy:dummy@localhost:3306/dummy"
         run: npx prisma generate
 
       - name: Build Backend
         working-directory: ./backend
+        env:
+          DATABASE_URL: "mysql://dummy:dummy@localhost:3306/dummy"
         run: npm run build
 
       - name: Prepare Backend for Deployment
