@@ -1,19 +1,70 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useModal } from "@/lib/hooks/useModal";
-import { Modal } from "@/components/ui/modal";
-import Button from "@/components/ui/button/Button";
-import Input from "@/app/(dashboard)/form-elements/_components/input/InputField";
-import Label from "@/app/(dashboard)/form-elements/_components/Label";
 import { HiOutlineLocationMarker, HiOutlineGlobeAlt, HiOutlineX } from "react-icons/hi";
+import { userService } from "@/lib/user-service";
+import { User } from "@/lib/auth-service";
 
 export default function UserAddressCard() {
   const { isOpen, openModal, closeModal } = useModal();
-  const handleSave = () => {
-    // Handle save logic here
-    console.log("Saving changes...");
-    closeModal();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [formData, setFormData] = useState({
+    city: "",
+    state: "",
+    country: "",
+  });
+
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const loadUserData = async () => {
+    try {
+      const userData = await userService.getProfile();
+      setUser(userData);
+      setFormData({
+        city: userData.city || "",
+        state: userData.state || "",
+        country: userData.country || "",
+      });
+    } catch (error) {
+      console.error("Failed to load user data:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleSave = async () => {
+    try {
+      const updatedUser = await userService.updateProfile(formData);
+      setUser(updatedUser);
+      closeModal();
+    } catch (error) {
+      console.error("Failed to update address:", error);
+      alert("Failed to update address. Please try again.");
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="p-5 border border-gray-200 rounded-md dark:border-gray-800 lg:p-6">
+        <div className="flex items-center justify-center h-32">
+          <div className="text-gray-500 dark:text-gray-400">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  const cityState = [user?.city, user?.state].filter(Boolean).join(", ") || "Not set";
+
   return (
     <>
       <div className="p-5 border border-gray-200 rounded-md dark:border-gray-800 lg:p-6">
@@ -29,7 +80,7 @@ export default function UserAddressCard() {
                   City/State
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  Phoenix, Arizona
+                  {cityState}
                 </p>
               </div>
 
@@ -38,7 +89,7 @@ export default function UserAddressCard() {
                   Country
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  United States
+                  {user?.country || "Not set"}
                 </p>
               </div>
             </div>
@@ -83,11 +134,11 @@ export default function UserAddressCard() {
           </div>
 
           {/* Body */}
-          <form className="p-6">
+          <form className="p-6" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  City/State
+                  City
                 </label>
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -95,9 +146,30 @@ export default function UserAddressCard() {
                   </div>
                   <input
                     type="text"
-                    defaultValue="Phoenix, Arizona"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
                     className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                    placeholder="Enter city and state"
+                    placeholder="Enter city"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  State
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <HiOutlineLocationMarker className="h-4 w-4 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleChange}
+                    className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                    placeholder="Enter state"
                   />
                 </div>
               </div>
@@ -112,7 +184,9 @@ export default function UserAddressCard() {
                   </div>
                   <input
                     type="text"
-                    defaultValue="United States"
+                    name="country"
+                    value={formData.country}
+                    onChange={handleChange}
                     className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
                     placeholder="Enter country"
                   />
@@ -130,8 +204,7 @@ export default function UserAddressCard() {
                 Cancel
               </button>
               <button
-                type="button"
-                onClick={handleSave}
+                type="submit"
                 className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30"
               >
                 Save Changes

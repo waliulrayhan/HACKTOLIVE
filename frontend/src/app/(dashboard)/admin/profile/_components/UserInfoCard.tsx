@@ -1,19 +1,74 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useModal } from "@/lib/hooks/useModal";
-import { Modal } from "@/components/ui/modal";
-import Button from "@/components/ui/button/Button";
-import Input from "@/app/(dashboard)/form-elements/_components/input/InputField";
-import Label from "@/app/(dashboard)/form-elements/_components/Label";
 import { HiOutlineUser, HiOutlineMail, HiOutlinePhone, HiOutlineBriefcase, HiOutlineX } from "react-icons/hi";
+import { userService } from "@/lib/user-service";
+import { User } from "@/lib/auth-service";
 
 export default function UserInfoCard() {
   const { isOpen, openModal, closeModal } = useModal();
-  const handleSave = () => {
-    // Handle save logic here
-    console.log("Saving changes...");
-    closeModal();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    bio: "",
+  });
+
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const loadUserData = async () => {
+    try {
+      const userData = await userService.getProfile();
+      setUser(userData);
+      setFormData({
+        name: userData.name || "",
+        email: userData.email || "",
+        phone: userData.phone || "",
+        bio: userData.bio || "",
+      });
+    } catch (error) {
+      console.error("Failed to load user data:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleSave = async () => {
+    try {
+      const updatedUser = await userService.updateProfile({
+        name: formData.name,
+        phone: formData.phone,
+        bio: formData.bio,
+      });
+      setUser(updatedUser);
+      closeModal();
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      alert("Failed to update profile. Please try again.");
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="p-5 border border-gray-200 rounded-md dark:border-gray-800 lg:p-6">
+        <div className="flex items-center justify-center h-32">
+          <div className="text-gray-500 dark:text-gray-400">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-5 border border-gray-200 rounded-md dark:border-gray-800 lg:p-6">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
@@ -28,7 +83,7 @@ export default function UserInfoCard() {
                 Full Name
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                Musharof Chowdhury
+                {user?.name || "Not set"}
               </p>
             </div>
 
@@ -37,7 +92,7 @@ export default function UserInfoCard() {
                 Email address
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                randomuser@pimjo.com
+                {user?.email || "Not set"}
               </p>
             </div>
 
@@ -46,7 +101,7 @@ export default function UserInfoCard() {
                 Phone
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                +09 363 398 46
+                {user?.phone || "Not set"}
               </p>
             </div>
 
@@ -55,7 +110,7 @@ export default function UserInfoCard() {
                 Bio
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                Team Manager
+                {user?.bio || "Not set"}
               </p>
             </div>
           </div>
@@ -100,7 +155,7 @@ export default function UserInfoCard() {
           </div>
 
           {/* Body */}
-          <form className="p-6">
+          <form className="p-6" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
             <div className="space-y-6">
 
               {/* Personal Information Section */}
@@ -116,7 +171,9 @@ export default function UserInfoCard() {
                       </div>
                       <input
                         type="text"
-                        defaultValue="Musharof Chowdhury"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
                         className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
                         placeholder="Enter full name"
                       />
@@ -133,11 +190,14 @@ export default function UserInfoCard() {
                       </div>
                       <input
                         type="email"
-                        defaultValue="randomuser@pimjo.com"
-                        className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                        name="email"
+                        value={formData.email}
+                        disabled
+                        className="w-full h-10 rounded-lg border border-gray-300 bg-gray-100 pl-10 pr-3 text-sm text-gray-500 placeholder-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400"
                         placeholder="Enter email address"
                       />
                     </div>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Email cannot be changed</p>
                   </div>
 
                   <div>
@@ -150,7 +210,9 @@ export default function UserInfoCard() {
                       </div>
                       <input
                         type="text"
-                        defaultValue="+09 363 398 46"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
                         className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
                         placeholder="Enter phone number"
                       />
@@ -167,7 +229,9 @@ export default function UserInfoCard() {
                       </div>
                       <input
                         type="text"
-                        defaultValue="Team Manager"
+                        name="bio"
+                        value={formData.bio}
+                        onChange={handleChange}
                         className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
                         placeholder="Enter bio"
                       />
@@ -187,8 +251,7 @@ export default function UserInfoCard() {
                 Cancel
               </button>
               <button
-                type="button"
-                onClick={handleSave}
+                type="submit"
                 className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30"
               >
                 Save Changes

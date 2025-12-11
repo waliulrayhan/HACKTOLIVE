@@ -1,11 +1,22 @@
 import api from './api-client';
 
 export interface User {
-  id: number;
+  id: string;
   email: string;
-  name: string;
+  name: string | null;
   role: 'STUDENT' | 'INSTRUCTOR' | 'ADMIN';
+  phone?: string | null;
+  bio?: string | null;
+  avatar?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  facebookUrl?: string | null;
+  twitterUrl?: string | null;
+  linkedinUrl?: string | null;
+  instagramUrl?: string | null;
   createdAt: string;
+  updatedAt: string;
   student?: any;
   instructor?: any;
 }
@@ -39,8 +50,26 @@ export const authService = {
     return response.data;
   },
 
-  async updateProfile(data: { name?: string; avatar?: string; bio?: string }) {
+  async updateProfile(data: { 
+    name?: string; 
+    avatar?: string; 
+    bio?: string;
+    phone?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+  }) {
     const response = await api.patch<User>('/auth/profile', data);
+    return response.data;
+  },
+
+  async updateSocialLinks(data: {
+    facebookUrl?: string;
+    twitterUrl?: string;
+    linkedinUrl?: string;
+    instagramUrl?: string;
+  }) {
+    const response = await api.patch<User>('/auth/profile/social-links', data);
     return response.data;
   },
 
