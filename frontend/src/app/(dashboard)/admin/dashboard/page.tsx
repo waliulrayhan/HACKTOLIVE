@@ -3,7 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
-import { FaUsers, FaBook, FaCheckCircle, FaChartLine, FaUserGraduate, FaChalkboardTeacher, FaDollarSign, FaCertificate } from "react-icons/fa";
+import {
+  HiOutlineUsers,
+  HiOutlineAcademicCap,
+  HiOutlineCheckCircle,
+  HiOutlineTrendingUp,
+  HiOutlineUserGroup,
+  HiOutlineCurrencyDollar,
+  HiOutlineBadgeCheck,
+} from "react-icons/hi";
 
 interface DashboardStats {
   stats: {
@@ -66,143 +74,122 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div>
+    <div className="space-y-4">
       <PageBreadcrumb pageTitle="Admin Dashboard" />
       
-      <div className="mt-6 space-y-6">
-        {/* Main Stats Cards */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="p-6 bg-white border border-gray-200 rounded-2xl dark:bg-gray-dark dark:border-gray-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Users</p>
-                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                  {stats?.stats.totalUsers || 0}
-                </p>
-                <p className="mt-1 text-sm text-green-600">All registered users</p>
-              </div>
-              <div className="p-3 bg-blue-100 rounded-lg dark:bg-blue-900/20">
-                <FaUsers className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-              </div>
+      {/* Main Stats Cards */}
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-500/15">
+              <HiOutlineUsers className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-500" />
             </div>
-          </div>
-
-          <div className="p-6 bg-white border border-gray-200 rounded-2xl dark:bg-gray-dark dark:border-gray-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Courses</p>
-                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                  {stats?.stats.totalCourses || 0}
-                </p>
-                <p className="mt-1 text-sm text-blue-600">{stats?.stats.draftCourses || 0} pending approval</p>
-              </div>
-              <div className="p-3 bg-green-100 rounded-lg dark:bg-green-900/20">
-                <FaBook className="w-8 h-8 text-green-600 dark:text-green-400" />
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6 bg-white border border-gray-200 rounded-2xl dark:bg-gray-dark dark:border-gray-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Enrollments</p>
-                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                  {stats?.stats.activeEnrollments || 0}
-                </p>
-                <p className="mt-1 text-sm text-purple-600">Across all courses</p>
-              </div>
-              <div className="p-3 bg-purple-100 rounded-lg dark:bg-purple-900/20">
-                <FaCheckCircle className="w-8 h-8 text-purple-600 dark:text-purple-400" />
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6 bg-white border border-gray-200 rounded-2xl dark:bg-gray-dark dark:border-gray-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Revenue</p>
-                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                  ${(stats?.stats.totalRevenue || 0).toLocaleString()}
-                </p>
-                <p className="mt-1 text-sm text-orange-600">From premium courses</p>
-              </div>
-              <div className="p-3 bg-orange-100 rounded-lg dark:bg-orange-900/20">
-                <FaDollarSign className="w-8 h-8 text-orange-600 dark:text-orange-400" />
-              </div>
+            <div>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Total Users</p>
+              <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">{stats?.stats.totalUsers || 0}</p>
             </div>
           </div>
         </div>
 
-        {/* Secondary Stats */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="p-6 bg-white border border-gray-200 rounded-2xl dark:bg-gray-dark dark:border-gray-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Students</p>
-                <p className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
-                  {stats?.stats.totalStudents || 0}
-                </p>
-              </div>
-              <FaUserGraduate className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-500/15">
+              <HiOutlineAcademicCap className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-500" />
             </div>
-          </div>
-
-          <div className="p-6 bg-white border border-gray-200 rounded-2xl dark:bg-gray-dark dark:border-gray-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Instructors</p>
-                <p className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
-                  {stats?.stats.totalInstructors || 0}
-                </p>
-              </div>
-              <FaChalkboardTeacher className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-            </div>
-          </div>
-
-          <div className="p-6 bg-white border border-gray-200 rounded-2xl dark:bg-gray-dark dark:border-gray-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Published Courses</p>
-                <p className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
-                  {stats?.stats.publishedCourses || 0}
-                </p>
-              </div>
-              <FaChartLine className="w-6 h-6 text-green-600 dark:text-green-400" />
-            </div>
-          </div>
-
-          <div className="p-6 bg-white border border-gray-200 rounded-2xl dark:bg-gray-dark dark:border-gray-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Certificates Issued</p>
-                <p className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
-                  {stats?.stats.totalCertificates || 0}
-                </p>
-              </div>
-              <FaCertificate className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+            <div>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Total Courses</p>
+              <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">{stats?.stats.totalCourses || 0}</p>
             </div>
           </div>
         </div>
 
-        {/* Recent Activity */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="p-6 bg-white border border-gray-200 rounded-2xl dark:bg-gray-dark dark:border-gray-800">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Enrollments</h3>
-              <span className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full dark:bg-blue-900/20 dark:text-blue-400">
-                {stats?.recentEnrollments.length || 0} new
-              </span>
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-500/15">
+              <HiOutlineCheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-500" />
             </div>
-            <div className="space-y-4">
-              {stats?.recentEnrollments.slice(0, 5).map((enrollment: any, index: number) => (
-                <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg dark:border-gray-700">
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white">{enrollment.student?.name || 'Unknown Student'}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{enrollment.course?.title || 'Unknown Course'}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                      {new Date(enrollment.enrolledAt).toLocaleDateString()}
-                    </p>
-                  </div>
+            <div>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Enrollments</p>
+              <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">{stats?.stats.activeEnrollments || 0}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-500/15">
+              <HiOutlineCurrencyDollar className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 dark:text-orange-500" />
+            </div>
+            <div>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Revenue</p>
+              <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">${(stats?.stats.totalRevenue || 0).toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Secondary Stats */}
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Students</p>
+              <p className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white">{stats?.stats.totalStudents || 0}</p>
+            </div>
+            <HiOutlineUserGroup className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
+          </div>
+        </div>
+
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Instructors</p>
+              <p className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white">{stats?.stats.totalInstructors || 0}</p>
+            </div>
+            <HiOutlineUsers className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-400" />
+          </div>
+        </div>
+
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Published</p>
+              <p className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white">{stats?.stats.publishedCourses || 0}</p>
+            </div>
+            <HiOutlineTrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400" />
+          </div>
+        </div>
+
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Certificates</p>
+              <p className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white">{stats?.stats.totalCertificates || 0}</p>
+            </div>
+            <HiOutlineBadgeCheck className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 dark:text-orange-400" />
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
+        <div className="rounded-md border border-gray-200 bg-white p-4 sm:p-6 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Recent Enrollments</h3>
+            <span className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full dark:bg-blue-900/20 dark:text-blue-400">
+              {stats?.recentEnrollments.length || 0} new
+            </span>
+          </div>
+          <div className="space-y-3">
+            {stats?.recentEnrollments.slice(0, 5).map((enrollment: any, index: number) => (
+              <div key={index} className="flex items-center justify-between p-3 sm:p-4 border border-gray-200 rounded-lg dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 transition-colors">
+                <div>
+                  <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">{enrollment.student?.name || 'Unknown Student'}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{enrollment.course?.title || 'Unknown Course'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    {new Date(enrollment.enrolledAt).toLocaleDateString()}
+                  </p>
+                </div>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                     enrollment.status === 'ACTIVE' 
                       ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
@@ -213,28 +200,28 @@ export default function AdminDashboard() {
                 </div>
               ))}
               {(!stats?.recentEnrollments || stats.recentEnrollments.length === 0) && (
-                <p className="text-center text-gray-500 dark:text-gray-400">No recent enrollments</p>
+                <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-4">No recent enrollments</p>
               )}
             </div>
           </div>
 
-          <div className="p-6 bg-white border border-gray-200 rounded-2xl dark:bg-gray-dark dark:border-gray-800">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Courses</h3>
-              <span className="px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full dark:bg-green-900/20 dark:text-green-400">
-                {stats?.recentCourses.length || 0} new
-              </span>
-            </div>
-            <div className="space-y-4">
-              {stats?.recentCourses.slice(0, 5).map((course: any, index: number) => (
-                <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg dark:border-gray-700">
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white">{course.title}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">By: {course.instructor?.name || 'Unknown'}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                      {new Date(course.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
+        <div className="rounded-md border border-gray-200 bg-white p-4 sm:p-6 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Recent Courses</h3>
+            <span className="px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full dark:bg-green-900/20 dark:text-green-400">
+              {stats?.recentCourses.length || 0} new
+            </span>
+          </div>
+          <div className="space-y-3">
+            {stats?.recentCourses.slice(0, 5).map((course: any, index: number) => (
+              <div key={index} className="flex items-center justify-between p-3 sm:p-4 border border-gray-200 rounded-lg dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 transition-colors">
+                <div>
+                  <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">{course.title}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">By: {course.instructor?.name || 'Unknown'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    {new Date(course.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                     course.status === 'PUBLISHED' 
                       ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
@@ -246,10 +233,9 @@ export default function AdminDashboard() {
                   </span>
                 </div>
               ))}
-              {(!stats?.recentCourses || stats.recentCourses.length === 0) && (
-                <p className="text-center text-gray-500 dark:text-gray-400">No recent courses</p>
-              )}
-            </div>
+            {(!stats?.recentCourses || stats.recentCourses.length === 0) && (
+              <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-4">No recent courses</p>
+            )}
           </div>
         </div>
       </div>
