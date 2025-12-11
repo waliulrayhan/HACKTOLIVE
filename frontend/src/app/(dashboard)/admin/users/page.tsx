@@ -13,7 +13,12 @@ import {
   HiOutlineUser,
   HiOutlineUsers,
   HiOutlineUserGroup,
-  HiOutlineShieldCheck
+  HiOutlineShieldCheck,
+  HiOutlineMail,
+  HiOutlineCalendar,
+  HiOutlineEye,
+  HiOutlineX,
+  HiOutlineExclamationCircle
 } from "react-icons/hi";
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
@@ -67,8 +72,10 @@ export default function UsersManagementPage() {
     totalPages: 0,
   });
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  const [modalMode, setModalMode] = useState<'create' | 'edit' | 'view'>('create');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<{ id: string; name: string } | null>(null);
   const [formData, setFormData] = useState<UserFormData>({
     email: '',
     password: '',
@@ -235,12 +242,12 @@ export default function UsersManagementPage() {
     }
   };
 
-  const handleDeleteUser = async (userId: string, userName: string) => {
-    if (!confirm(`Are you sure you want to delete "${userName}"?`)) return;
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users/${userId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users/${userToDelete.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -250,6 +257,8 @@ export default function UsersManagementPage() {
       if (!response.ok) throw new Error('Failed to delete user');
       
       toast.success('User deleted successfully!');
+      setShowDeleteModal(false);
+      setUserToDelete(null);
       fetchUsers();
       fetchAllUsers();
     } catch (error) {
@@ -258,6 +267,11 @@ export default function UsersManagementPage() {
         description: 'Please try again',
       });
     }
+  };
+
+  const openDeleteModal = (userId: string, userName: string) => {
+    setUserToDelete({ id: userId, name: userName });
+    setShowDeleteModal(true);
   };
 
   const openCreateModal = () => {
@@ -276,6 +290,12 @@ export default function UsersManagementPage() {
       name: user.name || '',
       role: user.role as any,
     });
+    setShowModal(true);
+  };
+
+  const openViewModal = (user: User) => {
+    setModalMode('view');
+    setSelectedUser(user);
     setShowModal(true);
   };
 
@@ -508,8 +528,11 @@ export default function UsersManagementPage() {
                       </div>
                     </TableCell>
                     <TableCell className="px-3 sm:px-4 py-3">
-                      <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 truncate">
-                        {user.email}
+                      <div className="flex items-center gap-1.5">
+                        <HiOutlineMail className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                        <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 truncate">
+                          {user.email}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell className="px-2 sm:px-2 py-3">
@@ -526,16 +549,26 @@ export default function UsersManagementPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="px-3 sm:px-4 py-3">
-                      <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
-                        {new Date(user.createdAt).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric'
-                        })}
+                      <div className="flex items-center gap-1.5">
+                        <HiOutlineCalendar className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                        <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
+                          {new Date(user.createdAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                          })}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell className="px-3 sm:px-4 py-3">
                       <div className="flex items-center justify-center gap-1">
+                        <button
+                          onClick={() => openViewModal(user)}
+                          className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-md text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200"
+                          title="View user"
+                        >
+                          <HiOutlineEye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        </button>
                         <button
                           onClick={() => openEditModal(user)}
                           className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-md text-gray-600 transition-colors hover:bg-brand-50 hover:text-brand-600 dark:text-gray-400 dark:hover:bg-brand-500/15 dark:hover:text-brand-400"
@@ -544,7 +577,7 @@ export default function UsersManagementPage() {
                           <HiOutlinePencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteUser(user.id, user.name || user.email)}
+                          onClick={() => openDeleteModal(user.id, user.name || user.email)}
                           className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-md text-gray-600 transition-colors hover:bg-error-50 hover:text-error-600 dark:text-gray-400 dark:hover:bg-error-500/15 dark:hover:text-error-500"
                           title="Delete user"
                         >
@@ -625,88 +658,255 @@ export default function UsersManagementPage() {
         )}
       </div>
 
-      {/* Modal */}
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-        <div className="w-full max-w-md p-4 sm:p-5">
-          <h3 className="mb-3 sm:mb-4 text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-            {modalMode === 'create' ? 'Create New User' : 'Edit User'}
-          </h3>
-          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-3.5">
-            <div>
-              <label className="mb-1 sm:mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                Full Name
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="h-9 w-full rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                placeholder="Enter full name"
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-1 sm:mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                Email Address
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="h-9 w-full rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                placeholder="Enter email address"
-                required
-                disabled={modalMode === 'edit'}
-              />
-            </div>
-            {modalMode === 'create' && (
-              <div>
-                <label className="mb-1 sm:mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="h-9 w-full rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                  placeholder="Enter password"
-                  required
-                />
-              </div>
-            )}
-            <div>
-              <label className="mb-1 sm:mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                Role
-              </label>
-              <select
-                value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
-                className="h-9 w-full rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                required
-              >
-                <option value="STUDENT">Student</option>
-                <option value="INSTRUCTOR">Instructor</option>
-                <option value="ADMIN">Admin</option>
-              </select>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2 pt-2 sm:pt-3">
+      {/* Create/Edit Modal */}
+      {showModal && (modalMode === 'create' || modalMode === 'edit') && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {modalMode === 'create' ? 'Create New User' : 'Edit User'}
+              </h3>
               <button
-                type="submit"
-                className="flex-1 inline-flex items-center justify-center font-medium gap-1.5 rounded-lg transition px-3 py-2 text-xs bg-brand-500 text-white hover:bg-brand-600"
-              >
-                {modalMode === 'create' ? 'Create' : 'Update'}
-              </button>
-              <button
-                type="button"
                 onClick={() => setShowModal(false)}
-                className="flex-1 inline-flex items-center justify-center font-medium gap-1.5 rounded-lg transition px-3 py-2 text-xs bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700 dark:hover:bg-white/3 dark:hover:text-gray-300"
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              >
+                <HiOutlineX className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <form onSubmit={handleSubmit} className="p-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                    placeholder="Enter full name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                    placeholder="Enter email address"
+                    required
+                    disabled={modalMode === 'edit'}
+                  />
+                </div>
+                {modalMode === 'create' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                      placeholder="Enter password"
+                      required
+                    />
+                  </div>
+                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Role
+                  </label>
+                  <select
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
+                    className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                    required
+                  >
+                    <option value="STUDENT">Student</option>
+                    <option value="INSTRUCTOR">Instructor</option>
+                    <option value="ADMIN">Admin</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30"
+                >
+                  {modalMode === 'create' ? 'Create User' : 'Update User'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* View Modal */}
+      {showModal && modalMode === 'view' && selectedUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                User Details
+              </h3>
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              >
+                <HiOutlineX className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6">
+              <div className="flex flex-col items-center mb-6">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-br from-brand-300 to-brand-500 text-2xl font-bold text-white mb-3">
+                  {getInitials(selectedUser.name)}
+                </div>
+                <h4 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  {selectedUser.name || 'N/A'}
+                </h4>
+                <div className="mt-2">
+                  <Badge
+                    variant="light"
+                    color={getRoleBadgeColor(selectedUser.role)}
+                    size="sm"
+                    startIcon={getRoleIcon(selectedUser.role)}
+                  >
+                    {selectedUser.role}
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
+                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
+                    <HiOutlineMail className="h-4 w-4" />
+                    <span className="text-xs font-medium">Email Address</span>
+                  </div>
+                  <p className="text-sm text-gray-900 dark:text-white ml-6">
+                    {selectedUser.email}
+                  </p>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
+                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
+                    <HiOutlineCalendar className="h-4 w-4" />
+                    <span className="text-xs font-medium">Joined Date</span>
+                  </div>
+                  <p className="text-sm text-gray-900 dark:text-white ml-6">
+                    {new Date(selectedUser.createdAt).toLocaleDateString('en-US', {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
+                  </p>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
+                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
+                    <HiOutlineUser className="h-4 w-4" />
+                    <span className="text-xs font-medium">User ID</span>
+                  </div>
+                  <p className="text-sm text-gray-900 dark:text-white ml-6 font-mono">
+                    {selectedUser.id}
+                  </p>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => {
+                    setShowModal(false);
+                    setTimeout(() => openEditModal(selectedUser), 100);
+                  }}
+                  className="flex-1 h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-4 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30"
+                >
+                  <HiOutlinePencil className="h-4 w-4" />
+                  Edit User
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && userToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-md">
+            {/* Header */}
+            <div className="px-6 py-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-800">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-error-100 dark:bg-error-500/15">
+                  <HiOutlineExclamationCircle className="h-6 w-6 text-error-600 dark:text-error-500" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Delete User
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              >
+                <HiOutlineX className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Are you sure you want to delete <span className="font-semibold text-gray-900 dark:text-white">{userToDelete.name}</span>?
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                This action cannot be undone and will permanently remove this user from the system.
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl flex gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="flex-1 h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
               >
                 Cancel
               </button>
+              <button
+                onClick={handleDeleteUser}
+                className="flex-1 h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-4 text-sm bg-error-600 text-white hover:bg-error-700 shadow-lg shadow-error-600/30"
+              >
+                <HiOutlineTrash className="h-4 w-4" />
+                Delete User
+              </button>
             </div>
-          </form>
+          </div>
         </div>
-      </Modal>
+      )}
     </div>
   );
 }
