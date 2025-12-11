@@ -17,8 +17,12 @@ import {
   HiOutlineMail,
   HiOutlineCalendar,
   HiOutlineEye,
+  HiOutlineEyeOff,
   HiOutlineX,
-  HiOutlineExclamationCircle
+  HiOutlineExclamationCircle,
+  HiOutlineLockClosed,
+  HiOutlineChevronDoubleLeft,
+  HiOutlineChevronDoubleRight
 } from "react-icons/hi";
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
@@ -56,8 +60,6 @@ interface PaginationData {
   totalPages: number;
 }
 
-const ITEMS_PER_PAGE = 10;
-
 export default function UsersManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [allUsers, setAllUsers] = useState<User[]>([]); // For stats
@@ -65,10 +67,11 @@ export default function UsersManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('ALL');
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [pagination, setPagination] = useState<PaginationData>({
     total: 0,
     page: 1,
-    limit: ITEMS_PER_PAGE,
+    limit: 10,
     totalPages: 0,
   });
   const [showModal, setShowModal] = useState(false);
@@ -82,6 +85,8 @@ export default function UsersManagementPage() {
     name: '',
     role: 'STUDENT'
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Use ref to prevent duplicate API calls
   const fetchControllerRef = useRef<AbortController | null>(null);
@@ -103,7 +108,7 @@ export default function UsersManagementPage() {
       // Build query parameters
       const params = new URLSearchParams({
         page: currentPage.toString(),
-        limit: ITEMS_PER_PAGE.toString(),
+        limit: itemsPerPage.toString(),
       });
 
       if (roleFilter !== 'ALL') {
@@ -144,7 +149,7 @@ export default function UsersManagementPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, roleFilter, searchTerm]);
+  }, [currentPage, roleFilter, searchTerm, itemsPerPage]);
 
   // Fetch all users for stats (without filters)
   const fetchAllUsers = useCallback(async () => {
@@ -181,10 +186,11 @@ export default function UsersManagementPage() {
   // Reset to page 1 when search or filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, roleFilter]);
+  }, [searchTerm, roleFilter, itemsPerPage]);
 
   const handleCreateUser = async () => {
     try {
+      setIsSubmitting(true);
       const token = localStorage.getItem('token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users`, {
         method: 'POST',
@@ -207,6 +213,8 @@ export default function UsersManagementPage() {
       toast.error('Failed to create user', {
         description: 'Please check your input and try again',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -214,6 +222,7 @@ export default function UsersManagementPage() {
     if (!selectedUser) return;
 
     try {
+      setIsSubmitting(true);
       const token = localStorage.getItem('token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users/${selectedUser.id}`, {
         method: 'PATCH',
@@ -239,6 +248,8 @@ export default function UsersManagementPage() {
       toast.error('Failed to update user', {
         description: 'Please try again',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -246,6 +257,7 @@ export default function UsersManagementPage() {
     if (!userToDelete) return;
 
     try {
+      setIsSubmitting(true);
       const token = localStorage.getItem('token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users/${userToDelete.id}`, {
         method: 'DELETE',
@@ -266,6 +278,8 @@ export default function UsersManagementPage() {
       toast.error('Failed to delete user', {
         description: 'Please try again',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -278,6 +292,7 @@ export default function UsersManagementPage() {
     setModalMode('create');
     setSelectedUser(null);
     resetForm();
+    setShowPassword(false);
     setShowModal(true);
   };
 
@@ -605,22 +620,48 @@ export default function UsersManagementPage() {
         </div>
 
         {/* Pagination */}
-        {pagination.totalPages > 1 && (
+        {pagination.totalPages > 0 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-200 px-3 sm:px-4 py-3 dark:border-white/5">
-            <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-              Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
-              {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
-              {pagination.total} results
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Show</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                className="h-7 rounded-md border border-gray-300 bg-white px-2 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+              <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                of {pagination.total} results
+              </span>
             </div>
+            
             <div className="flex items-center gap-1">
+              {/* First Page */}
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={pagination.page === 1}
+                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3"
+                title="First page"
+              >
+                <HiOutlineChevronDoubleLeft className="h-3 w-3" />
+              </button>
+              
+              {/* Previous Page */}
               <button
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={pagination.page === 1}
                 className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3"
+                title="Previous page"
               >
                 <HiOutlineChevronLeft className="h-3 w-3" />
               </button>
               
+              {/* Page Numbers */}
               {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
                 .filter(page => {
                   if (pagination.totalPages <= 7) return true;
@@ -646,12 +687,24 @@ export default function UsersManagementPage() {
                   </React.Fragment>
                 ))}
               
+              {/* Next Page */}
               <button
                 onClick={() => setCurrentPage(p => Math.min(pagination.totalPages, p + 1))}
                 disabled={pagination.page === pagination.totalPages}
                 className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3"
+                title="Next page"
               >
                 <HiOutlineChevronRight className="h-3 w-3" />
+              </button>
+              
+              {/* Last Page */}
+              <button
+                onClick={() => setCurrentPage(pagination.totalPages)}
+                disabled={pagination.page === pagination.totalPages}
+                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3"
+                title="Last page"
+              >
+                <HiOutlineChevronDoubleRight className="h-3 w-3" />
               </button>
             </div>
           </div>
@@ -660,8 +713,8 @@ export default function UsersManagementPage() {
 
       {/* Create/Edit Modal */}
       {showModal && (modalMode === 'create' || modalMode === 'edit') && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -682,75 +735,130 @@ export default function UsersManagementPage() {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Full Name
                   </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                    placeholder="Enter full name"
-                    required
-                  />
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <HiOutlineUser className="h-4 w-4 text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                      placeholder="Enter full name"
+                      required
+                      disabled={isSubmitting}
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Email Address
                   </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                    placeholder="Enter email address"
-                    required
-                    disabled={modalMode === 'edit'}
-                  />
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <HiOutlineMail className="h-4 w-4 text-gray-400" />
+                    </div>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:disabled:bg-gray-900 dark:disabled:text-gray-500"
+                      placeholder="Enter email address"
+                      required
+                      disabled={modalMode === 'edit' || isSubmitting}
+                    />
+                  </div>
+                  {modalMode === 'edit' && (
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Email cannot be changed</p>
+                  )}
                 </div>
                 {modalMode === 'create' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Password
                     </label>
-                    <input
-                      type="password"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                      placeholder="Enter password"
-                      required
-                    />
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <HiOutlineLockClosed className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-10 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                        placeholder="Enter password"
+                        required
+                        disabled={isSubmitting}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                        tabIndex={-1}
+                      >
+                        {showPassword ? (
+                          <HiOutlineEyeOff className="h-4 w-4" />
+                        ) : (
+                          <HiOutlineEye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                 )}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Role
                   </label>
-                  <select
-                    value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
-                    className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                    required
-                  >
-                    <option value="STUDENT">Student</option>
-                    <option value="INSTRUCTOR">Instructor</option>
-                    <option value="ADMIN">Admin</option>
-                  </select>
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <HiOutlineShieldCheck className="h-4 w-4 text-gray-400" />
+                    </div>
+                    <select
+                      value={formData.role}
+                      onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
+                      className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-8 text-sm text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white appearance-none"
+                      required
+                      disabled={isSubmitting}
+                    >
+                      <option value="STUDENT">Student</option>
+                      <option value="INSTRUCTOR">Instructor</option>
+                      <option value="ADMIN">Admin</option>
+                    </select>
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
+              <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                  className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                  disabled={isSubmitting}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30"
+                  className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isSubmitting}
                 >
-                  {modalMode === 'create' ? 'Create User' : 'Update User'}
+                  {isSubmitting ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </>
+                  ) : (
+                    modalMode === 'create' ? 'Create User' : 'Update User'
+                  )}
                 </button>
               </div>
             </form>
@@ -760,12 +868,12 @@ export default function UsersManagementPage() {
 
       {/* View Modal */}
       {showModal && modalMode === 'view' && selectedUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             {/* Header */}
-            <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
+            <div className="sticky top-0 bg-white dark:bg-gray-900 px-6 py-5 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                User Details
+                User Profile
               </h3>
               <button
                 onClick={() => setShowModal(false)}
@@ -776,67 +884,73 @@ export default function UsersManagementPage() {
             </div>
 
             {/* Body */}
-            <div className="p-6">
-              <div className="flex flex-col items-center mb-6">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-br from-brand-300 to-brand-500 text-2xl font-bold text-white mb-3">
+            <div className="px-6 pb-6">
+              {/* User Avatar and Name */}
+              <div className="flex items-center gap-4 pb-5 border-b border-gray-200 dark:border-gray-800">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-brand-300 to-brand-500 text-xl font-bold text-white shrink-0">
                   {getInitials(selectedUser.name)}
                 </div>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {selectedUser.name || 'N/A'}
-                </h4>
-                <div className="mt-2">
-                  <Badge
-                    variant="light"
-                    color={getRoleBadgeColor(selectedUser.role)}
-                    size="sm"
-                    startIcon={getRoleIcon(selectedUser.role)}
-                  >
-                    {selectedUser.role}
-                  </Badge>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                    {selectedUser.name || 'N/A'}
+                  </h4>
+                  <div className="mt-1">
+                    <Badge
+                      variant="light"
+                      color={getRoleBadgeColor(selectedUser.role)}
+                      size="sm"
+                      startIcon={getRoleIcon(selectedUser.role)}
+                    >
+                      {selectedUser.role}
+                    </Badge>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
-                    <HiOutlineMail className="h-4 w-4" />
-                    <span className="text-xs font-medium">Email Address</span>
+              {/* User Details */}
+              <div className="space-y-4 pt-5">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 shrink-0">
+                    <HiOutlineMail className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                   </div>
-                  <p className="text-sm text-gray-900 dark:text-white ml-6">
-                    {selectedUser.email}
-                  </p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Email</p>
+                    <p className="text-sm text-gray-900 dark:text-white truncate">{selectedUser.email}</p>
+                  </div>
                 </div>
 
-                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
-                    <HiOutlineCalendar className="h-4 w-4" />
-                    <span className="text-xs font-medium">Joined Date</span>
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 shrink-0">
+                    <HiOutlineCalendar className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                   </div>
-                  <p className="text-sm text-gray-900 dark:text-white ml-6">
-                    {new Date(selectedUser.createdAt).toLocaleDateString('en-US', {
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric'
-                    })}
-                  </p>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Joined Date</p>
+                    <p className="text-sm text-gray-900 dark:text-white">
+                      {new Date(selectedUser.createdAt).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
-                    <HiOutlineUser className="h-4 w-4" />
-                    <span className="text-xs font-medium">User ID</span>
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 shrink-0">
+                    <HiOutlineUser className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                   </div>
-                  <p className="text-sm text-gray-900 dark:text-white ml-6 font-mono">
-                    {selectedUser.id}
-                  </p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">User ID</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 font-mono truncate">{selectedUser.id}</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Footer */}
-              <div className="flex gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
+              {/* Footer Actions */}
+              <div className="flex justify-end gap-3 mt-6 pt-5 border-t border-gray-200 dark:border-gray-800">
                 <button
                   onClick={() => setShowModal(false)}
-                  className="flex-1 h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                  className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
                 >
                   Close
                 </button>
@@ -845,10 +959,10 @@ export default function UsersManagementPage() {
                     setShowModal(false);
                     setTimeout(() => openEditModal(selectedUser), 100);
                   }}
-                  className="flex-1 h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-4 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30"
+                  className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30"
                 >
                   <HiOutlinePencil className="h-4 w-4" />
-                  Edit User
+                  Edit
                 </button>
               </div>
             </div>
@@ -858,8 +972,8 @@ export default function UsersManagementPage() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && userToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-md">
+        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-md">
             {/* Header */}
             <div className="px-6 py-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-800">
               <div className="flex items-center gap-3">
@@ -889,19 +1003,33 @@ export default function UsersManagementPage() {
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl flex gap-3">
+            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="flex-1 h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                disabled={isSubmitting}
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteUser}
-                className="flex-1 h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-4 text-sm bg-error-600 text-white hover:bg-error-700 shadow-lg shadow-error-600/30"
+                className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-error-600 text-white hover:bg-error-700 shadow-lg shadow-error-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSubmitting}
               >
-                <HiOutlineTrash className="h-4 w-4" />
-                Delete User
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <HiOutlineTrash className="h-4 w-4" />
+                    Delete User
+                  </>
+                )}
               </button>
             </div>
           </div>
