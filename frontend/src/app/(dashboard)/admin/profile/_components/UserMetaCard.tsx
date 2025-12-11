@@ -142,7 +142,7 @@ export default function UserMetaCard() {
           {/* Header */}
           <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Edit Personal Information
+              Edit Social Links
             </h3>
             <button
               onClick={closeModal}
@@ -157,9 +157,6 @@ export default function UserMetaCard() {
             <div className="space-y-6">
               {/* Social Links Section */}
               <div>
-                <h5 className="mb-4 text-base font-medium text-gray-800 dark:text-white">
-                  Social Links
-                </h5>
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -196,82 +193,6 @@ export default function UserMetaCard() {
                       type="text"
                       defaultValue="https://instagram.com/PimjoHQ"
                     />
-                  </div>
-                </div>
-              </div>
-
-              {/* Personal Information Section */}
-              <div>
-                <h5 className="mb-4 text-base font-medium text-gray-800 dark:text-white">
-                  Personal Information
-                </h5>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Full Name
-                    </label>
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <HiOutlineUser className="h-4 w-4 text-gray-400" />
-                      </div>
-                      <input
-                        type="text"
-                        defaultValue="Musharof Chowdhury"
-                        className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                        placeholder="Enter full name"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Email Address
-                    </label>
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <HiOutlineMail className="h-4 w-4 text-gray-400" />
-                      </div>
-                      <input
-                        type="email"
-                        defaultValue="randomuser@pimjo.com"
-                        className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                        placeholder="Enter email address"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Phone
-                    </label>
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <HiOutlinePhone className="h-4 w-4 text-gray-400" />
-                      </div>
-                      <input
-                        type="text"
-                        defaultValue="+09 363 398 46"
-                        className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                        placeholder="Enter phone number"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Bio
-                    </label>
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <HiOutlineBriefcase className="h-4 w-4 text-gray-400" />
-                      </div>
-                      <input
-                        type="text"
-                        defaultValue="Team Manager"
-                        className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                        placeholder="Enter bio"
-                      />
-                    </div>
                   </div>
                 </div>
               </div>

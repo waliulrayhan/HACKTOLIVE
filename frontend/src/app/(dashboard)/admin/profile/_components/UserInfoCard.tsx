@@ -102,56 +102,9 @@ export default function UserInfoCard() {
           {/* Body */}
           <form className="p-6">
             <div className="space-y-6">
-              {/* Social Links Section */}
-              <div>
-                <h5 className="mb-4 text-base font-medium text-gray-800 dark:text-white">
-                  Social Links
-                </h5>
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Facebook
-                    </label>
-                    <Input
-                      type="text"
-                      defaultValue="https://www.facebook.com/PimjoHQ"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      X.com
-                    </label>
-                    <Input type="text" defaultValue="https://x.com/PimjoHQ" />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      LinkedIn
-                    </label>
-                    <Input
-                      type="text"
-                      defaultValue="https://www.linkedin.com/company/pimjo"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Instagram
-                    </label>
-                    <Input
-                      type="text"
-                      defaultValue="https://instagram.com/PimjoHQ"
-                    />
-                  </div>
-                </div>
-              </div>
 
               {/* Personal Information Section */}
               <div>
-                <h5 className="mb-4 text-base font-medium text-gray-800 dark:text-white">
-                  Personal Information
-                </h5>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
