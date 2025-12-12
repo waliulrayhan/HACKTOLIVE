@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 interface BreadcrumbProps {
@@ -6,6 +6,8 @@ interface BreadcrumbProps {
 }
 
 const PageBreadcrumb: React.FC<BreadcrumbProps> = ({ pageTitle }) => {
+  const router = useRouter();
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
       <h2
@@ -17,11 +19,11 @@ const PageBreadcrumb: React.FC<BreadcrumbProps> = ({ pageTitle }) => {
       <nav>
         <ol className="flex items-center gap-1.5">
           <li>
-            <Link
-              className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400"
-              href="/"
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors cursor-pointer"
             >
-              Home
+              Back
               <svg
                 className="stroke-current"
                 width="17"
@@ -38,7 +40,7 @@ const PageBreadcrumb: React.FC<BreadcrumbProps> = ({ pageTitle }) => {
                   strokeLinejoin="round"
                 />
               </svg>
-            </Link>
+            </button>
           </li>
           <li className="text-sm text-gray-800 dark:text-white/90">
             {pageTitle}

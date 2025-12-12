@@ -894,34 +894,17 @@ export default function EditCoursePage() {
               {modules.map((module, moduleIndex) => (
                 <div
                   key={module.id}
-                  className="rounded-md border border-gray-200 dark:border-white/5"
+                  className="rounded-lg border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 overflow-hidden transition-all"
                 >
-                  <div className="bg-gray-50 p-4 dark:bg-gray-800/50">
+                  <div className="bg-gray-50 p-3 sm:p-4 dark:bg-gray-800/50">
                     <div className="flex items-start gap-3">
-                      <div className="flex flex-col gap-1">
-                        <button
-                          onClick={() => moveModule(module.id, 'up')}
-                          disabled={moduleIndex === 0}
-                          className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
-                        >
-                          <HiOutlineChevronUp className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => moveModule(module.id, 'down')}
-                          disabled={moduleIndex === modules.length - 1}
-                          className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
-                        >
-                          <HiOutlineChevronDown className="h-4 w-4" />
-                        </button>
-                      </div>
-                      
-                      <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-xs sm:text-sm font-bold text-white shadow-lg">
+                      <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-xs sm:text-sm font-bold text-white shadow-lg shrink-0">
                         {moduleIndex + 1}
                       </div>
                       
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         {editingModuleId === module.id ? (
-                          <div className="space-y-2">
+                          <div className="space-y-3">
                             <input
                               type="text"
                               value={module.title}
@@ -983,29 +966,31 @@ export default function EditCoursePage() {
                             </div>
                           </div>
                         ) : (
-                          <div>
-                            <h4 className="text-base font-semibold text-gray-900 dark:text-white">
-                              {module.title}
-                            </h4>
-                            {module.description && (
-                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                {module.description}
-                              </p>
-                            )}
-                            <div className="flex items-center gap-2 mt-2 flex-wrap">
+                          <div className="space-y-3">
+                            <div>
+                              <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white break-words">
+                                {module.title}
+                              </h4>
+                              {module.description && (
+                                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1 break-words">
+                                  {module.description}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 flex-wrap">
                               <button
                                 onClick={() => setEditingModuleId(module.id)}
                                 className="inline-flex items-center gap-1.5 h-8 rounded-lg border border-gray-300 bg-white px-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                               >
                                 <HiOutlinePencil className="h-3.5 w-3.5" />
-                                Edit
+                                <span className="hidden sm:inline">Edit</span>
                               </button>
                               <button
                                 onClick={() => addLesson(module.id)}
                                 className="inline-flex items-center gap-1.5 h-8 rounded-lg border border-gray-300 bg-white px-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                               >
                                 <HiOutlinePlus className="h-3.5 w-3.5" />
-                                Add Lesson
+                                <span className="hidden sm:inline">Add Lesson</span>
                               </button>
                               <button
                                 onClick={() => setExpandedModuleId(
@@ -1016,16 +1001,16 @@ export default function EditCoursePage() {
                                 {expandedModuleId === module.id ? (
                                   <>
                                     <HiOutlineChevronUp className="h-3.5 w-3.5" />
-                                    Collapse
+                                    <span className="hidden sm:inline">Collapse</span>
                                   </>
                                 ) : (
                                   <>
                                     <HiOutlineChevronDown className="h-3.5 w-3.5" />
-                                    Expand
+                                    <span className="hidden sm:inline">Expand</span>
                                   </>
                                 )}
                                 <span className="text-gray-500 dark:text-gray-400">
-                                  ({module.lessons?.length || 0} {module.lessons?.length === 1 ? 'lesson' : 'lessons'})
+                                  ({module.lessons?.length || 0})
                                 </span>
                               </button>
                             </div>
@@ -1044,140 +1029,158 @@ export default function EditCoursePage() {
                   </div>
 
                   {expandedModuleId === module.id && module.lessons && module.lessons.length > 0 && (
-                    <div className="p-4 space-y-2">
+                    <div className="p-3 sm:p-4 space-y-2 bg-gray-50/50 dark:bg-gray-900/30">
                       {module.lessons.map((lesson, lessonIndex) => (
                         <div
                           key={lesson.id}
-                          className="rounded-md border border-gray-200 bg-white p-3 dark:border-white/5 dark:bg-gray-800/30"
+                          className="rounded-lg border border-gray-200 bg-white p-3 dark:border-white/5 dark:bg-gray-800/50"
                         >
                           {editingLessonId === lesson.id ? (
-                            <div className="space-y-2">
-                              <input
-                                type="text"
-                                value={lesson.title}
-                                onChange={(e) => {
-                                  setModules(modules.map(m => {
-                                    if (m.id === module.id) {
-                                      return {
-                                        ...m,
-                                        lessons: m.lessons.map(l =>
-                                          l.id === lesson.id ? { ...l, title: e.target.value } : l
-                                        )
-                                      };
-                                    }
-                                    return m;
-                                  }));
-                                }}
-                                className="w-full h-9 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                                placeholder="Lesson title"
-                              />
-                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                <select
-                                  value={lesson.type}
-                                  onChange={(e) => {
-                                    setModules(modules.map(m => {
-                                      if (m.id === module.id) {
-                                        return {
-                                          ...m,
-                                          lessons: m.lessons.map(l =>
-                                            l.id === lesson.id ? { ...l, type: e.target.value } : l
-                                          )
-                                        };
-                                      }
-                                      return m;
-                                    }));
-                                  }}
-                                  className="h-9 rounded-lg border border-gray-300 px-2 py-1.5 text-xs transition-colors focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none"
-                                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '14px 14px' }}
-                                >
-                                  <option value="VIDEO">Video</option>
-                                  <option value="ARTICLE">Article</option>
-                                  <option value="QUIZ">Quiz</option>
-                                  <option value="ASSIGNMENT">Assignment</option>
-                                </select>
-                                <input
-                                  type="number"
-                                  value={lesson.duration}
-                                  onChange={(e) => {
-                                    setModules(modules.map(m => {
-                                      if (m.id === module.id) {
-                                        return {
-                                          ...m,
-                                          lessons: m.lessons.map(l =>
-                                            l.id === lesson.id
-                                              ? { ...l, duration: parseInt(e.target.value) || 0 }
-                                              : l
-                                          )
-                                        };
-                                      }
-                                      return m;
-                                    }));
-                                  }}
-                                  className="h-9 rounded-lg border border-gray-300 px-2 py-1.5 text-xs transition-colors focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                                  placeholder="Duration (min)"
-                                  min="0"
-                                />
+                            <div className="flex items-start gap-2">
+                              <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-2 shrink-0">
+                                {lesson.type === 'VIDEO' && <HiOutlineVideoCamera className="h-3.5 w-3.5" />}
+                                {lesson.type === 'ARTICLE' && <HiOutlineDocumentText className="h-3.5 w-3.5" />}
+                                {lesson.type === 'QUIZ' && <HiOutlineClipboardList className="h-3.5 w-3.5" />}
+                                {lesson.type === 'ASSIGNMENT' && <HiOutlineClipboardList className="h-3.5 w-3.5" />}
+                                <span className="font-medium">
+                                  {moduleIndex + 1}.{lessonIndex + 1}
+                                </span>
                               </div>
-                              {lesson.type === 'VIDEO' && (
+                              <div className="flex-1 space-y-2">
                                 <input
-                                  type="url"
-                                  value={lesson.videoUrl || ''}
+                                  type="text"
+                                  value={lesson.title}
                                   onChange={(e) => {
                                     setModules(modules.map(m => {
                                       if (m.id === module.id) {
                                         return {
                                           ...m,
                                           lessons: m.lessons.map(l =>
-                                            l.id === lesson.id ? { ...l, videoUrl: e.target.value } : l
+                                            l.id === lesson.id ? { ...l, title: e.target.value } : l
                                           )
                                         };
                                       }
                                       return m;
                                     }));
                                   }}
-                                  className="w-full h-9 rounded-lg border border-gray-300 px-3 py-1.5 text-xs transition-colors focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                                  placeholder="Video URL (e.g., YouTube, Vimeo)"
+                                  className="w-full h-9 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                  placeholder="Lesson title"
                                 />
-                              )}
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => {
-                                    updateLesson(module.id, lesson.id, {
-                                      title: lesson.title,
-                                      type: lesson.type,
-                                      duration: lesson.duration,
-                                      videoUrl: lesson.videoUrl,
-                                    });
-                                    setEditingLessonId(null);
-                                  }}
-                                  disabled={savingLesson === lesson.id}
-                                  className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-3 text-xs bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  {savingLesson === lesson.id ? (
-                                    <>
-                                      <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                      </svg>
-                                      Saving...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <HiOutlineCheckCircle className="h-3.5 w-3.5" />
-                                      Save
-                                    </>
-                                  )}
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setEditingLessonId(null);
-                                    fetchCourse();
-                                  }}
-                                  className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-3 text-xs bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
-                                >
-                                  Cancel
-                                </button>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                  <select
+                                    value={lesson.type}
+                                    onChange={(e) => {
+                                      setModules(modules.map(m => {
+                                        if (m.id === module.id) {
+                                          return {
+                                            ...m,
+                                            lessons: m.lessons.map(l =>
+                                              l.id === lesson.id ? { ...l, type: e.target.value } : l
+                                            )
+                                          };
+                                        }
+                                        return m;
+                                      }));
+                                    }}
+                                    className="h-9 rounded-lg border border-gray-300 px-2 py-1.5 text-xs transition-colors focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none bg-no-repeat bg-[right_0.5rem_center] bg-[length:14px_14px]"
+                                    style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
+                                  >
+                                    <option value="VIDEO">Video</option>
+                                    <option value="ARTICLE">Article</option>
+                                    <option value="QUIZ">Quiz</option>
+                                    <option value="ASSIGNMENT">Assignment</option>
+                                  </select>
+                                  <input
+                                    type="number"
+                                    value={lesson.duration}
+                                    onChange={(e) => {
+                                      setModules(modules.map(m => {
+                                        if (m.id === module.id) {
+                                          return {
+                                            ...m,
+                                            lessons: m.lessons.map(l =>
+                                              l.id === lesson.id
+                                                ? { ...l, duration: parseInt(e.target.value) || 0 }
+                                                : l
+                                            )
+                                          };
+                                        }
+                                        return m;
+                                      }));
+                                    }}
+                                    className="h-9 rounded-lg border border-gray-300 px-2 py-1.5 text-xs transition-colors focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                    placeholder="Duration (min)"
+                                    min="0"
+                                  />
+                                </div>
+                                {lesson.type === 'VIDEO' && (
+                                  <input
+                                    type="url"
+                                    value={lesson.videoUrl || ''}
+                                    onChange={(e) => {
+                                      setModules(modules.map(m => {
+                                        if (m.id === module.id) {
+                                          return {
+                                            ...m,
+                                            lessons: m.lessons.map(l =>
+                                              l.id === lesson.id ? { ...l, videoUrl: e.target.value } : l
+                                            )
+                                          };
+                                        }
+                                        return m;
+                                      }));
+                                    }}
+                                    className="w-full h-9 rounded-lg border border-gray-300 px-3 py-1.5 text-xs transition-colors focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                    placeholder="Video URL (e.g., YouTube, Vimeo)"
+                                  />
+                                )}
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => {
+                                      updateLesson(module.id, lesson.id, {
+                                        title: lesson.title,
+                                        type: lesson.type,
+                                        duration: lesson.duration,
+                                        videoUrl: lesson.videoUrl,
+                                      });
+                                      setEditingLessonId(null);
+                                    }}
+                                    disabled={savingLesson === lesson.id}
+                                    className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-3 text-xs bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {savingLesson === lesson.id ? (
+                                      <>
+                                        <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Saving...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <HiOutlineCheckCircle className="h-3.5 w-3.5" />
+                                        Save
+                                      </>
+                                    )}
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setEditingLessonId(null);
+                                      fetchCourse();
+                                    }}
+                                    className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-3 text-xs bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
                               </div>
+                              <button
+                                onClick={() => openDeleteLessonModal(module.id, lesson.id, lesson.title)}
+                                className="flex h-7 w-7 items-center justify-center rounded-lg text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20 shrink-0"
+                                title="Delete lesson"
+                              >
+                                <HiOutlineTrash className="h-3.5 w-3.5" />
+                              </button>
                             </div>
                           ) : (
                             <div className="flex items-start gap-2">
@@ -1191,8 +1194,8 @@ export default function EditCoursePage() {
                                 </span>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                  {lesson.title}
+                                <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white break-words">
+                                  {lesson.title || 'Untitled Lesson'}
                                 </p>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
                                   {lesson.type} • {lesson.duration} min
