@@ -68,7 +68,10 @@ export const Header = (props: HeaderProps) => {
               }
             }}
           />
-          <Navigation />
+          <Flex position="absolute" left="50%" transform="translateX(-50%)">
+            <Navigation showOnlyLinks />
+          </Flex>
+          <Navigation showOnlyActions />
         </Flex>
       </Container>
     </Box>

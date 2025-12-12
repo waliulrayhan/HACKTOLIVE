@@ -13,11 +13,25 @@ import { NavLink } from '../nav-link'
 import siteConfig from '@/lib/config/data/config'
 
 import ThemeToggle from './theme-toggle'
+import MarketingUserDropdown from './MarketingUserDropdown'
+import { authService } from '@/lib/auth-service'
 
-const Navigation: React.FC = () => {
+interface NavigationProps {
+  showOnlyLinks?: boolean
+  showOnlyActions?: boolean
+}
+
+const Navigation: React.FC<NavigationProps> = ({ showOnlyLinks = false, showOnlyActions = false }) => {
   const mobileNav = useDisclosure()
   const router = useRouter()
   const path = usePathname()
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false)
+  
+  // Check if user is logged in
+  React.useEffect(() => {
+    const user = authService.getUser()
+    setIsLoggedIn(!!user)
+  }, [])
   
   // Only use scrollspy if there are links with ids
   const scrollSpySelectors = siteConfig.header.links
@@ -37,10 +51,97 @@ const Navigation: React.FC = () => {
     mobileNavBtnRef.current?.focus()
   }, [mobileNav.isOpen])
 
+  // If showing only center links
+  if (showOnlyLinks) {
+    return (
+      <HStack spacing="2" alignItems="center">
+        {siteConfig.header.links.map((link: any, i) => {
+          const { href, id, isAction, label, ...props } = link
+          
+          // Skip action buttons (Login, Get Started) - they go to the right
+          if (isAction || label === 'Login' || label === 'Get Started') {
+            return null
+          }
+          
+          return (
+            <NavLink
+              display={['none', null, 'block']}
+              href={href || `/#${id}`}
+              key={i}
+              isActive={
+                !!(
+                  (id && activeId === id) ||
+                  (href && !!path?.match(new RegExp(href)))
+                )
+              }
+              {...props}
+            >
+              {label}
+            </NavLink>
+          )
+        })}
+      </HStack>
+    )
+  }
+
+  // If showing only right-side actions
+  if (showOnlyActions) {
+    return (
+      <HStack spacing="2" flexShrink={0} alignItems="center">
+        {!isLoggedIn && siteConfig.header.links.map((link: any, i) => {
+          const { href, id, isAction, label, ...props } = link
+          
+          // Only show Login and Get Started when not logged in
+          if (label !== 'Login' && label !== 'Get Started') {
+            return null
+          }
+          
+          return (
+            <NavLink
+              display={['none', null, 'block']}
+              href={href || `/#${id}`}
+              key={i}
+              isActive={
+                !!(
+                  (id && activeId === id) ||
+                  (href && !!path?.match(new RegExp(href)))
+                )
+              }
+              ml={isAction ? '19' : '0'}
+              {...props}
+            >
+              {label}
+            </NavLink>
+          )
+        })}
+
+        <ThemeToggle />
+        
+        {isLoggedIn && <MarketingUserDropdown />}
+
+        <MobileNavButton
+          ref={mobileNavBtnRef}
+          aria-label="Open Menu"
+          onClick={mobileNav.onOpen}
+        />
+
+        <MobileNavContent isOpen={mobileNav.isOpen} onClose={mobileNav.onClose} />
+      </HStack>
+    )
+  }
+
+  // Default: show everything (for mobile/fallback)
+
   return (
-    <HStack spacing="2" flexShrink={0}>
+    <HStack spacing="2" flexShrink={0} alignItems="center">
       {siteConfig.header.links.map((link: any, i) => {
-        const { href, id, isAction, ...props } = link
+        const { href, id, isAction, label, ...props } = link
+        
+        // Hide Login and Get Started buttons when user is logged in
+        if (isLoggedIn && (label === 'Login' || label === 'Get Started')) {
+          return null
+        }
+        
         return (
           <NavLink
             display={['none', null, 'block']}
@@ -55,12 +156,14 @@ const Navigation: React.FC = () => {
             ml={isAction ? '19' : '0'}
             {...props}
           >
-            {props.label}
+            {label}
           </NavLink>
         )
       })}
 
       <ThemeToggle />
+      
+      {isLoggedIn && <MarketingUserDropdown />}
 
       <MobileNavButton
         ref={mobileNavBtnRef}
