@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
-import Button from "@/components/ui/button/Button";
 import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
 import {
   HiOutlineInformationCircle,
@@ -17,6 +16,15 @@ import {
   HiOutlineChevronDown,
   HiOutlineSave,
   HiOutlineEye,
+  HiOutlineAcademicCap,
+  HiOutlineTag,
+  HiOutlineClock,
+  HiOutlineCurrencyDollar,
+  HiOutlineVideoCamera,
+  HiOutlineDocumentText,
+  HiOutlineClipboardList,
+  HiOutlineCheckCircle,
+  HiOutlineExclamationCircle,
 } from "react-icons/hi";
 import Badge from "@/components/ui/badge/Badge";
 
@@ -509,128 +517,154 @@ export default function EditCoursePage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <PageBreadcrumb pageTitle={`Edit: ${course.title}`} />
         <div className="flex items-center gap-2">
-          <Badge color={course.status === 'PUBLISHED' ? 'success' : 'warning'}>
+          <Badge color={course.status === 'PUBLISHED' ? 'success' : 'warning'} size="sm">
             {course.status}
           </Badge>
           {course.status !== 'PUBLISHED' && (
-            <Button onClick={handlePublish} disabled={saving}>
-              <HiOutlineEye className="h-4 w-4 mr-1" />
-              Publish Course
-            </Button>
+            <button
+              onClick={handlePublish}
+              disabled={saving}
+              className="inline-flex items-center justify-center gap-1.5 h-9 rounded-lg border border-brand-500 bg-brand-500 px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-brand-600 hover:border-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <HiOutlineEye className="h-4 w-4" />
+              <span className="hidden sm:inline">Publish Course</span>
+              <span className="sm:hidden">Publish</span>
+            </button>
           )}
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 dark:border-white/5">
-        <div className="flex gap-4">
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === tab.id
-                  ? 'border-brand-500 text-brand-600 dark:text-brand-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-              }`}
-            >
-              <tab.icon className="h-4 w-4" />
-              {tab.label}
-            </button>
-          ))}
+      <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 overflow-hidden">
+        <div className="border-b border-gray-200 dark:border-white/5">
+          <div className="flex overflow-x-auto">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-brand-50/50 dark:bg-brand-900/10'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-white/5'
+                }`}
+              >
+                <tab.icon className="h-4 w-4" />
+                <span className="hidden sm:inline">{tab.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Tab Content */}
-      <div className="rounded-md border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
-        {/* Details Tab */}
-        {activeTab === 'details' && (
-          <div className="space-y-4">
+        {/* Tab Content */}
+        <div className="p-4 sm:p-6">
+          {/* Details Tab */}
+          {activeTab === 'details' && (
+            <div className="space-y-5">
+              <div className="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-white/5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/15">
+                  <HiOutlineAcademicCap className="h-5 w-5 text-brand-600 dark:text-brand-400" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                    Course Details
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Update your course information
+                  </p>
+                </div>
+              </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Course Title *
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Course Title <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+                  className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
                     errors.title
-                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                      : 'border-gray-300 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      ? 'border-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
                   }`}
                 />
-                {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
+                {errors.title && <p className="mt-1.5 text-xs text-red-500">{errors.title}</p>}
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Slug *
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Slug <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  name="slug"
-                  value={formData.slug}
-                  onChange={handleInputChange}
-                  className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
-                    errors.slug
-                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                      : 'border-gray-300 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
-                  }`}
-                />
-                {errors.slug && <p className="mt-1 text-xs text-red-500">{errors.slug}</p>}
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <HiOutlineTag className="h-4 w-4 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    name="slug"
+                    value={formData.slug}
+                    onChange={handleInputChange}
+                    className={`w-full h-10 rounded-lg border pl-10 pr-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                      errors.slug
+                        ? 'border-red-500 focus:border-red-500'
+                        : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                    }`}
+                  />
+                </div>
+                {errors.slug && <p className="mt-1.5 text-xs text-red-500">{errors.slug}</p>}
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Short Description *
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Short Description <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   name="shortDescription"
                   value={formData.shortDescription}
                   onChange={handleInputChange}
-                  rows={2}
-                  className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+                  rows={3}
+                  className={`w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none ${
                     errors.shortDescription
-                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                      : 'border-gray-300 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      ? 'border-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
                   }`}
                 />
-                {errors.shortDescription && <p className="mt-1 text-xs text-red-500">{errors.shortDescription}</p>}
+                {errors.shortDescription && <p className="mt-1.5 text-xs text-red-500">{errors.shortDescription}</p>}
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Full Description *
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Full Description <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
                   rows={6}
-                  className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
+                  className={`w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none ${
                     errors.description
-                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                      : 'border-gray-300 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      ? 'border-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
                   }`}
                 />
-                {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description}</p>}
+                {errors.description && <p className="mt-1.5 text-xs text-red-500">{errors.description}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Category
                 </label>
                 <select
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none"
+                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '16px 16px' }}
                 >
                   <option value="WEB_SECURITY">Web Security</option>
                   <option value="NETWORK_SECURITY">Network Security</option>
@@ -644,14 +678,15 @@ export default function EditCoursePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Level
                 </label>
                 <select
                   name="level"
                   value={formData.level}
                   onChange={handleInputChange}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none"
+                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '16px 16px' }}
                 >
                   <option value="FUNDAMENTAL">Fundamental</option>
                   <option value="INTERMEDIATE">Intermediate</option>
@@ -660,14 +695,15 @@ export default function EditCoursePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Tier
                 </label>
                 <select
                   name="tier"
                   value={formData.tier}
                   onChange={handleInputChange}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none"
+                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '16px 16px' }}
                 >
                   <option value="FREE">Free</option>
                   <option value="PREMIUM">Premium</option>
@@ -675,23 +711,28 @@ export default function EditCoursePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Price (USD)
                 </label>
-                <input
-                  type="number"
-                  name="price"
-                  value={formData.price}
-                  onChange={handleInputChange}
-                  min="0"
-                  step="0.01"
-                  disabled={formData.tier === 'FREE'}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white disabled:opacity-50"
-                />
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <HiOutlineCurrencyDollar className="h-4 w-4 text-gray-400" />
+                  </div>
+                  <input
+                    type="number"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleInputChange}
+                    min="0"
+                    step="0.01"
+                    disabled={formData.tier === 'FREE'}
+                    className="w-full h-10 rounded-lg border border-gray-300 pl-10 pr-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50 dark:disabled:bg-gray-900"
+                  />
+                </div>
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Learning Outcomes (one per line)
                 </label>
                 <textarea
@@ -699,12 +740,12 @@ export default function EditCoursePage() {
                   value={formData.learningOutcomes}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white resize-none"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Requirements (one per line)
                 </label>
                 <textarea
@@ -712,12 +753,12 @@ export default function EditCoursePage() {
                   value={formData.requirements}
                   onChange={handleInputChange}
                   rows={3}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white resize-none"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Tags (comma separated)
                 </label>
                 <input
@@ -725,31 +766,60 @@ export default function EditCoursePage() {
                   name="tags"
                   value={formData.tags}
                   onChange={handleInputChange}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end">
-              <Button onClick={handleSaveDetails} disabled={saving}>
-                <HiOutlineSave className="h-4 w-4 mr-1" />
-                {saving ? 'Saving...' : 'Save Changes'}
-              </Button>
+            <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-white/5">
+              <button
+                onClick={handleSaveDetails}
+                disabled={saving}
+                className="inline-flex items-center justify-center gap-2 h-10 font-medium rounded-lg transition px-5 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {saving ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <HiOutlineSave className="h-4 w-4" />
+                    Save Changes
+                  </>
+                )}
+              </button>
             </div>
           </div>
         )}
 
         {/* Curriculum Tab */}
         {activeTab === 'curriculum' && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Course Modules & Lessons
-              </h3>
-              <Button onClick={addModule} size="sm">
-                <HiOutlinePlus className="h-4 w-4 mr-1" />
-                Add Module
-              </Button>
+          <div className="space-y-5">
+            <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-white/5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-500/15">
+                  <HiOutlineBookOpen className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                    Course Modules & Lessons
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Build and manage your course curriculum
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={addModule}
+                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-brand-500 bg-brand-500 px-3 py-2 text-xs font-medium text-white transition-all hover:bg-brand-600 hover:border-brand-600 shadow-lg shadow-brand-500/30"
+              >
+                <HiOutlinePlus className="h-4 w-4" />
+                <span className="hidden sm:inline">Add Module</span>
+              </button>
             </div>
 
             <div className="space-y-3">
@@ -777,9 +847,9 @@ export default function EditCoursePage() {
                         </button>
                       </div>
                       
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+                      <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-xs sm:text-sm font-bold text-white shadow-lg">
                         {moduleIndex + 1}
-                      </span>
+                      </div>
                       
                       <div className="flex-1">
                         {editingModuleId === module.id ? (
@@ -792,7 +862,7 @@ export default function EditCoursePage() {
                                   m.id === module.id ? { ...m, title: e.target.value } : m
                                 ));
                               }}
-                              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm font-medium focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                              className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                               placeholder="Module title"
                             />
                             <textarea
@@ -803,12 +873,11 @@ export default function EditCoursePage() {
                                 ));
                               }}
                               rows={2}
-                              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white resize-none"
                               placeholder="Module description"
                             />
                             <div className="flex gap-2">
-                              <Button
-                                size="sm"
+                              <button
                                 onClick={() => {
                                   updateModule(module.id, {
                                     title: module.title,
@@ -816,19 +885,20 @@ export default function EditCoursePage() {
                                   });
                                   setEditingModuleId(null);
                                 }}
+                                className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-3 text-xs bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30"
                               >
+                                <HiOutlineCheckCircle className="h-3.5 w-3.5" />
                                 Save
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
+                              </button>
+                              <button
                                 onClick={() => {
                                   setEditingModuleId(null);
                                   fetchCourse();
                                 }}
+                                className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-3 text-xs bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
                               >
                                 Cancel
-                              </Button>
+                              </button>
                             </div>
                           </div>
                         ) : (
@@ -841,31 +911,41 @@ export default function EditCoursePage() {
                                 {module.description}
                               </p>
                             )}
-                            <div className="flex items-center gap-2 mt-2">
-                              <Button
+                            <div className="flex items-center gap-2 mt-2 flex-wrap">
+                              <button
                                 onClick={() => setEditingModuleId(module.id)}
-                                variant="outline"
-                                size="sm"
+                                className="inline-flex items-center gap-1.5 h-8 rounded-lg border border-gray-300 bg-white px-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                               >
-                                <HiOutlinePencil className="h-3 w-3 mr-1" />
+                                <HiOutlinePencil className="h-3.5 w-3.5" />
                                 Edit
-                              </Button>
-                              <Button
+                              </button>
+                              <button
                                 onClick={() => addLesson(module.id)}
-                                variant="outline"
-                                size="sm"
+                                className="inline-flex items-center gap-1.5 h-8 rounded-lg border border-gray-300 bg-white px-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                               >
-                                <HiOutlinePlus className="h-3 w-3 mr-1" />
+                                <HiOutlinePlus className="h-3.5 w-3.5" />
                                 Add Lesson
-                              </Button>
+                              </button>
                               <button
                                 onClick={() => setExpandedModuleId(
                                   expandedModuleId === module.id ? null : module.id
                                 )}
-                                className="text-xs text-brand-600 hover:text-brand-700 dark:text-brand-400"
+                                className="inline-flex items-center gap-1.5 text-xs text-brand-600 hover:text-brand-700 dark:text-brand-400 font-medium"
                               >
-                                {expandedModuleId === module.id ? 'Collapse' : 'Expand'} (
-                                {module.lessons?.length || 0} lessons)
+                                {expandedModuleId === module.id ? (
+                                  <>
+                                    <HiOutlineChevronUp className="h-3.5 w-3.5" />
+                                    Collapse
+                                  </>
+                                ) : (
+                                  <>
+                                    <HiOutlineChevronDown className="h-3.5 w-3.5" />
+                                    Expand
+                                  </>
+                                )}
+                                <span className="text-gray-500 dark:text-gray-400">
+                                  ({module.lessons?.length || 0} {module.lessons?.length === 1 ? 'lesson' : 'lessons'})
+                                </span>
                               </button>
                             </div>
                           </div>
@@ -874,9 +954,10 @@ export default function EditCoursePage() {
                       
                       <button
                         onClick={() => deleteModule(module.id)}
-                        className="text-red-600 hover:text-red-700 p-1"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
+                        title="Delete module"
                       >
-                        <HiOutlineTrash className="h-5 w-5" />
+                        <HiOutlineTrash className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
@@ -906,10 +987,10 @@ export default function EditCoursePage() {
                                     return m;
                                   }));
                                 }}
-                                className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                className="w-full h-9 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                                 placeholder="Lesson title"
                               />
-                              <div className="grid grid-cols-3 gap-2">
+                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                 <select
                                   value={lesson.type}
                                   onChange={(e) => {
@@ -925,7 +1006,8 @@ export default function EditCoursePage() {
                                       return m;
                                     }));
                                   }}
-                                  className="rounded-md border border-gray-300 px-2 py-1.5 text-xs focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                  className="h-9 rounded-lg border border-gray-300 px-2 py-1.5 text-xs transition-colors focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none"
+                                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '14px 14px' }}
                                 >
                                   <option value="VIDEO">Video</option>
                                   <option value="ARTICLE">Article</option>
@@ -950,7 +1032,7 @@ export default function EditCoursePage() {
                                       return m;
                                     }));
                                   }}
-                                  className="rounded-md border border-gray-300 px-2 py-1.5 text-xs focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                  className="h-9 rounded-lg border border-gray-300 px-2 py-1.5 text-xs transition-colors focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                                   placeholder="Duration (min)"
                                   min="0"
                                 />
@@ -972,13 +1054,12 @@ export default function EditCoursePage() {
                                       return m;
                                     }));
                                   }}
-                                  className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                                  placeholder="Video URL"
+                                  className="w-full h-9 rounded-lg border border-gray-300 px-3 py-1.5 text-xs transition-colors focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                  placeholder="Video URL (e.g., YouTube, Vimeo)"
                                 />
                               )}
                               <div className="flex gap-2">
-                                <Button
-                                  size="sm"
+                                <button
                                   onClick={() => {
                                     updateLesson(module.id, lesson.id, {
                                       title: lesson.title,
@@ -988,48 +1069,55 @@ export default function EditCoursePage() {
                                     });
                                     setEditingLessonId(null);
                                   }}
+                                  className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-3 text-xs bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30"
                                 >
+                                  <HiOutlineCheckCircle className="h-3.5 w-3.5" />
                                   Save
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
+                                </button>
+                                <button
                                   onClick={() => {
                                     setEditingLessonId(null);
                                     fetchCourse();
                                   }}
+                                  className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-3 text-xs bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
                                 >
                                   Cancel
-                                </Button>
+                                </button>
                               </div>
                             </div>
                           ) : (
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                            <div className="flex items-start gap-2">
+                              <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-0.5 shrink-0">
+                                {lesson.type === 'VIDEO' && <HiOutlineVideoCamera className="h-3.5 w-3.5" />}
+                                {lesson.type === 'ARTICLE' && <HiOutlineDocumentText className="h-3.5 w-3.5" />}
+                                {lesson.type === 'QUIZ' && <HiOutlineClipboardList className="h-3.5 w-3.5" />}
+                                {lesson.type === 'ASSIGNMENT' && <HiOutlineClipboardList className="h-3.5 w-3.5" />}
+                                <span className="font-medium">
                                   {moduleIndex + 1}.{lessonIndex + 1}
                                 </span>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                                    {lesson.title}
-                                  </p>
-                                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                                    {lesson.type} • {lesson.duration} min
-                                  </p>
-                                </div>
                               </div>
-                              <div className="flex items-center gap-1">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                  {lesson.title}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {lesson.type} • {lesson.duration} min
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-1 shrink-0">
                                 <button
                                   onClick={() => setEditingLessonId(lesson.id)}
-                                  className="p-1 text-blue-600 hover:text-blue-700"
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg text-blue-600 transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                  title="Edit lesson"
                                 >
-                                  <HiOutlinePencil className="h-4 w-4" />
+                                  <HiOutlinePencil className="h-3.5 w-3.5" />
                                 </button>
                                 <button
                                   onClick={() => deleteLesson(module.id, lesson.id)}
-                                  className="p-1 text-red-600 hover:text-red-700"
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
+                                  title="Delete lesson"
                                 >
-                                  <HiOutlineTrash className="h-4 w-4" />
+                                  <HiOutlineTrash className="h-3.5 w-3.5" />
                                 </button>
                               </div>
                             </div>
@@ -1042,10 +1130,13 @@ export default function EditCoursePage() {
               ))}
 
               {modules.length === 0 && (
-                <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-md dark:border-gray-600">
-                  <HiOutlineBookOpen className="mx-auto h-12 w-12 text-gray-400" />
-                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    No modules yet. Click "Add Module" to get started.
+                <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-lg dark:border-gray-600">
+                  <HiOutlineBookOpen className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+                  <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                    No modules yet
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Click "Add Module" to get started building your curriculum
                   </p>
                 </div>
               )}
@@ -1055,40 +1146,56 @@ export default function EditCoursePage() {
 
         {/* Settings Tab */}
         {activeTab === 'settings' && (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Course Settings
-            </h3>
+          <div className="space-y-5">
+            <div className="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-white/5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-500/15">
+                <HiOutlineCog className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                  Course Settings
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Manage course status and advanced options
+                </p>
+              </div>
+            </div>
 
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-md dark:border-white/5">
+              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg dark:border-white/5 bg-gray-50/50 dark:bg-gray-800/30">
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     Course Status
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Current status: <Badge color={course.status === 'PUBLISHED' ? 'success' : 'warning'}>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Current status:</p>
+                    <Badge color={course.status === 'PUBLISHED' ? 'success' : 'warning'} size="sm">
                       {course.status}
                     </Badge>
-                  </p>
+                  </div>
                 </div>
                 {course.status !== 'PUBLISHED' && (
-                  <Button onClick={handlePublish} disabled={saving}>
+                  <button
+                    onClick={handlePublish}
+                    disabled={saving}
+                    className="inline-flex items-center justify-center gap-2 h-9 font-medium rounded-lg transition px-4 text-xs bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <HiOutlineCheckCircle className="h-4 w-4" />
                     Publish Course
-                  </Button>
+                  </button>
                 )}
               </div>
 
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-md dark:border-white/5">
+              <div className="flex items-center justify-between p-4 border border-red-200 rounded-lg dark:border-red-800/30 bg-red-50/50 dark:bg-red-900/10">
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     Delete Course
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Permanently delete this course and all its content
                   </p>
                 </div>
-                <Button
+                <button
                   onClick={async () => {
                     if (confirm('Are you sure? This action cannot be undone.')) {
                       try {
@@ -1107,15 +1214,16 @@ export default function EditCoursePage() {
                       }
                     }
                   }}
-                  className="bg-error-600 hover:bg-error-700"
+                  className="inline-flex items-center justify-center gap-2 h-9 font-medium rounded-lg transition px-4 text-xs bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-500/30"
                 >
                   <HiOutlineTrash className="h-4 w-4" />
-                  Delete
-                </Button>
+                  Delete Course
+                </button>
               </div>
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
