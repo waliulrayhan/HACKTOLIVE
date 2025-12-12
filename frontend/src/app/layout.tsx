@@ -60,7 +60,7 @@ export default function RootLayout({
         />
         <link rel="manifest" href="/static/favicons/manifest.json" />
       </head>
-      <body className={`${outfit.className} dark:bg-gray-900`}>
+      <body className={`${outfit.className} dark:bg-gray-900`} suppressHydrationWarning>
         <GlobalLoading />
         <ThemeProvider>
           <AuthProvider>

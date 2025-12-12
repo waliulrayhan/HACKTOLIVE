@@ -22,6 +22,9 @@ import {
   HiOutlinePlus,
   HiOutlineChevronDoubleLeft,
   HiOutlineChevronDoubleRight,
+  HiOutlineX,
+  HiOutlineClock,
+  HiOutlineBookOpen,
 } from "react-icons/hi";
 import {
   Table,
@@ -30,9 +33,7 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table";
-import Button from "@/components/ui/button/Button";
 import Badge from "@/components/ui/badge/Badge";
-import { Modal } from "@/components/ui/modal";
 
 interface Course {
   id: string;
@@ -79,10 +80,11 @@ export default function InstructorCoursesPage() {
     limit: 10,
     totalPages: 0,
   });
-  const [showModal, setShowModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchControllerRef = useRef<AbortController | null>(null);
 
@@ -156,24 +158,9 @@ export default function InstructorCoursesPage() {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, itemsPerPage]);
 
-  const handleSearch = () => {
-    setSearchTerm(searchInput);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
-  const clearSearch = () => {
-    setSearchInput('');
-    setSearchTerm('');
-  };
-
   const openViewModal = (course: Course) => {
     setSelectedCourse(course);
-    setShowModal(true);
+    setShowViewModal(true);
   };
 
   const openDeleteModal = (courseId: string, courseTitle: string) => {
@@ -181,23 +168,25 @@ export default function InstructorCoursesPage() {
     setShowDeleteModal(true);
   };
 
-  const handleDelete = async () => {
+  const handleDeleteCourse = async () => {
     if (!courseToDelete) return;
 
     try {
+      setIsSubmitting(true);
       const token = localStorage.getItem('token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/instructor/courses/${courseToDelete.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/instructor/courses/${courseToDelete.id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) throw new Error('Failed to delete course');
       
-      toast.success('Course deleted successfully', {
-        description: `${courseToDelete.title} has been removed`,
-      });
+      toast.success('Course deleted successfully!');
       setShowDeleteModal(false);
       setCourseToDelete(null);
       fetchCourses();
@@ -206,6 +195,8 @@ export default function InstructorCoursesPage() {
       toast.error('Failed to delete course', {
         description: 'Please try again',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -216,7 +207,7 @@ export default function InstructorCoursesPage() {
       ARCHIVED: { color: 'error', icon: HiOutlineXCircle },
     };
     const config = variants[status] || variants.DRAFT;
-    return { variant: config.color, Icon: config.icon };
+    return { color: config.color, Icon: config.icon };
   };
 
   const getTierBadge = (tier: string) => {
@@ -241,20 +232,14 @@ export default function InstructorCoursesPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <PageBreadcrumb pageTitle="My Courses" />
-        <Button onClick={() => router.push('/instructor/courses/create')}>
-          <HiOutlinePlus className="h-4 w-4 mr-1" />
-          Create Course
-        </Button>
-      </div>
+      <PageBreadcrumb pageTitle="My Courses" />
       
       {/* Stats Cards */}
       <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
         <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-500/15">
-              <HiOutlineAcademicCap className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-500" />
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/15">
+              <HiOutlineAcademicCap className="h-4 w-4 sm:h-5 sm:w-5 text-brand-500 dark:text-brand-400" />
             </div>
             <div>
               <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Total Courses</p>
@@ -265,8 +250,8 @@ export default function InstructorCoursesPage() {
         
         <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-500/15">
-              <HiOutlineCheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-500" />
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-success-100 dark:bg-success-500/15">
+              <HiOutlineCheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-success-600 dark:text-success-500" />
             </div>
             <div>
               <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Published</p>
@@ -277,8 +262,8 @@ export default function InstructorCoursesPage() {
         
         <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-500/15">
-              <HiOutlineUsers className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600 dark:text-yellow-500" />
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-info-100 dark:bg-info-500/15">
+              <HiOutlineUsers className="h-4 w-4 sm:h-5 sm:w-5 text-info-600 dark:text-info-500" />
             </div>
             <div>
               <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Total Students</p>
@@ -289,8 +274,8 @@ export default function InstructorCoursesPage() {
         
         <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-500/15">
-              <HiOutlineStar className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-500" />
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-warning-100 dark:bg-warning-500/15">
+              <HiOutlineStar className="h-4 w-4 sm:h-5 sm:w-5 text-warning-600 dark:text-warning-500" />
             </div>
             <div>
               <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Avg Rating</p>
@@ -300,352 +285,547 @@ export default function InstructorCoursesPage() {
         </div>
       </div>
 
-      {/* Filters and Search */}
-      <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-1 items-center gap-2">
+      {/* Main Content Card */}
+      <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+        {/* Header */}
+        <div className="flex flex-col gap-3 border-b border-gray-200 p-3 sm:p-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/5">
+          <div>
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Courses</h2>
+            <p className="mt-0.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+              Manage and organize all your courses
+            </p>
+          </div>
+          <button
+            onClick={() => router.push('/instructor/courses/create')}
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-brand-500 bg-brand-500 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-brand-600 hover:border-brand-600"
+          >
+            <HiOutlinePlus className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="hidden sm:inline">Create Course</span>
+            <span className="sm:hidden">Create</span>
+          </button>
+        </div>
+
+        {/* Search and Filter */}
+        <div className="border-b border-gray-200 p-3 sm:p-4 dark:border-white/5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
             <div className="relative flex-1">
-              <HiOutlineSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <HiOutlineSearch className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search courses by title or category..."
+                placeholder="Search courses... (Press Enter to search)"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="w-full rounded-md border border-gray-300 py-2 pl-10 pr-4 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setSearchTerm(searchInput);
+                  }
+                }}
+                className="h-9 sm:h-10 w-full rounded-lg border border-gray-300 bg-white pl-9 pr-10 text-xs text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
               />
+              {searchInput && (
+                <button
+                  onClick={() => {
+                    setSearchInput('');
+                    setSearchTerm('');
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  title="Clear search"
+                >
+                  <HiOutlineX className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
-            <Button
-              onClick={handleSearch}
-              className="shrink-0"
-              size="sm"
-            >
-              Search
-            </Button>
-            {searchTerm && (
-              <Button
-                onClick={clearSearch}
-                variant="outline"
-                size="sm"
-                className="shrink-0"
-              >
-                Clear
-              </Button>
-            )}
-          </div>
-          
-          <div className="flex items-center gap-2">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+              className="h-9 sm:h-10 rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             >
               <option value="ALL">All Status</option>
               <option value="PUBLISHED">Published</option>
               <option value="DRAFT">Draft</option>
               <option value="ARCHIVED">Archived</option>
             </select>
-            
-            <select
-              value={itemsPerPage}
-              onChange={(e) => setItemsPerPage(Number(e.target.value))}
-              className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-            >
-              <option value={5}>5 per page</option>
-              <option value={10}>10 per page</option>
-              <option value={20}>20 per page</option>
-              <option value={50}>50 per page</option>
-            </select>
           </div>
         </div>
-      </div>
 
-      {/* Table */}
-      <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 overflow-hidden">
+        {/* Table */}
         <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <th className="text-left text-xs font-semibold text-gray-700 dark:text-gray-300 px-4 py-3">
-                  Course
-                </th>
-                <th className="text-left text-xs font-semibold text-gray-700 dark:text-gray-300 px-4 py-3">
-                  Category
-                </th>
-                <th className="text-center text-xs font-semibold text-gray-700 dark:text-gray-300 px-4 py-3">
-                  Students
-                </th>
-                <th className="text-center text-xs font-semibold text-gray-700 dark:text-gray-300 px-4 py-3">
-                  Rating
-                </th>
-                <th className="text-center text-xs font-semibold text-gray-700 dark:text-gray-300 px-4 py-3">
-                  Price
-                </th>
-                <th className="text-center text-xs font-semibold text-gray-700 dark:text-gray-300 px-4 py-3">
-                  Status
-                </th>
-                <th className="text-right text-xs font-semibold text-gray-700 dark:text-gray-300 px-4 py-3">
-                  Actions
-                </th>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {courses.map((course) => {
-                const statusBadge = getStatusBadge(course.status);
-                const StatusIcon = statusBadge.Icon;
-                
-                return (
-                  <TableRow key={course.id}>
-                    <TableCell className="px-4 py-3">
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white text-sm line-clamp-1">
-                          {course.title}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
-                          {course.shortDescription}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-4 py-3">
-                      <Badge color="primary" size="sm">
-                        {course.category.replace(/_/g, ' ')}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-center">
-                      <span className="text-sm text-gray-900 dark:text-white">
-                        {course.totalStudents}
-                      </span>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <HiOutlineStar className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                        <span className="text-sm text-gray-900 dark:text-white">
-                          {course.rating.toFixed(1)}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-center">
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">
-                        ${course.price}
-                      </span>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-center">
-                      <Badge variant={statusBadge.variant as any} size="sm">
-                        <StatusIcon className="h-3 w-3 mr-1" />
-                        {course.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => openViewModal(course)}
-                          className="rounded p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10"
-                          title="View Details"
-                        >
-                          <HiOutlineEye className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => window.location.href = `/instructor/courses/${course.id}/edit`}
-                          className="rounded p-1 text-green-600 hover:bg-green-50 dark:hover:bg-green-500/10"
-                          title="Edit"
-                        >
-                          <HiOutlinePencil className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => openDeleteModal(course.id, course.title)}
-                          className="rounded p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10"
-                          title="Delete"
-                        >
-                          <HiOutlineTrash className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-              {courses.length === 0 && (
+          <div className="min-w-[640px]">
+            <Table>
+              <TableHeader className="border-b border-gray-100 dark:border-white/5">
                 <TableRow>
-                  <td colSpan={7} className="py-12 text-center">
-                    <HiOutlineAcademicCap className="mx-auto h-12 w-12 text-gray-400" />
-                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                      No courses found
-                    </p>
-                    {searchTerm && (
-                      <p className="mt-1 text-xs text-gray-400">
-                        Try adjusting your search
-                      </p>
-                    )}
-                  </td>
+                  <th className="px-3 sm:px-4 py-3 text-left">
+                    <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
+                      Course
+                    </span>
+                  </th>
+                  <th className="px-3 sm:px-4 py-3 text-center">
+                    <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
+                      Category
+                    </span>
+                  </th>
+                  <th className="px-3 sm:px-4 py-3 text-center">
+                    <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
+                      Students
+                    </span>
+                  </th>
+                  <th className="px-3 sm:px-4 py-3 text-center">
+                    <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
+                      Rating
+                    </span>
+                  </th>
+                  <th className="px-3 sm:px-4 py-3 text-center">
+                    <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
+                      Status
+                    </span>
+                  </th>
+                  <th className="px-3 sm:px-4 py-3 text-center">
+                    <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
+                      Actions
+                    </span>
+                  </th>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {courses.map((course) => {
+                  const statusBadge = getStatusBadge(course.status);
+                  const StatusIcon = statusBadge.Icon;
+                  
+                  return (
+                    <TableRow key={course.id} className="border-b border-gray-100 hover:bg-gray-50 dark:border-white/5 dark:hover:bg-white/5">
+                      <TableCell className="px-3 sm:px-4 py-3">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600">
+                            <HiOutlineAcademicCap className="h-5 w-5 text-white" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white line-clamp-1">
+                              {course.title}
+                            </p>
+                            <p className="mt-0.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
+                              {course.shortDescription}
+                            </p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-3 sm:px-4 py-3 text-center">
+                        <Badge color="info" size="sm">
+                          <HiOutlineTag className="h-3 w-3 mr-1" />
+                          {course.category.replace(/_/g, ' ')}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="px-3 sm:px-4 py-3 text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <HiOutlineUsers className="h-3.5 w-3.5 text-gray-400" />
+                          <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                            {course.totalStudents}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-3 sm:px-4 py-3 text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <HiOutlineStar className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
+                          <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                            {course.rating.toFixed(1)}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-3 sm:px-4 py-3 text-center">
+                        <Badge color={statusBadge.color as any} size="sm">
+                          <StatusIcon className="h-3 w-3 mr-1" />
+                          {course.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="px-3 sm:px-4 py-3 text-center">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => openViewModal(course)}
+                            className="flex h-7 w-7 items-center justify-center rounded-md text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
+                            title="View details"
+                          >
+                            <HiOutlineEye className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => router.push(`/instructor/courses/${course.id}/edit`)}
+                            className="flex h-7 w-7 items-center justify-center rounded-md text-green-600 transition-colors hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-500/10"
+                            title="Edit course"
+                          >
+                            <HiOutlinePencil className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => openDeleteModal(course.id, course.title)}
+                            className="flex h-7 w-7 items-center justify-center rounded-md text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
+                            title="Delete course"
+                          >
+                            <HiOutlineTrash className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+            
+            {courses.length === 0 && (
+              <div className="py-8 text-center">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
+                  <HiOutlineAcademicCap className="h-6 w-6 text-gray-400" />
+                </div>
+                <p className="text-xs font-medium text-gray-900 dark:text-white">No courses found</p>
+                <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                  {searchTerm || statusFilter !== 'ALL' 
+                    ? 'Try adjusting your search or filter criteria' 
+                    : 'Get started by creating your first course'}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Pagination */}
-        {pagination.totalPages > 1 && (
-          <div className="border-t border-gray-200 px-4 py-3 dark:border-white/5">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="text-sm text-gray-700 dark:text-gray-300">
-                Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
-                <span className="font-medium">
-                  {Math.min(currentPage * itemsPerPage, pagination.total)}
-                </span>{' '}
-                of <span className="font-medium">{pagination.total}</span> results
-              </div>
+        {pagination.totalPages > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-200 px-3 sm:px-4 py-3 dark:border-white/5">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Show</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                className="h-7 rounded-md border border-gray-300 bg-white px-2 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+              <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                of {pagination.total} results
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-1">
+              {/* First Page */}
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={pagination.page === 1}
+                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3"
+                title="First page"
+              >
+                <HiOutlineChevronDoubleLeft className="h-3 w-3" />
+              </button>
               
-              <div className="flex items-center gap-2">
-                <Button
-                  onClick={() => setCurrentPage(1)}
-                  disabled={currentPage === 1}
-                  variant="outline"
-                  size="sm"
-                >
-                  <HiOutlineChevronDoubleLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  variant="outline"
-                  size="sm"
-                >
-                  <HiOutlineChevronLeft className="h-4 w-4" />
-                </Button>
-                
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Page {currentPage} of {pagination.totalPages}
-                </span>
-                
-                <Button
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  disabled={currentPage === pagination.totalPages}
-                  variant="outline"
-                  size="sm"
-                >
-                  <HiOutlineChevronRight className="h-4 w-4" />
-                </Button>
-                <Button
-                  onClick={() => setCurrentPage(pagination.totalPages)}
-                  disabled={currentPage === pagination.totalPages}
-                  variant="outline"
-                  size="sm"
-                >
-                  <HiOutlineChevronDoubleRight className="h-4 w-4" />
-                </Button>
-              </div>
+              {/* Previous Page */}
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={pagination.page === 1}
+                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3"
+                title="Previous page"
+              >
+                <HiOutlineChevronLeft className="h-3 w-3" />
+              </button>
+              
+              {/* Page Numbers */}
+              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                .filter(page => {
+                  if (pagination.totalPages <= 7) return true;
+                  if (page === 1 || page === pagination.totalPages) return true;
+                  if (Math.abs(page - pagination.page) <= 1) return true;
+                  return false;
+                })
+                .map((page, index, array) => (
+                  <React.Fragment key={page}>
+                    {index > 0 && array[index - 1] !== page - 1 && (
+                      <span className="flex h-7 w-7 items-center justify-center text-xs text-gray-400">
+                        ...
+                      </span>
+                    )}
+                    <button
+                      onClick={() => setCurrentPage(page)}
+                      className={`flex h-7 w-7 items-center justify-center rounded-md border text-xs font-medium transition-colors ${
+                        pagination.page === page
+                          ? 'border-brand-500 bg-brand-500 text-white'
+                          : 'border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  </React.Fragment>
+                ))}
+              
+              {/* Next Page */}
+              <button
+                onClick={() => setCurrentPage(p => Math.min(pagination.totalPages, p + 1))}
+                disabled={pagination.page === pagination.totalPages}
+                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3"
+                title="Next page"
+              >
+                <HiOutlineChevronRight className="h-3 w-3" />
+              </button>
+              
+              {/* Last Page */}
+              <button
+                onClick={() => setCurrentPage(pagination.totalPages)}
+                disabled={pagination.page === pagination.totalPages}
+                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3"
+                title="Last page"
+              >
+                <HiOutlineChevronDoubleRight className="h-3 w-3" />
+              </button>
             </div>
           </div>
         )}
       </div>
 
       {/* View Modal */}
-      {showModal && selectedCourse && (
-        <Modal
-          isOpen={showModal}
-          onClose={() => {
-            setShowModal(false);
-            setSelectedCourse(null);
-          }}
-        >
-          <div className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Course Details</h2>
-            <div>
+      {showViewModal && selectedCourse && (
+        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 bg-white dark:bg-gray-900 px-6 py-5 flex items-center justify-between border-b border-gray-200 dark:border-gray-800">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {selectedCourse.title}
+                Course Details
               </h3>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                {selectedCourse.shortDescription}
-              </p>
+              <button
+                onClick={() => {
+                  setShowViewModal(false);
+                  setSelectedCourse(null);
+                }}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              >
+                <HiOutlineX className="h-5 w-5" />
+              </button>
             </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Category</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {selectedCourse.category.replace(/_/g, ' ')}
-                </p>
+
+            {/* Body */}
+            <div className="px-6 pb-6">
+              {/* Course Header */}
+              <div className="flex items-start gap-4 pb-5 border-b border-gray-200 dark:border-gray-800 mt-5">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 to-brand-600">
+                  <HiOutlineAcademicCap className="h-8 w-8 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
+                    {selectedCourse.title}
+                  </h4>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                    {selectedCourse.shortDescription}
+                  </p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <Badge color={getStatusBadge(selectedCourse.status).color as any} size="sm">
+                      {React.createElement(getStatusBadge(selectedCourse.status).Icon, { className: "h-3 w-3 mr-1" })}
+                      {selectedCourse.status}
+                    </Badge>
+                    <Badge color={getTierBadge(selectedCourse.tier) as any} size="sm">
+                      {selectedCourse.tier}
+                    </Badge>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Level</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {selectedCourse.level}
-                </p>
+
+              {/* Course Stats */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-5 border-b border-gray-200 dark:border-gray-800">
+                <div className="text-center">
+                  <div className="flex items-center justify-center mb-1">
+                    <HiOutlineUsers className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {selectedCourse.totalStudents}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Students</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center mb-1">
+                    <HiOutlineStar className="h-5 w-5 text-yellow-400" />
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {selectedCourse.rating.toFixed(1)}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Rating</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center mb-1">
+                    <HiOutlineClock className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {selectedCourse.duration}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Hours</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center mb-1">
+                    <HiOutlineBookOpen className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {selectedCourse._count?.modules || 0}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Modules</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Tier</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {selectedCourse.tier}
-                </p>
+
+              {/* Course Details */}
+              <div className="space-y-4 pt-5">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                      <HiOutlineTag className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Category</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {selectedCourse.category.replace(/_/g, ' ')}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                      <HiOutlineAcademicCap className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Level</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {selectedCourse.level}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                      <HiOutlineTag className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Delivery Mode</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {selectedCourse.deliveryMode}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                      <HiOutlineTag className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Price</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        ${selectedCourse.price.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                    <HiOutlineClock className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Created</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      {new Date(selectedCourse.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Price</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  ${selectedCourse.price}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Students</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {selectedCourse.totalStudents}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Rating</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {selectedCourse.rating.toFixed(1)} ⭐
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Duration</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {selectedCourse.duration} hours
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Status</p>
-                <Badge variant={getStatusBadge(selectedCourse.status).variant as any} size="sm">
-                  {selectedCourse.status}
-                </Badge>
+
+              {/* Footer Actions */}
+              <div className="flex justify-end gap-3 mt-6 pt-5 border-t border-gray-200 dark:border-gray-800">
+                <button
+                  onClick={() => {
+                    setShowViewModal(false);
+                    setSelectedCourse(null);
+                  }}
+                  className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => router.push(`/instructor/courses/${selectedCourse.id}/edit`)}
+                  className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30"
+                >
+                  <HiOutlinePencil className="h-4 w-4" />
+                  Edit Course
+                </button>
               </div>
             </div>
           </div>
-        </Modal>
+        </div>
       )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && courseToDelete && (
-        <Modal
-          isOpen={showDeleteModal}
-          onClose={() => {
-            setShowDeleteModal(false);
-            setCourseToDelete(null);
-          }}
-        >
-          <div className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Delete Course</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Are you sure you want to delete <span className="font-semibold">{courseToDelete.title}</span>?
-              This action cannot be undone.
-            </p>
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
+        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-md">
+            {/* Header */}
+            <div className="px-6 py-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-800">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-error-100 dark:bg-error-500/15">
+                  <HiOutlineExclamationCircle className="h-6 w-6 text-error-600 dark:text-error-500" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Delete Course
+                </h3>
+              </div>
+              <button
                 onClick={() => {
                   setShowDeleteModal(false);
                   setCourseToDelete(null);
                 }}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              >
+                <HiOutlineX className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Are you sure you want to delete <span className="font-semibold text-gray-900 dark:text-white">{courseToDelete.title}</span>?
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                This action cannot be undone and will permanently remove this course and all its content from the system.
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setCourseToDelete(null);
+                }}
+                className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                disabled={isSubmitting}
               >
                 Cancel
-              </Button>
-              <Button
-                onClick={handleDelete}
-                className="bg-error-600 hover:bg-error-700"
+              </button>
+              <button
+                onClick={handleDeleteCourse}
+                className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-error-600 text-white hover:bg-error-700 shadow-lg shadow-error-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSubmitting}
               >
-                Delete Course
-              </Button>
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <HiOutlineTrash className="h-4 w-4" />
+                    Delete Course
+                  </>
+                )}
+              </button>
             </div>
           </div>
-        </Modal>
+        </div>
       )}
     </div>
   );

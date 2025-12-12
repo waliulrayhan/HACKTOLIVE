@@ -222,6 +222,64 @@ export class InstructorController {
     });
   }
 
+  @Post('courses/:courseId/publish')
+  @ApiOperation({ summary: 'Publish a course' })
+  async publishCourse(
+    @Request() req: any,
+    @Param('courseId') courseId: string,
+  ) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId: req.user.id },
+    });
+
+    // Verify ownership and get course with modules/lessons
+    const course = await this.prisma.course.findFirst({
+      where: {
+        id: courseId,
+        instructorId: instructor?.id,
+      },
+      include: {
+        modules: {
+          include: {
+            lessons: true,
+          },
+        },
+      },
+    });
+
+    if (!course) {
+      throw new Error('Course not found or access denied');
+    }
+
+    // Validate course has content before publishing
+    if (!course.modules || course.modules.length === 0) {
+      throw new Error('Cannot publish course without modules');
+    }
+
+    const hasLessons = course.modules.some(
+      (module) => module.lessons && module.lessons.length > 0,
+    );
+
+    if (!hasLessons) {
+      throw new Error('Cannot publish course without lessons');
+    }
+
+    // Update course status to PUBLISHED
+    return this.prisma.course.update({
+      where: { id: courseId },
+      data: {
+        status: 'PUBLISHED',
+      },
+      include: {
+        modules: {
+          include: {
+            lessons: true,
+          },
+        },
+      },
+    });
+  }
+
   @Delete('courses/:courseId')
   async deleteCourse(@Request() req: any, @Param('courseId') courseId: string) {
     const instructor = await this.prisma.instructor.findUnique({
@@ -309,5 +367,198 @@ export class InstructorController {
       coursePerformance,
       totalRevenue: coursePerformance.reduce((sum, c) => sum + c.revenue, 0),
     };
+  }
+
+  // Module Management
+  @Post('courses/:courseId/modules')
+  @ApiOperation({ summary: 'Add a module to a course' })
+  async addModule(
+    @Request() req: any,
+    @Param('courseId') courseId: string,
+    @Body() data: any,
+  ) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId: req.user.id },
+    });
+
+    // Verify course ownership
+    const course = await this.prisma.course.findFirst({
+      where: {
+        id: courseId,
+        instructorId: instructor?.id,
+      },
+    });
+
+    if (!course) {
+      throw new Error('Course not found or access denied');
+    }
+
+    return this.prisma.courseModule.create({
+      data: {
+        ...data,
+        courseId,
+      },
+      include: {
+        lessons: true,
+      },
+    });
+  }
+
+  @Patch('courses/:courseId/modules/:moduleId')
+  @ApiOperation({ summary: 'Update a module' })
+  async updateModule(
+    @Request() req: any,
+    @Param('courseId') courseId: string,
+    @Param('moduleId') moduleId: string,
+    @Body() data: any,
+  ) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId: req.user.id },
+    });
+
+    // Verify course ownership
+    const course = await this.prisma.course.findFirst({
+      where: {
+        id: courseId,
+        instructorId: instructor?.id,
+      },
+    });
+
+    if (!course) {
+      throw new Error('Course not found or access denied');
+    }
+
+    return this.prisma.courseModule.update({
+      where: { id: moduleId },
+      data,
+      include: {
+        lessons: true,
+      },
+    });
+  }
+
+  @Delete('courses/:courseId/modules/:moduleId')
+  @ApiOperation({ summary: 'Delete a module' })
+  async deleteModule(
+    @Request() req: any,
+    @Param('courseId') courseId: string,
+    @Param('moduleId') moduleId: string,
+  ) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId: req.user.id },
+    });
+
+    // Verify course ownership
+    const course = await this.prisma.course.findFirst({
+      where: {
+        id: courseId,
+        instructorId: instructor?.id,
+      },
+    });
+
+    if (!course) {
+      throw new Error('Course not found or access denied');
+    }
+
+    await this.prisma.courseModule.delete({
+      where: { id: moduleId },
+    });
+
+    return { message: 'Module deleted successfully' };
+  }
+
+  // Lesson Management
+  @Post('courses/:courseId/modules/:moduleId/lessons')
+  @ApiOperation({ summary: 'Add a lesson to a module' })
+  async addLesson(
+    @Request() req: any,
+    @Param('courseId') courseId: string,
+    @Param('moduleId') moduleId: string,
+    @Body() data: any,
+  ) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId: req.user.id },
+    });
+
+    // Verify course ownership
+    const course = await this.prisma.course.findFirst({
+      where: {
+        id: courseId,
+        instructorId: instructor?.id,
+      },
+    });
+
+    if (!course) {
+      throw new Error('Course not found or access denied');
+    }
+
+    return this.prisma.lesson.create({
+      data: {
+        ...data,
+        moduleId,
+      },
+    });
+  }
+
+  @Patch('courses/:courseId/modules/:moduleId/lessons/:lessonId')
+  @ApiOperation({ summary: 'Update a lesson' })
+  async updateLesson(
+    @Request() req: any,
+    @Param('courseId') courseId: string,
+    @Param('moduleId') moduleId: string,
+    @Param('lessonId') lessonId: string,
+    @Body() data: any,
+  ) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId: req.user.id },
+    });
+
+    // Verify course ownership
+    const course = await this.prisma.course.findFirst({
+      where: {
+        id: courseId,
+        instructorId: instructor?.id,
+      },
+    });
+
+    if (!course) {
+      throw new Error('Course not found or access denied');
+    }
+
+    return this.prisma.lesson.update({
+      where: { id: lessonId },
+      data,
+    });
+  }
+
+  @Delete('courses/:courseId/modules/:moduleId/lessons/:lessonId')
+  @ApiOperation({ summary: 'Delete a lesson' })
+  async deleteLesson(
+    @Request() req: any,
+    @Param('courseId') courseId: string,
+    @Param('moduleId') moduleId: string,
+    @Param('lessonId') lessonId: string,
+  ) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId: req.user.id },
+    });
+
+    // Verify course ownership
+    const course = await this.prisma.course.findFirst({
+      where: {
+        id: courseId,
+        instructorId: instructor?.id,
+      },
+    });
+
+    if (!course) {
+      throw new Error('Course not found or access denied');
+    }
+
+    await this.prisma.lesson.delete({
+      where: { id: lessonId },
+    });
+
+    return { message: 'Lesson deleted successfully' };
   }
 }
