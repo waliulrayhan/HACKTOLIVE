@@ -140,17 +140,22 @@ function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         onClose={closeDropdown}
         className="absolute right-0 mt-4.25 flex w-65 flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
       >
-        <div>
-          <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            {user?.name || 'Guest User'}
-          </span>
-          <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            {user?.email || 'No email'}
-          </span>
-          {user?.role && (
-            <span className="mt-1 inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-brand-50 text-brand-700 dark:bg-brand-900/20 dark:text-brand-400">
-              {user.role.charAt(0) + user.role.slice(1).toLowerCase()}
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
+              {user?.name || 'Guest User'}
             </span>
+            <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
+              {user?.email || 'No email'}
+            </span>
+          </div>
+
+          {user?.role && (
+            <div className="flex items-center justify-center">
+              <span className="inline-block px-2 py-0.5 text-sm font-medium rounded-full bg-brand-50 text-brand-700 dark:bg-brand-900/20 dark:text-brand-400">
+                {user.role.charAt(0) + user.role.slice(1).toLowerCase()}
+              </span>
+            </div>
           )}
         </div>
 
