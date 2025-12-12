@@ -12,10 +12,10 @@ export interface UpdateProfileDto {
 }
 
 export interface UpdateSocialLinksDto {
-  facebookUrl?: string;
-  twitterUrl?: string;
-  linkedinUrl?: string;
-  instagramUrl?: string;
+  facebookUrl?: string | null;
+  twitterUrl?: string | null;
+  linkedinUrl?: string | null;
+  instagramUrl?: string | null;
 }
 
 export const userService = {
@@ -31,6 +31,17 @@ export const userService = {
 
   async updateSocialLinks(data: UpdateSocialLinksDto) {
     const response = await api.patch<User>('/auth/profile/social-links', data);
+    return response.data;
+  },
+
+  async uploadAvatar(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post<User>('/upload/avatar', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   },
 

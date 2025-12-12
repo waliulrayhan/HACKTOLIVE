@@ -4,14 +4,22 @@ import { useModal } from "@/lib/hooks/useModal";
 import { HiOutlineUser, HiOutlineMail, HiOutlinePhone, HiOutlineBriefcase, HiOutlineX } from "react-icons/hi";
 import { userService } from "@/lib/user-service";
 import { User } from "@/lib/auth-service";
+import { toast } from "@/components/ui/toast/use-toast";
 
 export default function UserInfoCard() {
   const { isOpen, openModal, closeModal } = useModal();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
+    bio: "",
+  });
+  const [originalFormData, setOriginalFormData] = useState({
+    name: "",
     phone: "",
     bio: "",
   });
@@ -24,20 +32,59 @@ export default function UserInfoCard() {
     try {
       const userData = await userService.getProfile();
       setUser(userData);
-      setFormData({
+      const profileData = {
         name: userData.name || "",
-        email: userData.email || "",
         phone: userData.phone || "",
         bio: userData.bio || "",
+      };
+      setFormData({
+        ...profileData,
+        email: userData.email || "",
       });
+      setOriginalFormData(profileData);
     } catch (error) {
       console.error("Failed to load user data:", error);
+      toast.error("Failed to load user data");
     } finally {
       setLoading(false);
     }
   };
 
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+    
+    // Check if any data has changed
+    const hasChanges = formData.name !== originalFormData.name ||
+                      formData.phone !== originalFormData.phone ||
+                      formData.bio !== originalFormData.bio;
+    
+    if (!hasChanges) {
+      toast.info("No changes to save");
+      return false;
+    }
+    
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters';
+    }
+    
+    if (formData.phone && !/^[+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/.test(formData.phone)) {
+      newErrors.phone = 'Please enter a valid phone number';
+    }
+    
+    if (formData.bio && formData.bio.length > 500) {
+      newErrors.bio = 'Bio must be less than 500 characters';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSave = async () => {
+    if (!validateForm()) return;
+    
+    setSaving(true);
     try {
       const updatedUser = await userService.updateProfile({
         name: formData.name,
@@ -45,18 +92,36 @@ export default function UserInfoCard() {
         bio: formData.bio,
       });
       setUser(updatedUser);
+      setOriginalFormData({
+        name: formData.name,
+        phone: formData.phone,
+        bio: formData.bio,
+      });
       closeModal();
+      setErrors({});
+      toast.success("Profile updated successfully");
     } catch (error) {
       console.error("Failed to update profile:", error);
-      alert("Failed to update profile. Please try again.");
+      toast.error("Failed to update profile. Please try again.");
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+    // Clear error for this field
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   if (loading) {
@@ -174,10 +239,13 @@ export default function UserInfoCard() {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                        className={`w-full h-10 rounded-lg border ${errors.name ? 'border-red-500' : 'border-gray-300'} bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
                         placeholder="Enter full name"
                       />
                     </div>
+                    {errors.name && (
+                      <p className="mt-1 text-xs text-red-500">{errors.name}</p>
+                    )}
                   </div>
 
                   <div>
@@ -213,10 +281,13 @@ export default function UserInfoCard() {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                        className={`w-full h-10 rounded-lg border ${errors.phone ? 'border-red-500' : 'border-gray-300'} bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
                         placeholder="Enter phone number"
                       />
                     </div>
+                    {errors.phone && (
+                      <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
+                    )}
                   </div>
 
                   <div>
@@ -232,10 +303,13 @@ export default function UserInfoCard() {
                         name="bio"
                         value={formData.bio}
                         onChange={handleChange}
-                        className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                        className={`w-full h-10 rounded-lg border ${errors.bio ? 'border-red-500' : 'border-gray-300'} bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
                         placeholder="Enter bio"
                       />
                     </div>
+                    {errors.bio && (
+                      <p className="mt-1 text-xs text-red-500">{errors.bio}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -246,15 +320,24 @@ export default function UserInfoCard() {
               <button
                 type="button"
                 onClick={closeModal}
-                className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                disabled={saving}
+                className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30"
+                disabled={saving}
+                className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save Changes
+                {saving ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Saving...
+                  </>
+                ) : (
+                  'Save Changes'
+                )}
               </button>
             </div>
           </form>

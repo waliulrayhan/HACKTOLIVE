@@ -1,16 +1,29 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useModal } from "@/lib/hooks/useModal";
 import Image from "next/image";
-import { HiOutlineX } from "react-icons/hi";
+import { HiOutlineX, HiOutlineCamera } from "react-icons/hi";
 import { userService } from "@/lib/user-service";
 import { User } from "@/lib/auth-service";
+import ImageCropper from "@/components/ImageCropper";
+import { toast } from "@/components/ui/toast/use-toast";
 
 export default function UserMetaCard() {
   const { isOpen, openModal, closeModal } = useModal();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
+    facebookUrl: "",
+    twitterUrl: "",
+    linkedinUrl: "",
+    instagramUrl: "",
+  });
+  const [originalFormData, setOriginalFormData] = useState({
     facebookUrl: "",
     twitterUrl: "",
     linkedinUrl: "",
@@ -25,35 +38,153 @@ export default function UserMetaCard() {
     try {
       const userData = await userService.getProfile();
       setUser(userData);
-      setFormData({
+      const socialData = {
         facebookUrl: userData.facebookUrl || "",
         twitterUrl: userData.twitterUrl || "",
         linkedinUrl: userData.linkedinUrl || "",
         instagramUrl: userData.instagramUrl || "",
-      });
+      };
+      setFormData(socialData);
+      setOriginalFormData(socialData);
     } catch (error) {
       console.error("Failed to load user data:", error);
+      toast.error("Failed to load user data");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSave = async () => {
+  const validateUrl = (url: string, platform: string): boolean => {
+    if (!url) return true; // Empty is valid
     try {
-      const updatedUser = await userService.updateSocialLinks(formData);
+      const urlObj = new URL(url);
+      return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+    } catch {
+      setErrors(prev => ({ ...prev, [platform]: 'Please enter a valid URL (e.g., https://example.com)' }));
+      return false;
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+    
+    // Check if any data has changed
+    const hasChanges = Object.keys(formData).some(
+      (key) => formData[key as keyof typeof formData] !== originalFormData[key as keyof typeof originalFormData]
+    );
+    
+    if (!hasChanges) {
+      toast.info("No changes to save");
+      return false;
+    }
+    
+    // Validate URLs only if they are provided
+    if (formData.facebookUrl && !validateUrl(formData.facebookUrl, 'facebookUrl')) {
+      newErrors.facebookUrl = 'Please enter a valid Facebook URL';
+    }
+    if (formData.twitterUrl && !validateUrl(formData.twitterUrl, 'twitterUrl')) {
+      newErrors.twitterUrl = 'Please enter a valid Twitter URL';
+    }
+    if (formData.linkedinUrl && !validateUrl(formData.linkedinUrl, 'linkedinUrl')) {
+      newErrors.linkedinUrl = 'Please enter a valid LinkedIn URL';
+    }
+    if (formData.instagramUrl && !validateUrl(formData.instagramUrl, 'instagramUrl')) {
+      newErrors.instagramUrl = 'Please enter a valid Instagram URL';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSave = async () => {
+    if (!validateForm()) return;
+    
+    setSaving(true);
+    try {
+      // Send all fields: non-empty values as strings, empty values as null to clear them
+      const dataToSend = {
+        facebookUrl: formData.facebookUrl.trim() || null,
+        twitterUrl: formData.twitterUrl.trim() || null,
+        linkedinUrl: formData.linkedinUrl.trim() || null,
+        instagramUrl: formData.instagramUrl.trim() || null,
+      };
+      
+      const updatedUser = await userService.updateSocialLinks(dataToSend);
       setUser(updatedUser);
+      setOriginalFormData(formData);
       closeModal();
+      setErrors({});
+      toast.success("Social links updated successfully");
     } catch (error) {
       console.error("Failed to update social links:", error);
-      alert("Failed to update social links. Please try again.");
+      toast.error("Failed to update social links. Please try again.");
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+    // Clear error for this field
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Reset the input
+    e.target.value = '';
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB');
+      return;
+    }
+
+    // Show cropper
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImageToCrop(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCropComplete = async (croppedBlob: Blob) => {
+    setImageToCrop(null);
+    setUploadingAvatar(true);
+    
+    try {
+      const file = new File([croppedBlob], 'avatar.jpg', { type: 'image/jpeg' });
+      const updatedUser = await userService.uploadAvatar(file);
+      setUser(updatedUser);
+      toast.success('Avatar updated successfully');
+    } catch (error) {
+      console.error('Failed to upload avatar:', error);
+      toast.error('Failed to upload avatar. Please try again.');
+    } finally {
+      setUploadingAvatar(false);
+    }
   };
 
   if (loading) {
@@ -74,17 +205,43 @@ export default function UserMetaCard() {
     <div className="p-5 border border-gray-200 rounded-md dark:border-gray-800 lg:p-6">
       <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex flex-col items-center w-full gap-6 xl:flex-row">
-            <div className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800 bg-gray-100 dark:bg-gray-800">
-              {user?.avatar && (
-                <Image
-                  width={80}
-                  height={80}
-                  src={`${apiUrl}${user.avatar}`}
-                  alt={user?.name || "User"}
-                  className="object-cover w-full h-full"
-                  unoptimized
-                />
-              )}
+            <div className="relative group">
+              <div className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800 bg-gray-100 dark:bg-gray-800">
+                {user?.avatar ? (
+                  <Image
+                    width={80}
+                    height={80}
+                    src={`${apiUrl}${user.avatar}`}
+                    alt={user?.name || "User"}
+                    className="object-cover w-full h-full"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full text-2xl font-semibold text-gray-400 dark:text-gray-600">
+                    {user?.name?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                )}
+                {uploadingAvatar && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={handleAvatarClick}
+                disabled={uploadingAvatar}
+                className="absolute bottom-0 right-0 p-1.5 bg-brand-500 text-white rounded-full shadow-lg hover:bg-brand-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Upload avatar (1:1 ratio)"
+              >
+                <HiOutlineCamera className="w-4 h-4" />
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                className="hidden"
+              />
             </div>
             <div className="order-3 xl:order-2">
               <h4 className="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left">
@@ -172,9 +329,12 @@ export default function UserMetaCard() {
                       name="facebookUrl"
                       value={formData.facebookUrl}
                       onChange={handleChange}
-                      className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                      className={`w-full h-10 rounded-lg border ${errors.facebookUrl ? 'border-red-500' : 'border-gray-300'} bg-white px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
                       placeholder="https://www.facebook.com/username"
                     />
+                    {errors.facebookUrl && (
+                      <p className="mt-1 text-xs text-red-500">{errors.facebookUrl}</p>
+                    )}
                   </div>
 
                   <div>
@@ -186,9 +346,12 @@ export default function UserMetaCard() {
                       name="twitterUrl"
                       value={formData.twitterUrl}
                       onChange={handleChange}
-                      className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                      className={`w-full h-10 rounded-lg border ${errors.twitterUrl ? 'border-red-500' : 'border-gray-300'} bg-white px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
                       placeholder="https://x.com/username"
                     />
+                    {errors.twitterUrl && (
+                      <p className="mt-1 text-xs text-red-500">{errors.twitterUrl}</p>
+                    )}
                   </div>
 
                   <div>
@@ -200,9 +363,12 @@ export default function UserMetaCard() {
                       name="linkedinUrl"
                       value={formData.linkedinUrl}
                       onChange={handleChange}
-                      className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                      className={`w-full h-10 rounded-lg border ${errors.linkedinUrl ? 'border-red-500' : 'border-gray-300'} bg-white px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
                       placeholder="https://www.linkedin.com/in/username"
                     />
+                    {errors.linkedinUrl && (
+                      <p className="mt-1 text-xs text-red-500">{errors.linkedinUrl}</p>
+                    )}
                   </div>
 
                   <div>
@@ -214,9 +380,12 @@ export default function UserMetaCard() {
                       name="instagramUrl"
                       value={formData.instagramUrl}
                       onChange={handleChange}
-                      className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                      className={`w-full h-10 rounded-lg border ${errors.instagramUrl ? 'border-red-500' : 'border-gray-300'} bg-white px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
                       placeholder="https://instagram.com/username"
                     />
+                    {errors.instagramUrl && (
+                      <p className="mt-1 text-xs text-red-500">{errors.instagramUrl}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -227,20 +396,39 @@ export default function UserMetaCard() {
               <button
                 type="button"
                 onClick={closeModal}
-                className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                disabled={saving}
+                className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30"
+                disabled={saving}
+                className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save Changes
+                {saving ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Saving...
+                  </>
+                ) : (
+                  'Save Changes'
+                )}
               </button>
             </div>
           </form>
         </div>
       </div>
+
+      {/* Image Cropper Modal */}
+      {imageToCrop && (
+        <ImageCropper
+          image={imageToCrop}
+          onCropComplete={handleCropComplete}
+          onCancel={() => setImageToCrop(null)}
+          aspectRatio={1}
+        />
+      )}
     </div>
   );
 }

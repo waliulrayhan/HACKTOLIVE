@@ -4,14 +4,20 @@ import { useModal } from "@/lib/hooks/useModal";
 import { HiOutlineLocationMarker, HiOutlineGlobeAlt, HiOutlineX } from "react-icons/hi";
 import { userService } from "@/lib/user-service";
 import { User } from "@/lib/auth-service";
+import { toast } from "@/components/ui/toast/use-toast";
 
 export default function UserAddressCard() {
   const { isOpen, openModal, closeModal } = useModal();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     city: "",
-    state: "",
+    country: "",
+  });
+  const [originalFormData, setOriginalFormData] = useState({
+    city: "",
     country: "",
   });
 
@@ -23,34 +29,77 @@ export default function UserAddressCard() {
     try {
       const userData = await userService.getProfile();
       setUser(userData);
-      setFormData({
+      const addressData = {
         city: userData.city || "",
-        state: userData.state || "",
         country: userData.country || "",
-      });
+      };
+      setFormData(addressData);
+      setOriginalFormData(addressData);
     } catch (error) {
       console.error("Failed to load user data:", error);
+      toast.error("Failed to load user data");
     } finally {
       setLoading(false);
     }
   };
 
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+    
+    // Check if any data has changed
+    const hasChanges = formData.city !== originalFormData.city ||
+                      formData.country !== originalFormData.country;
+    
+    if (!hasChanges) {
+      toast.info("No changes to save");
+      return false;
+    }
+    
+    if (formData.city && formData.city.trim().length < 2) {
+      newErrors.city = 'City must be at least 2 characters';
+    }
+    
+    if (formData.country && formData.country.trim().length < 2) {
+      newErrors.country = 'Country must be at least 2 characters';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSave = async () => {
+    if (!validateForm()) return;
+    
+    setSaving(true);
     try {
       const updatedUser = await userService.updateProfile(formData);
       setUser(updatedUser);
+      setOriginalFormData(formData);
       closeModal();
+      setErrors({});
+      toast.success("Address updated successfully");
     } catch (error) {
       console.error("Failed to update address:", error);
-      alert("Failed to update address. Please try again.");
+      toast.error("Failed to update address. Please try again.");
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+    // Clear error for this field
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   if (loading) {
@@ -62,8 +111,6 @@ export default function UserAddressCard() {
       </div>
     );
   }
-
-  const cityState = [user?.city, user?.state].filter(Boolean).join(", ") || "Not set";
 
   return (
     <>
@@ -77,10 +124,10 @@ export default function UserAddressCard() {
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
               <div>
                 <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                  City/State
+                  City
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {cityState}
+                  {user?.city || "Not set"}
                 </p>
               </div>
 
@@ -149,29 +196,13 @@ export default function UserAddressCard() {
                     name="city"
                     value={formData.city}
                     onChange={handleChange}
-                    className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                    className={`w-full h-10 rounded-lg border ${errors.city ? 'border-red-500' : 'border-gray-300'} bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
                     placeholder="Enter city"
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  State
-                </label>
-                <div className="relative">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <HiOutlineLocationMarker className="h-4 w-4 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleChange}
-                    className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                    placeholder="Enter state"
-                  />
-                </div>
+                {errors.city && (
+                  <p className="mt-1 text-xs text-red-500">{errors.city}</p>
+                )}
               </div>
 
               <div>
@@ -187,10 +218,13 @@ export default function UserAddressCard() {
                     name="country"
                     value={formData.country}
                     onChange={handleChange}
-                    className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                    className={`w-full h-10 rounded-lg border ${errors.country ? 'border-red-500' : 'border-gray-300'} bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
                     placeholder="Enter country"
                   />
                 </div>
+                {errors.country && (
+                  <p className="mt-1 text-xs text-red-500">{errors.country}</p>
+                )}
               </div>
             </div>
 
@@ -199,15 +233,24 @@ export default function UserAddressCard() {
               <button
                 type="button"
                 onClick={closeModal}
-                className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                disabled={saving}
+                className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30"
+                disabled={saving}
+                className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save Changes
+                {saving ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Saving...
+                  </>
+                ) : (
+                  'Save Changes'
+                )}
               </button>
             </div>
           </form>
