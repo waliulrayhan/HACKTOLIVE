@@ -7,9 +7,11 @@ import { userService } from "@/lib/user-service";
 import { User } from "@/lib/auth-service";
 import ImageCropper from "@/components/ImageCropper";
 import { toast } from "@/components/ui/toast/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 export default function UserMetaCard() {
   const { isOpen, openModal, closeModal } = useModal();
+  const { updateUser } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -111,6 +113,7 @@ export default function UserMetaCard() {
       
       const updatedUser = await userService.updateSocialLinks(dataToSend);
       setUser(updatedUser);
+      updateUser(updatedUser); // Sync with global state and localStorage
       setOriginalFormData(formData);
       closeModal();
       setErrors({});
@@ -178,6 +181,7 @@ export default function UserMetaCard() {
       const file = new File([croppedBlob], 'avatar.jpg', { type: 'image/jpeg' });
       const updatedUser = await userService.uploadAvatar(file);
       setUser(updatedUser);
+      updateUser(updatedUser); // Sync with global state and localStorage
       toast.success('Avatar updated successfully');
     } catch (error) {
       console.error('Failed to upload avatar:', error);

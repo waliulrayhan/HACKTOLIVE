@@ -5,9 +5,11 @@ import { HiOutlineLocationMarker, HiOutlineGlobeAlt, HiOutlineX } from "react-ic
 import { userService } from "@/lib/user-service";
 import { User } from "@/lib/auth-service";
 import { toast } from "@/components/ui/toast/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 export default function UserAddressCard() {
   const { isOpen, openModal, closeModal } = useModal();
+  const { updateUser } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -74,6 +76,7 @@ export default function UserAddressCard() {
     try {
       const updatedUser = await userService.updateProfile(formData);
       setUser(updatedUser);
+      updateUser(updatedUser); // Sync with global state and localStorage
       setOriginalFormData(formData);
       closeModal();
       setErrors({});

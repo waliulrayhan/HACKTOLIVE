@@ -37,12 +37,13 @@ export const userService = {
   async uploadAvatar(file: File) {
     const formData = new FormData();
     formData.append('file', file);
-    const response = await api.post<User>('/upload/avatar', formData, {
+    const response = await api.post<{ message: string; avatarUrl: string; user: User }>('/upload/avatar', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return response.data;
+    // Return only the user object, not the entire response
+    return response.data.user;
   },
 
   async changePassword(oldPassword: string, newPassword: string) {

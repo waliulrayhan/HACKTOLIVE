@@ -5,9 +5,11 @@ import { HiOutlineUser, HiOutlineMail, HiOutlinePhone, HiOutlineBriefcase, HiOut
 import { userService } from "@/lib/user-service";
 import { User } from "@/lib/auth-service";
 import { toast } from "@/components/ui/toast/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 export default function UserInfoCard() {
   const { isOpen, openModal, closeModal } = useModal();
+  const { updateUser } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -92,6 +94,7 @@ export default function UserInfoCard() {
         bio: formData.bio,
       });
       setUser(updatedUser);
+      updateUser(updatedUser); // Sync with global state and localStorage
       setOriginalFormData({
         name: formData.name,
         phone: formData.phone,

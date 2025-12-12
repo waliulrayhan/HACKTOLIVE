@@ -102,8 +102,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateUser = (updatedUser: User) => {
-    authService.setUser(updatedUser);
-    setUser(updatedUser);
+    // Merge with existing user data to preserve all fields
+    const mergedUser = user ? { ...user, ...updatedUser } : updatedUser;
+    authService.setUser(mergedUser);
+    setUser(mergedUser);
   };
 
   return (

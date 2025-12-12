@@ -12,7 +12,7 @@ export default function GlobalLoading() {
 
   // Get current theme - check all possible sources
   const getIsDark = () => {
-    if (typeof window === 'undefined') return true
+    if (typeof window === 'undefined') return false
     
     return (
       localStorage.getItem('theme') === 'dark' ||
@@ -23,7 +23,7 @@ export default function GlobalLoading() {
     )
   }
 
-  const [isDark, setIsDark] = useState(getIsDark)
+  const [isDark, setIsDark] = useState(false)
 
   // Watch for theme changes
   useEffect(() => {
