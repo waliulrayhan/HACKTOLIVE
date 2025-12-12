@@ -1,6 +1,7 @@
 import UserAddressCard from "./_components/UserAddressCard";
 import UserInfoCard from "./_components/UserInfoCard";
 import UserMetaCard from "./_components/UserMetaCard";
+import UserPasswordCard from "./_components/UserPasswordCard";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import { Metadata } from "next";
 import React from "react";
@@ -20,6 +21,7 @@ export default function Profile() {
           <UserMetaCard />
           <UserInfoCard />
           <UserAddressCard />
+          <UserPasswordCard />
         </div>
       </div>
     </div>

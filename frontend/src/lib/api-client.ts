@@ -25,11 +25,16 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear token and redirect to login
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/login';
+      // Don't auto-logout for password change failures (wrong old password)
+      const isPasswordChangeError = error.config?.url?.includes('/auth/change-password');
+      
+      if (!isPasswordChangeError) {
+        // Clear token and redirect to login for other 401 errors
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);
