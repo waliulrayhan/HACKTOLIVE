@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
+import { AnalyticsLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
 import {
   HiOutlineChartBar,
   HiOutlineCurrencyDollar,
@@ -106,9 +107,7 @@ export default function AnalyticsPage() {
     return (
       <div>
         <PageBreadcrumb pageTitle="System Analytics" />
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500 dark:text-gray-400">Loading analytics...</div>
-        </div>
+        <AnalyticsLoadingSkeleton />
       </div>
     );
   }

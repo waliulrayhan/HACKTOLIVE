@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
+import { DashboardLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
 import {
   HiOutlineUsers,
   HiOutlineAcademicCap,
@@ -66,9 +67,7 @@ export default function AdminDashboard() {
     return (
       <div>
         <PageBreadcrumb pageTitle="Admin Dashboard" />
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500 dark:text-gray-400">Loading dashboard...</div>
-        </div>
+        <DashboardLoadingSkeleton />
       </div>
     );
   }

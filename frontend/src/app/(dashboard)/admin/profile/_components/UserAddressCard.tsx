@@ -6,6 +6,7 @@ import { userService } from "@/lib/user-service";
 import { User } from "@/lib/auth-service";
 import { toast } from "@/components/ui/toast/use-toast";
 import { useAuth } from "@/context/AuthContext";
+import { ProfileCardSkeleton } from "@/components/ui/skeleton/Skeleton";
 
 export default function UserAddressCard() {
   const { isOpen, openModal, closeModal } = useModal();
@@ -106,13 +107,7 @@ export default function UserAddressCard() {
   };
 
   if (loading) {
-    return (
-      <div className="p-5 border border-gray-200 rounded-md dark:border-gray-800 lg:p-6">
-        <div className="flex items-center justify-center h-32">
-          <div className="text-gray-500 dark:text-gray-400">Loading...</div>
-        </div>
-      </div>
-    );
+    return <ProfileCardSkeleton />;
   }
 
   return (

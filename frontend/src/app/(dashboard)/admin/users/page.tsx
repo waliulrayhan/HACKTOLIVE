@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
+import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
 import { 
   HiOutlinePlus, 
   HiOutlinePencil, 
@@ -373,9 +374,7 @@ export default function UsersManagementPage() {
     return (
       <div>
         <PageBreadcrumb pageTitle="User Management" />
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500 dark:text-gray-400">Loading users...</div>
-        </div>
+        <TablePageLoadingSkeleton />
       </div>
     );
   }
