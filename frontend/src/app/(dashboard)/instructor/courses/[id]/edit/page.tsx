@@ -49,6 +49,12 @@ interface Course {
   tags: string;
   status: string;
   thumbnail?: string;
+  liveSchedule?: string;
+  startDate?: string;
+  endDate?: string;
+  maxStudents?: number;
+  enrolledStudents?: number;
+  meetingLink?: string;
   modules: Module[];
 }
 
@@ -102,6 +108,11 @@ export default function EditCoursePage() {
     requirements: "",
     tags: "",
     thumbnail: "",
+    liveSchedule: "",
+    startDate: "",
+    endDate: "",
+    maxStudents: 0,
+    meetingLink: "",
   });
 
   // Module/Lesson state
@@ -160,6 +171,11 @@ export default function EditCoursePage() {
         requirements: data.requirements,
         tags: data.tags,
         thumbnail: data.thumbnail || "",
+        liveSchedule: data.liveSchedule || "",
+        startDate: data.startDate ? new Date(data.startDate).toISOString().split('T')[0] : "",
+        endDate: data.endDate ? new Date(data.endDate).toISOString().split('T')[0] : "",
+        maxStudents: data.maxStudents || 0,
+        meetingLink: data.meetingLink || "",
       });
       setModules(data.modules || []);
       setThumbnailPreview(data.thumbnail || null);
@@ -950,6 +966,101 @@ export default function EditCoursePage() {
                   />
                 </div>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Delivery Mode
+                </label>
+                <select
+                  name="deliveryMode"
+                  value={formData.deliveryMode}
+                  onChange={handleInputChange}
+                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none"
+                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '16px 16px' }}
+                >
+                  <option value="RECORDED">Recorded</option>
+                  <option value="LIVE">Live</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Duration (hours)
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <HiOutlineClock className="h-4 w-4 text-gray-400" />
+                  </div>
+                  <input
+                    type="number"
+                    name="duration"
+                    value={formData.duration}
+                    onChange={handleInputChange}
+                    min="0"
+                    className="w-full h-10 rounded-lg border border-gray-300 pl-10 pr-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              {/* Live Course Fields */}
+              {formData.deliveryMode === 'LIVE' && (
+                <>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Live Schedule <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="liveSchedule"
+                      value={formData.liveSchedule}
+                      onChange={handleInputChange}
+                      placeholder="e.g., Every Monday and Wednesday at 7:00 PM EST"
+                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Start Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      name="startDate"
+                      value={formData.startDate}
+                      onChange={handleInputChange}
+                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      End Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      name="endDate"
+                      value={formData.endDate}
+                      onChange={handleInputChange}
+                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Max Students
+                    </label>
+                    <input
+                      type="number"
+                      name="maxStudents"
+                      value={formData.maxStudents}
+                      onChange={handleInputChange}
+                      min="0"
+                      placeholder="Leave 0 for unlimited"
+                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    />
+                  </div>
+                </>
+              )}
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

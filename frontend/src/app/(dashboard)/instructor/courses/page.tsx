@@ -52,6 +52,12 @@ interface Course {
   totalStudents: number;
   duration: number;
   createdAt: string;
+  liveSchedule?: string;
+  startDate?: string;
+  endDate?: string;
+  maxStudents?: number;
+  enrolledStudents?: number;
+  meetingLink?: string;
   _count?: {
     enrollments: number;
     reviews: number;
@@ -695,6 +701,32 @@ export default function InstructorCoursesPage() {
                     {selectedCourse.deliveryMode}
                   </span>
                 </div>
+                {selectedCourse.deliveryMode === 'LIVE' && selectedCourse.liveSchedule && (
+                  <div className="flex items-start justify-between py-2 border-b border-gray-100 dark:border-white/5">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">Schedule</span>
+                    <span className="text-xs font-medium text-gray-900 dark:text-white text-right max-w-[200px]">
+                      {selectedCourse.liveSchedule}
+                    </span>
+                  </div>
+                )}
+                {selectedCourse.deliveryMode === 'LIVE' && (selectedCourse.startDate || selectedCourse.endDate) && (
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-white/5">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">Duration</span>
+                    <span className="text-xs font-medium text-gray-900 dark:text-white">
+                      {selectedCourse.startDate && new Date(selectedCourse.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {selectedCourse.startDate && selectedCourse.endDate && ' - '}
+                      {selectedCourse.endDate && new Date(selectedCourse.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                  </div>
+                )}
+                {selectedCourse.deliveryMode === 'LIVE' && selectedCourse.maxStudents && selectedCourse.maxStudents > 0 && (
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-white/5">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">Max Students</span>
+                    <span className="text-xs font-medium text-gray-900 dark:text-white">
+                      {selectedCourse.enrolledStudents || 0} / {selectedCourse.maxStudents}
+                    </span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-white/5">
                   <span className="text-xs text-gray-500 dark:text-gray-400">Price</span>
                   <span className="text-xs font-semibold text-brand-600 dark:text-brand-400">

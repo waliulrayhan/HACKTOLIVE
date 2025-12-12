@@ -73,6 +73,11 @@ export default function CreateCoursePage() {
     requirements: "",
     tags: "",
     thumbnail: "",
+    liveSchedule: "",
+    startDate: "",
+    endDate: "",
+    maxStudents: 0,
+    meetingLink: "",
   });
 
   // Modules & Lessons
@@ -618,6 +623,66 @@ export default function CreateCoursePage() {
                 </div>
                 {errors.duration && <p className="mt-1.5 text-xs text-red-500">{errors.duration}</p>}
               </div>
+
+              {/* Live Course Fields */}
+              {formData.deliveryMode === 'LIVE' && (
+                <>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Live Schedule <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="liveSchedule"
+                      value={formData.liveSchedule}
+                      onChange={handleInputChange}
+                      placeholder="e.g., Every Monday and Wednesday at 7:00 PM EST"
+                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Start Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      name="startDate"
+                      value={formData.startDate}
+                      onChange={handleInputChange}
+                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      End Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      name="endDate"
+                      value={formData.endDate}
+                      onChange={handleInputChange}
+                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Max Students
+                    </label>
+                    <input
+                      type="number"
+                      name="maxStudents"
+                      value={formData.maxStudents}
+                      onChange={handleInputChange}
+                      min="0"
+                      placeholder="Leave 0 for unlimited"
+                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    />
+                  </div>
+                </>
+              )}
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
