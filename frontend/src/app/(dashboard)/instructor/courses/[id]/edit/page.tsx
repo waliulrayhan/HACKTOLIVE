@@ -25,6 +25,7 @@ import {
   HiOutlineClipboardList,
   HiOutlineCheckCircle,
   HiOutlineExclamationCircle,
+  HiOutlineX,
 } from "react-icons/hi";
 import Badge from "@/components/ui/badge/Badge";
 
@@ -99,6 +100,13 @@ export default function EditCoursePage() {
   const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null);
   const [editingModuleId, setEditingModuleId] = useState<string | null>(null);
   const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
+  
+  // Delete modal state
+  const [showDeleteModuleModal, setShowDeleteModuleModal] = useState(false);
+  const [moduleToDelete, setModuleToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [showDeleteLessonModal, setShowDeleteLessonModal] = useState(false);
+  const [lessonToDelete, setLessonToDelete] = useState<{ moduleId: string; lessonId: string; title: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (courseId) {
@@ -312,13 +320,19 @@ export default function EditCoursePage() {
     }
   };
 
-  const deleteModule = async (moduleId: string) => {
-    if (!confirm('Are you sure you want to delete this module and all its lessons?')) return;
+  const openDeleteModuleModal = (moduleId: string, moduleTitle: string) => {
+    setModuleToDelete({ id: moduleId, title: moduleTitle });
+    setShowDeleteModuleModal(true);
+  };
+
+  const deleteModule = async () => {
+    if (!moduleToDelete) return;
     
     try {
+      setIsDeleting(true);
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/instructor/courses/${courseId}/modules/${moduleId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/instructor/courses/${courseId}/modules/${moduleToDelete.id}`,
         {
           method: 'DELETE',
           headers: {
@@ -329,11 +343,15 @@ export default function EditCoursePage() {
 
       if (!response.ok) throw new Error('Failed to delete module');
       
-      setModules(modules.filter(m => m.id !== moduleId));
-      toast.success('Module deleted');
+      setModules(modules.filter(m => m.id !== moduleToDelete.id));
+      toast.success('Module deleted successfully');
+      setShowDeleteModuleModal(false);
+      setModuleToDelete(null);
     } catch (error) {
       console.error('Error deleting module:', error);
       toast.error('Failed to delete module');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -458,13 +476,19 @@ export default function EditCoursePage() {
     }
   };
 
-  const deleteLesson = async (moduleId: string, lessonId: string) => {
-    if (!confirm('Are you sure you want to delete this lesson?')) return;
+  const openDeleteLessonModal = (moduleId: string, lessonId: string, lessonTitle: string) => {
+    setLessonToDelete({ moduleId, lessonId, title: lessonTitle });
+    setShowDeleteLessonModal(true);
+  };
+
+  const deleteLesson = async () => {
+    if (!lessonToDelete) return;
     
     try {
+      setIsDeleting(true);
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/instructor/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/instructor/courses/${courseId}/modules/${lessonToDelete.moduleId}/lessons/${lessonToDelete.lessonId}`,
         {
           method: 'DELETE',
           headers: {
@@ -476,19 +500,23 @@ export default function EditCoursePage() {
       if (!response.ok) throw new Error('Failed to delete lesson');
       
       setModules(modules.map(m => {
-        if (m.id === moduleId) {
+        if (m.id === lessonToDelete.moduleId) {
           return {
             ...m,
-            lessons: m.lessons.filter(l => l.id !== lessonId)
+            lessons: m.lessons.filter(l => l.id !== lessonToDelete.lessonId)
           };
         }
         return m;
       }));
       
-      toast.success('Lesson deleted');
+      toast.success('Lesson deleted successfully');
+      setShowDeleteLessonModal(false);
+      setLessonToDelete(null);
     } catch (error) {
       console.error('Error deleting lesson:', error);
       toast.error('Failed to delete lesson');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -953,7 +981,7 @@ export default function EditCoursePage() {
                       </div>
                       
                       <button
-                        onClick={() => deleteModule(module.id)}
+                        onClick={() => openDeleteModuleModal(module.id, module.title)}
                         className="flex h-8 w-8 items-center justify-center rounded-lg text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
                         title="Delete module"
                       >
@@ -1113,7 +1141,7 @@ export default function EditCoursePage() {
                                   <HiOutlinePencil className="h-3.5 w-3.5" />
                                 </button>
                                 <button
-                                  onClick={() => deleteLesson(module.id, lesson.id)}
+                                  onClick={() => openDeleteLessonModal(module.id, lesson.id, lesson.title)}
                                   className="flex h-7 w-7 items-center justify-center rounded-lg text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
                                   title="Delete lesson"
                                 >
@@ -1225,6 +1253,152 @@ export default function EditCoursePage() {
         )}
         </div>
       </div>
+
+      {/* Delete Module Confirmation Modal */}
+      {showDeleteModuleModal && moduleToDelete && (
+        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-md">
+            {/* Header */}
+            <div className="px-6 py-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-800">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-error-100 dark:bg-error-500/15">
+                  <HiOutlineExclamationCircle className="h-6 w-6 text-error-600 dark:text-error-500" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Delete Module
+                </h3>
+              </div>
+              <button
+                onClick={() => {
+                  setShowDeleteModuleModal(false);
+                  setModuleToDelete(null);
+                }}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                disabled={isDeleting}
+              >
+                <HiOutlineX className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Are you sure you want to delete <span className="font-semibold text-gray-900 dark:text-white">{moduleToDelete.title}</span>?
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                This action cannot be undone and will permanently remove this module and all its lessons.
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModuleModal(false);
+                  setModuleToDelete(null);
+                }}
+                className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={deleteModule}
+                className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-error-600 text-white hover:bg-error-700 shadow-lg shadow-error-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <HiOutlineTrash className="h-4 w-4" />
+                    Delete Module
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Lesson Confirmation Modal */}
+      {showDeleteLessonModal && lessonToDelete && (
+        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-md">
+            {/* Header */}
+            <div className="px-6 py-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-800">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-error-100 dark:bg-error-500/15">
+                  <HiOutlineExclamationCircle className="h-6 w-6 text-error-600 dark:text-error-500" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Delete Lesson
+                </h3>
+              </div>
+              <button
+                onClick={() => {
+                  setShowDeleteLessonModal(false);
+                  setLessonToDelete(null);
+                }}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                disabled={isDeleting}
+              >
+                <HiOutlineX className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Are you sure you want to delete <span className="font-semibold text-gray-900 dark:text-white">{lessonToDelete.title}</span>?
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                This action cannot be undone and will permanently remove this lesson from the module.
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteLessonModal(false);
+                  setLessonToDelete(null);
+                }}
+                className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={deleteLesson}
+                className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-error-600 text-white hover:bg-error-700 shadow-lg shadow-error-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <HiOutlineTrash className="h-4 w-4" />
+                    Delete Lesson
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
