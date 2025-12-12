@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
+import Image from "next/image";
+import ImageCropper from "@/components/ImageCropper";
 import {
   HiOutlineInformationCircle,
   HiOutlineBookOpen,
@@ -26,6 +28,7 @@ import {
   HiOutlineCheckCircle,
   HiOutlineExclamationCircle,
   HiOutlineX,
+  HiOutlineCamera,
 } from "react-icons/hi";
 import Badge from "@/components/ui/badge/Badge";
 
@@ -45,6 +48,7 @@ interface Course {
   requirements: string;
   tags: string;
   status: string;
+  thumbnail?: string;
   modules: Module[];
 }
 
@@ -77,6 +81,10 @@ export default function EditCoursePage() {
   const [activeTab, setActiveTab] = useState('details');
   const [course, setCourse] = useState<Course | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const thumbnailInputRef = useRef<HTMLInputElement>(null);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -93,6 +101,7 @@ export default function EditCoursePage() {
     learningOutcomes: "",
     requirements: "",
     tags: "",
+    thumbnail: "",
   });
 
   // Module/Lesson state
@@ -150,8 +159,10 @@ export default function EditCoursePage() {
         learningOutcomes: data.learningOutcomes,
         requirements: data.requirements,
         tags: data.tags,
+        thumbnail: data.thumbnail || "",
       });
       setModules(data.modules || []);
+      setThumbnailPreview(data.thumbnail || null);
     } catch (error) {
       console.error('Error fetching course:', error);
       toast.error('Failed to load course', {
@@ -168,6 +179,91 @@ export default function EditCoursePage() {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleThumbnailClick = () => {
+    thumbnailInputRef.current?.click();
+  };
+
+  const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Reset the input
+    e.target.value = '';
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB');
+      return;
+    }
+
+    // Show cropper
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImageToCrop(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCropComplete = async (croppedBlob: Blob) => {
+    setImageToCrop(null);
+    setUploadingThumbnail(true);
+    
+    try {
+      const file = new File([croppedBlob], 'thumbnail.jpg', { type: 'image/jpeg' });
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/image`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formDataUpload,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload thumbnail');
+      }
+
+      const data = await response.json();
+      
+      // Update course with new thumbnail
+      const updateResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/instructor/courses/${courseId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ thumbnail: data.imageUrl }),
+        }
+      );
+
+      if (!updateResponse.ok) {
+        throw new Error('Failed to update course thumbnail');
+      }
+
+      const updatedCourse = await updateResponse.json();
+      setCourse(updatedCourse);
+      setFormData(prev => ({ ...prev, thumbnail: data.imageUrl }));
+      setThumbnailPreview(data.imageUrl);
+      toast.success('Thumbnail updated successfully');
+    } catch (error) {
+      console.error('Failed to upload thumbnail:', error);
+      toast.error('Failed to upload thumbnail. Please try again.');
+    } finally {
+      setUploadingThumbnail(false);
+    }
   };
 
   const validateDetails = (): boolean => {
@@ -441,6 +537,8 @@ export default function EditCoursePage() {
         return m;
       }));
       
+      // Auto-expand the module when adding a lesson
+      setExpandedModuleId(moduleId);
       setEditingLessonId(newLesson.id);
       toast.success('Lesson added');
     } catch (error) {
@@ -598,8 +696,7 @@ export default function EditCoursePage() {
               className="inline-flex items-center justify-center gap-1.5 h-9 rounded-lg border border-brand-500 bg-brand-500 px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-brand-600 hover:border-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <HiOutlineEye className="h-4 w-4" />
-              <span className="hidden sm:inline">Publish Course</span>
-              <span className="sm:hidden">Publish</span>
+              <span className="sm:inline">Publish Course</span>
             </button>
           )}
         </div>
@@ -646,6 +743,61 @@ export default function EditCoursePage() {
               </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Course Thumbnail (2:1 ratio recommended)
+                </label>
+                <div className="flex items-start gap-4">
+                  <div className="relative group">
+                    <div className="w-40 h-20 overflow-hidden border-2 border-dashed border-gray-300 rounded-lg dark:border-gray-600 bg-gray-100 dark:bg-gray-800">
+                      {thumbnailPreview ? (
+                        <Image
+                          width={160}
+                          height={80}
+                          src={`${process.env.NEXT_PUBLIC_API_URL}${thumbnailPreview}`}
+                          alt="Course thumbnail"
+                          className="object-cover w-full h-full"
+                          unoptimized
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center w-full h-full text-gray-400 dark:text-gray-600">
+                          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                      )}
+                      {uploadingThumbnail && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
+                          <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleThumbnailClick}
+                      disabled={uploadingThumbnail}
+                      className="absolute bottom-0 right-0 p-1.5 bg-brand-500 text-white rounded-full shadow-lg hover:bg-brand-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Upload thumbnail (2:1 ratio)"
+                    >
+                      <HiOutlineCamera className="w-4 h-4" />
+                    </button>
+                    <input
+                      ref={thumbnailInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleThumbnailChange}
+                      className="hidden"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Upload a course thumbnail image with a 2:1 aspect ratio (e.g., 1200x600px). 
+                      Maximum file size: 5MB. Supported formats: JPG, PNG, WebP.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Course Title <span className="text-red-500">*</span>
@@ -897,8 +1049,8 @@ export default function EditCoursePage() {
                   className="rounded-lg border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 overflow-hidden transition-all"
                 >
                   <div className="bg-gray-50 p-3 sm:p-4 dark:bg-gray-800/50">
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-xs sm:text-sm font-bold text-white shadow-lg shrink-0">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-sm sm:text-base font-bold text-white shadow-lg shrink-0">
                         {moduleIndex + 1}
                       </div>
                       
@@ -927,7 +1079,7 @@ export default function EditCoursePage() {
                               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white resize-none"
                               placeholder="Module description"
                             />
-                            <div className="flex gap-2">
+                            <div className="flex flex-wrap gap-2">
                               <button
                                 onClick={() => {
                                   updateModule(module.id, {
@@ -937,7 +1089,7 @@ export default function EditCoursePage() {
                                   setEditingModuleId(null);
                                 }}
                                 disabled={savingModule === module.id}
-                                className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-3 text-xs bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-2.5 sm:px-3 text-xs bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 {savingModule === module.id ? (
                                   <>
@@ -959,7 +1111,7 @@ export default function EditCoursePage() {
                                   setEditingModuleId(null);
                                   fetchCourse();
                                 }}
-                                className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-3 text-xs bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                                className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-2.5 sm:px-3 text-xs bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
                               >
                                 Cancel
                               </button>
@@ -977,17 +1129,17 @@ export default function EditCoursePage() {
                                 </p>
                               )}
                             </div>
-                            <div className="flex items-center gap-2 flex-wrap">
+                            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                               <button
                                 onClick={() => setEditingModuleId(module.id)}
-                                className="inline-flex items-center gap-1.5 h-8 rounded-lg border border-gray-300 bg-white px-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                                className="inline-flex items-center gap-1 sm:gap-1.5 h-7 sm:h-8 rounded-lg border border-gray-300 bg-white px-2 sm:px-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                               >
                                 <HiOutlinePencil className="h-3.5 w-3.5" />
                                 <span className="hidden sm:inline">Edit</span>
                               </button>
                               <button
                                 onClick={() => addLesson(module.id)}
-                                className="inline-flex items-center gap-1.5 h-8 rounded-lg border border-gray-300 bg-white px-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                                className="inline-flex items-center gap-1 sm:gap-1.5 h-7 sm:h-8 rounded-lg border border-gray-300 bg-white px-2 sm:px-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                               >
                                 <HiOutlinePlus className="h-3.5 w-3.5" />
                                 <span className="hidden sm:inline">Add Lesson</span>
@@ -996,7 +1148,7 @@ export default function EditCoursePage() {
                                 onClick={() => setExpandedModuleId(
                                   expandedModuleId === module.id ? null : module.id
                                 )}
-                                className="inline-flex items-center gap-1.5 text-xs text-brand-600 hover:text-brand-700 dark:text-brand-400 font-medium"
+                                className="inline-flex items-center gap-1 sm:gap-1.5 text-xs text-brand-600 hover:text-brand-700 dark:text-brand-400 font-medium"
                               >
                                 {expandedModuleId === module.id ? (
                                   <>
@@ -1134,7 +1286,7 @@ export default function EditCoursePage() {
                                     placeholder="Video URL (e.g., YouTube, Vimeo)"
                                   />
                                 )}
-                                <div className="flex gap-2">
+                                <div className="flex flex-wrap gap-2">
                                   <button
                                     onClick={() => {
                                       updateLesson(module.id, lesson.id, {
@@ -1146,7 +1298,7 @@ export default function EditCoursePage() {
                                       setEditingLessonId(null);
                                     }}
                                     disabled={savingLesson === lesson.id}
-                                    className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-3 text-xs bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-2.5 sm:px-3 text-xs bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
                                     {savingLesson === lesson.id ? (
                                       <>
@@ -1168,7 +1320,7 @@ export default function EditCoursePage() {
                                       setEditingLessonId(null);
                                       fetchCourse();
                                     }}
-                                    className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-3 text-xs bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+                                    className="h-8 inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition px-2.5 sm:px-3 text-xs bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
                                   >
                                     Cancel
                                   </button>
@@ -1271,16 +1423,6 @@ export default function EditCoursePage() {
                     </Badge>
                   </div>
                 </div>
-                {course.status !== 'PUBLISHED' && (
-                  <button
-                    onClick={handlePublish}
-                    disabled={saving}
-                    className="inline-flex items-center justify-center gap-2 h-9 font-medium rounded-lg transition px-4 text-xs bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <HiOutlineCheckCircle className="h-4 w-4" />
-                    Publish Course
-                  </button>
-                )}
               </div>
 
               <div className="flex items-center justify-between p-4 border border-red-200 rounded-lg dark:border-red-800/30 bg-red-50/50 dark:bg-red-900/10">
@@ -1526,6 +1668,16 @@ export default function EditCoursePage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Image Cropper Modal */}
+      {imageToCrop && (
+        <ImageCropper
+          image={imageToCrop}
+          onCropComplete={handleCropComplete}
+          onCancel={() => setImageToCrop(null)}
+          aspectRatio={2}
+        />
       )}
     </div>
   );

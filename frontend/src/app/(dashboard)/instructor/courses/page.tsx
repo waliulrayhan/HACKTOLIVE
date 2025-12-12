@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
@@ -40,6 +41,7 @@ interface Course {
   title: string;
   slug: string;
   shortDescription: string;
+  thumbnail?: string;
   category: string;
   level: string;
   tier: string;
@@ -110,10 +112,10 @@ export default function InstructorCoursesPage() {
       );
 
       if (!response.ok) throw new Error('Failed to fetch courses');
-      
+
       const data = await response.json();
       setAllCourses(data);
-      
+
       // Apply filters
       let filteredData = data;
       if (statusFilter !== 'ALL') {
@@ -130,7 +132,7 @@ export default function InstructorCoursesPage() {
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
       const paginatedData = filteredData.slice(startIndex, endIndex);
-      
+
       setCourses(paginatedData);
       setPagination({
         total: filteredData.length,
@@ -185,7 +187,7 @@ export default function InstructorCoursesPage() {
       );
 
       if (!response.ok) throw new Error('Failed to delete course');
-      
+
       toast.success('Course deleted successfully!');
       setShowDeleteModal(false);
       setCourseToDelete(null);
@@ -214,6 +216,12 @@ export default function InstructorCoursesPage() {
     return tier === 'PREMIUM' ? 'info' : 'default';
   };
 
+  const getTierBadgeClass = (tier: string) => {
+    return tier === 'PREMIUM'
+      ? 'bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-500'
+      : 'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-500';
+  };
+
   if (loading) {
     return (
       <div>
@@ -226,14 +234,14 @@ export default function InstructorCoursesPage() {
   const totalPublished = allCourses.filter(c => c.status === 'PUBLISHED').length;
   const totalDraft = allCourses.filter(c => c.status === 'DRAFT').length;
   const totalStudents = allCourses.reduce((sum, c) => sum + c.totalStudents, 0);
-  const avgRating = allCourses.length > 0 
-    ? allCourses.reduce((sum, c) => sum + c.rating, 0) / allCourses.length 
+  const avgRating = allCourses.length > 0
+    ? allCourses.reduce((sum, c) => sum + c.rating, 0) / allCourses.length
     : 0;
 
   return (
     <div className="space-y-4">
       <PageBreadcrumb pageTitle="My Courses" />
-      
+
       {/* Stats Cards */}
       <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
         <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
@@ -247,7 +255,7 @@ export default function InstructorCoursesPage() {
             </div>
           </div>
         </div>
-        
+
         <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-success-100 dark:bg-success-500/15">
@@ -259,7 +267,7 @@ export default function InstructorCoursesPage() {
             </div>
           </div>
         </div>
-        
+
         <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-info-100 dark:bg-info-500/15">
@@ -271,7 +279,7 @@ export default function InstructorCoursesPage() {
             </div>
           </div>
         </div>
-        
+
         <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-warning-100 dark:bg-warning-500/15">
@@ -390,7 +398,7 @@ export default function InstructorCoursesPage() {
                 {courses.map((course) => {
                   const statusBadge = getStatusBadge(course.status);
                   const StatusIcon = statusBadge.Icon;
-                  
+
                   return (
                     <TableRow key={course.id} className="border-b border-gray-100 hover:bg-gray-50 dark:border-white/5 dark:hover:bg-white/5">
                       <TableCell className="px-3 sm:px-4 py-3">
@@ -400,7 +408,7 @@ export default function InstructorCoursesPage() {
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white line-clamp-1">
-                              {course.title}
+                              {course.title}<span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${getTierBadgeClass(course.tier)}`}>{course.tier}</span>
                             </p>
                             <p className="mt-0.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
                               {course.shortDescription}
@@ -466,7 +474,7 @@ export default function InstructorCoursesPage() {
                 })}
               </TableBody>
             </Table>
-            
+
             {courses.length === 0 && (
               <div className="py-8 text-center">
                 <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
@@ -474,8 +482,8 @@ export default function InstructorCoursesPage() {
                 </div>
                 <p className="text-xs font-medium text-gray-900 dark:text-white">No courses found</p>
                 <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                  {searchTerm || statusFilter !== 'ALL' 
-                    ? 'Try adjusting your search or filter criteria' 
+                  {searchTerm || statusFilter !== 'ALL'
+                    ? 'Try adjusting your search or filter criteria'
                     : 'Get started by creating your first course'}
                 </p>
               </div>
@@ -503,7 +511,7 @@ export default function InstructorCoursesPage() {
                 of {pagination.total} results
               </span>
             </div>
-            
+
             <div className="flex items-center gap-1">
               {/* First Page */}
               <button
@@ -514,7 +522,7 @@ export default function InstructorCoursesPage() {
               >
                 <HiOutlineChevronDoubleLeft className="h-3 w-3" />
               </button>
-              
+
               {/* Previous Page */}
               <button
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
@@ -524,7 +532,7 @@ export default function InstructorCoursesPage() {
               >
                 <HiOutlineChevronLeft className="h-3 w-3" />
               </button>
-              
+
               {/* Page Numbers */}
               {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
                 .filter(page => {
@@ -542,17 +550,16 @@ export default function InstructorCoursesPage() {
                     )}
                     <button
                       onClick={() => setCurrentPage(page)}
-                      className={`flex h-7 w-7 items-center justify-center rounded-md border text-xs font-medium transition-colors ${
-                        pagination.page === page
+                      className={`flex h-7 w-7 items-center justify-center rounded-md border text-xs font-medium transition-colors ${pagination.page === page
                           ? 'border-brand-500 bg-brand-500 text-white'
                           : 'border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3'
-                      }`}
+                        }`}
                     >
                       {page}
                     </button>
                   </React.Fragment>
                 ))}
-              
+
               {/* Next Page */}
               <button
                 onClick={() => setCurrentPage(p => Math.min(pagination.totalPages, p + 1))}
@@ -562,7 +569,7 @@ export default function InstructorCoursesPage() {
               >
                 <HiOutlineChevronRight className="h-3 w-3" />
               </button>
-              
+
               {/* Last Page */}
               <button
                 onClick={() => setCurrentPage(pagination.totalPages)}
@@ -599,6 +606,20 @@ export default function InstructorCoursesPage() {
 
             {/* Body */}
             <div className="p-4 space-y-4">
+              {/* Thumbnail */}
+              {selectedCourse.thumbnail && (
+                <div className="w-full aspect-[2/1] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                  <Image
+                    width={600}
+                    height={300}
+                    src={`${process.env.NEXT_PUBLIC_API_URL}${selectedCourse.thumbnail}`}
+                    alt={selectedCourse.title}
+                    className="object-cover w-full h-full"
+                    unoptimized
+                  />
+                </div>
+              )}
+
               {/* Title & Description */}
               <div>
                 <h4 className="text-sm font-medium text-gray-900 dark:text-white">
