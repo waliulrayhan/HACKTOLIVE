@@ -137,17 +137,58 @@ export class InstructorController {
   @Post('courses')
   async createCourse(
     @Request() req: any,
-    @Body() data: Prisma.CourseCreateInput,
+    @Body() data: any,
   ) {
     const instructor = await this.prisma.instructor.findUnique({
       where: { userId: req.user.id },
     });
 
+    if (!instructor) {
+      throw new Error('Instructor profile not found');
+    }
+
+    // Extract modules from data to handle separately
+    const { modules, ...courseData } = data;
+
+    // Prepare the course creation data with proper nested structure
+    const createData: any = {
+      ...courseData,
+      instructor: {
+        connect: { id: instructor.id },
+      },
+    };
+
+    // If modules are provided, format them for Prisma nested create
+    if (modules && Array.isArray(modules) && modules.length > 0) {
+      createData.modules = {
+        create: modules.map((module: any) => {
+          const { lessons, ...moduleData } = module;
+          
+          const moduleCreate: any = {
+            ...moduleData,
+          };
+
+          // If lessons are provided for this module, add them
+          if (lessons && Array.isArray(lessons) && lessons.length > 0) {
+            moduleCreate.lessons = {
+              create: lessons,
+            };
+          }
+
+          return moduleCreate;
+        }),
+      };
+    }
+
+    console.log('Creating course with data:', JSON.stringify(createData, null, 2));
+
     return this.prisma.course.create({
-      data: {
-        ...data,
-        instructor: {
-          connect: { id: instructor?.id },
+      data: createData,
+      include: {
+        modules: {
+          include: {
+            lessons: true,
+          },
         },
       },
     });
