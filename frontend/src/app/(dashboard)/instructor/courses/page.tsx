@@ -437,7 +437,7 @@ export default function InstructorCoursesPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="px-3 sm:px-4 py-3 text-center">
-                        <div className="flex items-center justify-end gap-1">
+                        <div className="flex items-center justify-center gap-1">
                           <button
                             onClick={() => openViewModal(course)}
                             className="flex h-7 w-7 items-center justify-center rounded-md text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
