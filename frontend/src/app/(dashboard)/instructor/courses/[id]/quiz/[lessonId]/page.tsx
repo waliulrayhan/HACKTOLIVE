@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
+import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
 import { toast } from "@/components/ui/toast";
 import {
   HiOutlineArrowLeft,
@@ -260,8 +261,9 @@ export default function QuizManagementPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div>
+        <PageBreadcrumb pageTitle={existingQuiz ? "Edit Quiz" : "Create Quiz"} />
+        <TablePageLoadingSkeleton />
       </div>
     );
   }
@@ -270,57 +272,57 @@ export default function QuizManagementPage() {
     <div>
       <PageBreadcrumb pageTitle={existingQuiz ? "Edit Quiz" : "Create Quiz"} />
 
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
           >
-            <HiOutlineArrowLeft className="h-4 w-4" />
+            <HiOutlineArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             Back to Course
           </button>
 
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <button
               onClick={() => router.back()}
-              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
             >
               Cancel
             </button>
             <button
               onClick={handleSaveQuiz}
               disabled={saving}
-              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-brand-500 bg-brand-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-600 hover:border-brand-600 disabled:opacity-50 transition-colors"
             >
-              <HiOutlineSave className="h-5 w-5" />
+              <HiOutlineSave className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               {saving ? "Saving..." : existingQuiz ? "Update Quiz" : "Create Quiz"}
             </button>
           </div>
         </div>
 
         {/* Quiz Details */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
             Quiz Details
           </h2>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-1.5">
                 Quiz Title *
               </label>
               <input
                 type="text"
                 value={quiz.title}
                 onChange={(e) => setQuiz({ ...quiz, title: e.target.value })}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 placeholder="e.g., Security Fundamentals Quiz"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-1.5">
                 Passing Score (%) *
               </label>
               <input
@@ -331,25 +333,25 @@ export default function QuizManagementPage() {
                 onChange={(e) =>
                   setQuiz({ ...quiz, passingScore: Number(e.target.value) })
                 }
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-1.5">
                 Description
               </label>
               <textarea
                 value={quiz.description}
                 onChange={(e) => setQuiz({ ...quiz, description: e.target.value })}
                 rows={3}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 placeholder="Brief description of what this quiz covers..."
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-1.5">
                 Time Limit (minutes)
               </label>
               <input
@@ -362,7 +364,7 @@ export default function QuizManagementPage() {
                     timeLimit: e.target.value ? Number(e.target.value) : undefined,
                   })
                 }
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 placeholder="Leave empty for no time limit"
               />
             </div>
@@ -370,72 +372,72 @@ export default function QuizManagementPage() {
         </div>
 
         {/* Questions */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
               Questions ({quiz.questions.length})
             </h2>
             <button
               onClick={() => openQuestionModal()}
-              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-brand-500 bg-brand-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-600 hover:border-brand-600 transition-colors"
             >
-              <HiOutlinePlus className="h-5 w-5" />
+              <HiOutlinePlus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Add Question
             </button>
           </div>
 
           {quiz.questions.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-center py-8 sm:py-12">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 No questions added yet. Click "Add Question" to get started.
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-2 sm:space-y-3">
               {quiz.questions.map((question, index) => (
                 <div
                   key={index}
-                  className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-700"
+                  className="rounded-md border border-gray-200 bg-gray-50 p-3 sm:p-4 dark:border-white/5 dark:bg-white/3"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <div className="flex items-start justify-between gap-2 sm:gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+                        <span className="text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400">
                           Q{index + 1}
                         </span>
-                        <Badge color="info">{getQuestionTypeLabel(question.type)}</Badge>
+                        <Badge color="info" size="sm">{getQuestionTypeLabel(question.type)}</Badge>
                       </div>
-                      <p className="text-gray-900 dark:text-white font-medium mb-2">
+                      <p className="text-xs sm:text-sm text-gray-900 dark:text-white font-medium mb-1.5 sm:mb-2">
                         {question.question}
                       </p>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        <p className="mb-1">
+                      <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 space-y-0.5">
+                        <p>
                           <strong>Options:</strong> {question.options}
                         </p>
-                        <p className="text-green-600 dark:text-green-400">
+                        <p className="text-success-600 dark:text-success-400">
                           <strong>Correct Answer:</strong> {question.correctAnswer}
                         </p>
                         {question.explanation && (
-                          <p className="mt-1 text-blue-600 dark:text-blue-400">
+                          <p className="text-info-600 dark:text-info-400">
                             <strong>Explanation:</strong> {question.explanation}
                           </p>
                         )}
                       </div>
                     </div>
-                    <div className="flex gap-2 ml-4">
+                    <div className="flex gap-1.5 shrink-0">
                       <button
                         onClick={() => openQuestionModal(question, index)}
-                        className="rounded p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900"
+                        className="rounded p-1.5 text-brand-600 hover:bg-brand-50 dark:text-brand-400 dark:hover:bg-brand-500/10 transition-colors"
                         title="Edit"
                       >
-                        <HiOutlineCheckCircle className="h-5 w-5" />
+                        <HiOutlineCheckCircle className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteQuestion(index)}
-                        className="rounded p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900"
+                        className="rounded p-1.5 text-error-600 hover:bg-error-50 dark:text-error-400 dark:hover:bg-error-500/10 transition-colors"
                         title="Delete"
                       >
-                        <HiOutlineTrash className="h-5 w-5" />
+                        <HiOutlineTrash className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
@@ -448,23 +450,23 @@ export default function QuizManagementPage() {
 
       {/* Question Modal */}
       {showQuestionModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="w-full max-w-2xl rounded-lg bg-white p-6 dark:bg-gray-800 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+        <div className="fixed inset-0 z-100000 flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-4">
+          <div className="w-full max-w-2xl rounded-xl bg-white p-4 sm:p-6 dark:bg-gray-800 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
                 {editingQuestion ? "Edit Question" : "Add Question"}
               </h2>
               <button
                 onClick={() => setShowQuestionModal(false)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
               >
-                <HiOutlineX className="h-6 w-6" />
+                <HiOutlineX className="h-5 w-5 sm:h-6 sm:w-6" />
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-1.5">
                   Question Type *
                 </label>
                 <select
@@ -475,7 +477,7 @@ export default function QuizManagementPage() {
                       type: e.target.value as any,
                     })
                   }
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
                 >
                   <option value="MCQ">Multiple Choice (Single Answer)</option>
                   <option value="MULTIPLE_SELECT">Multiple Choice (Multiple Answers)</option>
@@ -484,7 +486,7 @@ export default function QuizManagementPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-1.5">
                   Question Text *
                 </label>
                 <textarea
@@ -493,13 +495,13 @@ export default function QuizManagementPage() {
                     setQuestionForm({ ...questionForm, question: e.target.value })
                   }
                   rows={3}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   placeholder="Enter your question here..."
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-1.5">
                   Options * (Comma-separated or JSON array format)
                 </label>
                 <textarea
@@ -508,16 +510,16 @@ export default function QuizManagementPage() {
                     setQuestionForm({ ...questionForm, options: e.target.value })
                   }
                   rows={3}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   placeholder='e.g., Option A, Option B, Option C or ["Option A", "Option B", "Option C"]'
                 />
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
                   For True/False: use "True, False" or ["True", "False"]
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-1.5">
                   Correct Answer *
                 </label>
                 <input
@@ -526,13 +528,13 @@ export default function QuizManagementPage() {
                   onChange={(e) =>
                     setQuestionForm({ ...questionForm, correctAnswer: e.target.value })
                   }
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   placeholder="Enter the correct answer exactly as it appears in options"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-1.5">
                   Explanation (Optional)
                 </label>
                 <textarea
@@ -541,21 +543,21 @@ export default function QuizManagementPage() {
                     setQuestionForm({ ...questionForm, explanation: e.target.value })
                   }
                   rows={2}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   placeholder="Explain why this is the correct answer..."
                 />
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-2 sm:gap-3 pt-3 sm:pt-4">
                 <button
                   onClick={handleSaveQuestion}
-                  className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                  className="flex-1 rounded-lg border border-brand-500 bg-brand-500 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white hover:bg-brand-600 hover:border-brand-600 transition-colors"
                 >
                   {editingQuestion ? "Update Question" : "Add Question"}
                 </button>
                 <button
                   onClick={() => setShowQuestionModal(false)}
-                  className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                  className="flex-1 rounded-lg border border-gray-300 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5 transition-colors"
                 >
                   Cancel
                 </button>

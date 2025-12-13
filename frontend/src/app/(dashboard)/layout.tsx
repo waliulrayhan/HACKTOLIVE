@@ -125,11 +125,11 @@ export default function DashboardLayout({
             name: "Students",
             path: "/instructor/students",
           },
-          {
-            icon: <PieChartIcon />,
-            name: "Analytics",
-            path: "/instructor/analytics",
-          },
+          // {
+          //   icon: <PieChartIcon />,
+          //   name: "Analytics",
+          //   path: "/instructor/analytics",
+          // },
           {
             icon: <TaskIcon />,
             name: "Assignments",

@@ -272,26 +272,28 @@ export default function AssignmentManagementPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90">
+    <div className="space-y-4">
+      {/* Breadcrumb */}
+      <div className="rounded-md border border-gray-200 bg-white p-3 dark:border-white/5 dark:bg-white/3">
+        <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
           {lesson.module.course.title} → {lesson.module.title} → {lesson.title} → Assignment
-        </h2>
+        </p>
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => router.push(`/instructor/courses/${courseId}/edit`)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+            className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg border border-gray-300 text-gray-700 transition-colors hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
           >
-            <HiOutlineArrowLeft className="h-5 w-5" />
+            <HiOutlineArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
               {editMode ? "Edit Assignment" : "Create Assignment"}
             </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
               {lesson.module.title} → {lesson.title}
             </p>
           </div>
@@ -299,27 +301,30 @@ export default function AssignmentManagementPage() {
 
         <div className="flex items-center gap-2">
           {editMode && assignment.id && (
-            <Button
+            <button
               onClick={handleDeleteAssignment}
-              variant="outline"
-              className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-error-500 bg-white px-3 py-1.5 text-xs font-medium text-error-600 transition-colors hover:bg-error-50 dark:border-error-500/50 dark:bg-white/3 dark:text-error-400 dark:hover:bg-error-500/10"
             >
-              <HiOutlineTrash className="mr-2 h-4 w-4" />
-              Delete
-            </Button>
+              <HiOutlineTrash className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Delete</span>
+            </button>
           )}
-          <Button onClick={handleSaveAssignment} disabled={saving}>
-            <HiOutlineSave className="mr-2 h-4 w-4" />
-            {saving ? "Saving..." : editMode ? "Update Assignment" : "Create Assignment"}
-          </Button>
+          <button
+            onClick={handleSaveAssignment}
+            disabled={saving}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-brand-500 bg-brand-500 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-brand-600 hover:border-brand-600 disabled:opacity-50"
+          >
+            <HiOutlineSave className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            {saving ? "Saving..." : editMode ? "Update" : "Create"}
+          </button>
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
-        <div className="space-y-6">
+      <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+        <div className="space-y-4">
           {/* Title */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1.5 block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
               Assignment Title *
             </label>
             <input
@@ -327,13 +332,13 @@ export default function AssignmentManagementPage() {
               value={assignment.title}
               onChange={(e) => setAssignment({ ...assignment, title: e.target.value })}
               placeholder="Enter assignment title"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1.5 block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
               Description *
             </label>
             <textarea
@@ -341,13 +346,13 @@ export default function AssignmentManagementPage() {
               onChange={(e) => setAssignment({ ...assignment, description: e.target.value })}
               placeholder="Briefly describe the assignment"
               rows={3}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
             />
           </div>
 
           {/* Instructions */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1.5 block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
               Instructions
             </label>
             <textarea
@@ -355,14 +360,14 @@ export default function AssignmentManagementPage() {
               onChange={(e) => setAssignment({ ...assignment, instructions: e.target.value })}
               placeholder="Provide detailed instructions for students"
               rows={6}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
             />
           </div>
 
           {/* Max Score and Due Date */}
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="mb-1.5 block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
                 Maximum Score *
               </label>
               <input
@@ -371,30 +376,30 @@ export default function AssignmentManagementPage() {
                 max="1000"
                 value={assignment.maxScore}
                 onChange={(e) => setAssignment({ ...assignment, maxScore: parseInt(e.target.value) || 100 })}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="mb-1.5 block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
                 Due Date (Optional)
               </label>
               <input
                 type="datetime-local"
                 value={assignment.dueDate}
                 onChange={(e) => setAssignment({ ...assignment, dueDate: e.target.value })}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
               />
             </div>
           </div>
 
           {/* Info Box */}
-          <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
-            <div className="flex gap-3">
-              <HiOutlineClipboardList className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
-              <div className="text-sm text-blue-800 dark:text-blue-300">
-                <p className="font-medium">Assignment Guidelines:</p>
-                <ul className="mt-2 list-inside list-disc space-y-1">
+          <div className="rounded-lg bg-info-50 p-3 dark:bg-info-500/10 border border-info-200 dark:border-info-500/20">
+            <div className="flex gap-2 sm:gap-3">
+              <HiOutlineClipboardList className="mt-0.5 h-4 w-4 sm:h-5 sm:w-5 shrink-0 text-info-600 dark:text-info-400" />
+              <div className="text-[10px] sm:text-xs text-info-800 dark:text-info-300">
+                <p className="font-semibold">Assignment Guidelines:</p>
+                <ul className="mt-1.5 list-inside list-disc space-y-0.5">
                   <li>Students will submit their work through the student portal</li>
                   <li>You can grade submissions from the Assignments page</li>
                   <li>Set a due date to help students manage their time</li>
