@@ -58,7 +58,7 @@ export default function DashboardLayout({
           {
             icon: <BoxIconLine />,
             name: "Browse Courses",
-            path: "/student/browse",
+            path: "/academy/courses",
           },
           {
             icon: <UserCircleIcon />,

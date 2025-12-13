@@ -128,8 +128,12 @@ export default function CourseDetailPage() {
 
   if (!course) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">Course not found</p>
+      <div>
+        <PageBreadcrumb pageTitle="Course Details" />
+        <div className="rounded-md border border-gray-200 bg-white p-8 sm:p-12 text-center dark:border-white/5 dark:bg-white/3">
+          <HiOutlineAcademicCap className="mx-auto h-12 w-12 sm:h-16 sm:w-16 text-gray-400 dark:text-gray-600 opacity-50" />
+          <p className="mt-4 text-sm sm:text-base text-gray-500 dark:text-gray-400">Course not found</p>
+        </div>
       </div>
     );
   }
@@ -145,33 +149,33 @@ export default function CourseDetailPage() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <PageBreadcrumb pageTitle={course.title} />
 
       {/* Course Header */}
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
-        <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-3">
+      <div className="overflow-hidden rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 p-4 sm:p-6 lg:grid-cols-3">
           {/* Course Info */}
           <div className="lg:col-span-2">
-            <div className="mb-4 flex items-center gap-2">
-              <span className="rounded-md bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+            <div className="mb-3 sm:mb-4 flex items-center gap-2 flex-wrap">
+              <span className="rounded-md bg-blue-100 px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
                 {course.category.replace(/_/g, " ")}
               </span>
-              <span className="rounded-md bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800 dark:bg-gray-900 dark:text-gray-300">
+              <span className="rounded-md bg-gray-100 px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-medium text-gray-800 dark:bg-gray-800 dark:text-gray-300">
                 {course.level}
               </span>
             </div>
 
-            <h1 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="mb-3 sm:mb-4 text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
               {course.title}
             </h1>
 
-            <p className="mb-4 text-gray-600 dark:text-gray-400">
+            <p className="mb-3 sm:mb-4 text-sm sm:text-base text-gray-600 dark:text-gray-400">
               {course.shortDescription}
             </p>
 
             {/* Instructor */}
-            <div className="mb-4 flex items-center gap-3">
+            <div className="mb-3 sm:mb-4 flex items-center gap-3">
               {course.instructor.avatar ? (
                 <Image
                   src={course.instructor.avatar}
@@ -194,36 +198,36 @@ export default function CourseDetailPage() {
             </div>
 
             {/* Stats */}
-            <div className="flex items-center gap-6 text-sm">
-              <div className="flex items-center gap-2">
-                <HiOutlineStar className="h-5 w-5 text-yellow-500" />
+            <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <HiOutlineStar className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-500" />
                 <span className="text-gray-900 dark:text-white">
-                  {course.rating.toFixed(1)} ({course.totalRatings} reviews)
+                  {course.rating.toFixed(1)} ({course.totalRatings})
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <HiOutlineUsers className="h-5 w-5 text-gray-500" />
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <HiOutlineUsers className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-gray-400" />
                 <span className="text-gray-900 dark:text-white">
                   {course.totalStudents} students
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <HiOutlineClock className="h-5 w-5 text-gray-500" />
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <HiOutlineClock className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-gray-400" />
                 <span className="text-gray-900 dark:text-white">
-                  {Math.floor(course.duration / 60)} hours
+                  {Math.floor(course.duration / 60)}h
                 </span>
               </div>
             </div>
           </div>
 
           {/* Progress Card */}
-          <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-800">
-            <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+          <div className="rounded-md border border-gray-200 bg-gray-50 p-4 sm:p-6 dark:border-white/5 dark:bg-white/5">
+            <h3 className="mb-3 sm:mb-4 text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
               Your Progress
             </h3>
 
-            <div className="mb-4">
-              <div className="mb-2 flex items-center justify-between text-sm">
+            <div className="mb-3 sm:mb-4">
+              <div className="mb-2 flex items-center justify-between text-xs sm:text-sm">
                 <span className="text-gray-600 dark:text-gray-400">
                   Course Completion
                 </span>
@@ -231,15 +235,15 @@ export default function CourseDetailPage() {
                   {Math.round(enrollment.progress)}%
                 </span>
               </div>
-              <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+              <div className="h-2 sm:h-2.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                 <div
-                  className="h-full rounded-full bg-blue-600 transition-all dark:bg-blue-500"
+                  className="h-full rounded-full bg-brand-500 transition-all"
                   style={{ width: `${enrollment.progress}%` }}
                 />
               </div>
             </div>
 
-            <div className="space-y-2 text-sm">
+            <div className="space-y-2 text-xs sm:text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-gray-400">
                   Completed Lessons:
@@ -252,16 +256,16 @@ export default function CourseDetailPage() {
                 <span className="text-gray-600 dark:text-gray-400">
                   Status:
                 </span>
-                <span
-                  className={`font-medium ${
-                    enrollment.status === "COMPLETED"
-                      ? "text-green-600 dark:text-green-400"
-                      : "text-blue-600 dark:text-blue-400"
-                  }`}
-                >
-                  {enrollment.status === "COMPLETED"
-                    ? "Completed"
-                    : "In Progress"}
+                <span className="px-2 py-0.5 text-xs font-medium rounded-full">
+                  {enrollment.status === "COMPLETED" ? (
+                    <span className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
+                      Completed
+                    </span>
+                  ) : (
+                    <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                      In Progress
+                    </span>
+                  )}
                 </span>
               </div>
             </div>
@@ -270,12 +274,12 @@ export default function CourseDetailPage() {
       </div>
 
       {/* Course Content */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
-        <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+      <div className="rounded-md border border-gray-200 bg-white p-4 sm:p-6 dark:border-white/5 dark:bg-white/3">
+        <h2 className="mb-3 sm:mb-4 text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
           Course Content
         </h2>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {course.modules.map((module: any, moduleIndex: number) => {
             const isExpanded = expandedModules.has(module.id);
             const moduleLessons = module.lessons.length;
@@ -286,36 +290,36 @@ export default function CourseDetailPage() {
             return (
               <div
                 key={module.id}
-                className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700"
+                className="overflow-hidden rounded-md border border-gray-200 dark:border-white/5"
               >
                 {/* Module Header */}
                 <button
                   onClick={() => toggleModule(module.id)}
-                  className="flex w-full items-center justify-between bg-gray-50 p-4 text-left hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
+                  className="flex w-full items-center justify-between bg-gray-50 p-3 sm:p-4 text-left hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 transition-colors"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 dark:bg-blue-900 dark:text-blue-300">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <span className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-brand-100 text-xs sm:text-sm font-semibold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
                       {moduleIndex + 1}
                     </span>
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                      <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
                         {module.title}
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {moduleCompleted} / {moduleLessons} lessons completed
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                        {moduleCompleted} / {moduleLessons} lessons
                       </p>
                     </div>
                   </div>
                   {isExpanded ? (
-                    <HiOutlineChevronUp className="h-5 w-5 text-gray-500" />
+                    <HiOutlineChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-gray-400" />
                   ) : (
-                    <HiOutlineChevronDown className="h-5 w-5 text-gray-500" />
+                    <HiOutlineChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-gray-400" />
                   )}
                 </button>
 
                 {/* Module Lessons */}
                 {isExpanded && (
-                  <div className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
+                  <div className="divide-y divide-gray-200 bg-white dark:divide-white/5 dark:bg-white/3">
                     {module.lessons.map((lesson: any, lessonIndex: number) => {
                       const isCompleted = lesson.progress.length > 0;
 
@@ -323,15 +327,15 @@ export default function CourseDetailPage() {
                         <button
                           key={lesson.id}
                           onClick={() => handleLessonClick(lesson)}
-                          className="flex w-full items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-800"
+                          className="flex w-full items-center justify-between p-3 sm:p-4 text-left hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="text-gray-500">
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="text-gray-500 dark:text-gray-400">
                               {getLessonIcon(lesson.type)}
                             </div>
-                            <div>
+                            <div className="flex-1">
                               <h4
-                                className={`text-sm font-medium ${
+                                className={`text-xs sm:text-sm font-medium ${
                                   isCompleted
                                     ? "text-gray-500 line-through dark:text-gray-400"
                                     : "text-gray-900 dark:text-white"
@@ -339,15 +343,15 @@ export default function CourseDetailPage() {
                               >
                                 {lesson.title}
                               </h4>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
                                 {lesson.type} • {lesson.duration} min
                               </p>
                             </div>
                           </div>
                           {isCompleted ? (
-                            <HiOutlineCheckCircle className="h-6 w-6 text-green-600" />
+                            <HiOutlineCheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 dark:text-green-500" />
                           ) : (
-                            <HiOutlinePlay className="h-5 w-5 text-gray-400" />
+                            <HiOutlinePlay className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-500" />
                           )}
                         </button>
                       );

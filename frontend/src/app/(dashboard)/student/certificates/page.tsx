@@ -11,8 +11,9 @@ import {
   HiOutlineEye,
   HiOutlineCheckCircle,
   HiOutlineCalendar,
+  HiOutlineBadgeCheck,
 } from "react-icons/hi";
-import { FaCertificate } from "react-icons/fa";
+import { HiOutlineTrophy } from "react-icons/hi2";
 
 interface Certificate {
   id: string;
@@ -93,34 +94,67 @@ export default function CertificatesPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <PageBreadcrumb pageTitle="My Certificates" />
-        <div className="text-sm text-gray-600 dark:text-gray-400">
-          {certificates.length} certificate{certificates.length !== 1 ? "s" : ""} earned
-        </div>
-      </div>
+    <div className="space-y-4">
+      <PageBreadcrumb pageTitle="My Certificates" />
 
-      {/* Stats Banner */}
-      <div className="rounded-lg border border-gray-200 bg-linear-to-r from-blue-500 to-purple-600 p-8 text-white dark:border-white/5">
-        <div className="flex items-center gap-4">
-          <div className="rounded-lg bg-white/20 p-4">
-            <FaCertificate className="h-12 w-12" />
+      {/* Stats Overview */}
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-500/15">
+              <HiOutlineBadgeCheck className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600 dark:text-yellow-500" />
+            </div>
+            <div>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Total Certificates</p>
+              <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">{certificates.length}</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-3xl font-bold">{certificates.length}</h2>
-            <p className="text-blue-100">
-              Total Certificates Earned
-            </p>
+        </div>
+
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-500/15">
+              <HiOutlineCheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-500" />
+            </div>
+            <div>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Courses Completed</p>
+              <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">{certificates.length}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-500/15">
+              <HiOutlineTrophy className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-500" />
+            </div>
+            <div>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Achievements</p>
+              <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">{certificates.length}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-500/15">
+              <HiOutlineCalendar className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-500" />
+            </div>
+            <div>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">This Year</p>
+              <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">
+                {certificates.filter(c => new Date(c.issuedAt).getFullYear() === new Date().getFullYear()).length}
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Certificates Grid */}
       {certificates.length === 0 ? (
-        <div className="rounded-lg border border-gray-200 bg-white p-12 text-center dark:border-white/5 dark:bg-white/3">
-          <FaCertificate className="mx-auto h-20 w-20 text-gray-400" />
-          <h3 className="mt-4 text-xl font-semibold text-gray-900 dark:text-white">
+        <div className="rounded-md border border-gray-200 bg-white p-8 sm:p-12 text-center dark:border-white/5 dark:bg-white/3">
+          <HiOutlineBadgeCheck className="mx-auto h-12 w-12 sm:h-16 sm:w-16 text-gray-400 dark:text-gray-600 opacity-50" />
+          <h3 className="mt-4 text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
             No Certificates Yet
           </h3>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -128,30 +162,30 @@ export default function CertificatesPage() {
           </p>
           <button
             onClick={() => router.push("/student/courses")}
-            className="mt-6 rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700"
+            className="mt-6 rounded-md bg-brand-500 px-6 py-2 sm:py-3 text-sm font-medium text-white hover:bg-brand-600 transition-colors"
           >
             View My Courses
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
           {certificates.map((certificate) => (
             <div
               key={certificate.id}
-              className="group overflow-hidden rounded-lg border border-gray-200 bg-white transition-all hover:shadow-xl dark:border-white/5 dark:bg-white/3"
+              className="group overflow-hidden rounded-md border border-gray-200 bg-white transition-all hover:shadow-lg dark:border-white/5 dark:bg-white/3"
             >
               {/* Certificate Visual */}
-              <div className="relative h-48 bg-linear-to-br from-blue-500 to-purple-600 p-6">
+              <div className="relative h-40 sm:h-48 bg-gradient-to-br from-brand-500 to-purple-600 p-4 sm:p-6">
                 <div className="absolute inset-0 bg-black/10"></div>
                 <div className="relative z-10 flex h-full flex-col justify-between text-white">
                   <div>
-                    <FaCertificate className="h-12 w-12 opacity-50" />
+                    <HiOutlineBadgeCheck className="h-10 w-10 sm:h-12 sm:w-12 opacity-50" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold">
+                    <h3 className="text-base sm:text-lg font-bold">
                       Certificate of Completion
                     </h3>
-                    <p className="mt-1 text-sm opacity-90">
+                    <p className="mt-1 text-xs sm:text-sm opacity-90 line-clamp-1">
                       {certificate.studentName}
                     </p>
                   </div>
@@ -159,31 +193,31 @@ export default function CertificatesPage() {
               </div>
 
               {/* Certificate Details */}
-              <div className="p-6">
-                <h4 className="mb-2 line-clamp-2 text-lg font-semibold text-gray-900 dark:text-white">
+              <div className="p-4 sm:p-6">
+                <h4 className="mb-2 line-clamp-2 text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
                   {certificate.courseName}
                 </h4>
 
                 {/* Instructor */}
-                <div className="mb-4 flex items-center gap-2">
+                <div className="mb-3 sm:mb-4 flex items-center gap-2">
                   {certificate.course.instructor.avatar ? (
                     <Image
                       src={certificate.course.instructor.avatar}
                       alt={certificate.course.instructor.name}
-                      width={24}
-                      height={24}
+                      width={20}
+                      height={20}
                       className="rounded-full"
                     />
                   ) : (
-                    <div className="h-6 w-6 rounded-full bg-gray-300 dark:bg-gray-600" />
+                    <div className="h-5 w-5 rounded-full bg-gray-300 dark:bg-gray-600" />
                   )}
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
                     {certificate.course.instructor.name}
                   </span>
                 </div>
 
                 {/* Issue Date */}
-                <div className="mb-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <div className="mb-3 sm:mb-4 flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                   <HiOutlineCalendar className="h-4 w-4" />
                   <span>
                     Issued on{" "}
@@ -196,13 +230,13 @@ export default function CertificatesPage() {
                 </div>
 
                 {/* Verification Code */}
-                <div className="mb-4 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
-                  <p className="mb-1 text-xs text-gray-600 dark:text-gray-400">
+                <div className="mb-3 sm:mb-4 rounded-md bg-gray-50 p-3 dark:bg-white/5">
+                  <p className="mb-1 text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
                     Verification Code
                   </p>
                   <button
                     onClick={() => handleVerify(certificate.verificationCode)}
-                    className="font-mono text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                    className="font-mono text-xs sm:text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 transition-colors"
                   >
                     {certificate.verificationCode}
                   </button>
@@ -212,16 +246,16 @@ export default function CertificatesPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleDownload(certificate)}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                    className="flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-md bg-brand-500 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white hover:bg-brand-600 transition-colors"
                   >
-                    <HiOutlineDownload className="h-4 w-4" />
+                    <HiOutlineDownload className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     Download
                   </button>
                   <button
                     onClick={() => router.push(`/student/courses/${certificate.course.id}`)}
-                    className="flex items-center justify-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                    className="flex items-center justify-center rounded-md border border-gray-300 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
                   >
-                    <HiOutlineEye className="h-4 w-4" />
+                    <HiOutlineEye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   </button>
                 </div>
               </div>
@@ -232,14 +266,14 @@ export default function CertificatesPage() {
 
       {/* Info Box */}
       {certificates.length > 0 && (
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950">
-          <div className="flex gap-3">
-            <HiOutlineCheckCircle className="h-6 w-6 shrink-0 text-blue-600 dark:text-blue-400" />
+        <div className="rounded-md border border-blue-200 bg-blue-50 p-3 sm:p-4 dark:border-blue-900/30 dark:bg-blue-950/30">
+          <div className="flex gap-2 sm:gap-3">
+            <HiOutlineCheckCircle className="h-5 w-5 sm:h-6 sm:w-6 shrink-0 text-blue-600 dark:text-blue-400" />
             <div>
-              <h4 className="font-semibold text-blue-900 dark:text-blue-100">
+              <h4 className="text-sm sm:text-base font-semibold text-blue-900 dark:text-blue-100">
                 Verify Your Certificates
               </h4>
-              <p className="mt-1 text-sm text-blue-800 dark:text-blue-200">
+              <p className="mt-1 text-xs sm:text-sm text-blue-800 dark:text-blue-200">
                 Share your verification code with employers or institutions to prove the
                 authenticity of your certificates. Each code is unique and can be verified
                 through our platform.
