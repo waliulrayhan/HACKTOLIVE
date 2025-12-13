@@ -238,6 +238,16 @@ export class StudentService {
       },
     });
 
+    // Update instructor stats
+    if (course.instructorId) {
+      await this.prisma.instructor.update({
+        where: { id: course.instructorId },
+        data: {
+          totalStudents: { increment: 1 },
+        },
+      });
+    }
+
     return enrollment;
   }
 

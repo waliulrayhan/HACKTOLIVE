@@ -15,7 +15,19 @@ export class CoursesService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: Prisma.CourseCreateInput): Promise<Course> {
-    return this.prisma.course.create({ data });
+    const course = await this.prisma.course.create({ data });
+    
+    // Update instructor's totalCourses
+    if (course.instructorId) {
+      await this.prisma.instructor.update({
+        where: { id: course.instructorId },
+        data: {
+          totalCourses: { increment: 1 },
+        },
+      });
+    }
+    
+    return course;
   }
 
   // Helper method to update course module and lesson counts

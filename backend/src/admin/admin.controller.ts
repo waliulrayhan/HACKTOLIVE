@@ -123,4 +123,9 @@ export class AdminController {
       limit ? parseInt(limit) : 10,
     );
   }
+
+  @Post('sync-instructor-stats')
+  syncInstructorStats() {
+    return this.adminService.syncInstructorStats();
+  }
 }

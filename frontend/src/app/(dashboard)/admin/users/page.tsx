@@ -549,9 +549,12 @@ export default function UsersManagementPage() {
                   >
                     <TableCell className="px-3 sm:px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-linear-to-br from-brand-300 to-brand-500 text-[10px] sm:text-xs font-semibold text-white">
-                          {getInitials(user.name)}
-                        </div>
+                        <img 
+                          src={`${process.env.NEXT_PUBLIC_API_URL}${user.student?.avatar || user.instructor?.avatar || user.avatar}` || '/images/user/user-01.png'} 
+                          alt={user.name || 'User'}
+                          className="h-6 w-6 sm:h-7 sm:w-7 rounded-full object-cover"
+                          onError={(e) => { e.currentTarget.src = '/images/user/user-01.png'; }}
+                        />
                         <div className="min-w-0">
                           <div className="text-xs sm:text-sm text-gray-900 dark:text-white truncate">
                             {user.name || 'N/A'}
@@ -760,12 +763,15 @@ export default function UsersManagementPage() {
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                      className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:disabled:bg-gray-900 dark:disabled:text-gray-500"
                       placeholder="Enter full name"
                       required
-                      disabled={isSubmitting}
+                      disabled={modalMode === 'edit' || isSubmitting}
                     />
                   </div>
+                  {modalMode === 'edit' && (
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Name cannot be changed</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -904,9 +910,12 @@ export default function UsersManagementPage() {
             <div className="px-6 pb-6">
               {/* User Avatar and Name */}
               <div className="flex items-center gap-4 pb-5 border-b border-gray-200 dark:border-gray-800">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-brand-300 to-brand-500 text-xl font-bold text-white shrink-0">
-                  {getInitials(selectedUser.name)}
-                </div>
+                <img 
+                  src={`${process.env.NEXT_PUBLIC_API_URL}${selectedUser.student?.avatar || selectedUser.instructor?.avatar || selectedUser.avatar}` || '/images/user/user-01.png'} 
+                  alt={selectedUser.name || 'User'}
+                  className="h-16 w-16 rounded-full object-cover shrink-0"
+                  onError={(e) => { e.currentTarget.src = '/images/user/user-01.png'; }}
+                />
                 <div className="flex-1 min-w-0">
                   <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                     {selectedUser.name || 'N/A'}

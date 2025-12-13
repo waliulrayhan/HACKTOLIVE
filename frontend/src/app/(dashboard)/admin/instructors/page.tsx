@@ -224,7 +224,7 @@ export default function InstructorsManagementPage() {
             <div>
               <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Total Courses</p>
               <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">
-                {allInstructors.reduce((sum, i) => sum + i.totalCourses, 0)}
+                {allInstructors.reduce((sum, i) => sum + (i._count?.courses || i.totalCourses), 0)}
               </p>
             </div>
           </div>
@@ -316,9 +316,12 @@ export default function InstructorsManagementPage() {
                     <TableRow key={instructor.id} className="group border-b border-gray-100 transition-colors hover:bg-gray-50/50 dark:border-white/5 dark:hover:bg-white/2">
                       <TableCell className="px-3 py-2.5 sm:px-4 sm:py-3">
                         <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-brand-300 to-brand-500 text-xs sm:text-sm font-bold text-white">
-                            {getInitials(instructor.name)}
-                          </div>
+                          <img 
+                            src={`${process.env.NEXT_PUBLIC_API_URL}${instructor.avatar}` || '/images/user/user-01.png'} 
+                            alt={instructor.name}
+                            className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-full object-cover"
+                            onError={(e) => { e.currentTarget.src = '/images/user/user-01.png'; }}
+                          />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-1.5">
                               <p className="truncate text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
@@ -351,7 +354,7 @@ export default function InstructorsManagementPage() {
                       </TableCell>
                       <TableCell className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
                         <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                          {instructor.totalCourses}
+                          {instructor._count?.courses || instructor.totalCourses}
                         </span>
                       </TableCell>
                       <TableCell className="px-3 py-2.5 text-right sm:px-4 sm:py-3">
@@ -492,9 +495,12 @@ export default function InstructorsManagementPage() {
             <div className="px-6 pb-6">
               {/* Instructor Avatar and Name */}
               <div className="flex items-center gap-4 pb-5 border-b border-gray-200 dark:border-gray-800">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-brand-300 to-brand-500 text-xl font-bold text-white shrink-0">
-                  {getInitials(selectedInstructor.name)}
-                </div>
+                <img 
+                  src={`${process.env.NEXT_PUBLIC_API_URL}${selectedInstructor.avatar}` || '/images/user/user-01.png'} 
+                  alt={selectedInstructor.name}
+                  className="h-16 w-16 shrink-0 rounded-full object-cover"
+                  onError={(e) => { e.currentTarget.src = '/images/user/user-01.png'; }}
+                />
                 <div className="flex-1 min-w-0">
                   <h4 className="text-lg font-bold text-gray-900 dark:text-white truncate">
                     {selectedInstructor.name}
@@ -569,7 +575,7 @@ export default function InstructorsManagementPage() {
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-400">Courses</p>
                       <p className="text-lg font-bold text-gray-900 dark:text-white">
-                        {selectedInstructor.totalCourses}
+                        {selectedInstructor._count?.courses || selectedInstructor.totalCourses}
                       </p>
                     </div>
                   </div>

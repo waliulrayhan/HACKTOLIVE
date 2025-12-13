@@ -340,6 +340,47 @@ export class AdminService {
     });
   }
 
+  async syncInstructorStats() {
+    // Get all instructors
+    const instructors = await this.prisma.instructor.findMany({
+      include: {
+        courses: {
+          include: {
+            _count: {
+              select: {
+                enrollments: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Update each instructor's stats
+    const updates = instructors.map(async (instructor) => {
+      const totalCourses = instructor.courses.length;
+      const totalStudents = instructor.courses.reduce(
+        (sum, course) => sum + course._count.enrollments,
+        0,
+      );
+
+      return this.prisma.instructor.update({
+        where: { id: instructor.id },
+        data: {
+          totalCourses,
+          totalStudents,
+        },
+      });
+    });
+
+    await Promise.all(updates);
+
+    return {
+      message: 'Instructor stats synced successfully',
+      updated: instructors.length,
+    };
+  }
+
   private async calculateTotalRevenue(): Promise<number> {
     const enrollments = await this.prisma.enrollment.findMany({
       include: {

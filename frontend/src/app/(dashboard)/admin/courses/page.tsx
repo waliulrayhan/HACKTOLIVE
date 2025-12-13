@@ -456,7 +456,7 @@ export default function CoursesManagementPage() {
                     </TableCell>
                     <TableCell className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
                       <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                        {course.price > 0 ? `$${course.price}` : 'Free'}
+                        {course.price > 0 ? `${course.price} Tk` : 'Free'}
                       </span>
                     </TableCell>
                     <TableCell className="px-3 py-2.5 text-right sm:px-4 sm:py-3">

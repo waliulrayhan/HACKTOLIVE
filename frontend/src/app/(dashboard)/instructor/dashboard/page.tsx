@@ -123,7 +123,7 @@ export default function InstructorDashboard() {
             </div>
             <div>
               <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Total Revenue</p>
-              <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">${totalRevenue.toLocaleString()}</p>
+              <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">{totalRevenue.toLocaleString()} Tk</p>
             </div>
           </div>
         </div>
