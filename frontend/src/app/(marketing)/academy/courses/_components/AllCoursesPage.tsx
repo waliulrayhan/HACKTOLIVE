@@ -560,7 +560,7 @@ export default function AllCoursesPage() {
                 />
               ) : (
                 <VStack spacing="8" align="stretch">
-                  <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing="6">
+                  <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} spacing="6">
                     {currentCourses.map((course, index) => (
                       <FallInPlace key={course.id} delay={0.05 * index}>
                         <CourseCard course={course} />

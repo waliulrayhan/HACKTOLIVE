@@ -259,7 +259,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                               <Input
                                 size="lg"
                                 type="tel"
-                                placeholder="+1 (555) 000-0000"
+                                placeholder="+8801XXXXXXXXX"
                                 value={formData.phone}
                                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                 borderRadius="lg"
@@ -472,7 +472,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                       >
                         {isFree 
                           ? "Start Learning for Free" 
-                          : `Complete Payment - ₹${course.price.toLocaleString()}`
+                          : `Complete Payment - ${course.price.toLocaleString()} Tk`
                         }
                       </Button>
 
@@ -528,7 +528,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                           {isFree ? "FREE COURSE" : "PREMIUM COURSE"}
                         </Text>
                         <Text color="white" fontSize="3xl" fontWeight="bold">
-                          {isFree ? "₹0" : `₹${course.price.toLocaleString()}`}
+                          {isFree ? "0 Tk" : `${course.price.toLocaleString()} Tk`}
                         </Text>
                       </VStack>
                     </Box>
@@ -555,7 +555,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                           <Text>Duration</Text>
                         </HStack>
                         <Text fontWeight="semibold">
-                          {Math.floor(course.duration / 60)}h {course.duration % 60}m
+                          {course.duration} hours
                         </Text>
                       </HStack>
                       

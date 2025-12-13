@@ -255,7 +255,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                     size={{ base: "md", md: "lg" }}
                     width={{ base: "100%", sm: "auto" }}
                   >
-                    {course.tier === "premium" ? `Enroll Now - ₹${course.price}` : "Start Free Course"}
+                    {course.tier === "premium" ? `Enroll Now - ${course.price} Tk` : "Start Free Course"}
                   </ButtonLink>
                   <Button 
                     onClick={scrollToCurriculum} 

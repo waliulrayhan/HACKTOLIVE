@@ -470,7 +470,7 @@ export class InstructorController {
       throw new Error('Course not found or access denied');
     }
 
-    return this.prisma.courseModule.create({
+    const module = await this.prisma.courseModule.create({
       data: {
         ...data,
         courseId,
@@ -479,6 +479,17 @@ export class InstructorController {
         lessons: true,
       },
     });
+
+    // Update course totalModules count
+    const totalModules = await this.prisma.courseModule.count({
+      where: { courseId },
+    });
+    await this.prisma.course.update({
+      where: { id: courseId },
+      data: { totalModules },
+    });
+
+    return module;
   }
 
   @Patch('courses/:courseId/modules/:moduleId')
@@ -541,6 +552,23 @@ export class InstructorController {
       where: { id: moduleId },
     });
 
+    // Update course totalModules and totalLessons counts
+    const totalModules = await this.prisma.courseModule.count({
+      where: { courseId },
+    });
+    const modules = await this.prisma.courseModule.findMany({
+      where: { courseId },
+      include: { lessons: true },
+    });
+    const totalLessons = modules.reduce(
+      (sum, mod) => sum + mod.lessons.length,
+      0,
+    );
+    await this.prisma.course.update({
+      where: { id: courseId },
+      data: { totalModules, totalLessons },
+    });
+
     return { message: 'Module deleted successfully' };
   }
 
@@ -569,12 +597,28 @@ export class InstructorController {
       throw new Error('Course not found or access denied');
     }
 
-    return this.prisma.lesson.create({
+    const lesson = await this.prisma.lesson.create({
       data: {
         ...data,
         moduleId,
       },
     });
+
+    // Update course totalLessons count
+    const modules = await this.prisma.courseModule.findMany({
+      where: { courseId },
+      include: { lessons: true },
+    });
+    const totalLessons = modules.reduce(
+      (sum, mod) => sum + mod.lessons.length,
+      0,
+    );
+    await this.prisma.course.update({
+      where: { id: courseId },
+      data: { totalLessons },
+    });
+
+    return lesson;
   }
 
   @Patch('courses/:courseId/modules/:moduleId/lessons/:lessonId')
@@ -634,6 +678,20 @@ export class InstructorController {
 
     await this.prisma.lesson.delete({
       where: { id: lessonId },
+    });
+
+    // Update course totalLessons count
+    const modules = await this.prisma.courseModule.findMany({
+      where: { courseId },
+      include: { lessons: true },
+    });
+    const totalLessons = modules.reduce(
+      (sum, mod) => sum + mod.lessons.length,
+      0,
+    );
+    await this.prisma.course.update({
+      where: { id: courseId },
+      data: { totalLessons },
     });
 
     return { message: 'Lesson deleted successfully' };

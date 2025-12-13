@@ -43,8 +43,8 @@ export default function CourseCard({ course, variant = "default" }: CourseCardPr
       flexDirection="column"
     >
       {/* Thumbnail */}
-      <Box position="relative" h={variant === "compact" ? "150px" : "200px"}>
-        {course.thumbnail && course.thumbnail !== '/images/placeholder-course.jpg' ? (
+      <Box position="relative" aspectRatio="2/1">
+        {course.thumbnail && course.thumbnail ? (
           <Image
             src={course.thumbnail}
             alt={course.title}
@@ -202,7 +202,7 @@ export default function CourseCard({ course, variant = "default" }: CourseCardPr
         {/* Price & CTA */}
         <HStack justify="space-between" align="center" mt="auto" pt="3">
           <Text fontSize="2xl" fontWeight="bold" color="green.500">
-            {course.price === 0 ? "Free" : `৳${course.price}`}
+            {course.price === 0 ? "Free" : `${course.price} Tk`}
           </Text>
           <ButtonLink
             href={`/academy/courses/${course.slug}`}
