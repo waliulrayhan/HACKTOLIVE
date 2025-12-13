@@ -63,10 +63,10 @@ export default function CreateCoursePage() {
     slug: "",
     shortDescription: "",
     description: "",
-    category: "WEB_SECURITY",
-    level: "FUNDAMENTAL",
-    tier: "FREE",
-    deliveryMode: "RECORDED",
+    category: "",
+    level: "",
+    tier: "",
+    deliveryMode: "",
     price: 0,
     duration: 0,
     learningOutcomes: "",
@@ -180,10 +180,14 @@ export default function CreateCoursePage() {
       if (!formData.slug.trim()) newErrors.slug = "Slug is required";
       if (!formData.shortDescription.trim()) newErrors.shortDescription = "Short description is required";
       if (!formData.description.trim()) newErrors.description = "Description is required";
+      if (!formData.category.trim()) newErrors.category = "Category is required";
+      if (!formData.level.trim()) newErrors.level = "Level is required";
+      if (!formData.deliveryMode.trim()) newErrors.deliveryMode = "Delivery mode is required";
       if (formData.duration <= 0) newErrors.duration = "Duration must be greater than 0";
     }
 
     if (step === 2) {
+      if (!formData.tier.trim()) newErrors.tier = "Tier is required";
       if (formData.tier === 'PREMIUM' && formData.price <= 0) {
         newErrors.price = "Premium courses must have a price greater than 0";
       }
@@ -515,7 +519,7 @@ export default function CreateCoursePage() {
                   value={formData.shortDescription}
                   onChange={handleInputChange}
                   rows={3}
-                  className={`w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none ${
+                  className={`w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
                     errors.shortDescription
                       ? 'border-red-500 focus:border-red-500'
                       : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
@@ -534,7 +538,7 @@ export default function CreateCoursePage() {
                   value={formData.description}
                   onChange={handleInputChange}
                   rows={6}
-                  className={`w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none ${
+                  className={`w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
                     errors.description
                       ? 'border-red-500 focus:border-red-500'
                       : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
@@ -555,6 +559,7 @@ export default function CreateCoursePage() {
                   className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px]"
                   style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
                 >
+                  <option value="" disabled>Select Category</option>
                   <option value="WEB_SECURITY">Web Security</option>
                   <option value="NETWORK_SECURITY">Network Security</option>
                   <option value="MALWARE_ANALYSIS">Malware Analysis</option>
@@ -564,6 +569,7 @@ export default function CreateCoursePage() {
                   <option value="INCIDENT_RESPONSE">Incident Response</option>
                   <option value="SECURITY_FUNDAMENTALS">Security Fundamentals</option>
                 </select>
+                {errors.category && <p className="mt-1.5 text-xs text-red-500">{errors.category}</p>}
               </div>
 
               <div>
@@ -577,10 +583,12 @@ export default function CreateCoursePage() {
                   className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px]"
                   style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
                 >
+                  <option value="" disabled>Select Level</option>
                   <option value="FUNDAMENTAL">Fundamental</option>
                   <option value="INTERMEDIATE">Intermediate</option>
                   <option value="ADVANCED">Advanced</option>
                 </select>
+                {errors.level && <p className="mt-1.5 text-xs text-red-500">{errors.level}</p>}
               </div>
 
               <div>
@@ -594,9 +602,11 @@ export default function CreateCoursePage() {
                   className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px]"
                   style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
                 >
+                  <option value="" disabled>Select Delivery Mode</option>
                   <option value="RECORDED">Recorded</option>
                   <option value="LIVE">Live</option>
                 </select>
+                {errors.deliveryMode && <p className="mt-1.5 text-xs text-red-500">{errors.deliveryMode}</p>}
               </div>
 
               <div>
@@ -693,7 +703,7 @@ export default function CreateCoursePage() {
                   value={formData.learningOutcomes}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white resize-none"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                   placeholder="What will students learn?"
                 />
               </div>
@@ -707,7 +717,7 @@ export default function CreateCoursePage() {
                   value={formData.requirements}
                   onChange={handleInputChange}
                   rows={3}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white resize-none"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                   placeholder="Prerequisites for this course"
                 />
               </div>
@@ -758,14 +768,16 @@ export default function CreateCoursePage() {
                   className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px]"
                   style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
                 >
+                  <option value="" disabled>Select Tier</option>
                   <option value="FREE">Free</option>
                   <option value="PREMIUM">Premium</option>
                 </select>
+                {errors.tier && <p className="mt-1.5 text-xs text-red-500">{errors.tier}</p>}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Price (USD) <span className="text-red-500">*</span>
+                  Price (Tk) <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -853,6 +865,8 @@ export default function CreateCoursePage() {
               </div>
             )}
 
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-white">Modules</h4>
+
             <div className="space-y-3">
               {modules.map((module, moduleIndex) => (
                 <div
@@ -865,20 +879,26 @@ export default function CreateCoursePage() {
                         {moduleIndex + 1}
                       </div>
                       <div className="flex-1 space-y-3">
-                        <input
-                          type="text"
-                          value={module.title}
-                          onChange={(e) => updateModule(module.tempId, 'title', e.target.value)}
-                          className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                          placeholder="Module title"
-                        />
-                        <textarea
-                          value={module.description}
-                          onChange={(e) => updateModule(module.tempId, 'description', e.target.value)}
-                          rows={2}
-                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white resize-none"
-                          placeholder="Module description"
-                        />
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Module Title</label>
+                          <input
+                            type="text"
+                            value={module.title}
+                            onChange={(e) => updateModule(module.tempId, 'title', e.target.value)}
+                            className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                            placeholder="Module title"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                          <textarea
+                            value={module.description}
+                            onChange={(e) => updateModule(module.tempId, 'description', e.target.value)}
+                            rows={2}
+                            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                            placeholder="Module description"
+                          />
+                        </div>
                         
                         <div className="flex items-center gap-2 flex-wrap">
                           <button
@@ -923,6 +943,7 @@ export default function CreateCoursePage() {
 
                   {expandedModuleId === module.tempId && module.lessons.length > 0 && (
                     <div className="p-3 sm:p-4 space-y-2 bg-gray-50/50 dark:bg-gray-900/30">
+                      <h5 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Lessons</h5>
                       {module.lessons.map((lesson, lessonIndex) => (
                         <div
                           key={lesson.tempId}
@@ -935,54 +956,66 @@ export default function CreateCoursePage() {
                               {lesson.type === 'QUIZ' && <HiOutlineClipboardList className="h-3.5 w-3.5" />}
                               {lesson.type === 'ASSIGNMENT' && <HiOutlineClipboardList className="h-3.5 w-3.5" />}
                               <span className="font-medium">
-                                {moduleIndex + 1}.{lessonIndex + 1}
+                                Lesson {moduleIndex + 1}.{lessonIndex + 1}
                               </span>
                             </div>
                             <div className="flex-1 space-y-2">
-                              <input
-                                type="text"
-                                value={lesson.title}
-                                onChange={(e) =>
-                                  updateLesson(module.tempId, lesson.tempId, 'title', e.target.value)
-                                }
-                                className="w-full h-9 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                                placeholder="Lesson title"
-                              />
-                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                <select
-                                  value={lesson.type}
-                                  onChange={(e) =>
-                                    updateLesson(module.tempId, lesson.tempId, 'type', e.target.value)
-                                  }
-                                  className="h-9 rounded-lg border border-gray-300 px-2 py-1.5 text-xs transition-colors focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none bg-no-repeat bg-[right_0.5rem_center] bg-[length:14px_14px]"
-                                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
-                                >
-                                  <option value="VIDEO">Video</option>
-                                  <option value="ARTICLE">Article</option>
-                                  <option value="QUIZ">Quiz</option>
-                                  <option value="ASSIGNMENT">Assignment</option>
-                                </select>
+                              <div>
+                                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
                                 <input
-                                  type="number"
-                                  value={lesson.duration}
+                                  type="text"
+                                  value={lesson.title}
                                   onChange={(e) =>
-                                    updateLesson(module.tempId, lesson.tempId, 'duration', parseInt(e.target.value) || 0)
+                                    updateLesson(module.tempId, lesson.tempId, 'title', e.target.value)
                                   }
-                                  className="h-9 rounded-lg border border-gray-300 px-2 py-1.5 text-xs transition-colors focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                                  placeholder="Duration (min)"
-                                  min="0"
+                                  className="w-full h-9 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                  placeholder="Lesson title"
                                 />
                               </div>
+                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+                                  <select
+                                    value={lesson.type}
+                                    onChange={(e) =>
+                                      updateLesson(module.tempId, lesson.tempId, 'type', e.target.value)
+                                    }
+                                    className="w-full h-9 rounded-lg border border-gray-300 px-2 py-1.5 text-xs transition-colors focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none bg-no-repeat bg-[right_0.5rem_center] bg-[length:14px_14px]"
+                                    style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
+                                  >
+                                    <option value="VIDEO">Video</option>
+                                    <option value="ARTICLE">Article</option>
+                                    <option value="QUIZ">Quiz</option>
+                                    <option value="ASSIGNMENT">Assignment</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Duration</label>
+                                  <input
+                                    type="number"
+                                    value={lesson.duration}
+                                    onChange={(e) =>
+                                      updateLesson(module.tempId, lesson.tempId, 'duration', parseInt(e.target.value) || 0)
+                                    }
+                                    className="w-full h-9 rounded-lg border border-gray-300 px-2 py-1.5 text-xs transition-colors focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                    placeholder="Duration (min)"
+                                    min="0"
+                                  />
+                                </div>
+                              </div>
                               {lesson.type === 'VIDEO' && (
-                                <input
-                                  type="url"
-                                  value={lesson.videoUrl || ''}
-                                  onChange={(e) =>
-                                    updateLesson(module.tempId, lesson.tempId, 'videoUrl', e.target.value)
-                                  }
-                                  className="w-full h-9 rounded-lg border border-gray-300 px-3 py-1.5 text-xs transition-colors focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                                  placeholder="Video URL (e.g., YouTube, Vimeo)"
-                                />
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Video URL</label>
+                                  <input
+                                    type="url"
+                                    value={lesson.videoUrl || ''}
+                                    onChange={(e) =>
+                                      updateLesson(module.tempId, lesson.tempId, 'videoUrl', e.target.value)
+                                    }
+                                    className="w-full h-9 rounded-lg border border-gray-300 px-3 py-1.5 text-xs transition-colors focus:border-brand-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                    placeholder="Video URL (e.g., YouTube, Vimeo)"
+                                  />
+                                </div>
                               )}
                             </div>
                             <button
@@ -1071,7 +1104,7 @@ export default function CreateCoursePage() {
                       <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Price</dt>
                       <dd className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
                         <HiOutlineCurrencyDollar className="h-3.5 w-3.5 text-gray-400" />
-                        {formData.tier === 'FREE' ? 'Free' : `$${formData.price}`}
+                        {formData.tier === 'FREE' ? 'Free' : `${formData.price} Tk`}
                       </dd>
                     </div>
                   </dl>
@@ -1087,9 +1120,9 @@ export default function CreateCoursePage() {
                 </div>
                 <div className="p-4">
                   <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="rounded-lg bg-brand-50 p-3 dark:bg-brand-900/20">
+                    <div className="rounded-lg bg-brand-50 p-3 dark:bg-brand-500/20">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/20">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-200 dark:bg-brand-500/20">
                           <HiOutlineBookOpen className="h-4 w-4 text-brand-600 dark:text-brand-400" />
                         </div>
                         <div>
@@ -1098,9 +1131,9 @@ export default function CreateCoursePage() {
                         </div>
                       </div>
                     </div>
-                    <div className="rounded-lg bg-purple-50 p-3 dark:bg-purple-900/20">
+                    <div className="rounded-lg bg-purple-100 p-3 dark:bg-purple-500/20">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-500/20">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-200 dark:bg-purple-500/20">
                           <HiOutlineDocumentText className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                         </div>
                         <div>
