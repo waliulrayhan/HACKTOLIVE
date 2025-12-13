@@ -22,6 +22,9 @@ const nextConfig: NextConfig = {
         hostname: '**',
       },
     ],
+    // Allow loading images from private IPs (for local development)
+    dangerouslyAllowSVG: true,
+    unoptimized: process.env.NODE_ENV === 'development',
   },
   webpack(config) {
     config.module.rules.push({

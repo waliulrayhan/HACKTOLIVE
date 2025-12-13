@@ -38,6 +38,11 @@ import {
   FiGlobe,
   FiTarget,
   FiTrendingUp,
+  FiMail,
+  FiPhone,
+  FiMapPin,
+  FiFacebook,
+  FiInstagram,
 } from "react-icons/fi";
 import academyService from "@/lib/academy-service";
 
@@ -80,11 +85,13 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
     fetchInstructorData();
   }, [id]);
 
-  const socialIcons = {
+  const socialIcons: Record<string, any> = {
     linkedin: FiLinkedin,
     twitter: FiTwitter,
     github: FiGithub,
     website: FiGlobe,
+    facebook: FiFacebook,
+    instagram: FiInstagram,
   };
 
   if (loading) {
@@ -136,7 +143,7 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
                   boxShadow="2xl"
                 >
                   <Image
-                    src={instructor.avatar}
+                    src={instructor.avatar || '/images/user/user-01.jpg'}
                     alt={instructor.name}
                     width={600}
                     height={600}
@@ -144,6 +151,10 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
                       width: "100%",
                       height: "auto",
                       display: "block",
+                    }}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/images/user/user-01.jpg';
                     }}
                   />
                 </Box>
@@ -211,31 +222,140 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
                   {instructor.bio}
                 </Text>
 
-                {/* Social Links */}
-                {instructor.socialLinks && (
-                  <HStack spacing={3} pt={2}>
-                    {Object.entries(instructor.socialLinks).map(
-                      ([platform, url]) => {
-                        if (!url) return null;
-                        const IconComponent =
-                          socialIcons[platform as keyof typeof socialIcons];
-                        return (
-                          <Link key={platform} href={url} isExternal>
+                {/* Contact Information */}
+                {(instructor.user?.email || instructor.user?.phone || instructor.user?.city) && (
+                  <VStack align="start" spacing={3} pt={2}>
+                    {instructor.user?.email && (
+                      <HStack spacing={3} color={textMuted}>
+                        <Icon as={FiMail} boxSize={5} />
+                        <Link href={`mailto:${instructor.user.email}`} fontSize="md">
+                          {instructor.user.email}
+                        </Link>
+                      </HStack>
+                    )}
+                    {instructor.user?.phone && (
+                      <HStack spacing={3} color={textMuted}>
+                        <Icon as={FiPhone} boxSize={5} />
+                        <Link href={`tel:${instructor.user.phone}`} fontSize="md">
+                          {instructor.user.phone}
+                        </Link>
+                      </HStack>
+                    )}
+                    {(instructor.user?.city || instructor.user?.country) && (
+                      <HStack spacing={3} color={textMuted}>
+                        <Icon as={FiMapPin} boxSize={5} />
+                        <Text fontSize="md">
+                          {[instructor.user?.city, instructor.user?.country].filter(Boolean).join(", ")}
+                        </Text>
+                      </HStack>
+                    )}
+                  </VStack>
+                )}
+
+                {/* Social Links - Enhanced with all platforms */}
+                {(instructor.linkedinUrl || 
+                  instructor.twitterUrl || 
+                  instructor.githubUrl || 
+                  instructor.websiteUrl ||
+                  instructor.user?.facebookUrl ||
+                  instructor.user?.instagramUrl) && (
+                  <VStack align="start" spacing={3} pt={2}>
+                    <Text fontSize="sm" fontWeight="semibold" color={textMuted} textTransform="uppercase">
+                      Connect with me
+                    </Text>
+                    <Wrap spacing={3}>
+                      {instructor.linkedinUrl && (
+                        <WrapItem>
+                          <Link href={instructor.linkedinUrl} isExternal>
                             <Button
                               size="md"
                               variant="outline"
-                              leftIcon={<Icon as={IconComponent} />}
-                              textTransform="capitalize"
+                              leftIcon={<Icon as={FiLinkedin} />}
                               borderRadius="lg"
                               fontWeight="semibold"
                             >
-                              {platform}
+                              LinkedIn
                             </Button>
                           </Link>
-                        );
-                      }
-                    )}
-                  </HStack>
+                        </WrapItem>
+                      )}
+                      {instructor.twitterUrl && (
+                        <WrapItem>
+                          <Link href={instructor.twitterUrl} isExternal>
+                            <Button
+                              size="md"
+                              variant="outline"
+                              leftIcon={<Icon as={FiTwitter} />}
+                              borderRadius="lg"
+                              fontWeight="semibold"
+                            >
+                              Twitter
+                            </Button>
+                          </Link>
+                        </WrapItem>
+                      )}
+                      {instructor.githubUrl && (
+                        <WrapItem>
+                          <Link href={instructor.githubUrl} isExternal>
+                            <Button
+                              size="md"
+                              variant="outline"
+                              leftIcon={<Icon as={FiGithub} />}
+                              borderRadius="lg"
+                              fontWeight="semibold"
+                            >
+                              GitHub
+                            </Button>
+                          </Link>
+                        </WrapItem>
+                      )}
+                      {instructor.websiteUrl && (
+                        <WrapItem>
+                          <Link href={instructor.websiteUrl} isExternal>
+                            <Button
+                              size="md"
+                              variant="outline"
+                              leftIcon={<Icon as={FiGlobe} />}
+                              borderRadius="lg"
+                              fontWeight="semibold"
+                            >
+                              Website
+                            </Button>
+                          </Link>
+                        </WrapItem>
+                      )}
+                      {instructor.user?.facebookUrl && (
+                        <WrapItem>
+                          <Link href={instructor.user.facebookUrl} isExternal>
+                            <Button
+                              size="md"
+                              variant="outline"
+                              leftIcon={<Icon as={FiFacebook} />}
+                              borderRadius="lg"
+                              fontWeight="semibold"
+                            >
+                              Facebook
+                            </Button>
+                          </Link>
+                        </WrapItem>
+                      )}
+                      {instructor.user?.instagramUrl && (
+                        <WrapItem>
+                          <Link href={instructor.user.instagramUrl} isExternal>
+                            <Button
+                              size="md"
+                              variant="outline"
+                              leftIcon={<Icon as={FiInstagram} />}
+                              borderRadius="lg"
+                              fontWeight="semibold"
+                            >
+                              Instagram
+                            </Button>
+                          </Link>
+                        </WrapItem>
+                      )}
+                    </Wrap>
+                  </VStack>
                 )}
               </VStack>
             </FallInPlace>
@@ -341,55 +461,178 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
       {/* Skills & Expertise Section - Separated */}
       <Box py={{ base: "60px", md: "80px" }} bg={bgColor}>
         <Container maxW="container.xl">
-          <VStack spacing={8}>
-            <FallInPlace>
-              <VStack spacing={3} textAlign="center">
-                <Badge
-                  colorScheme="green"
-                  fontSize="sm"
-                  px={4}
-                  py={2}
-                  borderRadius="full"
-                >
-                  Skills & Expertise
-                </Badge>
-                <Heading fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}>
-                  Technical Expertise
-                </Heading>
-                <Text fontSize={{ base: "md", md: "lg" }} color={textMuted} maxW="2xl">
-                  Specialized in cutting-edge cybersecurity techniques and methodologies
-                </Text>
-              </VStack>
-            </FallInPlace>
+          <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={10}>
+            {/* Skills Section */}
+            <VStack spacing={8} align="stretch">
+              <FallInPlace>
+                <VStack spacing={3} align="start">
+                  <Badge
+                    colorScheme="green"
+                    fontSize="sm"
+                    px={4}
+                    py={2}
+                    borderRadius="full"
+                  >
+                    Skills & Expertise
+                  </Badge>
+                  <Heading fontSize={{ base: "2xl", md: "3xl" }}>
+                    Technical Expertise
+                  </Heading>
+                  <Text fontSize="md" color={textMuted}>
+                    Specialized in cutting-edge cybersecurity techniques
+                  </Text>
+                </VStack>
+              </FallInPlace>
 
-            <FallInPlace delay={0.1}>
-              <Box
-                w="full"
-                bg={cardBg}
-                p={8}
-                borderRadius="2xl"
-                borderWidth="1px"
-                borderColor={borderColor}
-              >
-                <Wrap spacing={3} justify="center">
-                  {instructor.skills.map((skill, index) => (
-                    <WrapItem key={index}>
-                      <Badge
-                        colorScheme="green"
-                        fontSize="md"
-                        px={5}
-                        py={3}
-                        borderRadius="lg"
-                        fontWeight="semibold"
-                      >
-                        {skill}
-                      </Badge>
-                    </WrapItem>
-                  ))}
-                </Wrap>
-              </Box>
-            </FallInPlace>
-          </VStack>
+              <FallInPlace delay={0.1}>
+                <Box
+                  w="full"
+                  bg={cardBg}
+                  p={6}
+                  borderRadius="xl"
+                  borderWidth="1px"
+                  borderColor={borderColor}
+                >
+                  <Wrap spacing={3}>
+                    {instructor.skills.map((skill, index) => (
+                      <WrapItem key={index}>
+                        <Badge
+                          colorScheme="green"
+                          fontSize="sm"
+                          px={4}
+                          py={2}
+                          borderRadius="lg"
+                          fontWeight="semibold"
+                        >
+                          {skill}
+                        </Badge>
+                      </WrapItem>
+                    ))}
+                  </Wrap>
+                </Box>
+              </FallInPlace>
+            </VStack>
+
+            {/* About / Profile Details Section */}
+            <VStack spacing={8} align="stretch">
+              <FallInPlace>
+                <VStack spacing={3} align="start">
+                  <Badge
+                    colorScheme="green"
+                    fontSize="sm"
+                    px={4}
+                    py={2}
+                    borderRadius="full"
+                  >
+                    About
+                  </Badge>
+                  <Heading fontSize={{ base: "2xl", md: "3xl" }}>
+                    Profile Details
+                  </Heading>
+                  <Text fontSize="md" color={textMuted}>
+                    Get to know {instructor.name.split(" ")[0]} better
+                  </Text>
+                </VStack>
+              </FallInPlace>
+
+              <FallInPlace delay={0.1}>
+                <Box
+                  w="full"
+                  bg={cardBg}
+                  p={6}
+                  borderRadius="xl"
+                  borderWidth="1px"
+                  borderColor={borderColor}
+                >
+                  <VStack spacing={4} align="stretch">
+                    {instructor.bio && (
+                      <Box>
+                        <Text fontSize="sm" fontWeight="semibold" color={textMuted} mb={2}>
+                          Bio
+                        </Text>
+                        <Text fontSize="md" lineHeight="tall">
+                          {instructor.bio}
+                        </Text>
+                      </Box>
+                    )}
+                    
+                    <Divider />
+                    
+                    {instructor.experience && (
+                      <HStack justify="space-between">
+                        <Text fontSize="sm" fontWeight="semibold" color={textMuted}>
+                          Experience
+                        </Text>
+                        <Badge colorScheme="blue" fontSize="sm" px={3} py={1}>
+                          {instructor.experience}
+                        </Badge>
+                      </HStack>
+                    )}
+                    
+                    {instructor.user?.email && (
+                      <>
+                        <Divider />
+                        <HStack justify="space-between">
+                          <Text fontSize="sm" fontWeight="semibold" color={textMuted}>
+                            Email
+                          </Text>
+                          <Link href={`mailto:${instructor.user.email}`} color={accentColor}>
+                            {instructor.user.email}
+                          </Link>
+                        </HStack>
+                      </>
+                    )}
+                    
+                    {instructor.user?.phone && (
+                      <>
+                        <Divider />
+                        <HStack justify="space-between">
+                          <Text fontSize="sm" fontWeight="semibold" color={textMuted}>
+                            Phone
+                          </Text>
+                          <Link href={`tel:${instructor.user.phone}`} color={accentColor}>
+                            {instructor.user.phone}
+                          </Link>
+                        </HStack>
+                      </>
+                    )}
+                    
+                    {(instructor.user?.city || instructor.user?.country) && (
+                      <>
+                        <Divider />
+                        <HStack justify="space-between">
+                          <Text fontSize="sm" fontWeight="semibold" color={textMuted}>
+                            Location
+                          </Text>
+                          <Text fontSize="md">
+                            {[instructor.user?.city, instructor.user?.country]
+                              .filter(Boolean)
+                              .join(", ")}
+                          </Text>
+                        </HStack>
+                      </>
+                    )}
+                    
+                    <Divider />
+                    
+                    <HStack justify="space-between">
+                      <Text fontSize="sm" fontWeight="semibold" color={textMuted}>
+                        Member Since
+                      </Text>
+                      <Text fontSize="md">
+                        {instructor.createdAt
+                          ? new Date(instructor.createdAt).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "long",
+                            })
+                          : "N/A"}
+                      </Text>
+                    </HStack>
+                  </VStack>
+                </Box>
+              </FallInPlace>
+            </VStack>
+          </SimpleGrid>
         </Container>
       </Box>
 

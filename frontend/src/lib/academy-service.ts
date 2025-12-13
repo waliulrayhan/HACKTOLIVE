@@ -316,6 +316,21 @@ class AcademyService {
   }
 
   /**
+   * Parse skills field (can be JSON string or array)
+   */
+  private parseSkills(skills: any): string[] {
+    if (!skills) return [];
+    if (typeof skills === 'string') {
+      try {
+        return JSON.parse(skills);
+      } catch {
+        return skills.split(',').map(s => s.trim()).filter(Boolean);
+      }
+    }
+    return Array.isArray(skills) ? skills : [];
+  }
+
+  /**
    * Transform a single instructor from API to frontend format
    */
   private transformInstructor(instructor: any): Instructor {
@@ -324,9 +339,13 @@ class AcademyService {
       // Transform image URLs
       avatar: this.transformImageUrl(instructor.avatar, 'avatar'),
       // Parse JSON fields if they come as strings
-      skills: typeof instructor.skills === 'string' 
-        ? JSON.parse(instructor.skills) 
-        : instructor.skills || [],
+      skills: this.parseSkills(instructor.skills),
+      // Keep original URL fields from backend
+      linkedinUrl: instructor.linkedinUrl,
+      twitterUrl: instructor.twitterUrl,
+      githubUrl: instructor.githubUrl,
+      websiteUrl: instructor.websiteUrl,
+      // Legacy support for socialLinks format
       socialLinks: {
         linkedin: instructor.linkedinUrl,
         twitter: instructor.twitterUrl,

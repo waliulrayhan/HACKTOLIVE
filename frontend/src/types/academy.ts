@@ -19,14 +19,32 @@ export type LessonType = "video" | "article" | "quiz" | "assignment";
 
 export interface Instructor {
   id: string;
+  userId: string;
   name: string;
-  avatar: string;
-  bio: string;
-  experience: string;
+  avatar: string | null;
+  bio: string | null;
+  experience: string | null;
   skills: string[];
   rating: number;
   totalStudents: number;
   totalCourses: number;
+  linkedinUrl?: string | null;
+  twitterUrl?: string | null;
+  githubUrl?: string | null;
+  websiteUrl?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  user?: {
+    id: string;
+    email: string;
+    name: string | null;
+    phone?: string | null;
+    city?: string | null;
+    country?: string | null;
+    facebookUrl?: string | null;
+    instagramUrl?: string | null;
+  };
+  // Legacy support for old socialLinks format
   socialLinks?: {
     linkedin?: string;
     twitter?: string;

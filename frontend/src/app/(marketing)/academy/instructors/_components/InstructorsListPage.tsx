@@ -20,7 +20,7 @@ import {
 import Image from "next/image";
 import { FallInPlace } from "@/components/shared/motion/fall-in-place";
 import { ButtonLink } from "@/components/shared/button-link/button-link";
-import { FiStar, FiUsers, FiBook, FiAward, FiTrendingUp } from "react-icons/fi";
+import { FiStar, FiUsers, FiBook, FiAward, FiTrendingUp, FiMapPin, FiMail } from "react-icons/fi";
 import { Instructor } from "@/types/academy";
 import academyService from "@/lib/academy-service";
 
@@ -204,10 +204,14 @@ export default function InstructorsListPage() {
                       {/* Instructor Image */}
                     <Box position="relative" h="280px" w="full" overflow="hidden">
                       <Image
-                        src={instructor.avatar}
+                        src={instructor.avatar || '/images/user/user-01.jpg'}
                         alt={instructor.name}
                         fill
                         style={{ objectFit: "cover" }}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/images/user/user-01.jpg';
+                        }}
                       />
                       <Box
                         position="absolute"
@@ -256,6 +260,30 @@ export default function InstructorsListPage() {
                       >
                         {instructor.bio}
                       </Text>
+
+                      {/* Additional Info - Location and Email if available */}
+                      {(instructor.user?.city || instructor.user?.country || instructor.user?.email) && (
+                        <VStack spacing={2} align="stretch">
+                          {(instructor.user?.city || instructor.user?.country) && (
+                            <HStack spacing={2}>
+                              <Icon as={FiMapPin} color={textMuted} boxSize={4} />
+                              <Text fontSize="xs" color={textMuted} noOfLines={1}>
+                                {[instructor.user?.city, instructor.user?.country]
+                                  .filter(Boolean)
+                                  .join(", ")}
+                              </Text>
+                            </HStack>
+                          )}
+                          {instructor.user?.email && (
+                            <HStack spacing={2}>
+                              <Icon as={FiMail} color={textMuted} boxSize={4} />
+                              <Text fontSize="xs" color={textMuted} noOfLines={1}>
+                                {instructor.user.email}
+                              </Text>
+                            </HStack>
+                          )}
+                        </VStack>
+                      )}
 
                       {/* Divider */}
                       <Divider borderColor={borderColor} />

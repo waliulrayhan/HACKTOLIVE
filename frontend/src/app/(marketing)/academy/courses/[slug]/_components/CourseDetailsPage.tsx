@@ -162,7 +162,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   _dark={{ bg: "gray.700" }}
                 >
                   <Image
-                    src={course.thumbnail}
+                    src={course.thumbnail || '/images/placeholder-course.jpg'}
                     alt={course.title}
                     width={500}
                     height={340}
@@ -170,6 +170,10 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                       width: "100%", 
                       height: "auto",
                       display: "block"
+                    }}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/images/placeholder-course.jpg';
                     }}
                   />
                 </Box>
