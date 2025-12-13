@@ -26,7 +26,7 @@ export default function InstructorCard({ instructor, showFullBio = false }: Inst
       <VStack spacing="5" align="center" textAlign="center">
         {/* Avatar */}
         <Image
-          src={instructor.avatar}
+          src={instructor.avatar || undefined}
           alt={instructor.name}
           boxSize="120px"
           borderRadius="full"

@@ -23,6 +23,7 @@ import * as React from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { toast } from '@/components/ui/toast'
+import { getFullImageUrl } from '@/lib/image-utils'
 
 import { Logo } from '../layout/logo'
 import siteConfig from '@/lib/config/data/config'
@@ -103,7 +104,6 @@ export function MobileNavContent(props: MobileNavContentProps) {
   const router = useRouter()
   const bgColor = useColorModeValue('white', 'gray.900')
   const [user, setUser] = React.useState<User | null>(null)
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
   React.useEffect(() => {
     const currentUser = authService.getUser()
@@ -185,7 +185,7 @@ export function MobileNavContent(props: MobileNavContentProps) {
                           <Image
                             width={36}
                             height={36}
-                            src={`${apiUrl}${user.avatar}`}
+                            src={getFullImageUrl(user.avatar, 'avatar')}
                             alt={user.name || 'User'}
                             className="object-cover w-full h-full"
                             unoptimized

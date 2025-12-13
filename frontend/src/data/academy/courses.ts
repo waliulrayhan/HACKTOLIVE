@@ -9,6 +9,7 @@ import {
 export const instructors: Instructor[] = [
   {
     id: "inst-001",
+    userId: "user-001",
     name: "Dr. Sarah Chen",
     avatar: "/images/user/user-01.jpg",
     bio: "Cybersecurity expert with 15+ years of experience in penetration testing and ethical hacking. Former security consultant at Fortune 500 companies.",
@@ -31,6 +32,7 @@ export const instructors: Instructor[] = [
   },
   {
     id: "inst-002",
+    userId: "user-002",
     name: "Marcus Williams",
     avatar: "/images/user/user-02.jpg",
     bio: "Certified Ethical Hacker and Security Researcher. Specialized in web application security and bug bounty hunting.",
@@ -52,6 +54,7 @@ export const instructors: Instructor[] = [
   },
   {
     id: "inst-003",
+    userId: "user-003",
     name: "Jennifer Rodriguez",
     avatar: "/images/user/user-03.jpg",
     bio: "Network Security Architect and CISSP certified professional. Expert in cloud security and zero-trust architecture.",
@@ -73,6 +76,7 @@ export const instructors: Instructor[] = [
   },
   {
     id: "inst-004",
+    userId: "user-004",
     name: "David Park",
     avatar: "/images/user/user-04.jpg",
     bio: "Malware Analyst and Reverse Engineer. Worked with government agencies on critical cybersecurity threats.",

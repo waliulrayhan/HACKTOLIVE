@@ -7,6 +7,7 @@ import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
 import { toast } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
 import { authService, User } from "@/lib/auth-service";
+import { getFullImageUrl } from "@/lib/image-utils";
 
 export default function MarketingUserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
@@ -67,8 +68,6 @@ export default function MarketingUserDropdown() {
     setIsOpen(false);
   }
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
   function handleSignOut(e: React.MouseEvent<HTMLAnchorElement>) {
     e.preventDefault();
     closeDropdown();
@@ -99,7 +98,7 @@ export default function MarketingUserDropdown() {
             <Image
               width={36}
               height={36}
-              src={`${apiUrl}${user.avatar}`}
+              src={getFullImageUrl(user.avatar, 'avatar')}
               alt={user.name || 'User'}
               className="object-cover w-full h-full"
               unoptimized

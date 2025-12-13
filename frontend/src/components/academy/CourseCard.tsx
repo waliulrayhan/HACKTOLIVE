@@ -140,7 +140,7 @@ export default function CourseCard({ course, variant = "default" }: CourseCardPr
         {/* Instructor */}
         <HStack spacing="2">
           <Image
-            src={course.instructor.avatar}
+            src={course.instructor.avatar || undefined}
             alt={course.instructor.name}
             boxSize="24px"
             borderRadius="full"

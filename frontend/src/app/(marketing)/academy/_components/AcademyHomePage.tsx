@@ -812,7 +812,7 @@ export default function AcademyHomePage() {
                     >
                       <Box position="relative" overflow="hidden">
                         <Image
-                          src={instructor.avatar}
+                          src={instructor.avatar || '/images/user/default-avatar.png'}
                           alt={instructor.name}
                           width={400}
                           height={400}
