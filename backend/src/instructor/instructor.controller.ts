@@ -154,12 +154,28 @@ export class InstructorController {
     // Extract modules from data to handle separately
     const { modules, ...courseData } = data;
 
-    // Convert date strings to ISO-8601 DateTime if present
-    if (courseData.startDate && typeof courseData.startDate === 'string') {
-      courseData.startDate = new Date(courseData.startDate).toISOString();
+    // Convert date strings to ISO-8601 DateTime if present, or null if empty
+    if (courseData.startDate !== undefined) {
+      if (courseData.startDate && typeof courseData.startDate === 'string' && courseData.startDate.trim() !== '') {
+        courseData.startDate = new Date(courseData.startDate).toISOString();
+      } else {
+        courseData.startDate = null;
+      }
     }
-    if (courseData.endDate && typeof courseData.endDate === 'string') {
-      courseData.endDate = new Date(courseData.endDate).toISOString();
+    if (courseData.endDate !== undefined) {
+      if (courseData.endDate && typeof courseData.endDate === 'string' && courseData.endDate.trim() !== '') {
+        courseData.endDate = new Date(courseData.endDate).toISOString();
+      } else {
+        courseData.endDate = null;
+      }
+    }
+
+    // Convert empty strings to null for optional fields
+    if (courseData.liveSchedule === '') {
+      courseData.liveSchedule = null;
+    }
+    if (courseData.meetingLink === '') {
+      courseData.meetingLink = null;
     }
 
     // Convert numeric fields to proper types

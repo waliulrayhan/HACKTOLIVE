@@ -15,9 +15,8 @@ export default function CourseCard({ course, variant = "default" }: CourseCardPr
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const hoverBorderColor = useColorModeValue("green.500", "green.400");
   
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    return `${hours}h ${minutes % 60}m`;
+  const formatDuration = (number) => {
+    return `${number}h`;
   };
 
   const levelColors = {
@@ -195,7 +194,7 @@ export default function CourseCard({ course, variant = "default" }: CourseCardPr
             </HStack>
             <HStack spacing="1">
               <Icon as={FiClock} />
-              <Text>{formatDuration(course.duration)}</Text>
+              <Text>{course.duration} hour</Text>
             </HStack>
           </HStack>
         )}

@@ -199,7 +199,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   </Badge>
                   {course.deliveryMode === "live" && (
                     <Badge colorScheme="red" fontSize="xs" px="2" py="1" borderRadius="md">
-                      🔴 LIVE
+                      LIVE
                     </Badge>
                   )}
                   <Badge colorScheme="cyan" fontSize="xs" px="2" py="1" borderRadius="md">
@@ -292,7 +292,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   <Icon as={FiClock} boxSize="6" color="green.500" />
                 </Flex>
                 <Text fontSize="xl" fontWeight="bold">
-                  {Math.floor(course.duration / 60)}h {course.duration % 60}m
+                  {course.duration}h
                 </Text>
                 <Text fontSize="sm" color="muted">
                   Total Duration
@@ -683,7 +683,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                       <HStack>
                         <Icon as={FiPlay} color="primary.500" />
                         <Text fontSize="sm">
-                          {course.totalLessons} on-demand video lessons
+                          {course.totalLessons} on-demand lessons
                         </Text>
                       </HStack>
                       <HStack>

@@ -41,19 +41,19 @@ export default function InstructorCard({ instructor, showFullBio = false }: Inst
             {instructor.name}
           </Text>
           <Badge colorScheme="primary" fontSize="xs" borderRadius="full" px="3" py="1">
-            {instructor.experience}
+            {instructor.bio}
           </Badge>
         </VStack>
 
         {/* Bio */}
-        <Text
+        {/* <Text
           fontSize="sm"
           color="muted"
           lineHeight="tall"
           noOfLines={showFullBio ? undefined : 3}
         >
           {instructor.bio}
-        </Text>
+        </Text> */}
 
         {/* Stats */}
         <HStack
