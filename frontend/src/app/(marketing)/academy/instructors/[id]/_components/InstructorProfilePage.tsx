@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -18,6 +19,8 @@ import {
   WrapItem,
   Divider,
   Link,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import { Instructor, Course } from "@/types/academy";
@@ -36,16 +39,17 @@ import {
   FiTarget,
   FiTrendingUp,
 } from "react-icons/fi";
+import academyService from "@/lib/academy-service";
 
 interface InstructorProfilePageProps {
-  instructor: Instructor;
-  courses: Course[];
+  id: string;
 }
 
-export default function InstructorProfilePage({
-  instructor,
-  courses,
-}: InstructorProfilePageProps) {
+export default function InstructorProfilePage({ id }: InstructorProfilePageProps) {
+  const [instructor, setInstructor] = useState<Instructor | null>(null);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
@@ -53,12 +57,64 @@ export default function InstructorProfilePage({
   const heroBg = useColorModeValue("white", "gray.800");
   const accentColor = useColorModeValue("green.500", "green.400");
 
+  useEffect(() => {
+    const fetchInstructorData = async () => {
+      setLoading(true);
+      try {
+        const instructorData = await academyService.getInstructorById(id);
+        setInstructor(instructorData);
+
+        // Fetch all courses and filter by instructor
+        const allCourses = await academyService.getCourses();
+        const instructorCourses = allCourses.filter(
+          (course) => course.instructor?.id === id
+        );
+        setCourses(instructorCourses);
+      } catch (error) {
+        console.error("Error fetching instructor data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInstructorData();
+  }, [id]);
+
   const socialIcons = {
     linkedin: FiLinkedin,
     twitter: FiTwitter,
     github: FiGithub,
     website: FiGlobe,
   };
+
+  if (loading) {
+    return (
+      <Container maxW="container.xl" py="20">
+        <Center>
+          <VStack spacing="4">
+            <Spinner size="xl" color="green.500" thickness="4px" />
+            <Text color={textMuted}>Loading instructor profile...</Text>
+          </VStack>
+        </Center>
+      </Container>
+    );
+  }
+
+  if (!instructor) {
+    return (
+      <Container maxW="container.xl" py="20">
+        <Center>
+          <VStack spacing="4">
+            <Heading>Instructor Not Found</Heading>
+            <Text color={textMuted}>The instructor you're looking for doesn't exist.</Text>
+            <ButtonLink href="/academy/instructors" colorScheme="primary">
+              Browse All Instructors
+            </ButtonLink>
+          </VStack>
+        </Center>
+      </Container>
+    );
+  }
 
   return (
     <Box bg={bgColor} minH="100vh">

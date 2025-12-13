@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -14,11 +15,11 @@ import {
   Flex,
   useColorModeValue,
   Divider,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import { ButtonLink } from "@/components/shared/button-link/button-link";
-import { courses } from "@/data/academy/courses";
-import { liveCourses } from "@/data/academy/batches";
 import CourseCard from "@/components/academy/CourseCard";
 import SearchBar from "@/components/academy/SearchBar";
 import { FallInPlace } from "@/components/shared/motion/fall-in-place";
@@ -37,6 +38,8 @@ import {
   FiCloud,
   FiLock
 } from "react-icons/fi";
+import { Course } from "@/types/academy";
+import academyService from "@/lib/academy-service";
 
 export default function AcademyHomePage() {
   const bgColor = useColorModeValue('gray.50', 'gray.900');
@@ -45,14 +48,43 @@ export default function AcademyHomePage() {
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
   const textMuted = useColorModeValue('gray.600', 'gray.400');
+  const headingColor = useColorModeValue('gray.800', 'white');
   const heroOverlay = useColorModeValue(
     'linear-gradient(135deg, rgba(26, 32, 44, 0.88) 0%, rgba(45, 55, 72, 0.92) 100%)',
     'linear-gradient(135deg, rgba(0, 0, 0, 0.75) 0%, rgba(26, 32, 44, 0.80) 100%)'
   );
 
-  const freeCourses = courses.filter((c) => c.tier === "free").slice(0, 3);
-  const premiumCourses = courses.filter((c) => c.tier === "premium").slice(0, 3);
-  const upcomingLiveCourses = liveCourses.slice(0, 3);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [freeCourses, setFreeCourses] = useState<Course[]>([]);
+  const [premiumCourses, setPremiumCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      setLoading(true);
+      try {
+        // Fetch all courses
+        const allCourses = await academyService.getCourses();
+        
+        // Filter only PUBLISHED courses
+        const publishedCourses = allCourses.filter((c) => c.status === "published");
+        setCourses(publishedCourses);
+
+        // Filter free and premium courses from published courses only
+        const free = publishedCourses.filter((c) => c.tier === "free").slice(0, 3);
+        const premium = publishedCourses.filter((c) => c.tier === "premium").slice(0, 3);
+        
+        setFreeCourses(free);
+        setPremiumCourses(premium);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   return (
     <Box>
@@ -350,7 +382,7 @@ export default function AcademyHomePage() {
               </VStack>
             </FallInPlace>
 
-            <SimpleGrid columns={{ base: 2, md: 3, lg: 6 }} spacing={{ base: "4", md: "6" }}>
+            <SimpleGrid columns={{ base: 2, md: 3, lg: 8 }} spacing={{ base: "4", md: "6" }}>
               {[
                 { name: "Web Security", icon: FiGlobe, count: courses.filter(c => c.category === "web-security").length, color: "blue" },
                 { name: "Network Security", icon: FiShield, count: courses.filter(c => c.category === "network-security").length, color: "purple" },
@@ -358,6 +390,8 @@ export default function AcademyHomePage() {
                 { name: "Malware Analysis", icon: FiActivity, count: courses.filter(c => c.category === "malware-analysis").length, color: "orange" },
                 { name: "Cloud Security", icon: FiCloud, count: courses.filter(c => c.category === "cloud-security").length, color: "cyan" },
                 { name: "Cryptography", icon: FiLock, count: courses.filter(c => c.category === "cryptography").length, color: "green" },
+                { name: "Security Fundamentals", icon: FiShield, count: courses.filter(c => c.category === "security-fundamentals").length, color: "teal" },
+                { name: "Incident Response", icon: FiActivity, count: courses.filter(c => c.category === "incident-response").length, color: "pink" },
               ].map((category, index) => (
                 <FallInPlace key={category.name} delay={0.1 * index}>
                   <Box position="relative" w="100%" h="100%">
@@ -457,11 +491,21 @@ export default function AcademyHomePage() {
             </FallInPlace>
 
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="6">
-              {freeCourses.map((course, index) => (
-                <FallInPlace key={course.id} delay={0.1 * index}>
-                  <CourseCard course={course} />
-                </FallInPlace>
-              ))}
+              {loading ? (
+                <Center gridColumn="1 / -1" py="12">
+                  <Spinner size="xl" color="green.500" thickness="4px" />
+                </Center>
+              ) : freeCourses.length > 0 ? (
+                freeCourses.map((course, index) => (
+                  <FallInPlace key={course.id} delay={0.1 * index}>
+                    <CourseCard course={course} />
+                  </FallInPlace>
+                ))
+              ) : (
+                <Center gridColumn="1 / -1" py="12">
+                  <Text color={textMuted}>No free courses available at the moment.</Text>
+                </Center>
+              )}
             </SimpleGrid>
           </VStack>
         </Container>
@@ -501,11 +545,21 @@ export default function AcademyHomePage() {
             </FallInPlace>
 
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="6">
-              {premiumCourses.map((course, index) => (
-                <FallInPlace key={course.id} delay={0.1 * index}>
-                  <CourseCard course={course} />
-                </FallInPlace>
-              ))}
+              {loading ? (
+                <Center gridColumn="1 / -1" py="12">
+                  <Spinner size="xl" color="purple.500" thickness="4px" />
+                </Center>
+              ) : premiumCourses.length > 0 ? (
+                premiumCourses.map((course, index) => (
+                  <FallInPlace key={course.id} delay={0.1 * index}>
+                    <CourseCard course={course} />
+                  </FallInPlace>
+                ))
+              ) : (
+                <Center gridColumn="1 / -1" py="12">
+                  <Text color={textMuted}>No premium courses available at the moment.</Text>
+                </Center>
+              )}
             </SimpleGrid>
           </VStack>
         </Container>
@@ -708,14 +762,21 @@ export default function AcademyHomePage() {
             </FallInPlace>
 
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="8">
-              {courses.slice(0, 3).map((course, index) => (
-                <FallInPlace key={course.instructor.id} delay={0.1 * index}>
-                  <ButtonLink
-                    href={`/academy/instructors/${course.instructor.id}`}
-                    variant="unstyled"
-                    height="auto"
-                    display="block"
-                  >
+              {(() => {
+                // Get unique instructors from published courses
+                const publishedCourses = courses.filter(c => c.status === "published");
+                const uniqueInstructors = Array.from(
+                  new Map(publishedCourses.map(course => [course.instructor.id, course.instructor])).values()
+                ).slice(0, 3);
+                
+                return uniqueInstructors.map((instructor, index) => (
+                  <FallInPlace key={instructor.id} delay={0.1 * index}>
+                    <ButtonLink
+                      href={`/academy/instructors/${instructor.id}`}
+                      variant="unstyled"
+                      height="auto"
+                      display="block"
+                    >
                     <Box
                       bg={cardBg}
                       borderRadius="3xl"
@@ -751,10 +812,11 @@ export default function AcademyHomePage() {
                     >
                       <Box position="relative" overflow="hidden">
                         <Image
-                          src={course.instructor.avatar}
-                          alt={course.instructor.name}
+                          src={instructor.avatar}
+                          alt={instructor.name}
                           width={400}
                           height={400}
+                          unoptimized
                           style={{
                             width: "100%",
                             height: "280px",
@@ -783,11 +845,11 @@ export default function AcademyHomePage() {
 
                       <VStack p="6" spacing="4" align="start">
                         <VStack align="start" spacing="2" w="full">
-                          <Heading size="md" color={useColorModeValue('gray.800', 'white')}>
-                            {course.instructor.name}
+                          <Heading size="md" color={headingColor}>
+                            {instructor.name}
                           </Heading>
                           <Text fontSize="sm" color={textMuted} noOfLines={2} lineHeight="tall">
-                            {course.instructor.experience}
+                            {instructor.experience || instructor.bio || "Expert Cybersecurity Instructor"}
                           </Text>
                         </VStack>
 
@@ -801,7 +863,7 @@ export default function AcademyHomePage() {
                             <VStack spacing="1">
                               <HStack spacing="1" color="yellow.500">
                                 <Icon as={FiStar} />
-                                <Text fontWeight="bold">{course.instructor.rating}</Text>
+                                <Text fontWeight="bold">{instructor.rating}</Text>
                               </HStack>
                               <Text fontSize="xs" color={textMuted}>Rating</Text>
                             </VStack>
@@ -810,9 +872,9 @@ export default function AcademyHomePage() {
                               <HStack spacing="1" color="purple.500">
                                 <Icon as={FiUsers} />
                                 <Text fontWeight="bold">
-                                  {course.instructor.totalStudents > 999
-                                    ? `${(course.instructor.totalStudents / 1000).toFixed(1)}k`
-                                    : course.instructor.totalStudents}
+                                  {instructor.totalStudents > 999
+                                    ? `${(instructor.totalStudents / 1000).toFixed(1)}k`
+                                    : instructor.totalStudents}
                                 </Text>
                               </HStack>
                               <Text fontSize="xs" color={textMuted}>Students</Text>
@@ -821,7 +883,7 @@ export default function AcademyHomePage() {
                             <VStack spacing="1">
                               <HStack spacing="1" color="blue.500">
                                 <Icon as={FiBook} />
-                                <Text fontWeight="bold">{course.instructor.totalCourses}</Text>
+                                <Text fontWeight="bold">{instructor.totalCourses}</Text>
                               </HStack>
                               <Text fontSize="xs" color={textMuted}>Courses</Text>
                             </VStack>
@@ -831,7 +893,8 @@ export default function AcademyHomePage() {
                     </Box>
                   </ButtonLink>
                 </FallInPlace>
-              ))}
+              ));
+              })()}
             </SimpleGrid>
 
             <FallInPlace delay={0.4}>

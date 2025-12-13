@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -23,10 +24,10 @@ import {
   Avatar,
   Progress,
   Button,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
 import Image from "next/image";
-import { courses } from "@/data/academy/courses";
-import { reviews } from "@/data/academy/reviews";
 import { ButtonLink } from "@/components/shared/button-link/button-link";
 import { FallInPlace } from "@/components/shared/motion/fall-in-place";
 import { Em } from "@/components/shared/typography";
@@ -47,17 +48,41 @@ import CurriculumAccordion from "@/components/academy/CurriculumAccordion";
 import ReviewCard from "@/components/academy/ReviewCard";
 import InstructorCard from "@/components/academy/InstructorCard";
 import RatingStars from "@/components/academy/RatingStars";
-import { color } from "framer-motion";
+import { Course, Review } from "@/types/academy";
+import academyService from "@/lib/academy-service";
 
 interface CourseDetailsPageProps {
   slug: string;
 }
 
 export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
-  const course = courses.find((c) => c.slug === slug);
-  const courseReviews = reviews.filter((r) => r.courseId === course?.id);
+  const [course, setCourse] = useState<Course | null>(null);
+  const [courseReviews, setCourseReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
+
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      setLoading(true);
+      try {
+        const courseData = await academyService.getCourseBySlug(slug);
+        setCourse(courseData);
+
+        if (courseData) {
+          const reviews = await academyService.getCourseReviews(courseData.id);
+          setCourseReviews(reviews);
+        }
+      } catch (error) {
+        console.error("Error fetching course data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourseData();
+  }, [slug]);
 
   const scrollToCurriculum = () => {
     const element = document.getElementById("curriculum-tab");
@@ -68,6 +93,19 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
       if (curriculumTabButton) curriculumTabButton.click();
     }
   };
+
+  if (loading) {
+    return (
+      <Container maxW="container.xl" py="20">
+        <Center>
+          <VStack spacing="4">
+            <Spinner size="xl" color="primary.500" thickness="4px" />
+            <Text color="muted">Loading course details...</Text>
+          </VStack>
+        </Center>
+      </Container>
+    );
+  }
 
   if (!course) {
     return (

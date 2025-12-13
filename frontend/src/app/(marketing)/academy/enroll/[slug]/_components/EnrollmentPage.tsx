@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -29,6 +30,8 @@ import {
   AlertDescription,
   Radio,
   RadioGroup,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
 import { toast } from '@/components/ui/toast'
 import Image from "next/image";
@@ -50,20 +53,39 @@ import {
   FiGift,
   FiLock,
 } from "react-icons/fi";
-import { useState } from "react";
+import academyService from "@/lib/academy-service";
 
 interface EnrollmentPageProps {
-  course: Course;
+  slug: string;
 }
 
-export default function EnrollmentPage({ course }: EnrollmentPageProps) {
+export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
+  const [course, setCourse] = useState<Course | null>(null);
+  const [loading, setLoading] = useState(true);
+
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const accentBg = useColorModeValue("green.50", "green.900");
   const accentColor = useColorModeValue("green.600", "green.300");
+
+  useEffect(() => {
+    const fetchCourse = async () => {
+      setLoading(true);
+      try {
+        const courseData = await academyService.getCourseBySlug(slug);
+        setCourse(courseData);
+      } catch (error) {
+        console.error("Error fetching course:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourse();
+  }, [slug]);
   
-  const isFree = course.price === 0;
+  const isFree = course?.price === 0;
   
   const [formData, setFormData] = useState({
     name: "",
@@ -105,6 +127,35 @@ export default function EnrollmentPage({ course }: EnrollmentPageProps) {
       }, 2000);
     }
   };
+
+  if (loading) {
+    return (
+      <Container maxW="container.xl" py="20">
+        <Center>
+          <VStack spacing="4">
+            <Spinner size="xl" color="green.500" thickness="4px" />
+            <Text color="muted">Loading enrollment details...</Text>
+          </VStack>
+        </Center>
+      </Container>
+    );
+  }
+
+  if (!course) {
+    return (
+      <Container maxW="container.xl" py="20">
+        <Center>
+          <VStack spacing="4">
+            <Heading>Course Not Found</Heading>
+            <Text color="muted">The course you're trying to enroll in doesn't exist.</Text>
+            <ButtonLink href="/academy/courses" colorScheme="primary">
+              Browse All Courses
+            </ButtonLink>
+          </VStack>
+        </Center>
+      </Container>
+    );
+  }
 
   return (
     <Box>

@@ -45,13 +45,26 @@ export default function CourseCard({ course, variant = "default" }: CourseCardPr
     >
       {/* Thumbnail */}
       <Box position="relative" h={variant === "compact" ? "150px" : "200px"}>
-        <Image
-          src={course.thumbnail}
-          alt={course.title}
-          w="full"
-          h="full"
-          objectFit="cover"
-        />
+        {course.thumbnail && course.thumbnail !== '/images/placeholder-course.jpg' ? (
+          <Image
+            src={course.thumbnail}
+            alt={course.title}
+            w="full"
+            h="full"
+            objectFit="cover"
+          />
+        ) : (
+          <Box
+            w="full"
+            h="full"
+            bg={useColorModeValue('gray.200', 'gray.700')}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Icon as={FiBook} boxSize="12" color={useColorModeValue('gray.400', 'gray.500')} />
+          </Box>
+        )}
         {/* Tier Badge */}
         <Badge
           position="absolute"

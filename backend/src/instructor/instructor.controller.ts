@@ -150,6 +150,25 @@ export class InstructorController {
     // Extract modules from data to handle separately
     const { modules, ...courseData } = data;
 
+    // Convert date strings to ISO-8601 DateTime if present
+    if (courseData.startDate && typeof courseData.startDate === 'string') {
+      courseData.startDate = new Date(courseData.startDate).toISOString();
+    }
+    if (courseData.endDate && typeof courseData.endDate === 'string') {
+      courseData.endDate = new Date(courseData.endDate).toISOString();
+    }
+
+    // Convert numeric fields to proper types
+    if (courseData.price !== undefined) {
+      courseData.price = parseFloat(courseData.price as any) || 0;
+    }
+    if (courseData.duration !== undefined) {
+      courseData.duration = parseInt(courseData.duration as any) || 0;
+    }
+    if (courseData.maxStudents !== undefined && courseData.maxStudents !== null) {
+      courseData.maxStudents = parseInt(courseData.maxStudents as any) || null;
+    }
+
     // Prepare the course creation data with proper nested structure
     const createData: any = {
       ...courseData,
@@ -216,9 +235,29 @@ export class InstructorController {
       throw new Error('Course not found or access denied');
     }
 
+    // Convert date strings to ISO-8601 DateTime and numeric fields to proper types
+    const processedData: any = { ...data };
+    if (processedData.startDate && typeof processedData.startDate === 'string') {
+      processedData.startDate = new Date(processedData.startDate).toISOString();
+    }
+    if (processedData.endDate && typeof processedData.endDate === 'string') {
+      processedData.endDate = new Date(processedData.endDate).toISOString();
+    }
+
+    // Convert numeric fields to proper types
+    if (processedData.price !== undefined) {
+      processedData.price = parseFloat(processedData.price) || 0;
+    }
+    if (processedData.duration !== undefined) {
+      processedData.duration = parseInt(processedData.duration) || 0;
+    }
+    if (processedData.maxStudents !== undefined && processedData.maxStudents !== null) {
+      processedData.maxStudents = parseInt(processedData.maxStudents) || null;
+    }
+
     return this.prisma.course.update({
       where: { id: courseId },
-      data,
+      data: processedData,
     });
   }
 

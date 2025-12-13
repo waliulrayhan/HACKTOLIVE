@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -38,13 +38,16 @@ import {
   Input,
   InputGroup,
   InputLeftAddon,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
 import { FiFilter, FiX } from "react-icons/fi";
 import { FallInPlace } from "@/components/shared/motion/fall-in-place";
-import { courses } from "@/data/academy/courses";
 import CourseCard from "@/components/academy/CourseCard";
 import SearchBar from "@/components/academy/SearchBar";
 import { EmptyState } from "@/components/academy/UIStates";
+import { Course } from "@/types/academy";
+import academyService from "@/lib/academy-service";
 
 export default function AllCoursesPage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -60,6 +63,27 @@ export default function AllCoursesPage() {
   const [sortBy, setSortBy] = useState("popular");
   const [currentPage, setCurrentPage] = useState(1);
   const coursesPerPage = 12;
+
+  // API state
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch courses from API
+  useEffect(() => {
+    const fetchCourses = async () => {
+      setLoading(true);
+      try {
+        const allCourses = await academyService.getCourses();
+        setCourses(allCourses);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   const levels = [
     { value: "fundamental", label: "Fundamental" },
@@ -520,7 +544,14 @@ export default function AllCoursesPage() {
 
             {/* Course Grid */}
             <Box flex="1">
-              {sortedCourses.length === 0 ? (
+              {loading ? (
+                <Center py="20">
+                  <VStack spacing="4">
+                    <Spinner size="xl" color="primary.500" thickness="4px" />
+                    <Text color="muted">Loading courses...</Text>
+                  </VStack>
+                </Center>
+              ) : sortedCourses.length === 0 ? (
                 <EmptyState
                   title="No courses found"
                   description="Try adjusting your filters or search query to find what you're looking for."

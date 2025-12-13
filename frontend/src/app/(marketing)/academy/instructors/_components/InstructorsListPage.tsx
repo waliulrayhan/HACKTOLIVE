@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -13,12 +14,15 @@ import {
   Badge,
   Flex,
   Divider,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
 import Image from "next/image";
-import { instructors, courses } from "@/data/academy/courses";
 import { FallInPlace } from "@/components/shared/motion/fall-in-place";
 import { ButtonLink } from "@/components/shared/button-link/button-link";
 import { FiStar, FiUsers, FiBook, FiAward, FiTrendingUp } from "react-icons/fi";
+import { Instructor } from "@/types/academy";
+import academyService from "@/lib/academy-service";
 
 export default function InstructorsListPage() {
   const bgColor = useColorModeValue("gray.50", "gray.900");
@@ -27,6 +31,25 @@ export default function InstructorsListPage() {
   const textMuted = useColorModeValue("gray.600", "gray.400");
   const heroBg = useColorModeValue("gray.900", "gray.950");
   const accentColor = useColorModeValue("green.500", "green.400");
+
+  const [instructors, setInstructors] = useState<Instructor[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchInstructors = async () => {
+      setLoading(true);
+      try {
+        const instructorData = await academyService.getInstructors();
+        setInstructors(instructorData);
+      } catch (error) {
+        console.error("Error fetching instructors:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInstructors();
+  }, []);
 
   return (
     <Box bg={bgColor} minH="100vh">
@@ -147,34 +170,38 @@ export default function InstructorsListPage() {
           </VStack>
 
           {/* Instructors Grid */}
-          <SimpleGrid
-            columns={{ base: 1, md: 2, lg: 3 }}
-            spacing={{ base: 8, md: 10 }}
-          >
-            {instructors.map((instructor, index) => {
-              const instructorCourses = courses.filter(
-                (c) => c.instructor.id === instructor.id
-              );
-
-              return (
-                <FallInPlace key={instructor.id} delay={0.05 * index}>
-                  <Box
-                    bg={cardBg}
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    borderRadius="xl"
-                    overflow="hidden"
-                    transition="all 0.3s ease"
-                    _hover={{
-                      transform: "translateY(-8px)",
-                      shadow: "2xl",
-                      borderColor: accentColor,
-                    }}
-                    h="full"
-                    display="flex"
-                    flexDirection="column"
-                  >
-                    {/* Instructor Image */}
+          {loading ? (
+            <Center py="20">
+              <VStack spacing="4">
+                <Spinner size="xl" color="green.500" thickness="4px" />
+                <Text color={textMuted}>Loading instructors...</Text>
+              </VStack>
+            </Center>
+          ) : instructors.length > 0 ? (
+            <SimpleGrid
+              columns={{ base: 1, md: 2, lg: 3 }}
+              spacing={{ base: 8, md: 10 }}
+            >
+              {instructors.map((instructor, index) => {
+                return (
+                  <FallInPlace key={instructor.id} delay={0.05 * index}>
+                    <Box
+                      bg={cardBg}
+                      borderWidth="1px"
+                      borderColor={borderColor}
+                      borderRadius="xl"
+                      overflow="hidden"
+                      transition="all 0.3s ease"
+                      _hover={{
+                        transform: "translateY(-8px)",
+                        shadow: "2xl",
+                        borderColor: accentColor,
+                      }}
+                      h="full"
+                      display="flex"
+                      flexDirection="column"
+                    >
+                      {/* Instructor Image */}
                     <Box position="relative" h="280px" w="full" overflow="hidden">
                       <Image
                         src={instructor.avatar}
@@ -251,7 +278,7 @@ export default function InstructorsListPage() {
                             />
                           </Flex>
                           <Text fontWeight="bold" fontSize="lg">
-                            {instructorCourses.length}
+                            {instructor.totalCourses}
                           </Text>
                           <Text fontSize="xs" color={textMuted}>
                             Courses
@@ -321,6 +348,11 @@ export default function InstructorsListPage() {
               );
             })}
           </SimpleGrid>
+          ) : (
+            <Center py="20">
+              <Text color={textMuted}>No instructors found.</Text>
+            </Center>
+          )}
         </Container>
       </Box>
 
