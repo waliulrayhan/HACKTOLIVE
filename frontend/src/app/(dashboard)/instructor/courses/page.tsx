@@ -460,6 +460,13 @@ export default function InstructorCoursesPage() {
                             <HiOutlineEye className="h-4 w-4" />
                           </button>
                           <button
+                            onClick={() => router.push(`/instructor/courses/${course.id}/certificates`)}
+                            className="flex h-7 w-7 items-center justify-center rounded-md text-purple-600 transition-colors hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-500/10"
+                            title="Manage certificates"
+                          >
+                            <HiOutlineAcademicCap className="h-4 w-4" />
+                          </button>
+                          <button
                             onClick={() => router.push(`/instructor/courses/${course.id}/edit`)}
                             className="flex h-7 w-7 items-center justify-center rounded-md text-green-600 transition-colors hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-500/10"
                             title="Edit course"

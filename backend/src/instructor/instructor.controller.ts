@@ -14,6 +14,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard, Roles } from '../auth/roles.guard';
 import { UserRole, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
+import { InstructorService } from './instructor.service';
 
 @ApiTags('instructor')
 @ApiBearerAuth()
@@ -21,7 +22,10 @@ import { PrismaService } from '../prisma.service';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.INSTRUCTOR)
 export class InstructorController {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private instructorService: InstructorService,
+  ) {}
 
   @Get('dashboard')
   async getDashboard(@Request() req: any) {
@@ -599,5 +603,199 @@ export class InstructorController {
     });
 
     return { message: 'Lesson deleted successfully' };
+  }
+
+  // Profile Management
+  @Get('profile')
+  @ApiOperation({ summary: 'Get instructor profile' })
+  async getProfile(@Request() req: any) {
+    return this.instructorService.getProfile(req.user.id);
+  }
+
+  @Patch('profile')
+  @ApiOperation({ summary: 'Update instructor profile' })
+  async updateProfile(@Request() req: any, @Body() data: Prisma.InstructorUpdateInput) {
+    return this.instructorService.updateProfile(req.user.id, data);
+  }
+
+  // Quiz Management
+  @Post('lessons/:lessonId/quizzes')
+  @ApiOperation({ summary: 'Create a quiz for a lesson' })
+  async createQuiz(
+    @Request() req: any,
+    @Param('lessonId') lessonId: string,
+    @Body() data: any,
+  ) {
+    return this.instructorService.createQuiz(req.user.id, lessonId, data);
+  }
+
+  @Patch('quizzes/:quizId')
+  @ApiOperation({ summary: 'Update a quiz' })
+  async updateQuiz(
+    @Request() req: any,
+    @Param('quizId') quizId: string,
+    @Body() data: any,
+  ) {
+    return this.instructorService.updateQuiz(req.user.id, quizId, data);
+  }
+
+  @Delete('quizzes/:quizId')
+  @ApiOperation({ summary: 'Delete a quiz' })
+  async deleteQuiz(@Request() req: any, @Param('quizId') quizId: string) {
+    return this.instructorService.deleteQuiz(req.user.id, quizId);
+  }
+
+  @Post('quizzes/:quizId/questions')
+  @ApiOperation({ summary: 'Add a question to a quiz' })
+  async addQuizQuestion(
+    @Request() req: any,
+    @Param('quizId') quizId: string,
+    @Body() data: any,
+  ) {
+    return this.instructorService.addQuizQuestion(req.user.id, quizId, data);
+  }
+
+  @Patch('quiz-questions/:questionId')
+  @ApiOperation({ summary: 'Update a quiz question' })
+  async updateQuizQuestion(
+    @Request() req: any,
+    @Param('questionId') questionId: string,
+    @Body() data: any,
+  ) {
+    return this.instructorService.updateQuizQuestion(req.user.id, questionId, data);
+  }
+
+  @Delete('quiz-questions/:questionId')
+  @ApiOperation({ summary: 'Delete a quiz question' })
+  async deleteQuizQuestion(
+    @Request() req: any,
+    @Param('questionId') questionId: string,
+  ) {
+    return this.instructorService.deleteQuizQuestion(req.user.id, questionId);
+  }
+
+  // Assignment Management
+  @Get('assignments')
+  @ApiOperation({ summary: 'Get all assignments for instructor courses' })
+  async getAllAssignments(@Request() req: any) {
+    return this.instructorService.getAllAssignments(req.user.id);
+  }
+
+  @Get('assignments/pending')
+  @ApiOperation({ summary: 'Get pending assignment submissions' })
+  async getPendingSubmissions(@Request() req: any) {
+    return this.instructorService.getPendingSubmissions(req.user.id);
+  }
+
+  @Post('lessons/:lessonId/assignments')
+  @ApiOperation({ summary: 'Create an assignment for a lesson' })
+  async createAssignment(
+    @Request() req: any,
+    @Param('lessonId') lessonId: string,
+    @Body() data: any,
+  ) {
+    return this.instructorService.createAssignment(req.user.id, lessonId, data);
+  }
+
+  @Patch('assignments/:assignmentId')
+  @ApiOperation({ summary: 'Update an assignment' })
+  async updateAssignment(
+    @Request() req: any,
+    @Param('assignmentId') assignmentId: string,
+    @Body() data: any,
+  ) {
+    return this.instructorService.updateAssignment(req.user.id, assignmentId, data);
+  }
+
+  @Delete('assignments/:assignmentId')
+  @ApiOperation({ summary: 'Delete an assignment' })
+  async deleteAssignment(
+    @Request() req: any,
+    @Param('assignmentId') assignmentId: string,
+  ) {
+    return this.instructorService.deleteAssignment(req.user.id, assignmentId);
+  }
+
+  @Get('assignments/:assignmentId/submissions')
+  @ApiOperation({ summary: 'Get all submissions for an assignment' })
+  async getAssignmentSubmissions(
+    @Request() req: any,
+    @Param('assignmentId') assignmentId: string,
+  ) {
+    return this.instructorService.getAssignmentSubmissions(req.user.id, assignmentId);
+  }
+
+  @Post('submissions/:submissionId/grade')
+  @ApiOperation({ summary: 'Grade an assignment submission' })
+  async gradeSubmission(
+    @Request() req: any,
+    @Param('submissionId') submissionId: string,
+    @Body() data: { score: number; feedback?: string },
+  ) {
+    return this.instructorService.gradeSubmission(
+      req.user.id,
+      submissionId,
+      data.score,
+      data.feedback,
+    );
+  }
+
+  // Lesson Resources
+  @Post('lessons/:lessonId/resources')
+  @ApiOperation({ summary: 'Add a resource to a lesson' })
+  async addLessonResource(
+    @Request() req: any,
+    @Param('lessonId') lessonId: string,
+    @Body() data: any,
+  ) {
+    return this.instructorService.addLessonResource(req.user.id, lessonId, data);
+  }
+
+  @Patch('resources/:resourceId')
+  @ApiOperation({ summary: 'Update a lesson resource' })
+  async updateLessonResource(
+    @Request() req: any,
+    @Param('resourceId') resourceId: string,
+    @Body() data: any,
+  ) {
+    return this.instructorService.updateLessonResource(req.user.id, resourceId, data);
+  }
+
+  @Delete('resources/:resourceId')
+  @ApiOperation({ summary: 'Delete a lesson resource' })
+  async deleteLessonResource(
+    @Request() req: any,
+    @Param('resourceId') resourceId: string,
+  ) {
+    return this.instructorService.deleteLessonResource(req.user.id, resourceId);
+  }
+
+  // Certificate Management
+  @Post('certificates/issue')
+  @ApiOperation({ summary: 'Issue a certificate to a student' })
+  async issueCertificate(
+    @Request() req: any,
+    @Body() data: { studentId: string; courseId: string },
+  ) {
+    return this.instructorService.issueCertificate(
+      req.user.id,
+      data.studentId,
+      data.courseId,
+    );
+  }
+
+  // Student Progress
+  @Get('courses/:courseId/students/:studentId/progress')
+  @ApiOperation({ summary: 'Get detailed student progress for a course' })
+  async getStudentCourseProgress(
+    @Request() req: any,
+    @Param('courseId') courseId: string,
+    @Param('studentId') studentId: string,
+  ) {
+    return this.instructorService.getStudentCourseProgress(
+      req.user.id,
+      courseId,
+      studentId,
+    );
   }
 }

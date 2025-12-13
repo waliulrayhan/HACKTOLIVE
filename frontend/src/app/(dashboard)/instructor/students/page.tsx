@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
@@ -61,6 +62,7 @@ interface PaginationData {
 }
 
 export default function InstructorStudentsPage() {
+  const router = useRouter();
   const [students, setStudents] = useState<Student[]>([]);
   const [allStudents, setAllStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
@@ -555,9 +557,20 @@ export default function InstructorStudentsPage() {
                           {enrollment.progress}%
                         </span>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                        Enrolled: {new Date(enrollment.enrolledAt).toLocaleDateString()}
-                      </p>
+                      <div className="flex items-center justify-between mt-2">
+                        <p className="text-xs text-gray-500 dark:text-gray-500">
+                          Enrolled: {new Date(enrollment.enrolledAt).toLocaleDateString()}
+                        </p>
+                        <button
+                          onClick={() => {
+                            router.push(`/instructor/students/${selectedStudent.id}/progress/${enrollment.id}`);
+                            setShowModal(false);
+                          }}
+                          className="text-xs text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 font-medium"
+                        >
+                          View Progress →
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

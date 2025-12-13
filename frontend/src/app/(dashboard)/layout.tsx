@@ -115,7 +115,10 @@ export default function DashboardLayout({
           {
             icon: <FileIcon />,
             name: "My Courses",
-            path: "/instructor/courses",
+            subItems: [
+              { name: "All Courses", path: "/instructor/courses" },
+              { name: "Create Course", path: "/instructor/courses/create" },
+            ],
           },
           {
             icon: <UserIcon />,
@@ -131,11 +134,6 @@ export default function DashboardLayout({
             icon: <TaskIcon />,
             name: "Assignments",
             path: "/instructor/assignments",
-          },
-          {
-            icon: <DocsIcon />,
-            name: "Content Library",
-            path: "/instructor/library",
           },
           {
             icon: <UserCircleIcon />,
