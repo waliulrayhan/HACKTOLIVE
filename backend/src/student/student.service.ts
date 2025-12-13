@@ -1028,8 +1028,8 @@ export class StudentService {
       data: {
         courseId,
         userId,
-        studentName: student.name,
-        studentAvatar: student.avatar,
+        studentName: student.user.name || 'Student',
+        studentAvatar: student.user.avatar,
         rating,
         comment,
       },

@@ -8,26 +8,26 @@ datasource db {
 }
 
 model User {
-  id          String      @id @default(uuid())
-  email       String      @unique
-  name        String?
-  password    String
-  role        UserRole    @default(STUDENT)
-  phone       String?
-  bio         String?
-  avatar      String?     @db.VarChar(500)
-  city        String?
-  state       String?
-  country     String?
-  facebookUrl String?     @db.VarChar(500)
-  twitterUrl  String?     @db.VarChar(500)
-  linkedinUrl String?     @db.VarChar(500)
-  instagramUrl String?    @db.VarChar(500)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  instructor  Instructor?
-  reviews     Review[]
-  student     Student?
+  id           String      @id @default(uuid())
+  email        String      @unique
+  name         String?
+  password     String
+  role         UserRole    @default(STUDENT)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  avatar       String?     @db.VarChar(500)
+  bio          String?
+  city         String?
+  country      String?
+  facebookUrl  String?     @db.VarChar(500)
+  instagramUrl String?     @db.VarChar(500)
+  linkedinUrl  String?     @db.VarChar(500)
+  phone        String?
+  state        String?
+  twitterUrl   String?     @db.VarChar(500)
+  instructor   Instructor?
+  reviews      Review[]
+  student      Student?
 }
 
 model Instructor {
@@ -57,10 +57,6 @@ model Instructor {
 model Student {
   id                    String                 @id @default(uuid())
   userId                String                 @unique
-  name                  String
-  email                 String                 @unique
-  avatar                String?
-  phone                 String?
   enrolledCourses       Int                    @default(0)
   completedCourses      Int                    @default(0)
   certificatesEarned    Int                    @default(0)
@@ -72,8 +68,6 @@ model Student {
   progress              LessonProgress[]
   quizAttempts          QuizAttempt[]
   user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([email])
 }
 
 model Course {

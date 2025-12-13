@@ -59,9 +59,6 @@ export class AuthService {
       await this.prisma.student.create({
         data: {
           userId: user.id,
-          name: user.name || 'Student',
-          email: user.email,
-          avatar: '/images/user/default-avatar.jpg',
         },
       });
     } else if (user.role === UserRole.INSTRUCTOR) {
@@ -184,13 +181,8 @@ export class AuthService {
 
     // Update associated profile
     if (user.role === UserRole.STUDENT && data.avatar) {
-      await this.prisma.student.update({
-        where: { userId },
-        data: {
-          name: data.name,
-          avatar: data.avatar,
-        },
-      });
+      // Student avatar is now in User table, no need to update Student
+      // The update to user.avatar above already handles this
     } else if (user.role === UserRole.INSTRUCTOR) {
       await this.prisma.instructor.update({
         where: { userId },

@@ -211,7 +211,74 @@ class AcademyService {
   // ==================== ENROLLMENTS ====================
   
   /**
-   * Create a new enrollment
+   * Create a new enrollment (requires authentication)
+   */
+  async enrollInCourse(courseId: string): Promise<any> {
+    try {
+      const response = await api.post(`/student/courses/${courseId}/enroll`);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error enrolling in course:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Enroll with auto-signup (for unauthenticated users)
+   */
+  async enrollWithSignup(courseId: string, userData: { name: string; email: string; password: string; phone?: string }): Promise<any> {
+    try {
+      // First signup
+      const signupResponse = await api.post('/auth/signup', {
+        name: userData.name,
+        email: userData.email,
+        password: userData.password,
+      });
+      
+      // Store token from signup
+      if (signupResponse.data.token) {
+        localStorage.setItem('token', signupResponse.data.token);
+        localStorage.setItem('user', JSON.stringify(signupResponse.data.user));
+      }
+
+      // Then enroll in course
+      const enrollResponse = await api.post(`/student/courses/${courseId}/enroll`);
+      
+      return {
+        user: signupResponse.data.user,
+        token: signupResponse.data.token,
+        enrollment: enrollResponse.data,
+      };
+    } catch (error: any) {
+      console.error('Error with signup and enrollment:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Process payment and enroll (dummy payment for now)
+   */
+  async processPaymentAndEnroll(courseId: string, paymentData: any): Promise<any> {
+    try {
+      // Simulate payment processing delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // For now, just enroll directly (payment integration to be added later)
+      const enrollResponse = await api.post(`/student/courses/${courseId}/enroll`);
+      
+      return {
+        success: true,
+        enrollment: enrollResponse.data,
+        paymentId: `PAY_${Date.now()}`, // Dummy payment ID
+      };
+    } catch (error: any) {
+      console.error('Error processing payment and enrollment:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Create a new enrollment (legacy method)
    */
   async createEnrollment(courseId: string, studentId: string): Promise<Enrollment | null> {
     try {

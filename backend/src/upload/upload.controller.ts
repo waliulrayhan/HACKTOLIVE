@@ -53,13 +53,8 @@ export class UploadController {
       },
     });
 
-    // Also update in student/instructor table if exists
-    if (req.user.role === 'STUDENT') {
-      await this.prisma.student.updateMany({
-        where: { userId: req.user.id },
-        data: { avatar: avatarUrl },
-      });
-    } else if (req.user.role === 'INSTRUCTOR') {
+    // Also update in instructor table if exists (Student avatar is now only in User table)
+    if (req.user.role === 'INSTRUCTOR') {
       await this.prisma.instructor.updateMany({
         where: { userId: req.user.id },
         data: { avatar: avatarUrl },

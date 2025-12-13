@@ -149,8 +149,6 @@ export class AdminService {
       await this.prisma.student.create({
         data: {
           userId: user.id,
-          name,
-          email,
         },
       });
     } else if (role === UserRole.INSTRUCTOR) {

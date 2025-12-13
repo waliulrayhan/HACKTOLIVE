@@ -560,7 +560,11 @@ export class InstructorService {
         },
       },
       include: {
-        student: true,
+        student: {
+          include: {
+            user: true,
+          },
+        },
         course: true,
       },
     });
@@ -597,7 +601,7 @@ export class InstructorService {
         course: {
           connect: { id: courseId },
         },
-        studentName: enrollment.student.name,
+        studentName: enrollment.student.user.name || 'Student',
         courseName: enrollment.course.title,
         verificationCode,
       },

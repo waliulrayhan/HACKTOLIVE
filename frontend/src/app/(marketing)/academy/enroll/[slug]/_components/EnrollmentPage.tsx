@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Box,
   Container,
@@ -32,6 +33,10 @@ import {
   RadioGroup,
   Spinner,
   Center,
+  InputGroup,
+  InputRightElement,
+  IconButton,
+  FormErrorMessage,
 } from "@chakra-ui/react";
 import { toast } from '@/components/ui/toast'
 import Image from "next/image";
@@ -52,16 +57,24 @@ import {
   FiZap,
   FiGift,
   FiLock,
+  FiEye,
 } from "react-icons/fi";
+import { FaEyeSlash } from "react-icons/fa";
 import academyService from "@/lib/academy-service";
+import { useAuth } from "@/context/AuthContext";
 
 interface EnrollmentPageProps {
   slug: string;
 }
 
 export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
@@ -84,13 +97,27 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
 
     fetchCourse();
   }, [slug]);
+
+  useEffect(() => {
+    // Pre-fill user data if logged in
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: user.name || "",
+        email: user.email || "",
+      }));
+    }
+  }, [user]);
   
   const isFree = course?.price === 0;
+  const isLoggedIn = !authLoading && !!user;
   
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
+    password: "",
+    confirmPassword: "",
     message: "",
     agreeToTerms: false,
   });
@@ -104,27 +131,146 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
     couponCode: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (isFree) {
-      toast.success("Enrollment Successful! 🎉", {
-        description: "You're now enrolled in this free course. Check your email for access details.",
-        duration: 5000,
-      });
-    } else {
-      toast.info("Processing Payment...", {
-        description: "Please wait while we process your enrollment.",
-        duration: 3000,
-      });
+
+    if (!course) {
+      toast.error("Course not found");
+      return;
+    }
+
+    // Validation for non-logged in users
+    if (!isLoggedIn) {
+      const newErrors = { name: "", email: "", password: "", confirmPassword: "" };
+      let hasError = false;
+
+      if (!formData.name.trim()) {
+        newErrors.name = "Name is required";
+        hasError = true;
+      }
+      if (!formData.email.trim()) {
+        newErrors.email = "Email is required";
+        hasError = true;
+      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+        newErrors.email = "Email is invalid";
+        hasError = true;
+      }
+      if (!formData.password) {
+        newErrors.password = "Password is required";
+        hasError = true;
+      } else if (formData.password.length < 6) {
+        newErrors.password = "Password must be at least 6 characters";
+        hasError = true;
+      }
+      if (!formData.confirmPassword) {
+        newErrors.confirmPassword = "Please confirm your password";
+        hasError = true;
+      } else if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = "Passwords do not match";
+        hasError = true;
+      }
+
+      if (hasError) {
+        setErrors(newErrors);
+        return;
+      }
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Case 1: User is already logged in
+      if (isLoggedIn) {
+        if (isFree) {
+          await academyService.enrollInCourse(course.id);
+          toast.success("Enrollment Successful! 🎉", {
+            description: "You're now enrolled in this free course.",
+            duration: 5000,
+          });
+          setTimeout(() => router.push("/student/courses"), 1500);
+        } else {
+          toast.info("Processing Payment...", {
+            description: "Please wait while we process your payment.",
+            duration: 3000,
+          });
+          await academyService.processPaymentAndEnroll(course.id, paymentData);
+          toast.success("Payment Successful! 🎉", {
+            description: "You're now enrolled! Check your dashboard for course access.",
+            duration: 5000,
+          });
+          setTimeout(() => router.push("/student/courses"), 1500);
+        }
+      }
+      // Case 2: User is NOT logged in - auto signup
+      else {
+        if (isFree) {
+          toast.info("Creating your account...", {
+            description: "Setting up your account and enrolling you in the course.",
+            duration: 3000,
+          });
+          await academyService.enrollWithSignup(course.id, {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+          });
+          toast.success("Welcome to HACKTOLIVE! 🎉", {
+            description: "Your account has been created and you're enrolled in the course!",
+            duration: 5000,
+          });
+          setTimeout(() => window.location.href = "/student/courses", 1500);
+        } else {
+          toast.info("Creating your account...", {
+            description: "Setting up your account and processing payment.",
+            duration: 3000,
+          });
+          await academyService.enrollWithSignup(course.id, {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+          });
+          toast.info("Processing Payment...", {
+            description: "Please wait while we process your payment.",
+            duration: 2000,
+          });
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          toast.success("Welcome & Payment Successful! 🎉", {
+            description: "Your account has been created and you're enrolled!",
+            duration: 5000,
+          });
+          setTimeout(() => window.location.href = "/student/courses", 1500);
+        }
+      }
+    } catch (error: any) {
+      console.error("Enrollment error:", error);
+      const errorMessage = error.response?.data?.message || error.message || "An error occurred";
       
-      // Simulate payment processing
-      setTimeout(() => {
-        toast.success("Payment Successful! 🎉", {
-          description: "You're now enrolled! Check your email for course access.",
+      if (errorMessage.includes("already enrolled")) {
+        toast.error("Already Enrolled", {
+          description: "You are already enrolled in this course.",
           duration: 5000,
         });
-      }, 2000);
+      } else if (errorMessage.includes("already exists") || errorMessage.includes("User already exists")) {
+        toast.error("Email Already Registered", {
+          description: "This email is already registered. Please login instead.",
+          duration: 5000,
+        });
+      } else {
+        toast.error("Enrollment Failed", {
+          description: errorMessage,
+          duration: 5000,
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -194,12 +340,19 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                 )}
               </HStack>
               <Heading fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}>
-                {isFree ? "Start Learning Today" : "Complete Your Enrollment"}
+                {isLoggedIn
+                  ? (isFree ? "Start Learning Today" : "Complete Your Enrollment")
+                  : "Create Account & Enroll"
+                }
               </Heading>
               <Text fontSize={{ base: "md", md: "lg" }} color="muted">
-                {isFree 
-                  ? "Fill in your details to get instant access to this free course"
-                  : "Secure your spot in this premium course and unlock expert-led content"
+                {isLoggedIn
+                  ? (isFree 
+                      ? "Click below to get instant access to this free course"
+                      : "Secure your spot in this premium course and unlock expert-led content")
+                  : (isFree
+                      ? "Create your free account to get instant access to this course"
+                      : "Create your account and complete payment to enroll in this premium course")
                 }
               </Text>
             </VStack>
@@ -243,15 +396,20 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                       <form onSubmit={handleSubmit} id="enrollment-form">
                         <VStack spacing="5" align="stretch">
                           <SimpleGrid columns={{ base: 1, md: 2 }} spacing="4">
-                            <FormControl isRequired>
+                            <FormControl isRequired isInvalid={!!errors.name}>
                               <FormLabel fontWeight="semibold">Full Name</FormLabel>
                               <Input
                                 size="lg"
                                 placeholder="John Doe"
                                 value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                onChange={(e) => {
+                                  setFormData({ ...formData, name: e.target.value });
+                                  setErrors({ ...errors, name: "" });
+                                }}
                                 borderRadius="lg"
+                                isDisabled={isLoggedIn}
                               />
+                              <FormErrorMessage>{errors.name}</FormErrorMessage>
                             </FormControl>
 
                             <FormControl isRequired>
@@ -267,20 +425,82 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                             </FormControl>
                           </SimpleGrid>
 
-                          <FormControl isRequired>
+                          <FormControl isRequired isInvalid={!!errors.email}>
                             <FormLabel fontWeight="semibold">Email Address</FormLabel>
                             <Input
                               size="lg"
                               type="email"
                               placeholder="your.email@example.com"
                               value={formData.email}
-                              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                              onChange={(e) => {
+                                setFormData({ ...formData, email: e.target.value });
+                                setErrors({ ...errors, email: "" });
+                              }}
                               borderRadius="lg"
+                              isDisabled={isLoggedIn}
                             />
                             <Text fontSize="xs" color="muted" mt="1">
                               We'll send course access and updates to this email
                             </Text>
+                            <FormErrorMessage>{errors.email}</FormErrorMessage>
                           </FormControl>
+
+                          {/* Password fields for non-logged in users */}
+                          {!isLoggedIn && (
+                            <>
+                              <FormControl isRequired isInvalid={!!errors.password}>
+                                <FormLabel fontWeight="semibold">Password</FormLabel>
+                                <InputGroup size="lg">
+                                  <Input
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="Create a password (min 6 characters)"
+                                    value={formData.password}
+                                    onChange={(e) => {
+                                      setFormData({ ...formData, password: e.target.value });
+                                      setErrors({ ...errors, password: "" });
+                                    }}
+                                    borderRadius="lg"
+                                  />
+                                  <InputRightElement>
+                                    <IconButton
+                                      aria-label={showPassword ? "Hide password" : "Show password"}
+                                      icon={showPassword ? <FaEyeSlash /> : <FiEye />}
+                                      onClick={() => setShowPassword(!showPassword)}
+                                      variant="ghost"
+                                      size="sm"
+                                    />
+                                  </InputRightElement>
+                                </InputGroup>
+                                <FormErrorMessage>{errors.password}</FormErrorMessage>
+                              </FormControl>
+
+                              <FormControl isRequired isInvalid={!!errors.confirmPassword}>
+                                <FormLabel fontWeight="semibold">Confirm Password</FormLabel>
+                                <InputGroup size="lg">
+                                  <Input
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    placeholder="Confirm your password"
+                                    value={formData.confirmPassword}
+                                    onChange={(e) => {
+                                      setFormData({ ...formData, confirmPassword: e.target.value });
+                                      setErrors({ ...errors, confirmPassword: "" });
+                                    }}
+                                    borderRadius="lg"
+                                  />
+                                  <InputRightElement>
+                                    <IconButton
+                                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                                      icon={showConfirmPassword ? <FaEyeSlash /> : <FiEye />}
+                                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                      variant="ghost"
+                                      size="sm"
+                                    />
+                                  </InputRightElement>
+                                </InputGroup>
+                                <FormErrorMessage>{errors.confirmPassword}</FormErrorMessage>
+                              </FormControl>
+                            </>
+                          )}
 
                           {!isFree && (
                             <FormControl>
@@ -457,11 +677,14 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                         fontSize="lg"
                         fontWeight="bold"
                         leftIcon={isFree ? <FiZap /> : <FiLock />}
+                        isLoading={isSubmitting}
+                        loadingText={isLoggedIn ? (isFree ? "Enrolling..." : "Processing...") : "Creating Account..."}
                         isDisabled={
                           !formData.agreeToTerms || 
                           !formData.name || 
                           !formData.email || 
                           !formData.phone ||
+                          (!isLoggedIn && (!formData.password || !formData.confirmPassword)) ||
                           (!isFree && paymentData.paymentMethod === "card" && (
                             !paymentData.cardNumber ||
                             !paymentData.cardName ||
@@ -470,9 +693,13 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                           ))
                         }
                       >
-                        {isFree 
-                          ? "Start Learning for Free" 
-                          : `Complete Payment - ${course.price.toLocaleString()} Tk`
+                        {isLoggedIn
+                          ? (isFree 
+                              ? "Start Learning for Free" 
+                              : `Complete Payment - ${course.price.toLocaleString()} Tk`)
+                          : (isFree
+                              ? "Sign Up & Enroll for Free"
+                              : `Sign Up & Pay ${course.price.toLocaleString()} Tk`)
                         }
                       </Button>
 
@@ -480,6 +707,23 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                         <Text fontSize="xs" color="muted" textAlign="center">
                           30-day money-back guarantee • Instant access after payment
                         </Text>
+                      )}
+
+                      {/* Login Link for non-logged in users */}
+                      {!isLoggedIn && (
+                        <>
+                          <Divider />
+                          <Text textAlign="center" fontSize="sm" color="muted">
+                            Already have an account?{" "}
+                            <ButtonLink
+                              href={`/login?redirect=/academy/enroll/${slug}`}
+                              color="primary.500"
+                              fontWeight="semibold"
+                            >
+                              Log in
+                            </ButtonLink>
+                          </Text>
+                        </>
                       )}
                     </VStack>
                   </Box>

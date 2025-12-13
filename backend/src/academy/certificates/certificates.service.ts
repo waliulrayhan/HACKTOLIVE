@@ -212,6 +212,9 @@ export class CertificatesService {
     // Get student and course details
     const student = await this.prisma.student.findUnique({
       where: { id: studentId },
+      include: {
+        user: true,
+      },
     });
 
     const course = await this.prisma.course.findUnique({
@@ -229,7 +232,7 @@ export class CertificatesService {
       data: {
         student: { connect: { id: studentId } },
         course: { connect: { id: courseId } },
-        studentName: student.name,
+        studentName: student.user.name || 'Student',
         courseName: course.title,
         verificationCode,
         certificateUrl: `/certificates/${studentId}-${courseId}.pdf`,
