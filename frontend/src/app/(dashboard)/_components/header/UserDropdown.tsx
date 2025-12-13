@@ -38,9 +38,9 @@ export default function UserDropdown() {
     if (!user) return '/';
     switch (user.role) {
       case 'STUDENT':
-        return '/student';
+        return '/';
       case 'INSTRUCTOR':
-        return '/instructor';
+        return '/';
       case 'ADMIN':
         return '/';
       default:

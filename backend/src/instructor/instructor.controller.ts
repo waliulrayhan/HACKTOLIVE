@@ -241,11 +241,29 @@ export class InstructorController {
 
     // Convert date strings to ISO-8601 DateTime and numeric fields to proper types
     const processedData: any = { ...data };
-    if (processedData.startDate && typeof processedData.startDate === 'string') {
-      processedData.startDate = new Date(processedData.startDate).toISOString();
+    
+    // Handle date fields - convert valid dates to ISO-8601, empty strings to null
+    if (processedData.startDate !== undefined) {
+      if (processedData.startDate && typeof processedData.startDate === 'string' && processedData.startDate.trim() !== '') {
+        processedData.startDate = new Date(processedData.startDate).toISOString();
+      } else {
+        processedData.startDate = null;
+      }
     }
-    if (processedData.endDate && typeof processedData.endDate === 'string') {
-      processedData.endDate = new Date(processedData.endDate).toISOString();
+    if (processedData.endDate !== undefined) {
+      if (processedData.endDate && typeof processedData.endDate === 'string' && processedData.endDate.trim() !== '') {
+        processedData.endDate = new Date(processedData.endDate).toISOString();
+      } else {
+        processedData.endDate = null;
+      }
+    }
+
+    // Handle optional string fields for live courses - convert empty strings to null
+    if (processedData.liveSchedule !== undefined && (!processedData.liveSchedule || processedData.liveSchedule.trim() === '')) {
+      processedData.liveSchedule = null;
+    }
+    if (processedData.meetingLink !== undefined && (!processedData.meetingLink || processedData.meetingLink.trim() === '')) {
+      processedData.meetingLink = null;
     }
 
     // Convert numeric fields to proper types
