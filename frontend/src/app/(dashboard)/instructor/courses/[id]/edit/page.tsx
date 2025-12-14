@@ -733,7 +733,7 @@ export default function EditCoursePage() {
       </div>
 
       {/* Content Statistics Overview */}
-      <div className="rounded-md border border-gray-200 bg-white p-4 dark:border-white/5 dark:bg-white/3">
+      {/* <div className="rounded-md border border-gray-200 bg-white p-4 dark:border-white/5 dark:bg-white/3">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Course Content Overview</h3>
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
@@ -773,7 +773,7 @@ export default function EditCoursePage() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Tabs */}
       <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 overflow-hidden">
@@ -1400,7 +1400,7 @@ export default function EditCoursePage() {
                                 </div>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                   <div>
-                                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Content Type</label>
                                     <select
                                       value={lesson.type}
                                       onChange={(e) => {
@@ -1421,9 +1421,8 @@ export default function EditCoursePage() {
                                     >
                                       <option value="VIDEO">Video</option>
                                       <option value="ARTICLE">Article</option>
-                                      <option value="QUIZ">Quiz</option>
-                                      <option value="ASSIGNMENT">Assignment</option>
                                     </select>
+                                    <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1">Add quiz/assignment separately</p>
                                   </div>
                                   <div>
                                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Duration</label>

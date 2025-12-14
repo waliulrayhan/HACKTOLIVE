@@ -342,8 +342,63 @@ export class StudentService {
       },
     });
 
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
+
+    // Add sequential locking logic
+    // First lesson is always unlocked, subsequent lessons require previous lesson completion
+    let allLessons: any[] = [];
+    course.modules.forEach((module) => {
+      module.lessons.forEach((lesson) => {
+        allLessons.push({
+          ...lesson,
+          moduleId: module.id,
+          moduleOrder: module.order,
+        });
+      });
+    });
+
+    // Sort all lessons by module order and lesson order
+    allLessons = allLessons.sort((a, b) => {
+      if (a.moduleOrder !== b.moduleOrder) {
+        return a.moduleOrder - b.moduleOrder;
+      }
+      return a.order - b.order;
+    });
+
+    // Add isLocked property
+    for (let i = 0; i < allLessons.length; i++) {
+      const lesson = allLessons[i];
+      
+      if (i === 0) {
+        // First lesson is always unlocked
+        lesson.isLocked = false;
+      } else {
+        // Check if previous lesson is completed
+        const previousLesson = allLessons[i - 1];
+        const isPreviousCompleted = previousLesson.progress && previousLesson.progress.length > 0;
+        lesson.isLocked = !isPreviousCompleted;
+      }
+    }
+
+    // Update the course modules with isLocked property
+    const courseWithLocks = {
+      ...course,
+      modules: course.modules.map((module) => ({
+        ...module,
+        lessons: module.lessons.map((lesson) => {
+          const lessonWithLock = allLessons.find((l) => l.id === lesson.id);
+          return {
+            ...lesson,
+            isLocked: lessonWithLock?.isLocked ?? false,
+          };
+        }),
+      })),
+    };
+
     return {
-      course,
+      course: courseWithLocks,
       enrollment,
     };
   }
@@ -567,6 +622,25 @@ export class StudentService {
             course: {
               include: {
                 instructor: true,
+                modules: {
+                  include: {
+                    lessons: {
+                      include: {
+                        progress: {
+                          where: {
+                            studentId: student.id,
+                          },
+                        },
+                      },
+                      orderBy: {
+                        order: 'asc',
+                      },
+                    },
+                  },
+                  orderBy: {
+                    order: 'asc',
+                  },
+                },
               },
             },
           },
@@ -604,6 +678,44 @@ export class StudentService {
 
     if (!enrollment && !lesson.isPreview) {
       throw new BadRequestException('Not enrolled in this course');
+    }
+
+    // Enforce sequential access (unless it's a preview lesson)
+    if (!lesson.isPreview) {
+      // Get all lessons in sequential order
+      let allLessons: any[] = [];
+      lesson.module.course.modules.forEach((module) => {
+        module.lessons.forEach((l) => {
+          allLessons.push({
+            ...l,
+            moduleOrder: module.order,
+            moduleId: module.id,
+          });
+        });
+      });
+
+      // Sort by module order then lesson order
+      allLessons = allLessons.sort((a, b) => {
+        if (a.moduleOrder !== b.moduleOrder) {
+          return a.moduleOrder - b.moduleOrder;
+        }
+        return a.order - b.order;
+      });
+
+      // Find current lesson index
+      const currentLessonIndex = allLessons.findIndex((l) => l.id === lessonId);
+      
+      // Check if previous lesson is completed (if not the first lesson)
+      if (currentLessonIndex > 0) {
+        const previousLesson = allLessons[currentLessonIndex - 1];
+        const isPreviousCompleted = previousLesson.progress && previousLesson.progress.length > 0;
+        
+        if (!isPreviousCompleted) {
+          throw new BadRequestException(
+            `You must complete the previous lesson "${previousLesson.title}" before accessing this lesson.`
+          );
+        }
+      }
     }
 
     return lesson;

@@ -40,7 +40,7 @@ interface Lesson {
   tempId: string;
   title: string;
   description: string;
-  type: 'VIDEO' | 'ARTICLE' | 'QUIZ' | 'ASSIGNMENT';
+  type: 'VIDEO' | 'ARTICLE';
   duration: number;
   videoUrl?: string;
   articleContent?: string;
@@ -974,7 +974,7 @@ export default function CreateCoursePage() {
                               </div>
                               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                 <div>
-                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Content Type</label>
                                   <select
                                     value={lesson.type}
                                     onChange={(e) =>
@@ -985,12 +985,11 @@ export default function CreateCoursePage() {
                                   >
                                     <option value="VIDEO">Video</option>
                                     <option value="ARTICLE">Article</option>
-                                    <option value="QUIZ">Quiz</option>
-                                    <option value="ASSIGNMENT">Assignment</option>
                                   </select>
+                                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1">Add quiz/assignment after creating the lesson</p>
                                 </div>
                                 <div>
-                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Duration</label>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Duration (minutes)</label>
                                   <input
                                     type="number"
                                     value={lesson.duration}

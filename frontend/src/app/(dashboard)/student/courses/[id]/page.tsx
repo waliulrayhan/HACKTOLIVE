@@ -104,19 +104,16 @@ export default function CourseDetailPage() {
   };
 
   const handleLessonClick = (lesson: any) => {
-    if (lesson.type === "VIDEO" || lesson.type === "ARTICLE") {
-      router.push(
-        `/student/courses/${courseId}/lesson/${lesson.id}`
-      );
-    } else if (lesson.type === "QUIZ") {
-      router.push(
-        `/student/courses/${courseId}/quiz/${lesson.id}`
-      );
-    } else if (lesson.type === "ASSIGNMENT") {
-      router.push(
-        `/student/courses/${courseId}/assignment/${lesson.id}`
-      );
+    // Check if lesson is locked
+    if (lesson.isLocked) {
+      toast.error("Lesson Locked", {
+        description: "Please complete the previous lesson first to unlock this lesson.",
+      });
+      return;
     }
+
+    // Redirect to unified lesson page for all lesson types
+    router.push(`/student/courses/${courseId}/lesson/${lesson.id}`);
   };
 
   if (loading) {
@@ -329,58 +326,83 @@ export default function CourseDetailPage() {
                   <div className="divide-y divide-gray-200 bg-white dark:divide-white/5 dark:bg-white/3">
                     {module.lessons.map((lesson: any, lessonIndex: number) => {
                       const isCompleted = lesson.progress.length > 0;
+                      const isLocked = lesson.isLocked || false;
 
                       return (
                         <button
                           key={lesson.id}
                           onClick={() => handleLessonClick(lesson)}
-                          className="flex w-full items-center justify-between p-3 sm:p-4 text-left hover:bg-brand-50/50 dark:hover:bg-white/5 transition-all group"
+                          disabled={isLocked}
+                          className={`flex w-full items-center justify-between p-3 sm:p-4 text-left transition-all group ${
+                            isLocked
+                              ? "cursor-not-allowed opacity-60 bg-gray-50/50 dark:bg-gray-800/50"
+                              : "hover:bg-brand-50/50 dark:hover:bg-white/5 cursor-pointer"
+                          }`}
                         >
                           <div className="flex items-center gap-2 sm:gap-3">
                             <div className={`${
-                              isCompleted
+                              isLocked
+                                ? "text-gray-400 dark:text-gray-600"
+                                : isCompleted
                                 ? "text-success-500 dark:text-success-400"
                                 : "text-brand-500 dark:text-brand-400 group-hover:text-brand-600 dark:group-hover:text-brand-300"
                             }`}>
                               {getLessonIcon(lesson.type)}
                             </div>
                             <div className="flex-1">
-                              <h4
-                                className={`text-xs sm:text-sm font-medium ${
-                                  isCompleted
-                                    ? "text-gray-500 line-through dark:text-gray-500"
-                                    : "text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400"
-                                }`}
-                              >
-                                {moduleIndex + 1}.{lessonIndex + 1} - {lesson.title}
-                              </h4>
-                              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                                {lesson.type} • {lesson.duration} min
-                              </p>
-                              {/* Content Statistics */}
-                              <div className="flex flex-wrap items-center gap-2 mt-1">
-                                {lesson.quizzes && lesson.quizzes.length > 0 && (
-                                  <div className="flex items-center gap-1 text-[10px] text-purple-600 dark:text-purple-400">
-                                    <HiOutlineQuestionMarkCircle className="h-3 w-3" />
-                                    <span>{lesson.quizzes.length} Quiz{lesson.quizzes.length !== 1 ? 'zes' : ''}</span>
-                                  </div>
-                                )}
-                                {lesson.assignments && lesson.assignments.length > 0 && (
-                                  <div className="flex items-center gap-1 text-[10px] text-orange-600 dark:text-orange-400">
-                                    <HiOutlineClipboardCheck className="h-3 w-3" />
-                                    <span>{lesson.assignments.length} Assignment{lesson.assignments.length !== 1 ? 's' : ''}</span>
-                                  </div>
-                                )}
-                                {lesson.resources && lesson.resources.length > 0 && (
-                                  <div className="flex items-center gap-1 text-[10px] text-green-600 dark:text-green-400">
-                                    <HiOutlinePaperClip className="h-3 w-3" />
-                                    <span>{lesson.resources.length} Resource{lesson.resources.length !== 1 ? 's' : ''}</span>
-                                  </div>
+                              <div className="flex items-center gap-2">
+                                <h4
+                                  className={`text-xs sm:text-sm font-medium ${
+                                    isLocked
+                                      ? "text-gray-400 dark:text-gray-600"
+                                      : isCompleted
+                                      ? "text-gray-500 line-through dark:text-gray-500"
+                                      : "text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400"
+                                  }`}
+                                >
+                                  {moduleIndex + 1}.{lessonIndex + 1} - {lesson.title}
+                                </h4>
+                                {isLocked && (
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-gray-200 px-2 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                                    <HiOutlineLockClosed className="h-3 w-3" />
+                                    Locked
+                                  </span>
                                 )}
                               </div>
+                              <p className={`text-[10px] sm:text-xs ${
+                                isLocked ? "text-gray-400 dark:text-gray-600" : "text-gray-500 dark:text-gray-400"
+                              }`}>
+                                {lesson.type} • {lesson.duration} min
+                                {isLocked && " • Complete previous lesson to unlock"}
+                              </p>
+                              {/* Content Statistics */}
+                              {!isLocked && (
+                                <div className="flex flex-wrap items-center gap-2 mt-1">
+                                  {lesson.quizzes && lesson.quizzes.length > 0 && (
+                                    <div className="flex items-center gap-1 text-[10px] text-purple-600 dark:text-purple-400">
+                                      <HiOutlineQuestionMarkCircle className="h-3 w-3" />
+                                      <span>{lesson.quizzes.length} Quiz{lesson.quizzes.length !== 1 ? 'zes' : ''}</span>
+                                    </div>
+                                  )}
+                                  {lesson.assignments && lesson.assignments.length > 0 && (
+                                    <div className="flex items-center gap-1 text-[10px] text-orange-600 dark:text-orange-400">
+                                      <HiOutlineClipboardCheck className="h-3 w-3" />
+                                      <span>{lesson.assignments.length} Assignment{lesson.assignments.length !== 1 ? 's' : ''}</span>
+                                    </div>
+                                  )}
+                                  {lesson.resources && lesson.resources.length > 0 && (
+                                    <div className="flex items-center gap-1 text-[10px] text-green-600 dark:text-green-400">
+                                      <HiOutlinePaperClip className="h-3 w-3" />
+                                      <span>{lesson.resources.length} Resource{lesson.resources.length !== 1 ? 's' : ''}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           </div>
-                          {isCompleted ? (
+                          {isLocked ? (
+                            <HiOutlineLockClosed className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 dark:text-gray-600" />
+                          ) : isCompleted ? (
                             <HiOutlineCheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-success-600 dark:text-success-500" />
                           ) : (
                             <HiOutlinePlay className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-500 group-hover:text-brand-500 dark:group-hover:text-brand-400" />
