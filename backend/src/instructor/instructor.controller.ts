@@ -72,24 +72,68 @@ export class InstructorController {
       where: { userId: req.user.id },
     });
 
-    return this.prisma.course.findMany({
+    const courses = await this.prisma.course.findMany({
       where: { instructorId: instructor?.id },
       include: {
         modules: {
           include: {
-            lessons: true,
+            lessons: {
+              include: {
+                _count: {
+                  select: {
+                    quizzes: true,
+                    assignments: true,
+                    resources: true,
+                  },
+                },
+              },
+              orderBy: {
+                order: 'asc',
+              },
+            },
+          },
+          orderBy: {
+            order: 'asc',
           },
         },
         _count: {
           select: {
             enrollments: true,
             reviews: true,
+            modules: true,
           },
         },
       },
       orderBy: {
         createdAt: 'desc',
       },
+    });
+
+    // Calculate content statistics for each course
+    return courses.map(course => {
+      let totalLessons = 0;
+      let totalQuizzes = 0;
+      let totalAssignments = 0;
+      let totalResources = 0;
+
+      course.modules.forEach(module => {
+        totalLessons += module.lessons.length;
+        module.lessons.forEach(lesson => {
+          totalQuizzes += lesson._count?.quizzes || 0;
+          totalAssignments += lesson._count?.assignments || 0;
+          totalResources += lesson._count?.resources || 0;
+        });
+      });
+
+      return {
+        ...course,
+        contentStats: {
+          lessons: totalLessons,
+          quizzes: totalQuizzes,
+          assignments: totalAssignments,
+          resources: totalResources,
+        },
+      };
     });
   }
 
@@ -115,8 +159,15 @@ export class InstructorController {
                     questions: true,
                   },
                 },
+                assignments: true,
+              },
+              orderBy: {
+                order: 'asc',
               },
             },
+          },
+          orderBy: {
+            order: 'asc',
           },
         },
         enrollments: {

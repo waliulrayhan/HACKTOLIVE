@@ -20,6 +20,7 @@ import {
   HiOutlineChevronDown,
   HiOutlineChevronUp,
   HiOutlineLockClosed,
+  HiOutlinePaperClip,
 } from "react-icons/hi";
 
 export default function CourseDetailPage() {
@@ -33,6 +34,7 @@ export default function CourseDetailPage() {
     new Set()
   );
   const [loading, setLoading] = useState(true);
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
   useEffect(() => {
     if (courseId) {
@@ -106,13 +108,13 @@ export default function CourseDetailPage() {
       router.push(
         `/student/courses/${courseId}/lesson/${lesson.id}`
       );
-    } else if (lesson.type === "QUIZ" && lesson.quizzes.length > 0) {
+    } else if (lesson.type === "QUIZ") {
       router.push(
-        `/student/courses/${courseId}/quiz/${lesson.quizzes[0].id}`
+        `/student/courses/${courseId}/quiz/${lesson.id}`
       );
-    } else if (lesson.type === "ASSIGNMENT" && lesson.assignments.length > 0) {
+    } else if (lesson.type === "ASSIGNMENT") {
       router.push(
-        `/student/courses/${courseId}/assignment/${lesson.assignments[0].id}`
+        `/student/courses/${courseId}/assignment/${lesson.id}`
       );
     }
   };
@@ -158,10 +160,10 @@ export default function CourseDetailPage() {
           {/* Course Info */}
           <div className="lg:col-span-2">
             <div className="mb-3 sm:mb-4 flex items-center gap-2 flex-wrap">
-              <span className="rounded-md bg-blue-100 px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+              <span className="rounded-md bg-brand-100 px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-medium text-brand-700 dark:bg-brand-500/15 dark:text-brand-400">
                 {course.category.replace(/_/g, " ")}
               </span>
-              <span className="rounded-md bg-gray-100 px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-medium text-gray-800 dark:bg-gray-800 dark:text-gray-300">
+              <span className="rounded-md bg-info-100 px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-medium text-info-700 dark:bg-info-500/15 dark:text-info-400">
                 {course.level}
               </span>
             </div>
@@ -178,14 +180,19 @@ export default function CourseDetailPage() {
             <div className="mb-3 sm:mb-4 flex items-center gap-3">
               {course.instructor.avatar ? (
                 <Image
-                  src={course.instructor.avatar}
+                  src={`${apiUrl}${course.instructor.avatar}`}
                   alt={course.instructor.name}
                   width={40}
                   height={40}
-                  className="rounded-full"
+                  className="rounded-full object-cover"
+                  unoptimized
                 />
               ) : (
-                <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600" />
+                <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                  <span className="text-lg font-semibold text-gray-600 dark:text-gray-300">
+                    {course.instructor.name?.charAt(0).toUpperCase() || 'I'}
+                  </span>
+                </div>
               )}
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -200,20 +207,20 @@ export default function CourseDetailPage() {
             {/* Stats */}
             <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm">
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <HiOutlineStar className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-500" />
-                <span className="text-gray-900 dark:text-white">
+                <HiOutlineStar className="h-4 w-4 sm:h-5 sm:w-5 text-warning-500 dark:text-warning-400" />
+                <span className="font-medium text-gray-900 dark:text-white">
                   {course.rating.toFixed(1)} ({course.totalRatings})
                 </span>
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <HiOutlineUsers className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-gray-400" />
-                <span className="text-gray-900 dark:text-white">
+                <HiOutlineUsers className="h-4 w-4 sm:h-5 sm:w-5 text-info-500 dark:text-info-400" />
+                <span className="font-medium text-gray-900 dark:text-white">
                   {course.totalStudents} students
                 </span>
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <HiOutlineClock className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-gray-400" />
-                <span className="text-gray-900 dark:text-white">
+                <HiOutlineClock className="h-4 w-4 sm:h-5 sm:w-5 text-success-500 dark:text-success-400" />
+                <span className="font-medium text-gray-900 dark:text-white">
                   {Math.floor(course.duration / 60)}h
                 </span>
               </div>
@@ -221,52 +228,52 @@ export default function CourseDetailPage() {
           </div>
 
           {/* Progress Card */}
-          <div className="rounded-md border border-gray-200 bg-gray-50 p-4 sm:p-6 dark:border-white/5 dark:bg-white/5">
+          <div className="rounded-md border border-gray-200 bg-gradient-to-br from-brand-50 to-white p-4 sm:p-6 dark:border-white/5 dark:from-brand-950/20 dark:to-white/5">
             <h3 className="mb-3 sm:mb-4 text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
               Your Progress
             </h3>
 
-            <div className="mb-3 sm:mb-4">
+            <div className="mb-4">
               <div className="mb-2 flex items-center justify-between text-xs sm:text-sm">
-                <span className="text-gray-600 dark:text-gray-400">
+                <span className="font-medium text-gray-600 dark:text-gray-400">
                   Course Completion
                 </span>
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="text-lg font-bold text-brand-600 dark:text-brand-400">
                   {Math.round(enrollment.progress)}%
                 </span>
               </div>
-              <div className="h-2 sm:h-2.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                 <div
-                  className="h-full rounded-full bg-brand-500 transition-all"
+                  className="h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-600 transition-all shadow-sm"
                   style={{ width: `${enrollment.progress}%` }}
                 />
               </div>
             </div>
 
-            <div className="space-y-2 text-xs sm:text-sm">
-              <div className="flex justify-between">
+            <div className="space-y-3 text-xs sm:text-sm">
+              <div className="flex justify-between items-center">
                 <span className="text-gray-600 dark:text-gray-400">
                   Completed Lessons:
                 </span>
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="font-semibold text-gray-900 dark:text-white">
                   {completedLessons} / {totalLessons}
                 </span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-gray-600 dark:text-gray-400">
                   Status:
                 </span>
-                <span className="px-2 py-0.5 text-xs font-medium rounded-full">
-                  {enrollment.status === "COMPLETED" ? (
-                    <span className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
-                      Completed
-                    </span>
-                  ) : (
-                    <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
-                      In Progress
-                    </span>
-                  )}
-                </span>
+                {enrollment.status === "COMPLETED" ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-success-100 px-2.5 py-0.5 text-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-400">
+                    <HiOutlineCheckCircle className="h-3.5 w-3.5" />
+                    Completed
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-info-100 px-2.5 py-0.5 text-xs font-medium text-info-700 dark:bg-info-500/15 dark:text-info-400">
+                    <HiOutlineClock className="h-3.5 w-3.5" />
+                    In Progress
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -295,25 +302,25 @@ export default function CourseDetailPage() {
                 {/* Module Header */}
                 <button
                   onClick={() => toggleModule(module.id)}
-                  className="flex w-full items-center justify-between bg-gray-50 p-3 sm:p-4 text-left hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 transition-colors"
+                  className="flex w-full items-center justify-between bg-gradient-to-r from-gray-50 to-gray-50/50 p-3 sm:p-4 text-left hover:from-gray-100 hover:to-gray-100/50 dark:from-white/5 dark:to-white/3 dark:hover:from-white/10 dark:hover:to-white/8 transition-all"
                 >
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <span className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-brand-100 text-xs sm:text-sm font-semibold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400">
+                    <span className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-brand-500 text-xs sm:text-sm font-bold text-white shadow-sm dark:bg-brand-600">
                       {moduleIndex + 1}
                     </span>
                     <div>
                       <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-                        {module.title}
+                        Module {moduleIndex + 1}: {module.title}
                       </h3>
                       <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                        {moduleCompleted} / {moduleLessons} lessons
+                        {moduleCompleted} / {moduleLessons} lessons completed
                       </p>
                     </div>
                   </div>
                   {isExpanded ? (
-                    <HiOutlineChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-gray-400" />
+                    <HiOutlineChevronUp className="h-5 w-5 text-brand-500 dark:text-brand-400" />
                   ) : (
-                    <HiOutlineChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-gray-400" />
+                    <HiOutlineChevronDown className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                   )}
                 </button>
 
@@ -327,31 +334,56 @@ export default function CourseDetailPage() {
                         <button
                           key={lesson.id}
                           onClick={() => handleLessonClick(lesson)}
-                          className="flex w-full items-center justify-between p-3 sm:p-4 text-left hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                          className="flex w-full items-center justify-between p-3 sm:p-4 text-left hover:bg-brand-50/50 dark:hover:bg-white/5 transition-all group"
                         >
                           <div className="flex items-center gap-2 sm:gap-3">
-                            <div className="text-gray-500 dark:text-gray-400">
+                            <div className={`${
+                              isCompleted
+                                ? "text-success-500 dark:text-success-400"
+                                : "text-brand-500 dark:text-brand-400 group-hover:text-brand-600 dark:group-hover:text-brand-300"
+                            }`}>
                               {getLessonIcon(lesson.type)}
                             </div>
                             <div className="flex-1">
                               <h4
                                 className={`text-xs sm:text-sm font-medium ${
                                   isCompleted
-                                    ? "text-gray-500 line-through dark:text-gray-400"
-                                    : "text-gray-900 dark:text-white"
+                                    ? "text-gray-500 line-through dark:text-gray-500"
+                                    : "text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400"
                                 }`}
                               >
-                                {lesson.title}
+                                {moduleIndex + 1}.{lessonIndex + 1} - {lesson.title}
                               </h4>
                               <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
                                 {lesson.type} • {lesson.duration} min
                               </p>
+                              {/* Content Statistics */}
+                              <div className="flex flex-wrap items-center gap-2 mt-1">
+                                {lesson.quizzes && lesson.quizzes.length > 0 && (
+                                  <div className="flex items-center gap-1 text-[10px] text-purple-600 dark:text-purple-400">
+                                    <HiOutlineQuestionMarkCircle className="h-3 w-3" />
+                                    <span>{lesson.quizzes.length} Quiz{lesson.quizzes.length !== 1 ? 'zes' : ''}</span>
+                                  </div>
+                                )}
+                                {lesson.assignments && lesson.assignments.length > 0 && (
+                                  <div className="flex items-center gap-1 text-[10px] text-orange-600 dark:text-orange-400">
+                                    <HiOutlineClipboardCheck className="h-3 w-3" />
+                                    <span>{lesson.assignments.length} Assignment{lesson.assignments.length !== 1 ? 's' : ''}</span>
+                                  </div>
+                                )}
+                                {lesson.resources && lesson.resources.length > 0 && (
+                                  <div className="flex items-center gap-1 text-[10px] text-green-600 dark:text-green-400">
+                                    <HiOutlinePaperClip className="h-3 w-3" />
+                                    <span>{lesson.resources.length} Resource{lesson.resources.length !== 1 ? 's' : ''}</span>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                           {isCompleted ? (
-                            <HiOutlineCheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 dark:text-green-500" />
+                            <HiOutlineCheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-success-600 dark:text-success-500" />
                           ) : (
-                            <HiOutlinePlay className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-500" />
+                            <HiOutlinePlay className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-500 group-hover:text-brand-500 dark:group-hover:text-brand-400" />
                           )}
                         </button>
                       );

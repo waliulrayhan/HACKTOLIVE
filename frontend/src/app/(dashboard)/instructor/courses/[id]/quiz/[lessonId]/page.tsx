@@ -72,9 +72,9 @@ export default function QuizManagementPage() {
       setLoading(true);
       const token = localStorage.getItem("token");
       
-      // Try to fetch existing quiz for this lesson
+      // Fetch course data to get quiz info
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/academy/quizzes/lesson/${lessonId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/instructor/courses/${courseId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -83,18 +83,24 @@ export default function QuizManagementPage() {
       );
 
       if (response.ok) {
-        const quizzes = await response.json();
-        if (quizzes && quizzes.length > 0) {
-          const existingQuiz = quizzes[0];
-          setExistingQuiz(existingQuiz);
-          setQuiz({
-            id: existingQuiz.id,
-            title: existingQuiz.title,
-            description: existingQuiz.description || "",
-            passingScore: existingQuiz.passingScore,
-            timeLimit: existingQuiz.timeLimit,
-            questions: existingQuiz.questions || [],
-          });
+        const courseData = await response.json();
+        
+        // Find the lesson and its quiz
+        for (const module of courseData.modules || []) {
+          const lesson = module.lessons?.find((l: any) => l.id === lessonId);
+          if (lesson && lesson.quizzes && lesson.quizzes.length > 0) {
+            const existingQuiz = lesson.quizzes[0];
+            setExistingQuiz(existingQuiz);
+            setQuiz({
+              id: existingQuiz.id,
+              title: existingQuiz.title,
+              description: existingQuiz.description || "",
+              passingScore: existingQuiz.passingScore,
+              timeLimit: existingQuiz.timeLimit,
+              questions: existingQuiz.questions || [],
+            });
+            break;
+          }
         }
       }
     } catch (error: any) {
@@ -178,6 +184,36 @@ export default function QuizManagementPage() {
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteQuiz = async () => {
+    if (!existingQuiz?.id) return;
+    
+    if (!confirm("Are you sure you want to delete this quiz? All student attempts will be lost.")) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/instructor/quizzes/${existingQuiz.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to delete quiz");
+
+      toast.success("Quiz deleted successfully");
+      router.push(`/instructor/courses/${courseId}/edit`);
+    } catch (error: any) {
+      toast.error("Failed to delete quiz", {
+        description: error.message,
+      });
     }
   };
 
@@ -284,6 +320,15 @@ export default function QuizManagementPage() {
           </button>
 
           <div className="flex gap-2">
+            {existingQuiz && (
+              <button
+                onClick={handleDeleteQuiz}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-error-500 bg-white px-3 py-1.5 text-xs font-medium text-error-600 transition-colors hover:bg-error-50 dark:border-error-500/50 dark:bg-white/3 dark:text-error-400 dark:hover:bg-error-500/10"
+              >
+                <HiOutlineTrash className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Delete Quiz</span>
+              </button>
+            )}
             <button
               onClick={() => router.back()}
               className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"

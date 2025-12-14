@@ -29,6 +29,9 @@ import {
   HiOutlineExclamationCircle,
   HiOutlineX,
   HiOutlineCamera,
+  HiOutlineQuestionMarkCircle,
+  HiOutlineClipboardCheck,
+  HiOutlinePaperClip,
 } from "react-icons/hi";
 import Badge from "@/components/ui/badge/Badge";
 
@@ -75,6 +78,9 @@ interface Lesson {
   videoUrl?: string;
   articleContent?: string;
   order: number;
+  quizzes?: any[];
+  assignments?: any[];
+  resources?: any[];
 }
 
 export default function EditCoursePage() {
@@ -697,6 +703,14 @@ export default function EditCoursePage() {
     { id: 'settings', label: 'Settings', icon: HiOutlineCog },
   ];
 
+  // Calculate content statistics
+  const contentStats = {
+    lessons: modules.reduce((sum, m) => sum + (m.lessons?.length || 0), 0),
+    quizzes: 0,
+    assignments: 0,
+    resources: 0,
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -715,6 +729,49 @@ export default function EditCoursePage() {
               <span className="sm:inline">Publish Course</span>
             </button>
           )}
+        </div>
+      </div>
+
+      {/* Content Statistics Overview */}
+      <div className="rounded-md border border-gray-200 bg-white p-4 dark:border-white/5 dark:bg-white/3">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Course Content Overview</h3>
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-500/15">
+              <HiOutlineBookOpen className="h-4 w-4 text-blue-600 dark:text-blue-500" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Lessons</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">{contentStats.lessons}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-500/15">
+              <HiOutlineQuestionMarkCircle className="h-4 w-4 text-purple-600 dark:text-purple-500" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Quizzes</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">{contentStats.quizzes}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-500/15">
+              <HiOutlineClipboardCheck className="h-4 w-4 text-orange-600 dark:text-orange-500" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Assignments</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">{contentStats.assignments}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 dark:bg-green-500/15">
+              <HiOutlinePaperClip className="h-4 w-4 text-green-600 dark:text-green-500" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Resources</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">{contentStats.resources}</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1484,6 +1541,26 @@ export default function EditCoursePage() {
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
                                   {lesson.type} • {lesson.duration} min
                                 </p>
+                                <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                                  {lesson.quizzes && lesson.quizzes.length > 0 && (
+                                    <div className="flex items-center gap-1 text-[10px] text-purple-600 dark:text-purple-400">
+                                      <HiOutlineQuestionMarkCircle className="h-3 w-3" />
+                                      <span>{lesson.quizzes.length} Quiz{lesson.quizzes.length !== 1 ? 'zes' : ''}</span>
+                                    </div>
+                                  )}
+                                  {lesson.assignments && lesson.assignments.length > 0 && (
+                                    <div className="flex items-center gap-1 text-[10px] text-orange-600 dark:text-orange-400">
+                                      <HiOutlineClipboardCheck className="h-3 w-3" />
+                                      <span>{lesson.assignments.length} Assignment{lesson.assignments.length !== 1 ? 's' : ''}</span>
+                                    </div>
+                                  )}
+                                  {lesson.resources && lesson.resources.length > 0 && (
+                                    <div className="flex items-center gap-1 text-[10px] text-green-600 dark:text-green-400">
+                                      <HiOutlinePaperClip className="h-3 w-3" />
+                                      <span>{lesson.resources.length} Resource{lesson.resources.length !== 1 ? 's' : ''}</span>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                               <div className="flex items-center gap-1 shrink-0">
                                 <button

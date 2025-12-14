@@ -26,6 +26,9 @@ import {
   HiOutlineX,
   HiOutlineClock,
   HiOutlineBookOpen,
+  HiOutlineQuestionMarkCircle,
+  HiOutlineClipboardCheck,
+  HiOutlinePaperClip,
 } from "react-icons/hi";
 import {
   Table,
@@ -62,6 +65,12 @@ interface Course {
     enrollments: number;
     reviews: number;
     modules: number;
+  };
+  contentStats?: {
+    lessons: number;
+    quizzes: number;
+    assignments: number;
+    resources: number;
   };
 }
 
@@ -419,6 +428,32 @@ export default function InstructorCoursesPage() {
                             <p className="mt-0.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
                               {course.shortDescription}
                             </p>
+                            {course.contentStats && (
+                              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                <span className="inline-flex items-center gap-0.5 text-[10px] text-info-600 dark:text-info-400" title="Lessons">
+                                  <HiOutlineBookOpen className="h-3 w-3" />
+                                  {course.contentStats.lessons}
+                                </span>
+                                {course.contentStats.quizzes > 0 && (
+                                  <span className="inline-flex items-center gap-0.5 text-[10px] text-purple-600 dark:text-purple-400" title="Quizzes">
+                                    <HiOutlineQuestionMarkCircle className="h-3 w-3" />
+                                    {course.contentStats.quizzes}
+                                  </span>
+                                )}
+                                {course.contentStats.assignments > 0 && (
+                                  <span className="inline-flex items-center gap-0.5 text-[10px] text-warning-600 dark:text-warning-400" title="Assignments">
+                                    <HiOutlineClipboardCheck className="h-3 w-3" />
+                                    {course.contentStats.assignments}
+                                  </span>
+                                )}
+                                {course.contentStats.resources > 0 && (
+                                  <span className="inline-flex items-center gap-0.5 text-[10px] text-success-600 dark:text-success-400" title="Resources">
+                                    <HiOutlinePaperClip className="h-3 w-3" />
+                                    {course.contentStats.resources}
+                                  </span>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </TableCell>
@@ -674,6 +709,31 @@ export default function InstructorCoursesPage() {
                   <p className="text-[10px] text-gray-500 dark:text-gray-400">Modules</p>
                 </div>
               </div>
+
+              {/* Content Breakdown */}
+              {selectedCourse.contentStats && (
+                <div className="rounded-md border border-info-200 bg-info-50 p-3 dark:border-info-500/20 dark:bg-info-950/20">
+                  <h5 className="text-xs font-semibold text-gray-900 dark:text-white mb-2">Course Content</h5>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                      <HiOutlineBookOpen className="h-4 w-4 text-info-600 dark:text-info-400" />
+                      <span>{selectedCourse.contentStats.lessons} Lessons</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                      <HiOutlineQuestionMarkCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                      <span>{selectedCourse.contentStats.quizzes} Quizzes</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                      <HiOutlineClipboardCheck className="h-4 w-4 text-warning-600 dark:text-warning-400" />
+                      <span>{selectedCourse.contentStats.assignments} Assignments</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                      <HiOutlinePaperClip className="h-4 w-4 text-success-600 dark:text-success-400" />
+                      <span>{selectedCourse.contentStats.resources} Resources</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Details */}
               <div className="space-y-2">
