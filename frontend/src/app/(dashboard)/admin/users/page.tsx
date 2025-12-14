@@ -43,6 +43,7 @@ interface User {
   name: string | null;
   role: string;
   createdAt: string;
+  avatar?: string | null;
   student?: any;
   instructor?: any;
 }
