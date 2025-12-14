@@ -31,24 +31,25 @@ model User {
 }
 
 model Instructor {
-  id            String   @id @default(uuid())
-  userId        String   @unique
+  id            String        @id @default(uuid())
+  userId        String        @unique
   name          String
-  avatar        String?  @db.VarChar(500)
-  bio           String?  @db.Text
-  experience    String?  @db.VarChar(500)
-  skills        String   @db.Text
-  rating        Float    @default(0)
-  totalStudents Int      @default(0)
-  totalCourses  Int      @default(0)
+  avatar        String?       @db.VarChar(500)
+  bio           String?       @db.Text
+  experience    String?       @db.VarChar(500)
+  skills        String        @db.Text
+  rating        Float         @default(0)
+  totalStudents Int           @default(0)
+  totalCourses  Int           @default(0)
   linkedinUrl   String?
   twitterUrl    String?
   githubUrl     String?
   websiteUrl    String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   courses       Course[]
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  certificates  Certificate[]
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([rating])
   @@index([totalStudents])

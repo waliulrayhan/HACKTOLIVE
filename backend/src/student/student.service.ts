@@ -1286,7 +1286,7 @@ export class StudentService {
       );
     }
 
-    // Check if certificate already exists
+    // Check if certificate request already exists
     const existingCertificate = await this.prisma.certificate.findFirst({
       where: {
         studentId: student.id,
@@ -1301,43 +1301,35 @@ export class StudentService {
     // Get course details
     const course = await this.prisma.course.findUnique({
       where: { id: courseId },
+      include: {
+        instructor: true,
+      },
     });
 
     if (!course) {
       throw new NotFoundException('Course not found');
     }
 
-    // Generate verification code
-    const timestamp = Date.now().toString(36).toUpperCase();
-    const randomPart = require('crypto').randomBytes(4).toString('hex').toUpperCase();
-    const verificationCode = `HACK-${timestamp}-${randomPart}`;
-
-    // Create certificate
+    // Create certificate request (PENDING status)
     const certificate = await this.prisma.certificate.create({
       data: {
         student: { connect: { id: student.id } },
         course: { connect: { id: courseId } },
+        instructor: { connect: { id: course.instructorId } },
         studentName: student.user.name || 'Student',
         courseName: course.title,
-        verificationCode,
-        certificateUrl: `/certificates/${student.id}-${courseId}.pdf`,
+        status: 'PENDING',
       },
       include: {
-        student: true,
+        student: {
+          include: {
+            user: true,
+          },
+        },
         course: {
           include: {
             instructor: true,
           },
-        },
-      },
-    });
-
-    // Update student certificates count
-    await this.prisma.student.update({
-      where: { id: student.id },
-      data: {
-        certificatesEarned: {
-          increment: 1,
         },
       },
     });

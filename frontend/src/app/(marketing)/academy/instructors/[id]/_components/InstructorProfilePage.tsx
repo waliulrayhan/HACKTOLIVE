@@ -43,6 +43,7 @@ import {
   FiMapPin,
   FiFacebook,
   FiInstagram,
+  FiMessageCircle,
 } from "react-icons/fi";
 import academyService from "@/lib/academy-service";
 
@@ -53,6 +54,7 @@ interface InstructorProfilePageProps {
 export default function InstructorProfilePage({ id }: InstructorProfilePageProps) {
   const [instructor, setInstructor] = useState<Instructor | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const bgColor = useColorModeValue("gray.50", "gray.900");
@@ -75,6 +77,21 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
           (course) => course.instructor?.id === id
         );
         setCourses(instructorCourses);
+
+        // Fetch reviews for all instructor's courses
+        if (instructorCourses.length > 0) {
+          const reviewsPromises = instructorCourses.map(course => 
+            academyService.getCourseReviews(course.id)
+          );
+          const allReviews = await Promise.all(reviewsPromises);
+          const flatReviews = allReviews.flat();
+          // Get top 6 recent 5-star reviews
+          const topReviews = flatReviews
+            .filter(r => r.rating === 5 && r.comment)
+            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+            .slice(0, 6);
+          setReviews(topReviews);
+        }
       } catch (error) {
         console.error("Error fetching instructor data:", error);
       } finally {
@@ -787,6 +804,76 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
           </VStack>
         </Container>
       </Box>
+
+      {/* Student Reviews Section */}
+      {reviews.length > 0 && (
+        <Box py={{ base: "60px", md: "80px" }} bg={cardBg}>
+          <Container maxW="container.xl">
+            <VStack spacing={10} align="stretch">
+              <FallInPlace>
+                <VStack spacing={3} textAlign="center">
+                  <Badge
+                    colorScheme="purple"
+                    fontSize="sm"
+                    px={4}
+                    py={2}
+                    borderRadius="full"
+                  >
+                    Student Testimonials
+                  </Badge>
+                  <Heading fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}>
+                    What Students Say
+                  </Heading>
+                  <Text fontSize={{ base: "md", md: "lg" }} color={textMuted} maxW="2xl">
+                    Real feedback from students who learned from {instructor.name.split(" ")[0]}
+                  </Text>
+                </VStack>
+              </FallInPlace>
+
+              <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+                {reviews.map((review, index) => (
+                  <FallInPlace key={review.id} delay={0.05 * index}>
+                    <Box
+                      bg={bgColor}
+                      p={6}
+                      borderRadius="xl"
+                      borderWidth="1px"
+                      borderColor={borderColor}
+                      h="full"
+                    >
+                      <VStack spacing={4} align="start" h="full">
+                        <HStack spacing={1}>
+                          {[...Array(review.rating)].map((_, i) => (
+                            <Icon key={i} as={FiStar} color="yellow.500" fill="yellow.500" boxSize={4} />
+                          ))}
+                        </HStack>
+                        <Text color={textMuted} fontSize="sm" lineHeight="tall" flex="1">
+                          "{review.comment}"
+                        </Text>
+                        <HStack spacing={3} mt="auto">
+                          <Avatar
+                            size="sm"
+                            name={review.studentName}
+                            src={review.studentAvatar}
+                          />
+                          <VStack align="start" spacing={0}>
+                            <Text fontWeight="bold" fontSize="sm">
+                              {review.studentName}
+                            </Text>
+                            <Text fontSize="xs" color="muted">
+                              Verified Student
+                            </Text>
+                          </VStack>
+                        </HStack>
+                      </VStack>
+                    </Box>
+                  </FallInPlace>
+                ))}
+              </SimpleGrid>
+            </VStack>
+          </Container>
+        </Box>
+      )}
 
       {/* CTA Section - Final Separated */}
       <Box py={{ base: "60px", md: "80px" }} bg={cardBg}>

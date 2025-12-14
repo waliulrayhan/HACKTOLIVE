@@ -914,17 +914,46 @@ export class InstructorController {
   }
 
   // Certificate Management
-  @Post('certificates/issue')
-  @ApiOperation({ summary: 'Issue a certificate to a student' })
+  @Get('certificates/pending')
+  @ApiOperation({ summary: 'Get pending certificate requests' })
+  async getPendingCertificateRequests(@Request() req: any) {
+    return this.instructorService.getPendingCertificateRequests(req.user.id);
+  }
+
+  @Get('certificates')
+  @ApiOperation({ summary: 'Get all certificate requests' })
+  async getAllCertificateRequests(@Request() req: any, @Param('status') status?: string) {
+    return this.instructorService.getAllCertificateRequests(req.user.id, status);
+  }
+
+  @Get('certificates/:certificateId/performance')
+  @ApiOperation({ summary: 'Get student performance for certificate review' })
+  async getStudentPerformance(
+    @Request() req: any,
+    @Param('certificateId') certificateId: string,
+  ) {
+    return this.instructorService.getStudentPerformanceForCertificate(
+      req.user.id,
+      certificateId,
+    );
+  }
+
+  @Post('certificates/:certificateId/issue')
+  @ApiOperation({ summary: 'Issue a certificate' })
   async issueCertificate(
     @Request() req: any,
-    @Body() data: { studentId: string; courseId: string },
+    @Param('certificateId') certificateId: string,
   ) {
-    return this.instructorService.issueCertificate(
-      req.user.id,
-      data.studentId,
-      data.courseId,
-    );
+    return this.instructorService.issueCertificate(req.user.id, certificateId);
+  }
+
+  @Post('certificates/:certificateId/reject')
+  @ApiOperation({ summary: 'Reject a certificate request' })
+  async rejectCertificate(
+    @Request() req: any,
+    @Param('certificateId') certificateId: string,
+  ) {
+    return this.instructorService.rejectCertificate(req.user.id, certificateId);
   }
 
   // Student Progress

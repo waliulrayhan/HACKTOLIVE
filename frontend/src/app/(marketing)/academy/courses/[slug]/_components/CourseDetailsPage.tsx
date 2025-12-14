@@ -58,6 +58,7 @@ interface CourseDetailsPageProps {
 export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
   const [course, setCourse] = useState<Course | null>(null);
   const [courseReviews, setCourseReviews] = useState<Review[]>([]);
+  const [ratingStats, setRatingStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   const bgColor = useColorModeValue("white", "gray.800");
@@ -71,8 +72,12 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
         setCourse(courseData);
 
         if (courseData) {
-          const reviews = await academyService.getCourseReviews(courseData.id);
+          const [reviews, stats] = await Promise.all([
+            academyService.getCourseReviews(courseData.id),
+            academyService.getCourseRatingStats(courseData.id)
+          ]);
           setCourseReviews(reviews);
+          setRatingStats(stats);
         }
       } catch (error) {
         console.error("Error fetching course data:", error);
@@ -510,7 +515,9 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                           </VStack>
                           <VStack align="stretch" flex="1" spacing="2">
                             {[5, 4, 3, 2, 1].map((stars) => {
-                              const percentage = Math.floor(Math.random() * 100);
+                              const count = ratingStats?.ratingDistribution?.[stars] || 0;
+                              const total = ratingStats?.totalReviews || course.totalRatings || 1;
+                              const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
                               return (
                                 <HStack key={stars} spacing="3">
                                   <HStack spacing="1" w="60px">

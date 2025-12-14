@@ -586,72 +586,6 @@ export class InstructorService {
     return { message: 'Resource deleted successfully' };
   }
 
-  // Certificate Issuance
-  async issueCertificate(userId: string, studentId: string, courseId: string) {
-    // Verify course ownership
-    await this.verifyCourseOwnership(userId, courseId);
-
-    // Check if student has completed the course
-    const enrollment = await this.prisma.enrollment.findUnique({
-      where: {
-        studentId_courseId: {
-          studentId,
-          courseId,
-        },
-      },
-      include: {
-        student: {
-          include: {
-            user: true,
-          },
-        },
-        course: true,
-      },
-    });
-
-    if (!enrollment) {
-      throw new NotFoundException('Enrollment not found');
-    }
-
-    if (enrollment.status !== 'COMPLETED') {
-      throw new ForbiddenException('Student has not completed the course yet');
-    }
-
-    // Check if certificate already exists
-    const existingCertificate = await this.prisma.certificate.findFirst({
-      where: {
-        studentId,
-        courseId,
-      },
-    });
-
-    if (existingCertificate) {
-      return existingCertificate;
-    }
-
-    // Generate verification code
-    const verificationCode = `CERT-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`;
-
-    // Create certificate
-    return this.prisma.certificate.create({
-      data: {
-        student: {
-          connect: { id: studentId },
-        },
-        course: {
-          connect: { id: courseId },
-        },
-        studentName: enrollment.student.user.name || 'Student',
-        courseName: enrollment.course.title,
-        verificationCode,
-      },
-      include: {
-        student: true,
-        course: true,
-      },
-    });
-  }
-
   // Get student progress for a course
   async getStudentCourseProgress(userId: string, courseId: string, studentId: string) {
     await this.verifyCourseOwnership(userId, courseId);
@@ -879,5 +813,455 @@ export class InstructorService {
         submittedAt: 'desc',
       },
     });
+  }
+
+  // Get pending certificate requests
+  async getPendingCertificateRequests(userId: string) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId },
+    });
+
+    if (!instructor) {
+      throw new NotFoundException('Instructor profile not found');
+    }
+
+    // Get all course IDs for this instructor
+    const courses = await this.prisma.course.findMany({
+      where: { instructorId: instructor.id },
+      select: { id: true },
+    });
+
+    const courseIds = courses.map((c) => c.id);
+
+    return this.prisma.certificate.findMany({
+      where: {
+        courseId: {
+          in: courseIds,
+        },
+        status: 'PENDING',
+      },
+      include: {
+        student: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+                avatar: true,
+              },
+            },
+          },
+        },
+        course: {
+          select: {
+            id: true,
+            title: true,
+            thumbnail: true,
+          },
+        },
+      },
+      orderBy: {
+        requestedAt: 'desc',
+      },
+    });
+  }
+
+  // Get all certificate requests (including issued/rejected)
+  async getAllCertificateRequests(userId: string, status?: string) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId },
+    });
+
+    if (!instructor) {
+      throw new NotFoundException('Instructor profile not found');
+    }
+
+    // Get all course IDs for this instructor
+    const courses = await this.prisma.course.findMany({
+      where: { instructorId: instructor.id },
+      select: { id: true },
+    });
+
+    const courseIds = courses.map((c) => c.id);
+
+    const where: any = {
+      courseId: {
+        in: courseIds,
+      },
+    };
+
+    if (status) {
+      where.status = status;
+    }
+
+    return this.prisma.certificate.findMany({
+      where,
+      include: {
+        student: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+                avatar: true,
+              },
+            },
+          },
+        },
+        course: {
+          select: {
+            id: true,
+            title: true,
+            thumbnail: true,
+          },
+        },
+      },
+      orderBy: {
+        requestedAt: 'desc',
+      },
+    });
+  }
+
+  // Issue certificate
+  async issueCertificate(userId: string, certificateId: string) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId },
+    });
+
+    if (!instructor) {
+      throw new NotFoundException('Instructor profile not found');
+    }
+
+    // Verify the certificate belongs to this instructor's course
+    const certificate = await this.prisma.certificate.findUnique({
+      where: { id: certificateId },
+      include: {
+        course: true,
+        student: true,
+      },
+    });
+
+    if (!certificate) {
+      throw new NotFoundException('Certificate request not found');
+    }
+
+    if (certificate.course.instructorId !== instructor.id) {
+      throw new ForbiddenException(
+        'You can only issue certificates for your own courses',
+      );
+    }
+
+    if (certificate.status !== 'PENDING') {
+      throw new ForbiddenException('Certificate has already been processed');
+    }
+
+    // Generate verification code
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const randomPart = require('crypto')
+      .randomBytes(4)
+      .toString('hex')
+      .toUpperCase();
+    const verificationCode = `HACK-${timestamp}-${randomPart}`;
+
+    // Update certificate to ISSUED
+    const updatedCertificate = await this.prisma.certificate.update({
+      where: { id: certificateId },
+      data: {
+        status: 'ISSUED',
+        issuedAt: new Date(),
+        verificationCode,
+        certificateUrl: `/certificates/${certificate.studentId}-${certificate.courseId}.pdf`,
+      },
+      include: {
+        student: {
+          include: {
+            user: true,
+          },
+        },
+        course: {
+          include: {
+            instructor: true,
+          },
+        },
+      },
+    });
+
+    // Update student certificates count
+    await this.prisma.student.update({
+      where: { id: certificate.studentId },
+      data: {
+        certificatesEarned: {
+          increment: 1,
+        },
+      },
+    });
+
+    return updatedCertificate;
+  }
+
+  // Reject certificate request
+  async rejectCertificate(userId: string, certificateId: string) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId },
+    });
+
+    if (!instructor) {
+      throw new NotFoundException('Instructor profile not found');
+    }
+
+    // Verify the certificate belongs to this instructor's course
+    const certificate = await this.prisma.certificate.findUnique({
+      where: { id: certificateId },
+      include: {
+        course: true,
+      },
+    });
+
+    if (!certificate) {
+      throw new NotFoundException('Certificate request not found');
+    }
+
+    if (certificate.course.instructorId !== instructor.id) {
+      throw new ForbiddenException(
+        'You can only reject certificates for your own courses',
+      );
+    }
+
+    if (certificate.status !== 'PENDING') {
+      throw new ForbiddenException('Certificate has already been processed');
+    }
+
+    // Update certificate to REJECTED
+    return this.prisma.certificate.update({
+      where: { id: certificateId },
+      data: {
+        status: 'REJECTED',
+      },
+      include: {
+        student: {
+          include: {
+            user: true,
+          },
+        },
+        course: true,
+      },
+    });
+  }
+
+  // Get student performance for certificate review
+  async getStudentPerformanceForCertificate(
+    userId: string,
+    certificateId: string,
+  ) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId },
+    });
+
+    if (!instructor) {
+      throw new NotFoundException('Instructor profile not found');
+    }
+
+    // Get certificate with course and student details
+    const certificate = await this.prisma.certificate.findUnique({
+      where: { id: certificateId },
+      include: {
+        course: {
+          include: {
+            modules: {
+              include: {
+                lessons: {
+                  include: {
+                    quizzes: true,
+                    assignments: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        student: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    if (!certificate) {
+      throw new NotFoundException('Certificate request not found');
+    }
+
+    if (certificate.course.instructorId !== instructor.id) {
+      throw new ForbiddenException(
+        'You can only view performance for your own courses',
+      );
+    }
+
+    // Get lesson progress
+    const lessonProgress = await this.prisma.lessonProgress.findMany({
+      where: {
+        studentId: certificate.studentId,
+        lesson: {
+          module: {
+            courseId: certificate.courseId,
+          },
+        },
+      },
+      include: {
+        lesson: {
+          select: {
+            id: true,
+            title: true,
+            type: true,
+          },
+        },
+      },
+    });
+
+    // Get quiz attempts
+    const quizAttempts = await this.prisma.quizAttempt.findMany({
+      where: {
+        studentId: certificate.studentId,
+        quiz: {
+          lesson: {
+            module: {
+              courseId: certificate.courseId,
+            },
+          },
+        },
+      },
+      include: {
+        quiz: {
+          select: {
+            id: true,
+            title: true,
+            passingScore: true,
+          },
+        },
+      },
+      orderBy: {
+        attemptedAt: 'desc',
+      },
+    });
+
+    // Get assignment submissions
+    const assignmentSubmissions =
+      await this.prisma.assignmentSubmission.findMany({
+        where: {
+          studentId: certificate.studentId,
+          assignment: {
+            lesson: {
+              module: {
+                courseId: certificate.courseId,
+              },
+            },
+          },
+        },
+        include: {
+          assignment: {
+            select: {
+              id: true,
+              title: true,
+              maxScore: true,
+            },
+          },
+        },
+      });
+
+    // Calculate statistics
+    const totalLessons = certificate.course.modules.reduce(
+      (sum, module) => sum + module.lessons.length,
+      0,
+    );
+    const completedLessons = lessonProgress.length;
+
+    const totalQuizzes = certificate.course.modules.reduce(
+      (sum, module) =>
+        sum +
+        module.lessons.reduce(
+          (lsum, lesson) => lsum + (lesson.quizzes?.length || 0),
+          0,
+        ),
+      0,
+    );
+
+    // Get unique quiz IDs that were passed
+    const passedQuizIds = new Set(
+      quizAttempts
+        .filter((attempt) => attempt.passed)
+        .map((attempt) => attempt.quizId),
+    );
+    const passedQuizzes = passedQuizIds.size;
+
+    const avgQuizScore =
+      quizAttempts.length > 0
+        ? quizAttempts.reduce((sum, attempt) => sum + attempt.score, 0) /
+          quizAttempts.length
+        : 0;
+
+    const totalAssignments = certificate.course.modules.reduce(
+      (sum, module) =>
+        sum +
+        module.lessons.reduce(
+          (lsum, lesson) => lsum + (lesson.assignments?.length || 0),
+          0,
+        ),
+      0,
+    );
+    const submittedAssignments = assignmentSubmissions.filter(
+      (sub) => sub.status !== 'PENDING',
+    ).length;
+    const gradedAssignments = assignmentSubmissions.filter(
+      (sub) => sub.status === 'GRADED' && sub.score !== null,
+    );
+    const avgAssignmentScore =
+      gradedAssignments.length > 0
+        ? gradedAssignments.reduce((sum, sub) => sum + (sub.score || 0), 0) /
+          gradedAssignments.length
+        : 0;
+
+    return {
+      certificate: {
+        id: certificate.id,
+        status: certificate.status,
+        requestedAt: certificate.requestedAt,
+        courseName: certificate.courseName,
+        studentName: certificate.studentName,
+      },
+      student: {
+        id: certificate.student.id,
+        name: certificate.student.user.name,
+        email: certificate.student.user.email,
+        avatar: certificate.student.user.avatar,
+      },
+      course: {
+        id: certificate.course.id,
+        title: certificate.course.title,
+      },
+      performance: {
+        lessons: {
+          total: totalLessons,
+          completed: completedLessons,
+          percentage: totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0,
+        },
+        quizzes: {
+          total: totalQuizzes,
+          passed: passedQuizzes,
+          attempts: quizAttempts.length,
+          averageScore: Math.round(avgQuizScore),
+        },
+        assignments: {
+          total: totalAssignments,
+          submitted: submittedAssignments,
+          graded: gradedAssignments.length,
+          averageScore: Math.round(avgAssignmentScore),
+        },
+      },
+      details: {
+        lessonProgress,
+        quizAttempts: quizAttempts.slice(0, 10), // Latest 10 attempts
+        assignmentSubmissions,
+      },
+    };
   }
 }

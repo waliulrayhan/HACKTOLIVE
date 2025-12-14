@@ -232,8 +232,10 @@ export class CertificatesService {
       data: {
         student: { connect: { id: studentId } },
         course: { connect: { id: courseId } },
+        instructor: { connect: { id: course.instructorId } },
         studentName: student.user.name || 'Student',
         courseName: course.title,
+        status: 'PENDING',
         verificationCode,
         certificateUrl: `/certificates/${studentId}-${courseId}.pdf`,
       },

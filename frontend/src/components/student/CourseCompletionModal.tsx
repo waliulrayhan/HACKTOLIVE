@@ -77,8 +77,8 @@ export default function CourseCompletionModal({
       const certificate = await response.json();
       setCertificateRequested(true);
       
-      toast.success("Certificate Issued!", {
-        description: `Verification Code: ${certificate.verificationCode}`,
+      toast.success("Certificate Requested!", {
+        description: "Your instructor will review and issue your certificate soon.",
       });
 
       // Show review prompt after certificate is requested

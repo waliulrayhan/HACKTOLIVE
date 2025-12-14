@@ -57,14 +57,18 @@ export default function AcademyHomePage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [freeCourses, setFreeCourses] = useState<Course[]>([]);
   const [premiumCourses, setPremiumCourses] = useState<Course[]>([]);
+  const [featuredReviews, setFeaturedReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        // Fetch all courses
-        const allCourses = await academyService.getCourses();
+        // Fetch all courses and reviews
+        const [allCourses, allReviews] = await Promise.all([
+          academyService.getCourses(),
+          academyService.getReviews({ take: 100 })
+        ]);
         
         // Filter only PUBLISHED courses
         const publishedCourses = allCourses.filter((c) => c.status === "published");
@@ -76,14 +80,20 @@ export default function AcademyHomePage() {
         
         setFreeCourses(free);
         setPremiumCourses(premium);
+
+        // Get top-rated reviews (5 stars) for testimonials
+        const topReviews = allReviews
+          .filter((r) => r.rating === 5 && r.comment && r.comment.length > 50)
+          .slice(0, 3);
+        setFeaturedReviews(topReviews);
       } catch (error) {
-        console.error("Error fetching courses:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCourses();
+    fetchData();
   }, []);
 
   return (
@@ -550,70 +560,58 @@ export default function AcademyHomePage() {
               </VStack>
             </FallInPlace>
 
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="6">
-              {[
-                {
-                  name: "Alex Thompson",
-                  avatar: "/images/user/user-05.jpg",
-                  role: "Security Engineer",
-                  rating: 5,
-                  comment: "HACKTOLIVE Academy completely changed my career path. The hands-on approach and expert instructors helped me land my dream job in cybersecurity!"
-                },
-                {
-                  name: "Sarah Johnson",
-                  avatar: "/images/user/user-06.jpg",
-                  role: "Penetration Tester",
-                  rating: 5,
-                  comment: "The best investment I've made in my career. The courses are practical, up-to-date, and taught by industry professionals who actually know their stuff."
-                },
-                {
-                  name: "Rahul Sharma",
-                  avatar: "/images/user/user-07.jpg",
-                  role: "Cybersecurity Analyst",
-                  rating: 5,
-                  comment: "Learning in Bengali made complex concepts so much easier to understand. The community support and lifetime access make it worth every penny!"
-                }
-              ].map((testimonial, index) => (
-                <FallInPlace key={testimonial.name} delay={0.1 * index}>
-                  <Box
-                    bg={cardBg}
-                    p="6"
-                    borderRadius="2xl"
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    h="full"
-                  >
-                    <VStack spacing="4" align="start">
-                      <HStack spacing="1">
-                        {[...Array(testimonial.rating)].map((_, i) => (
-                          <Icon key={i} as={FiStar} color="yellow.500" fill="yellow.500" />
-                        ))}
-                      </HStack>
-                      <Text color={textMuted} fontSize="sm" lineHeight="tall">
-                        "{testimonial.comment}"
-                      </Text>
-                      <HStack spacing="3" mt="auto">
-                        <Image
-                          src={testimonial.avatar}
-                          alt={testimonial.name}
-                          width={48}
-                          height={48}
-                          style={{ borderRadius: "50%" }}
-                        />
-                        <VStack align="start" spacing="0">
-                          <Text fontWeight="bold" fontSize="sm">
-                            {testimonial.name}
-                          </Text>
-                          <Text fontSize="xs" color="muted">
-                            {testimonial.role}
-                          </Text>
-                        </VStack>
-                      </HStack>
-                    </VStack>
-                  </Box>
-                </FallInPlace>
-              ))}
-            </SimpleGrid>
+            {featuredReviews.length > 0 && (
+              <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="6">
+                {featuredReviews.map((testimonial, index) => (
+                  <FallInPlace key={testimonial.id || index} delay={0.1 * index}>
+                    <Box
+                      bg={cardBg}
+                      p="6"
+                      borderRadius="2xl"
+                      borderWidth="1px"
+                      borderColor={borderColor}
+                      h="full"
+                    >
+                      <VStack spacing="4" align="start">
+                        <HStack spacing="1">
+                          {[...Array(testimonial.rating)].map((_, i) => (
+                            <Icon key={i} as={FiStar} color="yellow.500" fill="yellow.500" />
+                          ))}
+                        </HStack>
+                        <Text color={textMuted} fontSize="sm" lineHeight="tall">
+                          "{testimonial.comment}"
+                        </Text>
+                        <HStack spacing="3" mt="auto">
+                          <Image
+                            src={testimonial.studentAvatar || "/images/user/user-05.jpg"}
+                            alt={testimonial.studentName}
+                            width={48}
+                            height={48}
+                            style={{ borderRadius: "50%" }}
+                          />
+                          <VStack align="start" spacing="0">
+                            <Text fontWeight="bold" fontSize="sm">
+                              {testimonial.studentName}
+                            </Text>
+                            <Text fontSize="xs" color="muted">
+                              Verified Student
+                            </Text>
+                          </VStack>
+                        </HStack>
+                      </VStack>
+                    </Box>
+                  </FallInPlace>
+                ))}
+              </SimpleGrid>
+            )}
+            
+            {featuredReviews.length === 0 && !loading && (
+              <Box textAlign="center" py="12">
+                <Text color={textMuted} fontSize="lg">
+                  No reviews yet. Be the first to share your experience!
+                </Text>
+              </Box>
+            )}
           </VStack>
         </Container>
       </Box>

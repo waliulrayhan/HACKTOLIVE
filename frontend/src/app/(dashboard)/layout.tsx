@@ -141,6 +141,11 @@ export default function DashboardLayout({
             path: "/instructor/assignments",
           },
           {
+            icon: <CheckCircleIcon />,
+            name: "Certificates",
+            path: "/instructor/certificates",
+          },
+          {
             icon: <UserCircleIcon />,
             name: "Profile",
             path: "/instructor/profile",
