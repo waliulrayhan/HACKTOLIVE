@@ -51,6 +51,8 @@ export default function QuizManagementPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showQuestionModal, setShowQuestionModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingIndex, setDeletingIndex] = useState<number | null>(null);
   const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
@@ -62,6 +64,11 @@ export default function QuizManagementPage() {
     explanation: "",
     order: 1,
   });
+
+  // Helper state for interactive option management
+  const [optionsList, setOptionsList] = useState<string[]>([""]);
+  const [newOption, setNewOption] = useState("");
+  const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
 
   useEffect(() => {
     fetchQuiz();
@@ -222,6 +229,23 @@ export default function QuizManagementPage() {
       setEditingQuestion(question);
       setEditingIndex(index);
       setQuestionForm({ ...question });
+      // Parse existing options into array
+      const existingOptions = question.options
+        .split(",")
+        .map((opt) => opt.trim())
+        .filter((opt) => opt.length > 0);
+      setOptionsList(existingOptions.length > 0 ? existingOptions : [""]);
+      
+      // Parse existing correct answers for MULTIPLE_SELECT
+      if (question.type === "MULTIPLE_SELECT") {
+        const existingAnswers = question.correctAnswer
+          .split(",")
+          .map((ans) => ans.trim())
+          .filter((ans) => ans.length > 0);
+        setSelectedAnswers(existingAnswers);
+      } else {
+        setSelectedAnswers([]);
+      }
     } else {
       setEditingQuestion(null);
       setEditingIndex(null);
@@ -233,7 +257,10 @@ export default function QuizManagementPage() {
         explanation: "",
         order: quiz.questions.length + 1,
       });
+      setOptionsList([""]);
+      setSelectedAnswers([]);
     }
+    setNewOption("");
     setShowQuestionModal(true);
   };
 
@@ -245,40 +272,132 @@ export default function QuizManagementPage() {
       return;
     }
 
-    if (!questionForm.options.trim()) {
+    // Filter out empty options and trim
+    const validOptions = optionsList
+      .map((opt) => opt.trim())
+      .filter((opt) => opt.length > 0);
+
+    if (validOptions.length < 2) {
       toast.error("Error", {
-        description: "Please enter options",
+        description: "Please add at least 2 options",
       });
       return;
     }
 
-    if (!questionForm.correctAnswer.trim()) {
-      toast.error("Error", {
-        description: "Please enter the correct answer",
-      });
-      return;
+    // Validate correct answer based on question type
+    let finalCorrectAnswer: string;
+    
+    if (questionForm.type === "MULTIPLE_SELECT") {
+      if (selectedAnswers.length === 0) {
+        toast.error("Error", {
+          description: "Please select at least one correct answer",
+        });
+        return;
+      }
+      // Ensure all selected answers are in the options list
+      const invalidAnswers = selectedAnswers.filter(
+        (ans) => !validOptions.includes(ans)
+      );
+      if (invalidAnswers.length > 0) {
+        toast.error("Error", {
+          description: "Selected answers must be from the options",
+        });
+        return;
+      }
+      finalCorrectAnswer = selectedAnswers.join(", ");
+    } else {
+      if (!questionForm.correctAnswer.trim()) {
+        toast.error("Error", {
+          description: "Please select the correct answer",
+        });
+        return;
+      }
+      // Ensure correct answer is in the options list
+      if (!validOptions.includes(questionForm.correctAnswer.trim())) {
+        toast.error("Error", {
+          description: "Correct answer must be one of the options",
+        });
+        return;
+      }
+      finalCorrectAnswer = questionForm.correctAnswer.trim();
     }
+
+    // Join options with comma and space for consistent formatting
+    const formattedOptions = validOptions.join(", ");
+
+    const finalQuestion: QuizQuestion = {
+      ...questionForm,
+      options: formattedOptions,
+      correctAnswer: finalCorrectAnswer,
+    };
 
     if (editingIndex !== null) {
       // Update existing question
       const updatedQuestions = [...quiz.questions];
-      updatedQuestions[editingIndex] = questionForm;
+      updatedQuestions[editingIndex] = finalQuestion;
       setQuiz({ ...quiz, questions: updatedQuestions });
+      toast.success("Question updated successfully");
     } else {
       // Add new question
       setQuiz({
         ...quiz,
-        questions: [...quiz.questions, questionForm],
+        questions: [...quiz.questions, finalQuestion],
       });
+      toast.success("Question added successfully");
     }
 
     setShowQuestionModal(false);
   };
 
+  const handleAddOption = () => {
+    if (newOption.trim()) {
+      setOptionsList([...optionsList, newOption.trim()]);
+      setNewOption("");
+    }
+  };
+
+  const handleRemoveOption = (index: number) => {
+    const removedOption = optionsList[index];
+    const updatedOptions = optionsList.filter((_, i) => i !== index);
+    setOptionsList(updatedOptions.length > 0 ? updatedOptions : [""]);
+    
+    // Clear correct answer if it was the removed option
+    if (questionForm.correctAnswer === removedOption) {
+      setQuestionForm({ ...questionForm, correctAnswer: "" });
+    }
+    
+    // Remove from selected answers if applicable
+    if (selectedAnswers.includes(removedOption)) {
+      setSelectedAnswers(selectedAnswers.filter((ans) => ans !== removedOption));
+    }
+  };
+
+  const handleToggleAnswer = (option: string) => {
+    if (selectedAnswers.includes(option)) {
+      setSelectedAnswers(selectedAnswers.filter((ans) => ans !== option));
+    } else {
+      setSelectedAnswers([...selectedAnswers, option]);
+    }
+  };
+
+  const handleUpdateOption = (index: number, value: string) => {
+    const updatedOptions = [...optionsList];
+    updatedOptions[index] = value;
+    setOptionsList(updatedOptions);
+  };
+
   const handleDeleteQuestion = (index: number) => {
-    if (confirm("Are you sure you want to delete this question?")) {
-      const updatedQuestions = quiz.questions.filter((_, i) => i !== index);
+    setDeletingIndex(index);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteQuestion = () => {
+    if (deletingIndex !== null) {
+      const updatedQuestions = quiz.questions.filter((_, i) => i !== deletingIndex);
       setQuiz({ ...quiz, questions: updatedQuestions });
+      setShowDeleteModal(false);
+      setDeletingIndex(null);
+      toast.success("Question deleted successfully");
     }
   };
 
@@ -493,6 +612,62 @@ export default function QuizManagementPage() {
         </div>
       </div>
 
+      {/* Delete Question Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-100000 flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-4">
+          <div className="w-full max-w-md rounded-xl bg-white p-4 sm:p-6 dark:bg-gray-800 shadow-2xl">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+                Delete Question
+              </h2>
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeletingIndex(null);
+                }}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              >
+                <HiOutlineX className="h-5 w-5 sm:h-6 sm:w-6" />
+              </button>
+            </div>
+
+            <div className="mb-4 sm:mb-6">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Are you sure you want to delete this question? This action cannot be undone.
+              </p>
+              {deletingIndex !== null && quiz.questions[deletingIndex] && (
+                <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
+                    Q{deletingIndex + 1}
+                  </p>
+                  <p className="text-sm text-gray-900 dark:text-white">
+                    {quiz.questions[deletingIndex].question}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-2 sm:gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeletingIndex(null);
+                }}
+                className="flex-1 rounded-lg border border-gray-300 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteQuestion}
+                className="flex-1 rounded-lg border border-error-500 bg-error-500 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white hover:bg-error-600 hover:border-error-600 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Question Modal */}
       {showQuestionModal && (
         <div className="fixed inset-0 z-100000 flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-4">
@@ -547,35 +722,114 @@ export default function QuizManagementPage() {
 
               <div>
                 <label className="block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-1.5">
-                  Options * (Comma-separated or JSON array format)
+                  Options * (Add at least 2 options)
                 </label>
-                <textarea
-                  value={questionForm.options}
-                  onChange={(e) =>
-                    setQuestionForm({ ...questionForm, options: e.target.value })
-                  }
-                  rows={3}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                  placeholder='e.g., Option A, Option B, Option C or ["Option A", "Option B", "Option C"]'
-                />
-                <p className="mt-1 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                  For True/False: use "True, False" or ["True", "False"]
-                </p>
+                
+                <div className="space-y-2">
+                  {optionsList.map((option, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="text"
+                        value={option}
+                        onChange={(e) => handleUpdateOption(index, e.target.value)}
+                        className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                        placeholder={`Option ${index + 1}`}
+                      />
+                      {optionsList.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveOption(index)}
+                          className="rounded-lg border border-error-300 px-2.5 py-2 text-error-600 hover:bg-error-50 dark:border-error-500/50 dark:text-error-400 dark:hover:bg-error-500/10 transition-colors"
+                          title="Remove option"
+                        >
+                          <HiOutlineX className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newOption}
+                      onChange={(e) => setNewOption(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddOption();
+                        }
+                      }}
+                      className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                      placeholder="Type new option and press Enter or click Add"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddOption}
+                      disabled={!newOption.trim()}
+                      className="inline-flex items-center gap-1 rounded-lg border border-brand-500 bg-brand-500 px-3 py-2 text-xs sm:text-sm font-medium text-white hover:bg-brand-600 hover:border-brand-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <HiOutlinePlus className="h-4 w-4" />
+                      Add
+                    </button>
+                  </div>
+                </div>
+                
+                {questionForm.type === "TRUE_FALSE" && (
+                  <p className="mt-2 text-[10px] sm:text-xs text-info-600 dark:text-info-400">
+                    💡 Tip: For True/False questions, add "True" and "False" as options
+                  </p>
+                )}
               </div>
 
               <div>
                 <label className="block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-1.5">
-                  Correct Answer *
+                  Correct Answer{questionForm.type === "MULTIPLE_SELECT" ? "s" : ""} *
                 </label>
-                <input
-                  type="text"
-                  value={questionForm.correctAnswer}
-                  onChange={(e) =>
-                    setQuestionForm({ ...questionForm, correctAnswer: e.target.value })
-                  }
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                  placeholder="Enter the correct answer exactly as it appears in options"
-                />
+                
+                {questionForm.type === "MULTIPLE_SELECT" ? (
+                  <div className="space-y-2">
+                    {optionsList
+                      .filter((opt) => opt.trim().length > 0)
+                      .map((option, index) => (
+                        <label
+                          key={index}
+                          className="flex items-center gap-2 p-2 rounded-lg border border-gray-300 hover:bg-gray-50 dark:border-white/10 dark:hover:bg-white/5 cursor-pointer transition-colors"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedAnswers.includes(option.trim())}
+                            onChange={() => handleToggleAnswer(option.trim())}
+                            className="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5"
+                          />
+                          <span className="text-xs sm:text-sm text-gray-900 dark:text-white">
+                            {option.trim()}
+                          </span>
+                        </label>
+                      ))}
+                    {selectedAnswers.length > 0 && (
+                      <p className="text-[10px] sm:text-xs text-success-600 dark:text-success-400">
+                        ✓ {selectedAnswers.length} answer{selectedAnswers.length > 1 ? "s" : ""} selected
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <select
+                    value={questionForm.correctAnswer}
+                    onChange={(e) =>
+                      setQuestionForm({ ...questionForm, correctAnswer: e.target.value })
+                    }
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                  >
+                    <option value="">Select the correct answer</option>
+                    {optionsList
+                      .filter((opt) => opt.trim().length > 0)
+                      .map((option, index) => (
+                        <option key={index} value={option.trim()}>
+                          {option.trim()}
+                        </option>
+                      ))}
+                  </select>
+                )}
               </div>
 
               <div>

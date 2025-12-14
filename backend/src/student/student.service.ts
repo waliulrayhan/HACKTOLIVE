@@ -865,6 +865,77 @@ export class StudentService {
     };
   }
 
+  async getAllAssignments(userId: string) {
+    const student = await this.prisma.student.findUnique({
+      where: { userId },
+    });
+
+    if (!student) {
+      throw new NotFoundException('Student profile not found');
+    }
+
+    // Get all enrollments for the student
+    const enrollments = await this.prisma.enrollment.findMany({
+      where: {
+        studentId: student.id,
+      },
+      include: {
+        course: {
+          include: {
+            modules: {
+              include: {
+                lessons: {
+                  include: {
+                    assignments: {
+                      include: {
+                        lesson: {
+                          include: {
+                            module: {
+                              include: {
+                                course: true,
+                              },
+                            },
+                          },
+                        },
+                        submissions: {
+                          where: {
+                            studentId: student.id,
+                          },
+                          orderBy: {
+                            submittedAt: 'desc',
+                          },
+                          take: 1,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Flatten and return all assignments
+    const allAssignments: any[] = [];
+    for (const enrollment of enrollments) {
+      for (const module of enrollment.course.modules) {
+        for (const lesson of module.lessons) {
+          for (const assignment of lesson.assignments) {
+            const { submissions, ...assignmentData } = assignment;
+            allAssignments.push({
+              ...assignmentData,
+              submission: submissions[0] || null,
+            });
+          }
+        }
+      }
+    }
+
+    return allAssignments;
+  }
+
   async getAssignment(userId: string, assignmentId: string) {
     const student = await this.prisma.student.findUnique({
       where: { userId },
@@ -914,6 +985,28 @@ export class StudentService {
     }
 
     return assignment;
+  }
+
+  async getAssignmentSubmission(userId: string, assignmentId: string) {
+    const student = await this.prisma.student.findUnique({
+      where: { userId },
+    });
+
+    if (!student) {
+      throw new NotFoundException('Student profile not found');
+    }
+
+    const submission = await this.prisma.assignmentSubmission.findFirst({
+      where: {
+        assignmentId,
+        studentId: student.id,
+      },
+      orderBy: {
+        submittedAt: 'desc',
+      },
+    });
+
+    return submission;
   }
 
   async submitAssignment(

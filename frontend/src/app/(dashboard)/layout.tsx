@@ -56,6 +56,11 @@ export default function DashboardLayout({
             path: "/student/certificates",
           },
           {
+            icon: <FileIcon />,
+            name: "Assignments",
+            path: "/student/assignments",
+          },
+          {
             icon: <BoxIconLine />,
             name: "Browse Courses",
             path: "/academy/courses",

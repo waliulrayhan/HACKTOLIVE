@@ -97,6 +97,12 @@ export class StudentController {
     return this.studentService.getQuizAttempts(req.user.id);
   }
 
+  @Get('assignments')
+  @ApiOperation({ summary: 'Get all assignments for student' })
+  getAllAssignments(@Request() req: any) {
+    return this.studentService.getAllAssignments(req.user.id);
+  }
+
   @Get('assignments/:assignmentId')
   @ApiOperation({ summary: 'Get assignment details' })
   getAssignment(
@@ -104,6 +110,15 @@ export class StudentController {
     @Param('assignmentId') assignmentId: string,
   ) {
     return this.studentService.getAssignment(req.user.id, assignmentId);
+  }
+
+  @Get('assignments/:assignmentId/submission')
+  @ApiOperation({ summary: 'Get assignment submission' })
+  getAssignmentSubmission(
+    @Request() req: any,
+    @Param('assignmentId') assignmentId: string,
+  ) {
+    return this.studentService.getAssignmentSubmission(req.user.id, assignmentId);
   }
 
   @Post('assignments/:assignmentId/submit')

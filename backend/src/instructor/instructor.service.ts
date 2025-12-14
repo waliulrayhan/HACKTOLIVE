@@ -143,12 +143,46 @@ export class InstructorService {
 
     const { questions, ...quizData } = data;
 
-    return this.prisma.quiz.update({
-      where: { id: quizId },
-      data: quizData,
-      include: {
-        questions: true,
-      },
+    // Update quiz and handle questions in a transaction
+    return this.prisma.$transaction(async (tx) => {
+      // Update the quiz basic data
+      const updatedQuiz = await tx.quiz.update({
+        where: { id: quizId },
+        data: quizData,
+      });
+
+      // If questions are provided, replace all existing questions
+      if (questions && Array.isArray(questions)) {
+        // Delete existing questions
+        await tx.quizQuestion.deleteMany({
+          where: { quizId },
+        });
+
+        // Create new questions
+        if (questions.length > 0) {
+          await tx.quizQuestion.createMany({
+            data: questions.map((q: any) => ({
+              quizId,
+              question: q.question,
+              type: q.type,
+              options: q.options,
+              correctAnswer: q.correctAnswer,
+              explanation: q.explanation,
+              order: q.order,
+            })),
+          });
+        }
+      }
+
+      // Return the updated quiz with questions
+      return tx.quiz.findUnique({
+        where: { id: quizId },
+        include: {
+          questions: {
+            orderBy: { order: 'asc' },
+          },
+        },
+      });
     });
   }
 
@@ -288,6 +322,7 @@ export class InstructorService {
             course: true,
           },
         },
+        assignments: true,
       },
     });
 
@@ -296,6 +331,11 @@ export class InstructorService {
     }
 
     await this.verifyCourseOwnership(userId, lesson.module.course.id);
+
+    // Check if an assignment already exists for this lesson
+    if (lesson.assignments && lesson.assignments.length > 0) {
+      throw new ForbiddenException('This lesson already has an assignment. Please update the existing one instead.');
+    }
 
     // Convert date strings to DateTime
     const assignmentData: any = { ...data };

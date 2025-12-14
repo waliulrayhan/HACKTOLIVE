@@ -71,6 +71,8 @@ interface QuizQuestion {
   question: string;
   type: string;
   options: string | string[];
+  correctAnswer: string;
+  explanation?: string;
   order: number;
 }
 
@@ -127,7 +129,7 @@ export default function StudentLessonPage() {
 
   // Quiz state
   const [quizAttempts, setQuizAttempts] = useState<QuizAttempt[]>([]);
-  const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, string | string[]>>({});
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizSubmitting, setQuizSubmitting] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
@@ -242,7 +244,7 @@ export default function StudentLessonPage() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${apiUrl}/student/quizzes/${lesson.quizzes[0].id}/attempts`,
+        `${apiUrl}/student/quiz-attempts`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -252,10 +254,18 @@ export default function StudentLessonPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setQuizAttempts(data);
+        // Filter attempts for this specific quiz
+        const quizId = lesson.quizzes[0].id;
+        const filteredAttempts = data.filter((attempt: any) => attempt.quizId === quizId);
+        setQuizAttempts(filteredAttempts);
+      } else if (response.status === 404) {
+        // Endpoint not available, silently handle
+        console.log('Quiz attempts endpoint not available');
+        setQuizAttempts([]);
       }
     } catch (error) {
       console.error("Error fetching quiz attempts:", error);
+      setQuizAttempts([]);
     }
   };
 
@@ -328,6 +338,14 @@ export default function StudentLessonPage() {
     try {
       setQuizSubmitting(true);
       const token = localStorage.getItem("token");
+      
+      // Format answers: convert arrays to comma-separated strings for multiple select
+      const formattedAnswers: Record<string, string> = {};
+      Object.keys(quizAnswers).forEach(questionId => {
+        const answer = quizAnswers[questionId];
+        formattedAnswers[questionId] = Array.isArray(answer) ? answer.join(', ') : answer as string;
+      });
+      
       const response = await fetch(
         `${apiUrl}/student/quizzes/${lesson.quizzes[0].id}/submit`,
         {
@@ -336,19 +354,34 @@ export default function StudentLessonPage() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ answers: quizAnswers }),
+          body: JSON.stringify(formattedAnswers),
         }
       );
 
       if (!response.ok) throw new Error("Failed to submit quiz");
 
       const data = await response.json();
-      setQuizResult(data);
+      
+      // Calculate score percentage from response
+      const scorePercentage = data.attempt?.score ?? 
+        (data.correctAnswers && data.totalQuestions 
+          ? Math.round((data.correctAnswers / data.totalQuestions) * 100) 
+          : 0);
+      
+      const result = {
+        score: scorePercentage,
+        passed: data.passed,
+        correctAnswers: data.correctAnswers,
+        totalQuestions: data.totalQuestions,
+        attempt: data.attempt
+      };
+      
+      setQuizResult(result);
       setQuizStarted(false);
       setTimeRemaining(null);
       fetchQuizAttempts();
 
-      if (data.passed) {
+      if (result.passed) {
         toast.success("Congratulations! You passed the quiz!");
       } else {
         toast.error("You didn't pass this time. Try again!");
@@ -412,11 +445,18 @@ export default function StudentLessonPage() {
 
   const parseOptions = (options: string | string[]) => {
     if (Array.isArray(options)) return options;
-    try {
-      return JSON.parse(options);
-    } catch {
-      return [];
+    if (typeof options === 'string') {
+      // First try to parse as JSON
+      try {
+        const parsed = JSON.parse(options);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {
+        // If JSON parse fails, treat as comma-separated string
+      }
+      // Split by comma and trim whitespace
+      return options.split(',').map(opt => opt.trim()).filter(opt => opt.length > 0);
     }
+    return [];
   };
 
   const formatTime = (seconds: number) => {
@@ -514,14 +554,14 @@ export default function StudentLessonPage() {
 
             {!isCompleted && (
               <Button
-              onClick={markAsComplete}
-              disabled={completing}
-              variant="primary"
-              size="sm"
-              className="shrink-0"
+                onClick={markAsComplete}
+                disabled={completing}
+                variant="primary"
+                size="sm"
+                className="shrink-0"
+                startIcon={<HiOutlineCheckCircle className="h-4 w-4" />}
               >
-              <HiOutlineCheckCircle className="h-4 w-4" />
-              {completing ? "Marking..." : "Mark Complete"}
+                {completing ? "Marking..." : "Mark Complete"}
               </Button>
             )}
           </div>
@@ -735,8 +775,11 @@ export default function StudentLessonPage() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button onClick={handleQuizStart} variant="primary">
-                      <HiOutlinePlay className="h-4 w-4" />
+                    <Button 
+                      onClick={handleQuizStart} 
+                      variant="primary"
+                      startIcon={<HiOutlinePlay className="h-4 w-4" />}
+                    >
                       {quizAttempts.length > 0 ? "Retake Quiz" : "Start Quiz"}
                     </Button>
                   </div>
@@ -823,49 +866,84 @@ export default function StudentLessonPage() {
                       .sort((a, b) => a.order - b.order)
                       .map((question, index) => {
                         const options = parseOptions(question.options);
+                        const isMultipleSelect = question.type === 'MULTIPLE_SELECT';
+                        const currentAnswer = quizAnswers[question.id];
+                        const selectedOptions = isMultipleSelect && Array.isArray(currentAnswer) ? currentAnswer : [];
+                        
                         return (
                           <div
                             key={question.id}
                             className="p-5 rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3"
                           >
-                            <div className="flex gap-3 mb-4">
-                              <div className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/15">
-                                <span className="text-sm font-bold text-brand-600 dark:text-brand-400">
-                                  {index + 1}
-                                </span>
-                              </div>
-                              <h4 className="text-sm font-semibold text-gray-900 dark:text-white pt-1">
-                                {question.question}
-                              </h4>
-                            </div>
-                            <div className="space-y-2 ml-11">
-                              {options.map((option: string, optIndex: number) => (
-                                <label
-                                  key={optIndex}
-                                  className={`flex items-start gap-3 p-3 rounded-md border cursor-pointer transition-all ${
-                                    quizAnswers[question.id] === option
-                                      ? "border-brand-500 bg-brand-50 dark:border-brand-500 dark:bg-brand-950/20"
-                                      : "border-gray-200 hover:bg-gray-50 dark:border-white/5 dark:hover:bg-white/5"
-                                  }`}
-                                >
-                                  <input
-                                    type="radio"
-                                    name={question.id}
-                                    value={option}
-                                    checked={quizAnswers[question.id] === option}
-                                    onChange={(e) =>
-                                      setQuizAnswers({
-                                        ...quizAnswers,
-                                        [question.id]: e.target.value,
-                                      })
-                                    }
-                                    className="mt-0.5 h-4 w-4 text-brand-600 focus:ring-brand-500 dark:bg-white/5 dark:border-white/10"
-                                  />
-                                  <span className="text-sm text-gray-900 dark:text-white flex-1">
-                                    {option}
-                                  </span>
-                                </label>
-                              ))}
+                            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                              <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-brand-100 dark:bg-brand-500/15 text-brand-600 dark:text-brand-400 text-xs font-bold mr-2">
+                                {index + 1}
+                              </span>
+                              {question.question}
+                            </h4>
+                            {isMultipleSelect && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 pl-8">
+                                Select all that apply
+                              </p>
+                            )}
+                            <div className="space-y-2 pl-8">
+                              {options && options.length > 0 ? (
+                                options.map((option: string, optIndex: number) => {
+                                  const isChecked = isMultipleSelect 
+                                    ? selectedOptions.includes(option)
+                                    : currentAnswer === option;
+                                  
+                                  return (
+                                    <label
+                                      key={optIndex}
+                                      className={`flex items-start gap-3 p-3 rounded-md border cursor-pointer transition-all ${
+                                        isChecked
+                                          ? "border-brand-500 bg-brand-50 dark:border-brand-500 dark:bg-brand-950/20"
+                                          : "border-gray-200 hover:bg-gray-50 dark:border-white/5 dark:hover:bg-white/5"
+                                      }`}
+                                    >
+                                      <input
+                                        type={isMultipleSelect ? "checkbox" : "radio"}
+                                        name={question.id}
+                                        value={option}
+                                        checked={isChecked}
+                                        onChange={(e) => {
+                                          if (isMultipleSelect) {
+                                            const currentSelections = Array.isArray(quizAnswers[question.id]) 
+                                              ? [...quizAnswers[question.id] as string[]] 
+                                              : [];
+                                            
+                                            if (e.target.checked) {
+                                              setQuizAnswers({
+                                                ...quizAnswers,
+                                                [question.id]: [...currentSelections, option],
+                                              });
+                                            } else {
+                                              setQuizAnswers({
+                                                ...quizAnswers,
+                                                [question.id]: currentSelections.filter(o => o !== option),
+                                              });
+                                            }
+                                          } else {
+                                            setQuizAnswers({
+                                              ...quizAnswers,
+                                              [question.id]: e.target.value,
+                                            });
+                                          }
+                                        }}
+                                        className="mt-0.5 h-4 w-4 text-brand-600 focus:ring-brand-500 dark:bg-white/5 dark:border-white/10 rounded"
+                                      />
+                                      <span className="text-sm text-gray-900 dark:text-white flex-1">
+                                        {option}
+                                      </span>
+                                    </label>
+                                  );
+                                })
+                              ) : (
+                                <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                                  No options available for this question
+                                </p>
+                              )}
                             </div>
                           </div>
                         );
@@ -877,8 +955,8 @@ export default function StudentLessonPage() {
                       onClick={handleQuizSubmit}
                       disabled={quizSubmitting}
                       variant="primary"
+                      startIcon={<HiOutlineCheckCircle className="h-4 w-4" />}
                     >
-                      <HiOutlineCheckCircle className="h-4 w-4" />
                       {quizSubmitting ? "Submitting..." : "Submit Quiz"}
                     </Button>
                   </div>
@@ -927,6 +1005,84 @@ export default function StudentLessonPage() {
                     </div>
                   </div>
 
+                  {/* Question Review */}
+                  <div className="mt-6 space-y-3">
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                      Question Review
+                    </h4>
+                    {lesson.quizzes![0].questions
+                      .sort((a, b) => a.order - b.order)
+                      .map((question, index) => {
+                        const studentAnswer = quizResult.attempt?.answers ? 
+                          JSON.parse(quizResult.attempt.answers)[question.id] : 
+                          null;
+                        const isCorrect = studentAnswer === question.correctAnswer;
+                        const options = parseOptions(question.options);
+                        
+                        return (
+                          <div
+                            key={question.id}
+                            className={`p-4 rounded-md border-2 ${
+                              isCorrect
+                                ? "border-success-200 bg-success-50 dark:border-success-500/20 dark:bg-success-950/20"
+                                : "border-error-200 bg-error-50 dark:border-error-500/20 dark:bg-error-950/20"
+                            }`}
+                          >
+                            <div className="flex items-start gap-3 mb-3">
+                              <div className={`flex h-8 w-8 items-center justify-center rounded-full flex-shrink-0 ${
+                                isCorrect 
+                                  ? "bg-success-100 dark:bg-success-500/15" 
+                                  : "bg-error-100 dark:bg-error-500/15"
+                              }`}>
+                                {isCorrect ? (
+                                  <HiOutlineCheckCircle className="h-5 w-5 text-success-600 dark:text-success-400" />
+                                ) : (
+                                  <HiOutlineXCircle className="h-5 w-5 text-error-600 dark:text-error-400" />
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                                  Question {index + 1}: {question.question}
+                                </h5>
+                                
+                                <div className="space-y-2 text-sm">
+                                  <div>
+                                    <span className="font-medium text-gray-700 dark:text-gray-300">Your Answer: </span>
+                                    <span className={isCorrect ? "text-success-700 dark:text-success-400" : "text-error-700 dark:text-error-400"}>
+                                      {studentAnswer || "Not answered"}
+                                    </span>
+                                  </div>
+                                  
+                                  {!isCorrect && (
+                                    <div>
+                                      <span className="font-medium text-gray-700 dark:text-gray-300">Correct Answer: </span>
+                                      <span className="text-success-700 dark:text-success-400">
+                                        {question.correctAnswer}
+                                      </span>
+                                    </div>
+                                  )}
+                                  
+                                  {question.explanation && (
+                                    <div className="mt-2 pt-2 border-t border-gray-200 dark:border-white/10">
+                                      <div className="flex items-start gap-2">
+                                        <HiOutlineInformationCircle className="h-4 w-4 text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5" />
+                                        <div>
+                                          <span className="font-medium text-gray-700 dark:text-gray-300">Explanation: </span>
+                                          <span className="text-gray-600 dark:text-gray-400">
+                                            {question.explanation}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+
                   <div className="mt-6 flex gap-2">
                     <Button
                       onClick={() => {
@@ -934,14 +1090,17 @@ export default function StudentLessonPage() {
                         setQuizStarted(false);
                         fetchQuizAttempts();
                       }}
-                      variant="secondary"
+                      variant="outline"
+                      startIcon={<HiOutlineArrowLeft className="h-4 w-4" />}
                     >
-                      <HiOutlineArrowLeft className="h-4 w-4" />
                       Back to Quiz
                     </Button>
                     {!quizResult.passed && (
-                      <Button onClick={handleQuizStart} variant="primary">
-                        <HiOutlinePlay className="h-4 w-4" />
+                      <Button 
+                        onClick={handleQuizStart} 
+                        variant="primary"
+                        startIcon={<HiOutlinePlay className="h-4 w-4" />}
+                      >
                         Try Again
                       </Button>
                     )}
@@ -1057,8 +1216,8 @@ export default function StudentLessonPage() {
                       onClick={handleAssignmentSubmit}
                       disabled={assignmentSubmitting || (!submissionText && !submissionUrl)}
                       variant="primary"
+                      startIcon={<HiOutlineUpload className="h-4 w-4" />}
                     >
-                      <HiOutlineUpload className="h-4 w-4" />
                       {assignmentSubmitting ? "Submitting..." : submission ? "Update Submission" : "Submit Assignment"}
                     </Button>
                   </div>
