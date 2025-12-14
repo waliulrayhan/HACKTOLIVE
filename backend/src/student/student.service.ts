@@ -1258,4 +1258,91 @@ export class StudentService {
 
     return review;
   }
+
+  async requestCertificate(userId: string, courseId: string) {
+    const student = await this.prisma.student.findUnique({
+      where: { userId },
+      include: {
+        user: true,
+      },
+    });
+
+    if (!student) {
+      throw new NotFoundException('Student profile not found');
+    }
+
+    // Check if course is completed
+    const enrollment = await this.prisma.enrollment.findFirst({
+      where: {
+        studentId: student.id,
+        courseId,
+        status: 'COMPLETED',
+      },
+    });
+
+    if (!enrollment) {
+      throw new BadRequestException(
+        'Course must be completed before requesting certificate',
+      );
+    }
+
+    // Check if certificate already exists
+    const existingCertificate = await this.prisma.certificate.findFirst({
+      where: {
+        studentId: student.id,
+        courseId,
+      },
+    });
+
+    if (existingCertificate) {
+      return existingCertificate;
+    }
+
+    // Get course details
+    const course = await this.prisma.course.findUnique({
+      where: { id: courseId },
+    });
+
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
+
+    // Generate verification code
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const randomPart = require('crypto').randomBytes(4).toString('hex').toUpperCase();
+    const verificationCode = `HACK-${timestamp}-${randomPart}`;
+
+    // Create certificate
+    const certificate = await this.prisma.certificate.create({
+      data: {
+        student: { connect: { id: student.id } },
+        course: { connect: { id: courseId } },
+        studentName: student.user.name || 'Student',
+        courseName: course.title,
+        verificationCode,
+        certificateUrl: `/certificates/${student.id}-${courseId}.pdf`,
+      },
+      include: {
+        student: true,
+        course: {
+          include: {
+            instructor: true,
+          },
+        },
+      },
+    });
+
+    // Update student certificates count
+    await this.prisma.student.update({
+      where: { id: student.id },
+      data: {
+        certificatesEarned: {
+          increment: 1,
+        },
+      },
+    });
+
+    return certificate;
+  }
 }
+

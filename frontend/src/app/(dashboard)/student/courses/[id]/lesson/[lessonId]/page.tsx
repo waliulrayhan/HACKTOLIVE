@@ -311,8 +311,51 @@ export default function StudentLessonPage() {
 
       if (!response.ok) throw new Error("Failed to mark lesson complete");
 
+      const result = await response.json();
+      
       toast.success("Lesson marked as complete!");
-      fetchLesson();
+      
+      // Check if this completion triggered course completion
+      // Refresh the lesson data first
+      await fetchLesson();
+      
+      // Then check course progress
+      console.log('🔍 Checking course progress after lesson completion...');
+      const progressResponse = await fetch(
+        `${apiUrl}/student/courses/${courseId}/progress`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      if (progressResponse.ok) {
+        const progressData = await progressResponse.json();
+        console.log('📊 Course progress:', progressData);
+        
+        // Check the status from enrollment object
+        const courseStatus = progressData.enrollment?.status || progressData.status;
+        console.log('📌 Course status:', courseStatus);
+        
+        // If course just reached 100%, redirect to course page with completion parameter
+        if (courseStatus === 'COMPLETED') {
+          console.log('🎉 Course completed! Redirecting with completion parameter...');
+          toast.success("🎉 Course Completed!", {
+            description: "Congratulations! You've completed all lessons!",
+          });
+          
+          // Small delay before redirect to let user see the success message
+          setTimeout(() => {
+            const redirectUrl = `/student/courses/${courseId}?completed=true`;
+            console.log('🚀 Redirecting to:', redirectUrl);
+            router.push(redirectUrl);
+          }, 1500);
+          return; // Exit early to prevent further execution
+        } else {
+          console.log('ℹ️ Course not yet completed. Status:', courseStatus);
+        }
+      }
     } catch (error) {
       console.error("Error marking lesson complete:", error);
       toast.error("Failed to mark lesson complete", {
@@ -502,7 +545,34 @@ export default function StudentLessonPage() {
       {/* Back Button */}
       <div>
         <button
-          onClick={() => router.push(`/student/courses/${courseId}`)}
+          onClick={async () => {
+            // Check if course is completed before redirecting
+            try {
+              const token = localStorage.getItem("token");
+              const response = await fetch(
+                `${apiUrl}/student/courses/${courseId}/progress`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+              
+              if (response.ok) {
+                const progressData = await response.json();
+                const courseStatus = progressData.enrollment?.status || progressData.status;
+                if (courseStatus === 'COMPLETED') {
+                  router.push(`/student/courses/${courseId}?completed=true`);
+                } else {
+                  router.push(`/student/courses/${courseId}`);
+                }
+              } else {
+                router.push(`/student/courses/${courseId}`);
+              }
+            } catch (error) {
+              router.push(`/student/courses/${courseId}`);
+            }
+          }}
           className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
         >
           <HiOutlineArrowLeft className="h-4 w-4" />
@@ -606,9 +676,9 @@ export default function StudentLessonPage() {
             >
               <HiOutlinePaperClip className="h-5 w-5" />
               <span>Resources</span>
-              <Badge color="light" className="ml-1">
+              <span className="ml-1 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-300">
                 {lesson.resources?.length}
-              </Badge>
+              </span>
             </button>
           )}
           {hasQuiz && (
@@ -657,7 +727,31 @@ export default function StudentLessonPage() {
               )}
 
               {hasArticleContent && (
-                <div className="prose prose-gray dark:prose-invert max-w-none">
+                <div className="article-content">
+                  <style dangerouslySetInnerHTML={{ __html: `
+                    .article-content h2 { font-size: 1.5em; font-weight: 700; margin: 1em 0 0.5em; color: #111827; }
+                    .dark .article-content h2 { color: #f3f4f6; }
+                    .article-content h3 { font-size: 1.25em; font-weight: 600; margin: 0.75em 0 0.5em; color: #111827; }
+                    .dark .article-content h3 { color: #f3f4f6; }
+                    .article-content p { margin-bottom: 0.75em; line-height: 1.6; color: #374151; }
+                    .dark .article-content p { color: #d1d5db; }
+                    .article-content ul, .article-content ol { padding-left: 1.5rem; margin-bottom: 0.75em; color: #374151; }
+                    .dark .article-content ul, .dark .article-content ol { color: #d1d5db; }
+                    .article-content li { margin-bottom: 0.25em; }
+                    .article-content blockquote { border-left: 4px solid #3b82f6; padding-left: 1rem; margin: 0 0 0.75em; font-style: italic; color: #6b7280; }
+                    .dark .article-content blockquote { color: #9ca3af; }
+                    .article-content pre { background: #1f2937; color: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 0.75em; }
+                    .article-content code { background: #f3f4f6; padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-size: 0.875em; color: #1f2937; }
+                    .dark .article-content code { background: #374151; color: #f3f4f6; }
+                    .article-content pre code { background: transparent; padding: 0; color: #f3f4f6; }
+                    .article-content a { color: #3b82f6; text-decoration: underline; }
+                    .article-content a:hover { color: #2563eb; }
+                    .article-content img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 1rem 0; }
+                    .article-content strong { font-weight: 600; color: #111827; }
+                    .dark .article-content strong { color: #f3f4f6; }
+                    .article-content em { font-style: italic; }
+                    .article-content u { text-decoration: underline; }
+                  ` }} />
                   <div dangerouslySetInnerHTML={{ __html: lesson.articleContent! }} />
                 </div>
               )}

@@ -45,6 +45,27 @@ export class StudentController {
     return this.studentService.getEnrolledCourses(req.user.id);
   }
 
+  @Post('courses/:courseId/request-certificate')
+  @ApiOperation({ summary: 'Request certificate for completed course' })
+  requestCertificate(@Request() req: any, @Param('courseId') courseId: string) {
+    return this.studentService.requestCertificate(req.user.id, courseId);
+  }
+
+  @Post('courses/:courseId/review')
+  @ApiOperation({ summary: 'Add review to a course' })
+  addReview(
+    @Request() req: any,
+    @Param('courseId') courseId: string,
+    @Body() data: { rating: number; comment?: string },
+  ) {
+    return this.studentService.addReview(
+      req.user.id,
+      courseId,
+      data.rating,
+      data.comment,
+    );
+  }
+
   @Get('courses/:courseId')
   @ApiOperation({ summary: 'Get course details with modules and lessons' })
   getCourseDetail(@Request() req: any, @Param('courseId') courseId: string) {
@@ -149,20 +170,5 @@ export class StudentController {
   @ApiOperation({ summary: 'Get earned certificates' })
   getCertificates(@Request() req: any) {
     return this.studentService.getCertificates(req.user.id);
-  }
-
-  @Post('courses/:courseId/review')
-  @ApiOperation({ summary: 'Add review to a course' })
-  addReview(
-    @Request() req: any,
-    @Param('courseId') courseId: string,
-    @Body() data: { rating: number; comment?: string },
-  ) {
-    return this.studentService.addReview(
-      req.user.id,
-      courseId,
-      data.rating,
-      data.comment,
-    );
   }
 }

@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
+import CourseCompletionModal from "@/components/student/CourseCompletionModal";
 import {
   HiOutlineAcademicCap,
   HiOutlineStar,
@@ -21,11 +22,14 @@ import {
   HiOutlineChevronUp,
   HiOutlineLockClosed,
   HiOutlinePaperClip,
+  HiOutlineDownload,
 } from "react-icons/hi";
+import { HiOutlineTrophy } from "react-icons/hi2";
 
 export default function CourseDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const courseId = params.id as string;
 
   const [course, setCourse] = useState<any>(null);
@@ -34,13 +38,38 @@ export default function CourseDetailPage() {
     new Set()
   );
   const [loading, setLoading] = useState(true);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
   useEffect(() => {
     if (courseId) {
       fetchCourseDetail();
     }
-  }, [courseId]);
+    
+    // Check if redirected from lesson completion
+    const completedParam = searchParams.get('completed');
+    console.log('🔍 Checking completion parameter:', completedParam);
+    
+    if (completedParam === 'true') {
+      console.log('✅ Completion parameter found! Opening modal...');
+      setShowCompletionModal(true);
+      // Remove the parameter from URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete('completed');
+      window.history.replaceState({}, '', url.toString());
+    } else {
+      console.log('❌ No completion parameter found');
+    }
+    
+    // Check if review parameter is present
+    if (searchParams.get('review') === 'true') {
+      setShowReviewForm(true);
+    }
+  }, [courseId, searchParams]);
 
   const fetchCourseDetail = async () => {
     try {
@@ -60,6 +89,12 @@ export default function CourseDetailPage() {
       const data = await response.json();
       setCourse(data.course);
       setEnrollment(data.enrollment);
+
+      // Debug log
+      console.log('Course data:', {
+        status: data.enrollment.status,
+        progress: data.enrollment.progress,
+      });
 
       // Expand first module by default
       if (data.course.modules.length > 0) {
@@ -116,6 +151,56 @@ export default function CourseDetailPage() {
     router.push(`/student/courses/${courseId}/lesson/${lesson.id}`);
   };
 
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      setSubmittingReview(true);
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/student/courses/${courseId}/review`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            rating: reviewRating,
+            comment: reviewComment,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to submit review");
+      }
+
+      toast.success("Review submitted!", {
+        description: "Thank you for your feedback!",
+      });
+      
+      setShowReviewForm(false);
+      setReviewComment("");
+      setReviewRating(5);
+      
+      // Refresh course data to show updated rating
+      fetchCourseDetail();
+    } catch (error: any) {
+      console.error("Error submitting review:", error);
+      toast.error("Failed to submit review", {
+        description: error.message || "Please try again",
+      });
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  const handleViewCertificates = () => {
+    router.push("/student/certificates");
+  };
+
   if (loading) {
     return (
       <div>
@@ -150,6 +235,132 @@ export default function CourseDetailPage() {
   return (
     <div className="space-y-4">
       <PageBreadcrumb pageTitle={course.title} />
+
+      {/* Completion Modal */}
+      <CourseCompletionModal
+        isOpen={showCompletionModal}
+        onClose={() => setShowCompletionModal(false)}
+        courseId={courseId}
+        courseTitle={course.title}
+        courseThumbnail={course.thumbnail}
+        instructorName={course.instructor.name}
+        completedLessons={completedLessons}
+        totalLessons={totalLessons}
+      />
+
+      {/* Course Completed Banner */}
+      {enrollment.status === "COMPLETED" && (
+        <div className="overflow-hidden rounded-md border border-success-200 bg-gradient-to-r from-success-50 to-green-50 dark:border-success-800 dark:from-success-900/20 dark:to-green-900/20">
+          <div className="p-4 sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-success-500 text-white">
+                  <HiOutlineTrophy className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-success-900 dark:text-success-100">
+                    Course Completed! 🎉
+                  </h3>
+                  <p className="text-sm text-success-700 dark:text-success-300">
+                    Congratulations on completing this course
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowCompletionModal(true)}
+                  className="flex items-center gap-2 rounded-lg border border-purple-600 bg-transparent px-4 py-2 text-sm font-medium text-purple-700 hover:bg-purple-50 dark:border-purple-500 dark:text-purple-400 dark:hover:bg-purple-900/20 transition-colors"
+                >
+                  🎊 Show Celebration
+                </button>
+                <button
+                  onClick={handleViewCertificates}
+                  className="flex items-center gap-2 rounded-lg bg-success-600 px-4 py-2 text-sm font-medium text-white hover:bg-success-700 transition-colors"
+                >
+                  <HiOutlineDownload className="h-4 w-4" />
+                  View Certificate
+                </button>
+                {!showReviewForm && (
+                  <button
+                    onClick={() => setShowReviewForm(true)}
+                    className="flex items-center gap-2 rounded-lg border border-success-600 bg-transparent px-4 py-2 text-sm font-medium text-success-700 hover:bg-success-50 dark:border-success-500 dark:text-success-400 dark:hover:bg-success-900/20 transition-colors"
+                  >
+                    <HiOutlineStar className="h-4 w-4" />
+                    Leave Review
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Review Form */}
+      {showReviewForm && (
+        <div className="overflow-hidden rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+          <div className="border-b border-gray-200 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
+            <h3 className="font-semibold text-gray-900 dark:text-white">
+              Leave a Review
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Share your experience with this course
+            </p>
+          </div>
+          <form onSubmit={handleSubmitReview} className="p-4 sm:p-6">
+            <div className="mb-4">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Rating
+              </label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setReviewRating(star)}
+                    className="transition-transform hover:scale-110"
+                  >
+                    <HiOutlineStar
+                      className={`h-8 w-8 ${
+                        star <= reviewRating
+                          ? "fill-warning-500 text-warning-500"
+                          : "text-gray-300 dark:text-gray-600"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Comment (Optional)
+              </label>
+              <textarea
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                rows={4}
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
+                placeholder="Share your thoughts about this course..."
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                disabled={submittingReview}
+                className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50 transition-colors"
+              >
+                {submittingReview ? "Submitting..." : "Submit Review"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowReviewForm(false)}
+                className="rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* Course Header */}
       <div className="overflow-hidden rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">

@@ -1562,6 +1562,16 @@ export default function EditCoursePage() {
                                 </div>
                               </div>
                               <div className="flex items-center gap-1 shrink-0">
+                                {lesson.type === 'ARTICLE' && (
+                                  <button
+                                    onClick={() => router.push(`/instructor/courses/${courseId}/article/${lesson.id}`)}
+                                    className="inline-flex items-center gap-1 sm:gap-1.5 h-7 sm:h-8 rounded-lg px-2 sm:px-3 text-xs font-medium text-indigo-600 transition-colors hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                                    title="Edit Article Content"
+                                  >
+                                    <HiOutlineDocumentText className="h-3.5 w-3.5" />
+                                    <span className="hidden sm:inline">Article</span>
+                                  </button>
+                                )}
                                 <button
                                   onClick={() => router.push(`/instructor/courses/${courseId}/assignment/${lesson.id}`)}
                                   className="inline-flex items-center gap-1 sm:gap-1.5 h-7 sm:h-8 rounded-lg px-2 sm:px-3 text-xs font-medium text-orange-600 transition-colors hover:bg-orange-50 dark:hover:bg-orange-900/20"

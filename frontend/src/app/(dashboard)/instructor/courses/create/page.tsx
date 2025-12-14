@@ -40,7 +40,7 @@ interface Lesson {
   tempId: string;
   title: string;
   description: string;
-  type: 'VIDEO' | 'ARTICLE';
+  type: 'VIDEO' | 'ARTICLE' | 'QUIZ' | 'ASSIGNMENT';
   duration: number;
   videoUrl?: string;
   articleContent?: string;
