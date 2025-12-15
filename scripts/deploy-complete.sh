@@ -36,7 +36,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Verify we're in the right directory
-if [ ! -f "package.json" ] || [ ! -d "backend" ] || [ ! -d "frontend" ]; then
+if [ ! -d "backend" ] || [ ! -d "frontend" ] || [ ! -d "scripts" ]; then
     echo -e "${RED}Error: Please run this script from the HACKTOLIVE root directory${NC}"
     exit 1
 fi
