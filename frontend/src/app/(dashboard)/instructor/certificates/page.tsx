@@ -49,7 +49,7 @@ export default function InstructorCertificatesPage() {
   const [processing, setProcessing] = useState<string | null>(null);
   const [showPerformanceModal, setShowPerformanceModal] = useState(false);
   const [selectedCertificateId, setSelectedCertificateId] = useState<string | null>(null);
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
   useEffect(() => {
     fetchCertificates();

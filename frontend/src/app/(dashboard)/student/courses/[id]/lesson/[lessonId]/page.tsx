@@ -141,7 +141,7 @@ export default function StudentLessonPage() {
   const [submissionText, setSubmissionText] = useState("");
   const [submissionUrl, setSubmissionUrl] = useState("");
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
   useEffect(() => {
     if (lessonId && courseId) {

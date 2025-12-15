@@ -34,7 +34,7 @@ export default function StudentPerformanceModal({
 }: PerformanceModalProps) {
   const [loading, setLoading] = useState(true);
   const [performance, setPerformance] = useState<any>(null);
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
   useEffect(() => {
     if (isOpen && certificateId) {

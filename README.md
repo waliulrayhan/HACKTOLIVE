@@ -1,197 +1,250 @@
-# 🚀 HACKTOLIVE
+# 🚀 HACKTOLIVE - Cybersecurity Learning Platform
 
-Full-stack web application built with **NestJS** (Backend) and **Next.js** (Frontend).
+A comprehensive cybersecurity education platform with courses, certificates, quizzes, and interactive learning.
+
+## 🎯 Live Application
+
+- **Website**: https://hacktolive.io
+- **API**: https://api.hacktolive.io
+- **API Documentation**: https://api.hacktolive.io/api
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
 - [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
+- [Features](#features)
 - [Getting Started](#getting-started)
 - [Development](#development)
-- [Environment Variables](#environment-variables)
-- [Contributing](#contributing)
+- [Deployment](#deployment)
+- [Documentation](#documentation)
 
-## 🎯 Overview
+## 🛠️ Tech Stack
 
-HACKTOLIVE is a modern full-stack application featuring:
-- **Backend**: RESTful API built with NestJS and Prisma ORM
-- **Frontend**: Server-side rendered React application with Next.js and TailwindCSS
-- **Database**: MySQL (Hostinger)
+**Frontend:**
+- Next.js 16 (React 19)
+- TypeScript
+- Chakra UI
+- TailwindCSS
 
-## 🛠 Tech Stack
+**Backend:**
+- NestJS
+- Prisma ORM
+- MySQL 8.0
+- JWT Authentication
+- File Upload (Multer)
 
-### Backend
-- **Framework**: NestJS
-- **Database ORM**: Prisma
-- **Database**: MySQL
-- **Language**: TypeScript
-- **Runtime**: Node.js 20
+**Infrastructure:**
+- VPS: Hostinger Ubuntu 24.04
+- Web Server: Nginx
+- Process Manager: PM2
+- SSL: Let's Encrypt
 
-### Frontend
-- **Framework**: Next.js 14+
-- **Language**: TypeScript
-- **Styling**: TailwindCSS
+## ✨ Features
 
-## 📁 Project Structure
+- 🔐 JWT Authentication & Authorization
+- 👥 Multi-role system (Admin, Instructor, Student)
+- 📚 Course Management
+- 📝 Quiz & Assessment System
+- 🏆 Certificate Generation
+- 📊 Progress Tracking
+- 💬 Reviews & Ratings
+- 📤 File Upload (Images, Documents)
+- 🎓 Instructor Management
+- 📈 Admin Dashboard
+
+## � Project Structure
 
 ```
 HACKTOLIVE/
 ├── backend/              # NestJS backend application
-│   ├── src/             # Source code
+│   ├── src/
+│   │   ├── academy/     # Academy features (courses, quizzes, certificates)
+│   │   ├── auth/        # Authentication & authorization
+│   │   ├── admin/       # Admin management
+│   │   ├── instructor/  # Instructor management
+│   │   ├── student/     # Student management
+│   │   ├── users/       # User management
+│   │   └── upload/      # File upload service
 │   ├── prisma/          # Database schema and migrations
-│   ├── .env            # Backend environment variables
-│   └── package.json     # Backend dependencies
+│   └── package.json
 ├── frontend/            # Next.js frontend application
-│   ├── src/            # Source code
-│   ├── public/         # Static assets
-│   ├── .env.local      # Frontend environment variables
-│   └── package.json    # Frontend dependencies
-├── .gitignore         # Git ignore rules
-└── README.md          # This file
+│   ├── src/
+│   │   ├── app/         # Next.js app router
+│   │   ├── components/  # Reusable components
+│   │   ├── context/     # React contexts
+│   │   └── types/       # TypeScript types
+│   └── package.json
+└── COMPLETE_DEPLOYMENT_REFERENCE.md  # Full deployment guide
 ```
+
+## 🚀 Getting Started
+│   └── package.json    # Frontend dependencies
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- **Node.js**: v20+ ([Download](https://nodejs.org/))
-- **Git**: Latest version
+- Node.js 20+
+- MySQL 8.0+
+- pnpm (recommended) or npm
 
-### Quick Setup
+### Local Development Setup
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/ShabikunShahria/HACKTOLIVE.git
-   cd HACKTOLIVE
-   ```
+**1. Clone the repository**
+```bash
+git clone https://github.com/YOUR_USERNAME/HACKTOLIVE.git
+cd HACKTOLIVE
+```
 
-2. **Configure Backend**
-   ```bash
-   cd backend
-   npm install
-   
-   # Edit .env file with your database credentials
-   # The file is already configured with the Hostinger MySQL database
-   ```
+**2. Backend Setup**
+```bash
+cd backend
+pnpm install
 
-3. **Configure Frontend**
-   ```bash
-   cd ../frontend
-   npm install
-   
-   # Edit .env.local file with your API URL
-   # Already configured for local development
-   ```
+# Copy environment file
+cp .env.example .env
 
-4. **Start Development Servers**
-   
-   **Terminal 1 - Backend:**
-   ```bash
-   cd backend
-   npm run start:dev
-   ```
-   
-   **Terminal 2 - Frontend:**
-   ```bash
-   cd frontend
-   npm run dev
-   ```
+# Configure your DATABASE_URL in .env
+# DATABASE_URL="mysql://user:password@localhost:3306/hacktolive"
 
-5. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend: http://localhost:3001
+# Generate Prisma client and sync database
+npx prisma generate
+npx prisma db push
+
+# Start backend (http://localhost:4000)
+pnpm run dev
+```
+
+**3. Frontend Setup**
+```bash
+cd frontend
+npm install
+
+# Copy environment file
+cp .env.example .env
+
+# Configure your API URL in .env
+# NEXT_PUBLIC_API_URL=http://localhost:4000
+
+# Start frontend (http://localhost:3000)
+npm run dev
+```
+
+**4. Access the application**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:4000
+- API Docs: http://localhost:4000/api
 
 ## 💻 Development
 
-### Backend Development
+### Backend Commands
 
 ```bash
 cd backend
 
-# Development mode with hot reload
-npm run start:dev
+# Development with hot reload
+pnpm run dev
 
-# Production mode
-npm run start:prod
+# Production build
+pnpm run build
+pnpm run start
 
-# Run Prisma migrations
-npx prisma migrate dev
+# Database management
+npx prisma generate         # Generate Prisma client
+npx prisma db push          # Sync schema with database
+npx prisma studio           # Open database GUI
 
-# Generate Prisma client
-npx prisma generate
-
-# Open Prisma Studio (Database GUI)
-npx prisma studio
+# Testing
+pnpm run test              # Unit tests
+pnpm run test:e2e          # E2E tests
 ```
 
-### Frontend Development
+### Frontend Commands
 
 ```bash
 cd frontend
 
-# Development mode
+# Development server
 npm run dev
 
-# Build for production
+# Production build
 npm run build
-
-# Start production server
 npm run start
 
-# Run linting
+# Linting
 npm run lint
+```
+
+## 🌐 Deployment
+
+The application is deployed on Hostinger VPS. For complete deployment instructions, see [COMPLETE_DEPLOYMENT_REFERENCE.md](COMPLETE_DEPLOYMENT_REFERENCE.md).
+
+### Quick Update Process
+
+After making changes locally and pushing to GitHub:
+
+
+```bash
+# SSH to server and run update script
+ssh root@72.62.71.250 '/var/www/hacktolive/quick-update.sh'
+```
+
+Or manually:
+```bash
+ssh root@72.62.71.250
+cd /var/www/hacktolive
+git pull
+cd backend && pnpm install && pnpm run build && pm2 restart hacktolive-backend
+cd ../frontend && npm install && pm2 restart hacktolive-frontend
 ```
 
 ## 🔐 Environment Variables
 
-Copy `.env.example` to `.env` and configure:
-
+### Backend (.env)
 ```env
-# Database
-DATABASE_URL=postgresql://user:pass@host:5432/db?schema=public
-
-# Backend
-PORT=3001
-NODE_ENV=development
-API_PREFIX=api/v1
-JWT_SECRET=your-secret-key
-
-# Frontend
-NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
+DATABASE_URL="mysql://root:password@localhost:3306/hacktolive"
+JWT_SECRET="your-super-secret-jwt-key"
+FRONTEND_URL="https://hacktolive.io"
+PORT=4000
+NODE_ENV=production
 ```
 
-See `.env.example` for complete list of variables.
+### Frontend (.env)
+```env
+NEXT_PUBLIC_API_URL=https://api.hacktolive.io
+NEXT_PUBLIC_SITE_URL=https://hacktolive.io
+```
 
-## 🤝 Contributing
+See [.env.example](.env.example) for complete list.
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+## 📚 Documentation
+
+- [Complete Deployment Reference](COMPLETE_DEPLOYMENT_REFERENCE.md) - Full VPS setup and deployment guide
+- [Authentication Guide](AUTHENTICATION_GUIDE.md) - JWT auth implementation
+- [Course Completion](COURSE_COMPLETION_IMPLEMENTATION.md) - Course progress tracking
+- [Security Guidelines](SECURITY.md) - Security best practices
+
+## 🔒 Security Features
+
+- JWT-based authentication
+- Role-based access control (RBAC)
+- Password hashing with bcrypt
+- HTTPS/SSL encryption
+- Environment-based secrets
+- Input validation & sanitization
+- SQL injection prevention (Prisma ORM)
 
 ## 📝 License
 
-This project is private and proprietary.
+Private project - All rights reserved
 
-## 👥 Team
+## 👨‍💻 Developer
 
-- **Repository Owner**: [Md. Waliul Islam Rayhan](https://github.com/waliulrayhan)
+Built and maintained by a solo developer
 
 ---
 
-**Need Help?** Open an issue or contact the team.
-### Backend (.env)
-
-```env
-# Database Configuration
-DATABASE_URL="mysql://username:password@host:3306/database_name"
-
-# JWT Configuration
-JWT_SECRET="your-super-secret-jwt-key-change-in-production"
-JWT_EXPIRES_IN="7d"
+**Live Application**: https://hacktolive.io  
+**Need Help?** Check the documentation or open an issue.
 
 # Server Configuration
 PORT=3001

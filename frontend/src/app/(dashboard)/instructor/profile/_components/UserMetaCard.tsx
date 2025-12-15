@@ -198,7 +198,7 @@ export default function UserMetaCard() {
 
   const cityState = [user?.city, user?.state].filter(Boolean).join(", ");
   const location = [cityState, user?.country].filter(Boolean).join(", ") || "Not set";
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
   return (
     <div className="p-5 border border-gray-200 rounded-md dark:border-gray-800 lg:p-6">

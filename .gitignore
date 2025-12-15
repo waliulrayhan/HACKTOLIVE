@@ -18,6 +18,7 @@ out/
 .env*.local
 .env.production
 .env.development
+.env.docker
 
 # Logs
 logs
@@ -41,7 +42,14 @@ lerna-debug.log*
 # Docker
 *.tar
 docker-compose.override.yml
+docker-compose.yml
 exports/*.tar
+.dockerignore
+
+# Deployment (scripts on server)
+scripts/
+nginx/
+ecosystem.config.js
 
 # Database
 *.db
