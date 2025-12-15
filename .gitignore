@@ -47,7 +47,20 @@ exports/*.tar
 *.db
 *.sqlite
 *.sqlite3
-prisma/migrations/
+
+# Uploads
+uploads/
+!uploads/.gitkeep
+
+# Backups
+*.backup
+*.bak
+*.sql
+*.sql.gz
+/var/backups/
+
+# Scripts logs
+*.sh.log
 
 # Temporary files
 *.tmp
