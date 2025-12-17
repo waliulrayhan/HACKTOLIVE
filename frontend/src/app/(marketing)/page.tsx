@@ -222,7 +222,7 @@ const HeroSection: React.FC = () => {
                 lineHeight="1.2"
                 textAlign={{ base: 'center', md: 'left' }}
               >
-                Master Cybersecurity
+                Momo
                 <Br />
                 Defend Bangladesh
               </Heading>
