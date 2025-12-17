@@ -28,7 +28,6 @@ import {
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
 import Badge from "@/components/ui/badge/Badge";
-import Avatar from "@/components/ui/avatar/Avatar";
 import {
   Table,
   TableBody,
@@ -61,6 +60,52 @@ interface PaginationData {
   limit: number;
   totalPages: number;
 }
+
+interface UserAvatarProps {
+  src?: string | null;
+  alt?: string;
+  containerClassName?: string;
+  iconClassName?: string;
+}
+
+const UserAvatar: React.FC<UserAvatarProps> = ({
+  src,
+  alt = "User",
+  containerClassName = "h-6 w-6",
+  iconClassName = "h-3.5 w-3.5",
+}) => {
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setHasError(false);
+  }, [src]);
+
+  if (!src || hasError) {
+    return (
+      <div
+        className={`flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 ${containerClassName}`}
+      >
+        <HiOutlineUser className={`${iconClassName} text-gray-500 dark:text-gray-400`} />
+      </div>
+    );
+  }
+
+  return (
+    <div className={`overflow-hidden rounded-full ${containerClassName}`}>
+      <img
+        src={src}
+        alt={alt}
+        className="h-full w-full object-cover"
+        onError={() => setHasError(true)}
+      />
+    </div>
+  );
+};
+
+const getUserAvatarSrc = (user: User) => {
+  const avatarPath = user.student?.avatar ?? user.instructor?.avatar ?? user.avatar;
+  return avatarPath ? `${process.env.NEXT_PUBLIC_API_URL}${avatarPath}` : undefined;
+};
 
 export default function UsersManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -550,11 +595,11 @@ export default function UsersManagementPage() {
                   >
                     <TableCell className="px-3 sm:px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <img 
-                          src={`${process.env.NEXT_PUBLIC_API_URL}${user.student?.avatar || user.instructor?.avatar || user.avatar}` || '/images/user/user-01.png'} 
+                        <UserAvatar
+                          src={getUserAvatarSrc(user)}
                           alt={user.name || 'User'}
-                          className="h-6 w-6 sm:h-7 sm:w-7 rounded-full object-cover"
-                          onError={(e) => { e.currentTarget.src = '/images/user/user-01.png'; }}
+                          containerClassName="h-6 w-6 sm:h-7 sm:w-7"
+                          iconClassName="h-3.5 w-3.5 sm:h-4 sm:w-4"
                         />
                         <div className="min-w-0">
                           <div className="text-xs sm:text-sm text-gray-900 dark:text-white truncate">
@@ -911,11 +956,11 @@ export default function UsersManagementPage() {
             <div className="px-6 pb-6">
               {/* User Avatar and Name */}
               <div className="flex items-center gap-4 pb-5 border-b border-gray-200 dark:border-gray-800">
-                <img 
-                  src={`${process.env.NEXT_PUBLIC_API_URL}${selectedUser.student?.avatar || selectedUser.instructor?.avatar || selectedUser.avatar}` || '/images/user/user-01.png'} 
+                <UserAvatar
+                  src={getUserAvatarSrc(selectedUser)}
                   alt={selectedUser.name || 'User'}
-                  className="h-16 w-16 rounded-full object-cover shrink-0"
-                  onError={(e) => { e.currentTarget.src = '/images/user/user-01.png'; }}
+                  containerClassName="h-16 w-16"
+                  iconClassName="h-7 w-7"
                 />
                 <div className="flex-1 min-w-0">
                   <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">

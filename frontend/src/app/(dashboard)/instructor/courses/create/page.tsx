@@ -26,6 +26,7 @@ import {
   HiOutlineClipboardList,
   HiOutlineX,
   HiOutlineCamera,
+  HiOutlineExclamationCircle,
 } from "react-icons/hi";
 
 interface Module {
@@ -104,6 +105,43 @@ export default function CreateCoursePage() {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');
       setFormData(prev => ({ ...prev, slug }));
+    }
+
+    // Clear related errors when delivery mode changes
+    if (name === 'deliveryMode') {
+      const newErrors = { ...errors };
+      delete newErrors.liveSchedule;
+      delete newErrors.startDate;
+      delete newErrors.endDate;
+      delete newErrors.meetingLink;
+      setErrors(newErrors);
+      
+      // Reset live course fields if switching to RECORDED
+      if (value === 'RECORDED') {
+        setFormData(prev => ({
+          ...prev,
+          liveSchedule: '',
+          startDate: '',
+          endDate: '',
+          maxStudents: 0,
+          meetingLink: '',
+        }));
+      }
+    }
+
+    // Reset price to 0 when tier is FREE
+    if (name === 'tier' && value === 'FREE') {
+      setFormData(prev => ({ ...prev, price: 0 }));
+      const newErrors = { ...errors };
+      delete newErrors.price;
+      setErrors(newErrors);
+    }
+
+    // Clear specific field error when user starts typing
+    if (errors[name]) {
+      const newErrors = { ...errors };
+      delete newErrors[name];
+      setErrors(newErrors);
     }
   };
 
@@ -184,6 +222,32 @@ export default function CreateCoursePage() {
       if (!formData.level.trim()) newErrors.level = "Level is required";
       if (!formData.deliveryMode.trim()) newErrors.deliveryMode = "Delivery mode is required";
       if (formData.duration <= 0) newErrors.duration = "Duration must be greater than 0";
+      
+      // Validate live course specific fields
+      if (formData.deliveryMode === 'LIVE') {
+        if (!formData.liveSchedule.trim()) newErrors.liveSchedule = "Live schedule is required for live courses";
+        if (!formData.startDate.trim()) newErrors.startDate = "Start date is required for live courses";
+        if (!formData.endDate.trim()) newErrors.endDate = "End date is required for live courses";
+        if (!formData.meetingLink.trim()) {
+          newErrors.meetingLink = "Meeting link is required for live courses";
+        } else {
+          // Validate URL format
+          try {
+            new URL(formData.meetingLink);
+          } catch {
+            newErrors.meetingLink = "Please enter a valid meeting URL";
+          }
+        }
+        
+        // Validate date logic
+        if (formData.startDate && formData.endDate) {
+          const start = new Date(formData.startDate);
+          const end = new Date(formData.endDate);
+          if (end <= start) {
+            newErrors.endDate = "End date must be after start date";
+          }
+        }
+      }
     }
 
     if (step === 2) {
@@ -296,10 +360,21 @@ export default function CreateCoursePage() {
       const token = localStorage.getItem('token');
 
       // Prepare course data
-      const courseData = {
-        ...formData,
+      const courseData: any = {
+        title: formData.title,
+        slug: formData.slug,
+        shortDescription: formData.shortDescription,
+        description: formData.description,
+        category: formData.category,
+        level: formData.level,
+        tier: formData.tier,
+        deliveryMode: formData.deliveryMode,
         price: parseFloat(formData.price.toString()),
         duration: parseInt(formData.duration.toString()),
+        learningOutcomes: formData.learningOutcomes,
+        requirements: formData.requirements,
+        tags: formData.tags,
+        thumbnail: formData.thumbnail,
         modules: modules.map(m => ({
           title: m.title,
           description: m.description,
@@ -315,6 +390,15 @@ export default function CreateCoursePage() {
           }))
         }))
       };
+
+      // Add live course specific fields
+      if (formData.deliveryMode === 'LIVE') {
+        courseData.liveSchedule = formData.liveSchedule;
+        courseData.startDate = formData.startDate;
+        courseData.endDate = formData.endDate;
+        courseData.maxStudents = parseInt(formData.maxStudents.toString()) || 0;
+        courseData.meetingLink = formData.meetingLink;
+      }
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/instructor/courses`, {
         method: 'POST',
@@ -397,6 +481,25 @@ export default function CreateCoursePage() {
         {/* Step 1: Basic Info */}
         {currentStep === 1 && (
           <div className="space-y-5">
+            {/* Validation Errors Summary */}
+            {Object.keys(errors).length > 0 && (
+              <div className="rounded-lg bg-red-50 border border-red-200 p-3 sm:p-4 dark:bg-red-900/20 dark:border-red-800/30">
+                <div className="flex gap-2">
+                  <HiOutlineExclamationCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-red-800 dark:text-red-300 mb-1">
+                      Please fix the following errors:
+                    </p>
+                    <ul className="list-disc list-inside text-xs text-red-700 dark:text-red-400 space-y-0.5">
+                      {Object.values(errors).map((error, index) => (
+                        <li key={index}>{error}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-white/5">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/15">
                 <HiOutlineAcademicCap className="h-5 w-5 text-brand-600 dark:text-brand-400" />
@@ -638,6 +741,17 @@ export default function CreateCoursePage() {
               {formData.deliveryMode === 'LIVE' && (
                 <>
                   <div className="md:col-span-2">
+                    <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 dark:bg-amber-900/20 dark:border-amber-800/30 mb-4">
+                      <div className="flex gap-2">
+                        <HiOutlineInformationCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                        <p className="text-xs text-amber-800 dark:text-amber-300">
+                          Live course settings: Configure schedule, dates, and meeting details for your live sessions.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Live Schedule <span className="text-red-500">*</span>
                     </label>
@@ -647,8 +761,13 @@ export default function CreateCoursePage() {
                       value={formData.liveSchedule}
                       onChange={handleInputChange}
                       placeholder="e.g., Every Monday and Wednesday at 7:00 PM EST"
-                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                        errors.liveSchedule
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      }`}
                     />
+                    {errors.liveSchedule && <p className="mt-1.5 text-xs text-red-500">{errors.liveSchedule}</p>}
                   </div>
 
                   <div>
@@ -660,8 +779,13 @@ export default function CreateCoursePage() {
                       name="startDate"
                       value={formData.startDate}
                       onChange={handleInputChange}
-                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                        errors.startDate
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      }`}
                     />
+                    {errors.startDate && <p className="mt-1.5 text-xs text-red-500">{errors.startDate}</p>}
                   </div>
 
                   <div>
@@ -673,8 +797,13 @@ export default function CreateCoursePage() {
                       name="endDate"
                       value={formData.endDate}
                       onChange={handleInputChange}
-                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                        errors.endDate
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      }`}
                     />
+                    {errors.endDate && <p className="mt-1.5 text-xs text-red-500">{errors.endDate}</p>}
                   </div>
 
                   <div>
@@ -690,6 +819,31 @@ export default function CreateCoursePage() {
                       placeholder="Leave 0 for unlimited"
                       className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                     />
+                    <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                      0 = unlimited students
+                    </p>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Meeting Link <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="url"
+                      name="meetingLink"
+                      value={formData.meetingLink}
+                      onChange={handleInputChange}
+                      placeholder="e.g., https://zoom.us/j/123456789 or https://meet.google.com/xxx-xxxx-xxx"
+                      className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                        errors.meetingLink
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      }`}
+                    />
+                    {errors.meetingLink && <p className="mt-1.5 text-xs text-red-500">{errors.meetingLink}</p>}
+                    <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                      Provide the virtual meeting link (Zoom, Google Meet, Microsoft Teams, etc.) where live sessions will be conducted.
+                    </p>
                   </div>
                 </>
               )}
@@ -742,6 +896,25 @@ export default function CreateCoursePage() {
         {/* Step 2: Pricing */}
         {currentStep === 2 && (
           <div className="space-y-5">
+            {/* Validation Errors Summary */}
+            {Object.keys(errors).length > 0 && (
+              <div className="rounded-lg bg-red-50 border border-red-200 p-3 sm:p-4 dark:bg-red-900/20 dark:border-red-800/30">
+                <div className="flex gap-2">
+                  <HiOutlineExclamationCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-red-800 dark:text-red-300 mb-1">
+                      Please fix the following errors:
+                    </p>
+                    <ul className="list-disc list-inside text-xs text-red-700 dark:text-red-400 space-y-0.5">
+                      {Object.values(errors).map((error, index) => (
+                        <li key={index}>{error}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-white/5">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success-100 dark:bg-success-500/15">
                 <HiOutlineCurrencyDollar className="h-5 w-5 text-success-600 dark:text-success-500" />
@@ -824,6 +997,25 @@ export default function CreateCoursePage() {
         {/* Step 3: Curriculum */}
         {currentStep === 3 && (
           <div className="space-y-5">
+            {/* Validation Errors Summary */}
+            {Object.keys(errors).length > 0 && (
+              <div className="rounded-lg bg-red-50 border border-red-200 p-3 sm:p-4 dark:bg-red-900/20 dark:border-red-800/30">
+                <div className="flex gap-2">
+                  <HiOutlineExclamationCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-red-800 dark:text-red-300 mb-1">
+                      Please fix the following errors:
+                    </p>
+                    <ul className="list-disc list-inside text-xs text-red-700 dark:text-red-400 space-y-0.5">
+                      {Object.values(errors).map((error, index) => (
+                        <li key={index}>{error}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-white/5">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-500/15">
@@ -1089,6 +1281,10 @@ export default function CreateCoursePage() {
                       <dd className="font-medium text-gray-900 dark:text-white capitalize">{formData.level.toLowerCase()}</dd>
                     </div>
                     <div>
+                      <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Delivery Mode</dt>
+                      <dd className="font-medium text-gray-900 dark:text-white capitalize">{formData.deliveryMode.toLowerCase()}</dd>
+                    </div>
+                    <div>
                       <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Duration</dt>
                       <dd className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
                         <HiOutlineClock className="h-3.5 w-3.5 text-gray-400" />
@@ -1106,6 +1302,45 @@ export default function CreateCoursePage() {
                         {formData.tier === 'FREE' ? 'Free' : `${formData.price} Tk`}
                       </dd>
                     </div>
+                    {formData.deliveryMode === 'LIVE' && (
+                      <>
+                        <div className="sm:col-span-2">
+                          <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Live Schedule</dt>
+                          <dd className="font-medium text-gray-900 dark:text-white">{formData.liveSchedule}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Start Date</dt>
+                          <dd className="font-medium text-gray-900 dark:text-white">
+                            {formData.startDate ? new Date(formData.startDate).toLocaleDateString() : 'Not set'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">End Date</dt>
+                          <dd className="font-medium text-gray-900 dark:text-white">
+                            {formData.endDate ? new Date(formData.endDate).toLocaleDateString() : 'Not set'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Max Students</dt>
+                          <dd className="font-medium text-gray-900 dark:text-white">
+                            {formData.maxStudents === 0 ? 'Unlimited' : formData.maxStudents}
+                          </dd>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Meeting Link</dt>
+                          <dd className="font-medium text-gray-900 dark:text-white break-all">
+                            <a 
+                              href={formData.meetingLink} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 underline"
+                            >
+                              {formData.meetingLink}
+                            </a>
+                          </dd>
+                        </div>
+                      </>
+                    )}
                   </dl>
                 </div>
               </div>

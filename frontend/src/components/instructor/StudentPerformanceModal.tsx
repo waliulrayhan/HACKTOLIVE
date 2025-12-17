@@ -310,7 +310,7 @@ export default function StudentPerformanceModal({
 
         {/* Footer Actions */}
         <div className="sticky bottom-0 flex items-center justify-end gap-3 border-t border-gray-200 bg-white px-6 py-4 dark:border-white/5 dark:bg-gray-900">
-          <Button onClick={onClose} variant="secondary" size="md">
+          <Button onClick={onClose} variant="outline" size="md">
             Cancel
           </Button>
           <Button
@@ -318,9 +318,10 @@ export default function StudentPerformanceModal({
               onReject(certificateId);
               onClose();
             }}
-            variant="danger"
+            variant="outline"
             size="md"
             startIcon={<HiOutlineXCircle className="h-4 w-4" />}
+            className="border-red-500 text-red-600 hover:bg-red-50 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-500/10"
           >
             Reject
           </Button>

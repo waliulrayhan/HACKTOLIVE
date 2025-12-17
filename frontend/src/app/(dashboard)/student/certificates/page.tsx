@@ -119,7 +119,7 @@ export default function CertificatesPage() {
         );
       case "REJECTED":
         return (
-          <Badge color="danger">
+          <Badge color="error">
             <div className="flex items-center gap-1">
               <HiOutlineXCircle className="h-3.5 w-3.5" />
               Rejected

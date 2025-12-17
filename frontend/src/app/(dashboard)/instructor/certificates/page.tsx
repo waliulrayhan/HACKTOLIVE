@@ -172,7 +172,7 @@ export default function InstructorCertificatesPage() {
         );
       case "REJECTED":
         return (
-          <Badge color="danger">
+          <Badge color="error">
             <div className="flex items-center gap-1">
               <HiOutlineXCircle className="h-3.5 w-3.5" />
               Rejected
@@ -383,10 +383,10 @@ export default function InstructorCertificatesPage() {
                         <Button
                           onClick={() => handleRejectCertificate(cert.id)}
                           disabled={processing === cert.id}
-                          variant="danger"
+                          variant="outline"
                           size="sm"
                           startIcon={<HiOutlineXCircle className="h-4 w-4" />}
-                          className="flex-1 sm:flex-none"
+                          className="flex-1 sm:flex-none border-red-500 text-red-600 hover:bg-red-50 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-500/10"
                         >
                           Reject
                         </Button>
