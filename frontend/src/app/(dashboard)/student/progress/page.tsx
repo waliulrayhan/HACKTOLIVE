@@ -212,21 +212,21 @@ export default function ProgressPage() {
                 onClick={() => router.push(`/student/courses/${item.course.id}`)}
               >
                 <div className="flex items-start gap-3 sm:gap-4">
-                  {/* Thumbnail */}
-                  <div className="relative h-20 w-28 sm:h-24 sm:w-32 shrink-0 overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
+                    {/* Thumbnail (2:1 aspect ratio) */}
+                    <div className="relative w-28 sm:w-32 aspect-[2/1] shrink-0 overflow-hidden rounded-md bg-gray-200 dark:bg-gray-700">
                     {item.course.thumbnail ? (
                       <Image
-                        src={item.course.thumbnail}
-                        alt={item.course.title}
-                        fill
-                        className="object-cover"
+                      src={item.course.thumbnail}
+                      alt={item.course.title}
+                      fill
+                      className="object-cover"
                       />
                     ) : (
-                      <div className="flex h-full items-center justify-center">
-                        <HiOutlineAcademicCap className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 dark:text-gray-500" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                      <HiOutlineAcademicCap className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 dark:text-gray-500" />
                       </div>
                     )}
-                  </div>
+                    </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
