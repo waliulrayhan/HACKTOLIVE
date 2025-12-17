@@ -248,43 +248,43 @@ export default function StudentDashboard() {
                   key={enrollment.id}
                   className="flex items-center gap-3 p-3 sm:p-4 border border-gray-200 rounded-lg dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 transition-colors cursor-pointer"
                   onClick={() =>
-                    router.push(`/student/courses/${enrollment.course.id}`)
+                  router.push(`/student/courses/${enrollment.course.id}`)
                   }
                 >
                   {enrollment.course.thumbnail ? (
-                    <Image
-                      src={enrollment.course.thumbnail}
-                      alt={enrollment.course.title}
-                      width={64}
-                      height={64}
-                      className="rounded-md object-cover w-16 h-16"
-                    />
+                  <Image
+                    src={enrollment.course.thumbnail}
+                    alt={enrollment.course.title}
+                    width={120}
+                    height={60}
+                    className="rounded-md object-cover w-32 h-16"
+                  />
                   ) : (
-                    <div className="h-16 w-16 rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                      <HiOutlineAcademicCap className="h-8 w-8 text-gray-400 dark:text-gray-500" />
-                    </div>
+                  <div className="h-16 w-32 rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                    <HiOutlineAcademicCap className="h-8 w-8 text-gray-400 dark:text-gray-500" />
+                  </div>
                   )}
                   <div className="flex-1">
-                    <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white line-clamp-1">
-                      {enrollment.course.title}
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      {enrollment.course.instructor.name}
-                    </p>
-                    <div className="mt-2">
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-                        <div
-                          className="bg-brand-500 h-1.5 rounded-full transition-all"
-                          style={{ width: `${enrollment.progress}%` }}
-                        ></div>
-                      </div>
-                      <div className="flex items-center justify-between mt-1">
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                          {Math.round(enrollment.progress)}% complete
-                        </p>
-                        <HiOutlinePlay className="h-3.5 w-3.5 text-brand-500" />
-                      </div>
+                  <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white line-clamp-1">
+                    {enrollment.course.title}
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    {enrollment.course.instructor.name}
+                  </p>
+                  <div className="mt-2">
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                    <div
+                      className="bg-brand-500 h-1.5 rounded-full transition-all"
+                      style={{ width: `${enrollment.progress}%` }}
+                    ></div>
                     </div>
+                    <div className="flex items-center justify-between mt-1">
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      {Math.round(enrollment.progress)}% complete
+                    </p>
+                    <HiOutlinePlay className="h-3.5 w-3.5 text-brand-500" />
+                    </div>
+                  </div>
                   </div>
                 </div>
               ))
