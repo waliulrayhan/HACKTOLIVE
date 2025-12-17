@@ -573,110 +573,169 @@ export default function StudentLessonPage() {
               router.push(`/student/courses/${courseId}`);
             }
           }}
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
         >
-          <HiOutlineArrowLeft className="h-4 w-4" />
+          <HiOutlineArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           Back to Course
         </button>
       </div>
 
       {/* Lesson Header Card */}
-      <div className="rounded-md border border-gray-200 bg-white p-4 sm:p-6 dark:border-white/5 dark:bg-white/3">
-        <div className="flex flex-col gap-4">
-          {/* Header Top Section */}
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <div className="flex flex-wrap items-center gap-2 mb-3">
-                <Badge color={lesson.type === "VIDEO" ? "info" : "primary"}>
-                  <div className="flex items-center gap-1">
-                    {lesson.type === "VIDEO" ? (
-                      <HiOutlinePlay className="h-3.5 w-3.5" />
-                    ) : (
-                      <HiOutlineBookOpen className="h-3.5 w-3.5" />
-                    )}
-                    {lesson.type}
-                  </div>
-                </Badge>
-                <Badge color="light">
-                  <div className="flex items-center gap-1">
-                    <HiOutlineClock className="h-3.5 w-3.5" />
-                    {lesson.duration} min
-                  </div>
-                </Badge>
-                {isCompleted && (
-                  <Badge color="success">
-                    <div className="flex items-center gap-1">
-                      <HiOutlineCheckCircle className="h-3.5 w-3.5" />
-                      Completed
-                    </div>
-                  </Badge>
+      <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 mb-2">
+              <Badge color={lesson.type === "VIDEO" ? "info" : "primary"} size="sm">
+                {lesson.type === "VIDEO" ? (
+                  <HiOutlinePlay className="h-3 w-3" />
+                ) : (
+                  <HiOutlineBookOpen className="h-3 w-3" />
                 )}
-              </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                {lesson.title}
-              </h1>
-              {lesson.description && (
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-                  {lesson.description}
-                </p>
+                {lesson.type}
+              </Badge>
+              <Badge color="light" size="sm">
+                <HiOutlineClock className="h-3 w-3" />
+                {lesson.duration} min
+              </Badge>
+              {isCompleted && (
+                <Badge color="success" size="sm">
+                  <HiOutlineCheckCircle className="h-3 w-3" />
+                  Completed
+                </Badge>
               )}
             </div>
-
-            {!isCompleted && (
-              <Button
-                onClick={markAsComplete}
-                disabled={completing}
-                variant="primary"
-                size="sm"
-                className="shrink-0"
-                startIcon={<HiOutlineCheckCircle className="h-4 w-4" />}
-              >
-                {completing ? "Marking..." : "Mark Complete"}
-              </Button>
+            <h1 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1">
+              {lesson.title}
+            </h1>
+            {lesson.description && (
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                {lesson.description}
+              </p>
             )}
           </div>
 
-          {/* Course & Module Info */}
-          <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-200 dark:border-white/5">
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <HiOutlineAcademicCap className="h-4 w-4" />
-              <span>{lesson.module.course.title}</span>
-            </div>
-            <span className="text-gray-400">•</span>
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <HiOutlineBookOpen className="h-4 w-4" />
-              <span>{lesson.module.title}</span>
-            </div>
+          {!isCompleted && (
+            <Button
+              onClick={markAsComplete}
+              disabled={completing}
+              variant="primary"
+              size="sm"
+              className="shrink-0"
+              startIcon={<HiOutlineCheckCircle className="h-4 w-4" />}
+            >
+              {completing ? "Marking..." : "Mark as Complete"}
+            </Button>
+          )}
+        </div>
+
+        {/* Course & Module Info */}
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-200 dark:border-white/5">
+          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
+            <HiOutlineAcademicCap className="h-3.5 w-3.5" />
+            <span className="truncate">{lesson.module.course.title}</span>
+          </div>
+          <span className="text-gray-400">•</span>
+          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
+            <HiOutlineBookOpen className="h-3.5 w-3.5" />
+            <span className="truncate">{lesson.module.title}</span>
           </div>
         </div>
       </div>
+
+      {/* Quick Stats - Only show if lesson has quiz or assignment */}
+      {(hasQuiz || hasAssignment) && (
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
+          {hasQuiz && (
+            <>
+              <div className="rounded-md border border-gray-200 bg-white p-3 dark:border-white/5 dark:bg-white/3">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-info-100 dark:bg-info-500/15">
+                    <HiOutlineQuestionMarkCircle className="h-4 w-4 text-info-600 dark:text-info-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Quiz Questions</p>
+                    <p className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+                      {lesson.quizzes![0].questions?.length || 0}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="rounded-md border border-gray-200 bg-white p-3 dark:border-white/5 dark:bg-white/3">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-success-100 dark:bg-success-500/15">
+                    <HiOutlineStar className="h-4 w-4 text-success-600 dark:text-success-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Quiz Passing Score</p>
+                    <p className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+                      {lesson.quizzes![0].passingScore}%
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+          {hasAssignment && (
+            <>
+              <div className="rounded-md border border-gray-200 bg-white p-3 dark:border-white/5 dark:bg-white/3">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-warning-100 dark:bg-warning-500/15">
+                    <HiOutlineClipboardCheck className="h-4 w-4 text-warning-600 dark:text-warning-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Assignment</p>
+                    <p className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+                      {submission ? "Submitted" : "Pending"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {submission?.score !== null && submission?.score !== undefined && (
+                <div className="rounded-md border border-gray-200 bg-white p-3 dark:border-white/5 dark:bg-white/3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/15">
+                      <HiOutlineStar className="h-4 w-4 text-brand-600 dark:text-brand-500" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Your Score</p>
+                      <p className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+                        {submission.score}/{lesson.assignments![0].maxScore}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
 
       {/* Tab Navigation */}
       <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 overflow-hidden">
         <div className="flex border-b border-gray-200 dark:border-white/5 overflow-x-auto">
           <button
             onClick={() => setActiveTab("content")}
-            className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               activeTab === "content"
                 ? "border-brand-600 text-brand-600 bg-brand-50/50 dark:border-brand-400 dark:text-brand-400 dark:bg-brand-950/20"
                 : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-white/5"
             }`}
           >
-            <HiOutlineBookOpen className="h-5 w-5" />
+            <HiOutlineBookOpen className="h-4 w-4" />
             <span>Content</span>
           </button>
           {hasResources && (
             <button
               onClick={() => setActiveTab("resources")}
-              className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+              className={`flex items-center gap-1.5 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === "resources"
                   ? "border-brand-600 text-brand-600 bg-brand-50/50 dark:border-brand-400 dark:text-brand-400 dark:bg-brand-950/20"
                   : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-white/5"
               }`}
             >
-              <HiOutlinePaperClip className="h-5 w-5" />
+              <HiOutlinePaperClip className="h-4 w-4" />
               <span>Resources</span>
-              <span className="ml-1 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+              <span className="ml-0.5 inline-flex items-center rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-300">
                 {lesson.resources?.length}
               </span>
             </button>
@@ -684,36 +743,36 @@ export default function StudentLessonPage() {
           {hasQuiz && (
             <button
               onClick={() => setActiveTab("quiz")}
-              className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+              className={`flex items-center gap-1.5 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === "quiz"
                   ? "border-brand-600 text-brand-600 bg-brand-50/50 dark:border-brand-400 dark:text-brand-400 dark:bg-brand-950/20"
                   : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-white/5"
               }`}
             >
-              <HiOutlineQuestionMarkCircle className="h-5 w-5" />
+              <HiOutlineQuestionMarkCircle className="h-4 w-4" />
               <span>Quiz</span>
             </button>
           )}
           {hasAssignment && (
             <button
               onClick={() => setActiveTab("assignment")}
-              className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+              className={`flex items-center gap-1.5 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === "assignment"
                   ? "border-brand-600 text-brand-600 bg-brand-50/50 dark:border-brand-400 dark:text-brand-400 dark:bg-brand-950/20"
                   : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-white/5"
               }`}
             >
-              <HiOutlineClipboardCheck className="h-5 w-5" />
+              <HiOutlineClipboardCheck className="h-4 w-4" />
               <span>Assignment</span>
             </button>
           )}
         </div>
 
         {/* Tab Content */}
-        <div className="p-4 sm:p-6">
+        <div className="p-3 sm:p-4">
           {/* Content Tab */}
           {activeTab === "content" && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {hasVideoContent && (
                 <div className="aspect-video w-full overflow-hidden rounded-lg bg-gray-900">
                   <iframe
@@ -727,21 +786,21 @@ export default function StudentLessonPage() {
               )}
 
               {hasArticleContent && (
-                <div className="article-content">
+                <div className="article-content rounded-lg border border-gray-200 bg-gray-50 p-4 sm:p-5 dark:border-white/5 dark:bg-white/5">
                   <style dangerouslySetInnerHTML={{ __html: `
-                    .article-content h2 { font-size: 1.5em; font-weight: 700; margin: 1em 0 0.5em; color: #111827; }
+                    .article-content h2 { font-size: 1.25em; font-weight: 700; margin: 1em 0 0.5em; color: #111827; }
                     .dark .article-content h2 { color: #f3f4f6; }
-                    .article-content h3 { font-size: 1.25em; font-weight: 600; margin: 0.75em 0 0.5em; color: #111827; }
+                    .article-content h3 { font-size: 1.125em; font-weight: 600; margin: 0.75em 0 0.5em; color: #111827; }
                     .dark .article-content h3 { color: #f3f4f6; }
-                    .article-content p { margin-bottom: 0.75em; line-height: 1.6; color: #374151; }
+                    .article-content p { margin-bottom: 0.75em; line-height: 1.6; color: #374151; font-size: 0.875rem; }
                     .dark .article-content p { color: #d1d5db; }
-                    .article-content ul, .article-content ol { padding-left: 1.5rem; margin-bottom: 0.75em; color: #374151; }
+                    .article-content ul, .article-content ol { padding-left: 1.5rem; margin-bottom: 0.75em; color: #374151; font-size: 0.875rem; }
                     .dark .article-content ul, .dark .article-content ol { color: #d1d5db; }
                     .article-content li { margin-bottom: 0.25em; }
-                    .article-content blockquote { border-left: 4px solid #3b82f6; padding-left: 1rem; margin: 0 0 0.75em; font-style: italic; color: #6b7280; }
+                    .article-content blockquote { border-left: 3px solid #3b82f6; padding-left: 1rem; margin: 0 0 0.75em; font-style: italic; color: #6b7280; font-size: 0.875rem; }
                     .dark .article-content blockquote { color: #9ca3af; }
-                    .article-content pre { background: #1f2937; color: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 0.75em; }
-                    .article-content code { background: #f3f4f6; padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-size: 0.875em; color: #1f2937; }
+                    .article-content pre { background: #1f2937; color: #f3f4f6; padding: 0.75rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 0.75em; font-size: 0.8125rem; }
+                    .article-content code { background: #f3f4f6; padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-size: 0.8125em; color: #1f2937; }
                     .dark .article-content code { background: #374151; color: #f3f4f6; }
                     .article-content pre code { background: transparent; padding: 0; color: #f3f4f6; }
                     .article-content a { color: #3b82f6; text-decoration: underline; }
@@ -757,12 +816,16 @@ export default function StudentLessonPage() {
               )}
 
               {!hasVideoContent && !hasArticleContent && (
-                <div className="text-center py-12">
-                  <HiOutlineInformationCircle className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600 mb-3" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                <div className="text-center py-8 sm:py-12">
+                  <div className="flex justify-center mb-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-white/5">
+                      <HiOutlineInformationCircle className="h-6 w-6 text-gray-400 dark:text-gray-600" />
+                    </div>
+                  </div>
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-1">
                     Content Coming Soon
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                     The instructor hasn't added the lesson content yet.
                   </p>
                 </div>
@@ -772,42 +835,42 @@ export default function StudentLessonPage() {
 
           {/* Resources Tab */}
           {activeTab === "resources" && hasResources && (
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 gap-2">
               {lesson.resources!.map((resource) => (
                 <a
                   key={resource.id}
                   href={resource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-4 rounded-md border border-gray-200 bg-white hover:border-brand-500 hover:shadow-sm dark:border-white/5 dark:bg-white/3 dark:hover:border-brand-500 transition-all group"
+                  className="flex items-center gap-3 p-3 rounded-md border border-gray-200 bg-gray-50 hover:border-brand-500 hover:bg-white hover:shadow-sm dark:border-white/5 dark:bg-white/5 dark:hover:border-brand-500 dark:hover:bg-white/3 transition-all group"
                 >
-                  <div className="flex-shrink-0 flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-white/5 group-hover:bg-brand-50 dark:group-hover:bg-brand-950/20 transition-colors">
+                  <div className="flex-shrink-0 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-white dark:bg-white/10 group-hover:bg-brand-50 dark:group-hover:bg-brand-950/20 transition-colors border border-gray-200 dark:border-white/5">
                     {resource.type === "PDF" && (
-                      <HiOutlineDocumentText className="h-6 w-6 text-error-600 dark:text-error-400" />
+                      <HiOutlineDocumentText className="h-4 w-4 sm:h-5 sm:w-5 text-error-600 dark:text-error-400" />
                     )}
                     {resource.type === "LINK" && (
-                      <HiOutlineLink className="h-6 w-6 text-info-600 dark:text-info-400" />
+                      <HiOutlineLink className="h-4 w-4 sm:h-5 sm:w-5 text-info-600 dark:text-info-400" />
                     )}
                     {(resource.type === "ZIP" || resource.type === "DOC") && (
-                      <HiOutlineDownload className="h-6 w-6 text-success-600 dark:text-success-400" />
+                      <HiOutlineDownload className="h-4 w-4 sm:h-5 sm:w-5 text-success-600 dark:text-success-400" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate group-hover:text-brand-600 dark:group-hover:text-brand-400">
+                    <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white truncate group-hover:text-brand-600 dark:group-hover:text-brand-400">
                       {resource.name}
                     </p>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-center gap-2 mt-0.5">
                       <Badge color="light" size="sm">
                         {resource.type}
                       </Badge>
                       {resource.size && (
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
                           {resource.size}
                         </span>
                       )}
                     </div>
                   </div>
-                  <HiOutlineDownload className="h-5 w-5 text-gray-400 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors" />
+                  <HiOutlineDownload className="h-4 w-4 text-gray-400 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors flex-shrink-0" />
                 </a>
               ))}
             </div>
@@ -815,56 +878,64 @@ export default function StudentLessonPage() {
 
           {/* Quiz Tab */}
           {activeTab === "quiz" && hasQuiz && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {!quizStarted && !quizResult && (
                 <div>
-                  <div className="mb-6">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                  <div className="mb-4">
+                    <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white mb-1">
                       {lesson.quizzes![0].title}
                     </h3>
                     {lesson.quizzes![0].description && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         {lesson.quizzes![0].description}
                       </p>
                     )}
                   </div>
 
-                  {/* Quiz Stats Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-                    <div className="rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-info-100 dark:bg-info-500/15">
-                          <HiOutlineQuestionMarkCircle className="h-4 w-4 text-info-600 dark:text-info-500" />
+                  {/* Quiz Stats Cards - Compact Grid */}
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    <div className="rounded-md border border-gray-200 bg-gray-50 p-2.5 sm:p-3 dark:border-white/5 dark:bg-white/5">
+                      <div className="flex flex-col items-center text-center gap-1.5">
+                        <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-info-100 dark:bg-info-500/15">
+                          <HiOutlineQuestionMarkCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-info-600 dark:text-info-500" />
                         </div>
-                        <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Questions</span>
+                        <div>
+                          <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                            {lesson.quizzes![0].questions?.length || 0}
+                          </p>
+                          <p className="text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400">Questions</p>
+                        </div>
                       </div>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {lesson.quizzes![0].questions?.length || 0}
-                      </p>
                     </div>
 
-                    <div className="rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-warning-100 dark:bg-warning-500/15">
-                          <HiOutlineClock className="h-4 w-4 text-warning-600 dark:text-warning-500" />
+                    <div className="rounded-md border border-gray-200 bg-gray-50 p-2.5 sm:p-3 dark:border-white/5 dark:bg-white/5">
+                      <div className="flex flex-col items-center text-center gap-1.5">
+                        <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-warning-100 dark:bg-warning-500/15">
+                          <HiOutlineClock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-warning-600 dark:text-warning-500" />
                         </div>
-                        <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Time Limit</span>
+                        <div>
+                          <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                            {lesson.quizzes![0].timeLimit || "∞"}
+                          </p>
+                          <p className="text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400">
+                            {lesson.quizzes![0].timeLimit ? "Minutes" : "No Limit"}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {lesson.quizzes![0].timeLimit ? `${lesson.quizzes![0].timeLimit}m` : "None"}
-                      </p>
                     </div>
 
-                    <div className="rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-success-100 dark:bg-success-500/15">
-                          <HiOutlineStar className="h-4 w-4 text-success-600 dark:text-success-500" />
+                    <div className="rounded-md border border-gray-200 bg-gray-50 p-2.5 sm:p-3 dark:border-white/5 dark:bg-white/5">
+                      <div className="flex flex-col items-center text-center gap-1.5">
+                        <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-success-100 dark:bg-success-500/15">
+                          <HiOutlineStar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-success-600 dark:text-success-500" />
                         </div>
-                        <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Passing Score</span>
+                        <div>
+                          <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                            {lesson.quizzes![0].passingScore}%
+                          </p>
+                          <p className="text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400">Pass Score</p>
+                        </div>
                       </div>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {lesson.quizzes![0].passingScore}%
-                      </p>
                     </div>
                   </div>
 
@@ -872,6 +943,7 @@ export default function StudentLessonPage() {
                     <Button 
                       onClick={handleQuizStart} 
                       variant="primary"
+                      size="sm"
                       startIcon={<HiOutlinePlay className="h-4 w-4" />}
                     >
                       {quizAttempts.length > 0 ? "Retake Quiz" : "Start Quiz"}
@@ -880,29 +952,28 @@ export default function StudentLessonPage() {
 
                   {/* Previous Attempts */}
                   {quizAttempts.length > 0 && (
-                    <div className="mt-6">
-                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                    <div className="mt-4">
+                      <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2">
                         Previous Attempts
                       </h4>
                       <div className="space-y-2">
                         {quizAttempts.map((attempt, index) => (
                           <div
                             key={attempt.id}
-                            className="flex items-center justify-between p-4 rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3"
+                            className="flex items-center justify-between p-2.5 sm:p-3 rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3"
                           >
-                            <div className="flex items-center gap-3">
-                              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-white/5">
-                                <span className="text-sm font-bold text-gray-900 dark:text-white">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-gray-100 dark:bg-white/5">
+                                <span className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white">
                                   #{quizAttempts.length - index}
                                 </span>
                               </div>
                               <div>
-                                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
                                   Attempt {quizAttempts.length - index}
                                 </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
                                   {new Date(attempt.attemptedAt).toLocaleDateString('en-US', {
-                                    year: 'numeric',
                                     month: 'short',
                                     day: 'numeric',
                                     hour: '2-digit',
@@ -911,20 +982,20 @@ export default function StudentLessonPage() {
                                 </p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
                               <div className="text-right">
-                                <p className="text-lg font-bold text-gray-900 dark:text-white">
+                                <p className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">
                                   {attempt.score}%
                                 </p>
                               </div>
                               {attempt.passed ? (
-                                <Badge color="success">
-                                  <HiOutlineCheckCircle className="h-3.5 w-3.5" />
+                                <Badge color="success" size="sm">
+                                  <HiOutlineCheckCircle className="h-3 w-3" />
                                   Passed
                                 </Badge>
                               ) : (
-                                <Badge color="error">
-                                  <HiOutlineXCircle className="h-3.5 w-3.5" />
+                                <Badge color="error" size="sm">
+                                  <HiOutlineXCircle className="h-3 w-3" />
                                   Failed
                                 </Badge>
                               )}
@@ -940,22 +1011,22 @@ export default function StudentLessonPage() {
               {quizStarted && (
                 <div>
                   {timeRemaining !== null && (
-                    <div className="mb-6 p-4 rounded-md border-2 border-warning-200 bg-warning-50 dark:bg-warning-950/20 dark:border-warning-500/20">
+                    <div className="mb-4 p-3 rounded-md border-2 border-warning-200 bg-warning-50 dark:bg-warning-950/20 dark:border-warning-500/20">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <HiOutlineClock className="h-5 w-5 text-warning-600 dark:text-warning-500" />
-                          <span className="text-sm font-semibold text-warning-900 dark:text-warning-300">
+                          <HiOutlineClock className="h-4 w-4 sm:h-5 sm:w-5 text-warning-600 dark:text-warning-500" />
+                          <span className="text-xs sm:text-sm font-semibold text-warning-900 dark:text-warning-300">
                             Time Remaining
                           </span>
                         </div>
-                        <span className="text-xl font-bold text-warning-700 dark:text-warning-400">
+                        <span className="text-lg sm:text-xl font-bold text-warning-700 dark:text-warning-400">
                           {formatTime(timeRemaining)}
                         </span>
                       </div>
                     </div>
                   )}
 
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {lesson.quizzes![0].questions
                       .sort((a, b) => a.order - b.order)
                       .map((question, index) => {
@@ -967,20 +1038,20 @@ export default function StudentLessonPage() {
                         return (
                           <div
                             key={question.id}
-                            className="p-5 rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3"
+                            className="p-3 sm:p-4 rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3"
                           >
-                            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                              <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-brand-100 dark:bg-brand-500/15 text-brand-600 dark:text-brand-400 text-xs font-bold mr-2">
+                            <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                              <span className="inline-flex items-center justify-center h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-brand-100 dark:bg-brand-500/15 text-brand-600 dark:text-brand-400 text-[10px] sm:text-xs font-bold mr-2">
                                 {index + 1}
                               </span>
                               {question.question}
                             </h4>
                             {isMultipleSelect && (
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 pl-8">
+                              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-2 pl-7 sm:pl-8">
                                 Select all that apply
                               </p>
                             )}
-                            <div className="space-y-2 pl-8">
+                            <div className="space-y-1.5 sm:space-y-2 pl-7 sm:pl-8">
                               {options && options.length > 0 ? (
                                 options.map((option: string, optIndex: number) => {
                                   const isChecked = isMultipleSelect 
@@ -990,7 +1061,7 @@ export default function StudentLessonPage() {
                                   return (
                                     <label
                                       key={optIndex}
-                                      className={`flex items-start gap-3 p-3 rounded-md border cursor-pointer transition-all ${
+                                      className={`flex items-start gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-md border cursor-pointer transition-all ${
                                         isChecked
                                           ? "border-brand-500 bg-brand-50 dark:border-brand-500 dark:bg-brand-950/20"
                                           : "border-gray-200 hover:bg-gray-50 dark:border-white/5 dark:hover:bg-white/5"
@@ -1025,16 +1096,16 @@ export default function StudentLessonPage() {
                                             });
                                           }
                                         }}
-                                        className="mt-0.5 h-4 w-4 text-brand-600 focus:ring-brand-500 dark:bg-white/5 dark:border-white/10 rounded"
+                                        className="mt-0.5 h-3.5 w-3.5 sm:h-4 sm:w-4 text-brand-600 focus:ring-brand-500 dark:bg-white/5 dark:border-white/10 rounded"
                                       />
-                                      <span className="text-sm text-gray-900 dark:text-white flex-1">
+                                      <span className="text-xs sm:text-sm text-gray-900 dark:text-white flex-1">
                                         {option}
                                       </span>
                                     </label>
                                   );
                                 })
                               ) : (
-                                <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 italic">
                                   No options available for this question
                                 </p>
                               )}
@@ -1044,11 +1115,12 @@ export default function StudentLessonPage() {
                       })}
                   </div>
 
-                  <div className="mt-6 flex gap-2">
+                  <div className="mt-4 flex gap-2">
                     <Button
                       onClick={handleQuizSubmit}
                       disabled={quizSubmitting}
                       variant="primary"
+                      size="sm"
                       startIcon={<HiOutlineCheckCircle className="h-4 w-4" />}
                     >
                       {quizSubmitting ? "Submitting..." : "Submit Quiz"}
@@ -1059,39 +1131,39 @@ export default function StudentLessonPage() {
 
               {quizResult && (
                 <div>
-                  <div className={`p-8 rounded-md border-2 ${
+                  <div className={`p-5 sm:p-6 rounded-md border-2 ${
                     quizResult.passed
                       ? "border-success-200 bg-success-50 dark:border-success-500/20 dark:bg-success-950/20"
                       : "border-error-200 bg-error-50 dark:border-error-500/20 dark:bg-error-950/20"
                   }`}>
                     <div className="text-center">
-                      <div className="mb-4">
+                      <div className="mb-3">
                         {quizResult.passed ? (
                           <div className="flex justify-center">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success-100 dark:bg-success-500/15">
-                              <HiOutlineCheckCircle className="h-10 w-10 text-success-600 dark:text-success-400" />
+                            <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-success-100 dark:bg-success-500/15">
+                              <HiOutlineCheckCircle className="h-7 w-7 sm:h-8 sm:w-8 text-success-600 dark:text-success-400" />
                             </div>
                           </div>
                         ) : (
                           <div className="flex justify-center">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-error-100 dark:bg-error-500/15">
-                              <HiOutlineXCircle className="h-10 w-10 text-error-600 dark:text-error-400" />
+                            <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-error-100 dark:bg-error-500/15">
+                              <HiOutlineXCircle className="h-7 w-7 sm:h-8 sm:w-8 text-error-600 dark:text-error-400" />
                             </div>
                           </div>
                         )}
                       </div>
-                      <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2">
                         {quizResult.passed ? "Congratulations!" : "Keep Trying!"}
                       </h3>
-                      <div className="mb-4">
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      <div className="mb-3">
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">
                           Your Score
                         </p>
-                        <p className="text-4xl font-bold text-gray-900 dark:text-white">
+                        <p className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
                           {quizResult.score}%
                         </p>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         {quizResult.passed
                           ? "You've successfully passed the quiz!"
                           : `You need ${lesson.quizzes![0].passingScore}% to pass. Review the material and try again!`}
@@ -1100,8 +1172,8 @@ export default function StudentLessonPage() {
                   </div>
 
                   {/* Question Review */}
-                  <div className="mt-6 space-y-3">
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                  <div className="mt-4 space-y-2">
+                    <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2">
                       Question Review
                     </h4>
                     {lesson.quizzes![0].questions
@@ -1116,30 +1188,30 @@ export default function StudentLessonPage() {
                         return (
                           <div
                             key={question.id}
-                            className={`p-4 rounded-md border-2 ${
+                            className={`p-2.5 sm:p-3 rounded-md border-2 ${
                               isCorrect
                                 ? "border-success-200 bg-success-50 dark:border-success-500/20 dark:bg-success-950/20"
                                 : "border-error-200 bg-error-50 dark:border-error-500/20 dark:bg-error-950/20"
                             }`}
                           >
-                            <div className="flex items-start gap-3 mb-3">
-                              <div className={`flex h-8 w-8 items-center justify-center rounded-full flex-shrink-0 ${
+                            <div className="flex items-start gap-2 sm:gap-3">
+                              <div className={`flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full flex-shrink-0 ${
                                 isCorrect 
                                   ? "bg-success-100 dark:bg-success-500/15" 
                                   : "bg-error-100 dark:bg-error-500/15"
                               }`}>
                                 {isCorrect ? (
-                                  <HiOutlineCheckCircle className="h-5 w-5 text-success-600 dark:text-success-400" />
+                                  <HiOutlineCheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-success-600 dark:text-success-400" />
                                 ) : (
-                                  <HiOutlineXCircle className="h-5 w-5 text-error-600 dark:text-error-400" />
+                                  <HiOutlineXCircle className="h-4 w-4 sm:h-5 sm:w-5 text-error-600 dark:text-error-400" />
                                 )}
                               </div>
                               <div className="flex-1">
-                                <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                                  Question {index + 1}: {question.question}
+                                <h5 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-1.5">
+                                  Q{index + 1}: {question.question}
                                 </h5>
                                 
-                                <div className="space-y-2 text-sm">
+                                <div className="space-y-1.5 text-xs sm:text-sm">
                                   <div>
                                     <span className="font-medium text-gray-700 dark:text-gray-300">Your Answer: </span>
                                     <span className={isCorrect ? "text-success-700 dark:text-success-400" : "text-error-700 dark:text-error-400"}>
@@ -1149,7 +1221,7 @@ export default function StudentLessonPage() {
                                   
                                   {!isCorrect && (
                                     <div>
-                                      <span className="font-medium text-gray-700 dark:text-gray-300">Correct Answer: </span>
+                                      <span className="font-medium text-gray-700 dark:text-gray-300">Correct: </span>
                                       <span className="text-success-700 dark:text-success-400">
                                         {question.correctAnswer}
                                       </span>
@@ -1157,9 +1229,9 @@ export default function StudentLessonPage() {
                                   )}
                                   
                                   {question.explanation && (
-                                    <div className="mt-2 pt-2 border-t border-gray-200 dark:border-white/10">
-                                      <div className="flex items-start gap-2">
-                                        <HiOutlineInformationCircle className="h-4 w-4 text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5" />
+                                    <div className="mt-1.5 pt-1.5 border-t border-gray-200 dark:border-white/10">
+                                      <div className="flex items-start gap-1.5">
+                                        <HiOutlineInformationCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5" />
                                         <div>
                                           <span className="font-medium text-gray-700 dark:text-gray-300">Explanation: </span>
                                           <span className="text-gray-600 dark:text-gray-400">
@@ -1177,7 +1249,7 @@ export default function StudentLessonPage() {
                       })}
                   </div>
 
-                  <div className="mt-6 flex gap-2">
+                  <div className="mt-4 flex gap-2">
                     <Button
                       onClick={() => {
                         setQuizResult(null);
@@ -1185,6 +1257,7 @@ export default function StudentLessonPage() {
                         fetchQuizAttempts();
                       }}
                       variant="outline"
+                      size="sm"
                       startIcon={<HiOutlineArrowLeft className="h-4 w-4" />}
                     >
                       Back to Quiz
@@ -1193,6 +1266,7 @@ export default function StudentLessonPage() {
                       <Button 
                         onClick={handleQuizStart} 
                         variant="primary"
+                        size="sm"
                         startIcon={<HiOutlinePlay className="h-4 w-4" />}
                       >
                         Try Again
@@ -1205,12 +1279,16 @@ export default function StudentLessonPage() {
           )}
 
           {activeTab === "quiz" && !hasQuiz && (
-            <div className="text-center py-12">
-              <HiOutlineQuestionMarkCircle className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600 mb-3" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+            <div className="text-center py-8 sm:py-10">
+              <div className="flex justify-center mb-2">
+                <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-white/5">
+                  <HiOutlineQuestionMarkCircle className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 dark:text-gray-600" />
+                </div>
+              </div>
+              <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-1">
                 No Quiz Available
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 The instructor hasn't added a quiz for this lesson yet.
               </p>
             </div>
@@ -1218,24 +1296,24 @@ export default function StudentLessonPage() {
 
           {/* Assignment Tab */}
           {activeTab === "assignment" && hasAssignment && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white mb-1">
                   {lesson.assignments![0].title}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3">
                   {lesson.assignments![0].description}
                 </p>
 
                 {lesson.assignments![0].instructions && (
-                  <div className="p-4 rounded-md border border-info-200 bg-info-50 dark:bg-info-950/20 dark:border-info-500/20 mb-4">
+                  <div className="p-2.5 sm:p-3 rounded-md border border-info-200 bg-info-50 dark:bg-info-950/20 dark:border-info-500/20 mb-3">
                     <div className="flex items-start gap-2">
-                      <HiOutlineInformationCircle className="h-5 w-5 text-info-600 dark:text-info-500 flex-shrink-0 mt-0.5" />
+                      <HiOutlineInformationCircle className="h-4 w-4 sm:h-5 sm:w-5 text-info-600 dark:text-info-500 flex-shrink-0 mt-0.5" />
                       <div>
-                        <h4 className="text-sm font-semibold text-info-900 dark:text-info-300 mb-1">
+                        <h4 className="text-xs sm:text-sm font-semibold text-info-900 dark:text-info-300 mb-0.5">
                           Instructions
                         </h4>
-                        <p className="text-sm text-info-800 dark:text-info-400">
+                        <p className="text-xs sm:text-sm text-info-800 dark:text-info-400">
                           {lesson.assignments![0].instructions}
                         </p>
                       </div>
@@ -1243,34 +1321,37 @@ export default function StudentLessonPage() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-                  <div className="rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-success-100 dark:bg-success-500/15">
-                        <HiOutlineStar className="h-4 w-4 text-success-600 dark:text-success-500" />
+                <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
+                  <div className="rounded-md border border-gray-200 bg-gray-50 p-2.5 sm:p-3 dark:border-white/5 dark:bg-white/5">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-success-100 dark:bg-success-500/15">
+                        <HiOutlineStar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-success-600 dark:text-success-500" />
                       </div>
-                      <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Max Score</span>
+                      <div>
+                        <p className="text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400">Max Score</p>
+                        <p className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+                          {lesson.assignments![0].maxScore}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {lesson.assignments![0].maxScore}
-                    </p>
                   </div>
 
                   {lesson.assignments![0].dueDate && (
-                    <div className="rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-warning-100 dark:bg-warning-500/15">
-                          <HiOutlineCalendar className="h-4 w-4 text-warning-600 dark:text-warning-500" />
+                    <div className="rounded-md border border-gray-200 bg-gray-50 p-2.5 sm:p-3 dark:border-white/5 dark:bg-white/5">
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-warning-100 dark:bg-warning-500/15">
+                          <HiOutlineCalendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-warning-600 dark:text-warning-500" />
                         </div>
-                        <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Due Date</span>
+                        <div>
+                          <p className="text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400">Due Date</p>
+                          <p className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+                            {new Date(lesson.assignments![0].dueDate).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric'
+                            })}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-lg font-bold text-gray-900 dark:text-white">
-                        {new Date(lesson.assignments![0].dueDate).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric'
-                        })}
-                      </p>
                     </div>
                   )}
                 </div>
@@ -1278,29 +1359,29 @@ export default function StudentLessonPage() {
 
               {/* Submission Form or View */}
               {!submission || !submission.gradedAt ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                    <label className="block text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-1.5">
                       Text Submission
                     </label>
                     <textarea
                       value={submissionText}
                       onChange={(e) => setSubmissionText(e.target.value)}
-                      rows={8}
-                      className="w-full rounded-md border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder-gray-500"
+                      rows={6}
+                      className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder-gray-500"
                       placeholder="Enter your submission text here..."
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                      Submission URL <span className="text-gray-500 font-normal">(Optional)</span>
+                    <label className="block text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-1.5">
+                      Submission URL <span className="text-gray-500 font-normal text-[10px] sm:text-xs">(Optional)</span>
                     </label>
                     <input
                       type="url"
                       value={submissionUrl}
                       onChange={(e) => setSubmissionUrl(e.target.value)}
-                      className="w-full rounded-md border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder-gray-500"
+                      className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder-gray-500"
                       placeholder="https://..."
                     />
                   </div>
@@ -1310,25 +1391,26 @@ export default function StudentLessonPage() {
                       onClick={handleAssignmentSubmit}
                       disabled={assignmentSubmitting || (!submissionText && !submissionUrl)}
                       variant="primary"
+                      size="sm"
                       startIcon={<HiOutlineUpload className="h-4 w-4" />}
                     >
-                      {assignmentSubmitting ? "Submitting..." : submission ? "Update Submission" : "Submit Assignment"}
+                      {assignmentSubmitting ? "Submitting..." : submission ? "Update" : "Submit"}
                     </Button>
                   </div>
 
                   {submission && !submission.gradedAt && (
-                    <div className="p-4 rounded-md border border-info-200 bg-info-50 dark:bg-info-950/20 dark:border-info-500/20">
+                    <div className="p-2.5 sm:p-3 rounded-md border border-info-200 bg-info-50 dark:bg-info-950/20 dark:border-info-500/20">
                       <div className="flex items-start gap-2">
-                        <HiOutlineInformationCircle className="h-5 w-5 text-info-600 dark:text-info-500 flex-shrink-0 mt-0.5" />
+                        <HiOutlineInformationCircle className="h-4 w-4 sm:h-5 sm:w-5 text-info-600 dark:text-info-500 flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-sm font-semibold text-info-900 dark:text-info-300 mb-1">
+                          <p className="text-xs sm:text-sm font-semibold text-info-900 dark:text-info-300 mb-0.5">
                             Submission Received
                           </p>
-                          <p className="text-sm text-info-800 dark:text-info-400">
+                          <p className="text-xs sm:text-sm text-info-800 dark:text-info-400">
                             Submitted on {new Date(submission.submittedAt).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
                             })}. Waiting for instructor feedback.
                           </p>
                         </div>
@@ -1337,55 +1419,55 @@ export default function StudentLessonPage() {
                   )}
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <div className="p-6 rounded-md border-2 border-success-200 bg-success-50 dark:bg-success-950/20 dark:border-success-500/20">
-                    <div className="flex items-center justify-between mb-3">
+                <div className="space-y-3">
+                  <div className="p-4 sm:p-5 rounded-md border-2 border-success-200 bg-success-50 dark:bg-success-950/20 dark:border-success-500/20">
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success-100 dark:bg-success-500/15">
-                          <HiOutlineStar className="h-6 w-6 text-success-600 dark:text-success-500" />
+                        <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-success-100 dark:bg-success-500/15">
+                          <HiOutlineStar className="h-4 w-4 sm:h-5 sm:w-5 text-success-600 dark:text-success-500" />
                         </div>
                         <div>
-                          <p className="text-xs font-medium text-success-600 dark:text-success-400">
+                          <p className="text-[10px] sm:text-xs font-medium text-success-600 dark:text-success-400">
                             Your Score
                           </p>
-                          <p className="text-2xl font-bold text-success-700 dark:text-success-400">
+                          <p className="text-xl sm:text-2xl font-bold text-success-700 dark:text-success-400">
                             {submission.score}/{lesson.assignments![0].maxScore}
                           </p>
                         </div>
                       </div>
-                      <Badge color="success">
-                        <HiOutlineCheckCircle className="h-3.5 w-3.5" />
+                      <Badge color="success" size="sm">
+                        <HiOutlineCheckCircle className="h-3 w-3" />
                         Graded
                       </Badge>
                     </div>
-                    <p className="text-xs text-success-600 dark:text-success-400">
+                    <p className="text-[10px] sm:text-xs text-success-600 dark:text-success-400">
                       Graded on {new Date(submission.gradedAt!).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
                       })}
                     </p>
                   </div>
 
                   {submission.feedback && (
-                    <div className="p-4 rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
-                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                        <HiOutlineAcademicCap className="h-4 w-4" />
+                    <div className="p-2.5 sm:p-3 rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+                      <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-1.5 flex items-center gap-1.5">
+                        <HiOutlineAcademicCap className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         Instructor Feedback
                       </h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                         {submission.feedback}
                       </p>
                     </div>
                   )}
 
-                  <div className="p-4 rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                      <HiOutlineClipboardCheck className="h-4 w-4" />
+                  <div className="p-2.5 sm:p-3 rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+                    <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-1.5">
+                      <HiOutlineClipboardCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       Your Submission
                     </h4>
                     {submission.submissionText && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
                         {submission.submissionText}
                       </p>
                     )}
@@ -1394,9 +1476,9 @@ export default function StudentLessonPage() {
                         href={submission.submissionUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 font-medium"
+                        className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 font-medium"
                       >
-                        <HiOutlineLink className="h-4 w-4" />
+                        <HiOutlineLink className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         {submission.submissionUrl}
                       </a>
                     )}
@@ -1407,12 +1489,16 @@ export default function StudentLessonPage() {
           )}
 
           {activeTab === "assignment" && !hasAssignment && (
-            <div className="text-center py-12">
-              <HiOutlineClipboardCheck className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600 mb-3" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+            <div className="text-center py-8 sm:py-10">
+              <div className="flex justify-center mb-2">
+                <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-white/5">
+                  <HiOutlineClipboardCheck className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 dark:text-gray-600" />
+                </div>
+              </div>
+              <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-1">
                 No Assignment Available
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 The instructor hasn't added an assignment for this lesson yet.
               </p>
             </div>
@@ -1421,13 +1507,13 @@ export default function StudentLessonPage() {
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between gap-4 pt-2">
+      <div className="flex items-center justify-between gap-3 pt-1">
         {prevLesson ? (
           <button
             onClick={() => router.push(`/student/courses/${courseId}/lesson/${prevLesson.id}`)}
-            className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 dark:border-white/5 dark:bg-white/3 dark:text-gray-300 dark:hover:bg-white/5 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 bg-white px-3 py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 dark:border-white/5 dark:bg-white/3 dark:text-gray-300 dark:hover:bg-white/5 transition-colors"
           >
-            <HiOutlineChevronLeft className="h-4 w-4" />
+            <HiOutlineChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">Previous Lesson</span>
             <span className="sm:hidden">Previous</span>
           </button>
@@ -1438,11 +1524,11 @@ export default function StudentLessonPage() {
         {nextLesson && (
           <button
             onClick={() => router.push(`/student/courses/${courseId}/lesson/${nextLesson.id}`)}
-            className="inline-flex items-center gap-2 rounded-md bg-brand-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-700 transition-colors ml-auto"
+            className="inline-flex items-center gap-1.5 rounded-md bg-brand-600 px-3 py-2 text-xs sm:text-sm font-medium text-white hover:bg-brand-700 transition-colors ml-auto"
           >
             <span className="hidden sm:inline">Next Lesson</span>
             <span className="sm:hidden">Next</span>
-            <HiOutlineChevronRight className="h-4 w-4" />
+            <HiOutlineChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>
         )}
       </div>
