@@ -298,32 +298,32 @@ export default function CourseDetailPage() {
 
       {/* Review Form */}
       {showReviewForm && (
-        <div className="overflow-hidden rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 shadow-sm">
-          <div className="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white p-3 sm:p-4 dark:border-white/5 dark:from-white/5 dark:to-white/3">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+          <div className="border-b border-gray-200 px-3 sm:px-4 py-2.5 sm:py-3 dark:border-white/5">
+            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
               Leave a Review
             </h3>
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               Share your experience with this course
             </p>
           </div>
-          <form onSubmit={handleSubmitReview} className="p-4 sm:p-6">
-            <div className="mb-4">
-              <label className="mb-2 block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+          <form onSubmit={handleSubmitReview} className="p-3 sm:p-4 space-y-3 sm:space-y-4">
+            <div>
+              <label className="mb-1.5 sm:mb-2 block text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300">
                 Rating
               </label>
-              <div className="flex gap-1 sm:gap-2">
+              <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
                     type="button"
                     onClick={() => setReviewRating(star)}
-                    className="transition-all hover:scale-110 active:scale-95"
+                    className="transition-transform hover:scale-110 active:scale-95"
                   >
                     <HiOutlineStar
-                      className={`h-7 w-7 sm:h-8 sm:w-8 ${
+                      className={`h-6 w-6 sm:h-7 sm:w-7 ${
                         star <= reviewRating
-                          ? "fill-warning-500 text-warning-500 drop-shadow-sm"
+                          ? "fill-warning-500 text-warning-500"
                           : "text-gray-300 dark:text-gray-600"
                       }`}
                     />
@@ -331,30 +331,30 @@ export default function CourseDetailPage() {
                 ))}
               </div>
             </div>
-            <div className="mb-4">
-              <label className="mb-2 block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+            <div>
+              <label className="mb-1.5 sm:mb-2 block text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300">
                 Comment (Optional)
               </label>
               <textarea
                 value={reviewComment}
                 onChange={(e) => setReviewComment(e.target.value)}
-                rows={4}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs sm:text-sm text-gray-900 placeholder-gray-500 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 transition-all"
+                rows={3}
+                className="w-full rounded-md border border-gray-300 bg-white px-2.5 sm:px-3 py-2 text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 transition-colors"
                 placeholder="Share your thoughts about this course..."
               />
             </div>
-            <div className="flex gap-2 sm:gap-3">
+            <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={submittingReview}
-                className="rounded-lg bg-gradient-to-r from-brand-500 to-brand-600 px-4 py-2 text-xs sm:text-sm font-medium text-white hover:from-brand-600 hover:to-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
+                className="rounded-md bg-brand-500 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {submittingReview ? "Submitting..." : "Submit Review"}
               </button>
               <button
                 type="button"
                 onClick={() => setShowReviewForm(false)}
-                className="rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800 transition-all"
+                className="rounded-md border border-gray-300 bg-transparent px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
               >
                 Cancel
               </button>

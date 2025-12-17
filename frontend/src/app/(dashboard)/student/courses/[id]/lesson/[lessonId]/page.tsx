@@ -27,6 +27,8 @@ import {
   HiOutlineInformationCircle,
   HiOutlineAcademicCap,
   HiOutlineArrowLeft,
+  HiOutlineX,
+  HiOutlineExclamationCircle,
 } from "react-icons/hi";
 
 // Interfaces
@@ -140,6 +142,7 @@ export default function StudentLessonPage() {
   const [assignmentSubmitting, setAssignmentSubmitting] = useState(false);
   const [submissionText, setSubmissionText] = useState("");
   const [submissionUrl, setSubmissionUrl] = useState("");
+  const [showSubmissionConfirm, setShowSubmissionConfirm] = useState(false);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -439,15 +442,20 @@ export default function StudentLessonPage() {
     }
   };
 
-  const handleAssignmentSubmit = async () => {
-    if (!lesson?.assignments || lesson.assignments.length === 0) return;
+  const handleAssignmentSubmitClick = () => {
     if (!submissionText && !submissionUrl) {
       toast.error("Please provide either text submission or URL");
       return;
     }
+    setShowSubmissionConfirm(true);
+  };
 
+  const handleAssignmentSubmit = async () => {
+    if (!lesson?.assignments || lesson.assignments.length === 0) return;
+    
     try {
       setAssignmentSubmitting(true);
+      setShowSubmissionConfirm(false);
       const token = localStorage.getItem("token");
       const response = await fetch(
         `${apiUrl}/student/assignments/${lesson.assignments[0].id}/submit`,
@@ -1358,7 +1366,7 @@ export default function StudentLessonPage() {
               </div>
 
               {/* Submission Form or View */}
-              {!submission || !submission.gradedAt ? (
+              {!submission ? (
                 <div className="space-y-3">
                   <div>
                     <label className="block text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-1.5">
@@ -1388,35 +1396,72 @@ export default function StudentLessonPage() {
 
                   <div className="flex gap-2">
                     <Button
-                      onClick={handleAssignmentSubmit}
+                      onClick={handleAssignmentSubmitClick}
                       disabled={assignmentSubmitting || (!submissionText && !submissionUrl)}
                       variant="primary"
                       size="sm"
                       startIcon={<HiOutlineUpload className="h-4 w-4" />}
                     >
-                      {assignmentSubmitting ? "Submitting..." : submission ? "Update" : "Submit"}
+                      {assignmentSubmitting ? "Submitting..." : "Submit Assignment"}
                     </Button>
                   </div>
-
-                  {submission && !submission.gradedAt && (
-                    <div className="p-2.5 sm:p-3 rounded-md border border-info-200 bg-info-50 dark:bg-info-950/20 dark:border-info-500/20">
-                      <div className="flex items-start gap-2">
-                        <HiOutlineInformationCircle className="h-4 w-4 sm:h-5 sm:w-5 text-info-600 dark:text-info-500 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-xs sm:text-sm font-semibold text-info-900 dark:text-info-300 mb-0.5">
-                            Submission Received
-                          </p>
-                          <p className="text-xs sm:text-sm text-info-800 dark:text-info-400">
-                            Submitted on {new Date(submission.submittedAt).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric'
-                            })}. Waiting for instructor feedback.
-                          </p>
-                        </div>
+                </div>
+              ) : !submission.gradedAt ? (
+                <div className="space-y-3">
+                  <div className="p-4 sm:p-5 rounded-md border-2 border-warning-200 bg-warning-50 dark:bg-warning-950/20 dark:border-warning-500/20">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-warning-100 dark:bg-warning-500/15 flex-shrink-0">
+                        <HiOutlineClock className="h-5 w-5 text-warning-600 dark:text-warning-500" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-sm sm:text-base font-bold text-warning-900 dark:text-warning-300 mb-1">
+                          Submission Received
+                        </h4>
+                        <p className="text-xs sm:text-sm text-warning-800 dark:text-warning-400 mb-3">
+                          Submitted on {new Date(submission.submittedAt).toLocaleDateString('en-US', {
+                            month: 'long',
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}. Your submission is waiting for instructor review.
+                        </p>
+                        <Badge color="warning" size="sm">
+                          <HiOutlineClock className="h-3 w-3" />
+                          Pending Review
+                        </Badge>
                       </div>
                     </div>
-                  )}
+                  </div>
+
+                  <div className="p-3 sm:p-4 rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+                    <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-1.5">
+                      <HiOutlineClipboardCheck className="h-4 w-4" />
+                      Your Submission
+                    </h4>
+                    {submission.submissionText && (
+                      <div className="mb-3">
+                        <p className="text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Text Submission:</p>
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
+                          {submission.submissionText}
+                        </p>
+                      </div>
+                    )}
+                    {submission.submissionUrl && (
+                      <div>
+                        <p className="text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Submission URL:</p>
+                        <a
+                          href={submission.submissionUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 font-medium"
+                        >
+                          <HiOutlineLink className="h-4 w-4" />
+                          {submission.submissionUrl}
+                        </a>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -1532,6 +1577,96 @@ export default function StudentLessonPage() {
           </button>
         )}
       </div>
+
+      {/* Assignment Submission Confirmation Modal */}
+      {showSubmissionConfirm && (
+        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-md">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-white/5">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                Confirm Submission
+              </h3>
+              <button
+                onClick={() => setShowSubmissionConfirm(false)}
+                disabled={assignmentSubmitting}
+                className="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-white/5 transition-colors disabled:opacity-50"
+              >
+                <HiOutlineX className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-4">
+              <div className="flex items-start gap-3 mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-warning-100 dark:bg-warning-500/15 flex-shrink-0">
+                  <HiOutlineExclamationCircle className="h-6 w-6 text-warning-600 dark:text-warning-500" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                    Submit Assignment?
+                  </h4>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                    Once submitted, you will not be able to edit your assignment. Make sure you have reviewed your work before submitting.
+                  </p>
+                </div>
+              </div>
+
+              {/* Preview of submission */}
+              <div className="p-3 rounded-md border border-gray-200 bg-gray-50 dark:border-white/5 dark:bg-white/5">
+                <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Your Submission:</p>
+                {submissionText && (
+                  <div className="mb-2">
+                    <p className="text-[10px] text-gray-600 dark:text-gray-400 mb-0.5">Text:</p>
+                    <p className="text-xs text-gray-900 dark:text-white line-clamp-3">
+                      {submissionText}
+                    </p>
+                  </div>
+                )}
+                {submissionUrl && (
+                  <div>
+                    <p className="text-[10px] text-gray-600 dark:text-gray-400 mb-0.5">URL:</p>
+                    <p className="text-xs text-brand-600 dark:text-brand-400 truncate">
+                      {submissionUrl}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-2 p-4 border-t border-gray-200 dark:border-white/5">
+              <button
+                onClick={() => setShowSubmissionConfirm(false)}
+                disabled={assignmentSubmitting}
+                className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAssignmentSubmit}
+                disabled={assignmentSubmitting}
+                className="rounded-lg border border-brand-500 bg-brand-500 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-brand-600 disabled:opacity-50 inline-flex items-center gap-1.5"
+              >
+                {assignmentSubmitting ? (
+                  <>
+                    <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <HiOutlineCheckCircle className="h-4 w-4" />
+                    Confirm & Submit
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
