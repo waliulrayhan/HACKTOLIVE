@@ -56,9 +56,9 @@ ecosystem.config.js
 *.sqlite
 *.sqlite3
 
-# Uploads
-uploads/
-!uploads/.gitkeep
+# # Uploads
+# uploads/
+# !uploads/.gitkeep
 
 # Backups
 *.backup
