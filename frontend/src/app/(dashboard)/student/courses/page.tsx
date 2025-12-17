@@ -15,6 +15,7 @@ import {
   HiOutlineBookOpen,
   HiOutlinePlay,
 } from "react-icons/hi";
+import { FiUser } from "react-icons/fi";
 
 interface Enrollment {
   id: string;
@@ -311,7 +312,7 @@ export default function MyCoursesPage() {
                       className="rounded-full"
                     />
                   ) : (
-                    <div className="h-5 w-5 rounded-full bg-gray-300 dark:bg-gray-600" />
+                    <FiUser className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                   )}
                   <span className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
                     {enrollment.course.instructor.name}
