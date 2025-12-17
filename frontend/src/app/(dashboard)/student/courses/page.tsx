@@ -7,13 +7,15 @@ import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
 import { getFullImageUrl } from "@/lib/image-utils";
+import Badge from "@/components/ui/badge/Badge";
 import {
   HiOutlineAcademicCap,
   HiOutlineStar,
-  HiOutlineUsers,
   HiOutlineClock,
   HiOutlineBookOpen,
   HiOutlinePlay,
+  HiOutlineFilter,
+  HiOutlineCheckCircle,
 } from "react-icons/hi";
 import { FiUser } from "react-icons/fi";
 
@@ -100,8 +102,9 @@ export default function MyCoursesPage() {
   };
 
   const filteredEnrollments = enrollments.filter((enrollment) => {
-    if (filter === "ALL") return true;
-    return enrollment.status === filter;
+    // Filter by status
+    if (filter !== "ALL" && enrollment.status !== filter) return false;
+    return true;
   });
 
   const formatCategory = (category: string) => {
@@ -182,176 +185,236 @@ export default function MyCoursesPage() {
         </div>
       </div>
 
-      {/* Filter Tabs & Actions */}
-      <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setFilter("ALL")}
-              className={`rounded-md px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors ${
-                filter === "ALL"
-                  ? "bg-brand-500 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-              }`}
-            >
-              All ({enrollments.length})
-            </button>
-            <button
-              onClick={() => setFilter("ACTIVE")}
-              className={`rounded-md px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors ${
-                filter === "ACTIVE"
-                  ? "bg-brand-500 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-              }`}
-            >
-              In Progress ({enrollments.filter((e) => e.status === "ACTIVE").length})
-            </button>
-            <button
-              onClick={() => setFilter("COMPLETED")}
-              className={`rounded-md px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors ${
-                filter === "COMPLETED"
-                  ? "bg-brand-500 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-              }`}
-            >
-              Completed ({enrollments.filter((e) => e.status === "COMPLETED").length})
-            </button>
+      {/* Filter Section */}
+      <div className="rounded-lg border border-gray-200 bg-white p-4 sm:p-6 dark:border-white/5 dark:bg-white/3">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          {/* Filter Tabs */}
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+              <HiOutlineFilter className="h-4 w-4" />
+              <span>Status:</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setFilter("ALL")}
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                  filter === "ALL"
+                    ? "bg-brand-500 text-white shadow-sm"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                }`}
+              >
+                All <span className="ml-1 opacity-75">({enrollments.length})</span>
+              </button>
+              <button
+                onClick={() => setFilter("ACTIVE")}
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                  filter === "ACTIVE"
+                    ? "bg-green-500 text-white shadow-sm"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                }`}
+              >
+                In Progress <span className="ml-1 opacity-75">({enrollments.filter((e) => e.status === "ACTIVE").length})</span>
+              </button>
+              <button
+                onClick={() => setFilter("COMPLETED")}
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                  filter === "COMPLETED"
+                    ? "bg-purple-500 text-white shadow-sm"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                }`}
+              >
+                Completed <span className="ml-1 opacity-75">({enrollments.filter((e) => e.status === "COMPLETED").length})</span>
+              </button>
+            </div>
           </div>
+
+          {/* Browse Button */}
           <button
             onClick={() => router.push("/academy/courses")}
-            className="rounded-md bg-brand-500 px-4 py-2 text-xs sm:text-sm font-medium text-white hover:bg-brand-600 transition-colors"
+            className="flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors whitespace-nowrap"
           >
-            Browse More Courses
+            <HiOutlineAcademicCap className="h-5 w-5" />
+            <span>Browse Courses</span>
           </button>
         </div>
       </div>
 
       {/* Courses Grid */}
       {filteredEnrollments.length === 0 ? (
-        <div className="rounded-md border border-gray-200 bg-white p-8 sm:p-12 text-center dark:border-white/5 dark:bg-white/3">
-          <HiOutlineAcademicCap className="mx-auto h-12 w-12 sm:h-16 sm:w-16 text-gray-400 dark:text-gray-600 opacity-50" />
-          <h3 className="mt-4 text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-            No courses found
-          </h3>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            {filter === "ALL"
-              ? "You haven't enrolled in any courses yet."
-              : `You don't have any ${filter.toLowerCase()} courses.`}
-          </p>
-          <button
-            onClick={() => router.push("/academy/courses")}
-            className="mt-6 rounded-md bg-brand-500 px-6 py-2 text-sm font-medium text-white hover:bg-brand-600 transition-colors"
-          >
-            Browse Courses
-          </button>
+        <div className="rounded-lg border border-gray-200 bg-white p-12 text-center dark:border-white/5 dark:bg-white/3">
+          <div className="mx-auto max-w-md">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
+              <HiOutlineAcademicCap className="h-10 w-10 text-gray-400 dark:text-gray-600" />
+            </div>
+            <h3 className="mt-6 text-lg font-semibold text-gray-900 dark:text-white">
+              {filter === "ALL"
+                ? "No courses enrolled yet"
+                : `No ${filter.toLowerCase()} courses`}
+            </h3>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              {filter === "ALL"
+                ? "Start your learning journey by enrolling in courses from our courses."
+                : `You don't have any ${filter.toLowerCase()} courses at the moment.`}
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <button
+                onClick={() => router.push("/academy/courses")}
+                className="rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors"
+              >
+                Browse All Courses
+              </button>
+            </div>
+          </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
           {filteredEnrollments.map((enrollment) => (
             <div
               key={enrollment.id}
-              className="group overflow-hidden rounded-md border border-gray-200 bg-white transition-all hover:shadow-lg dark:border-white/5 dark:bg-white/3 cursor-pointer"
+              className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white transition-all hover:shadow-xl hover:-translate-y-1 dark:border-white/5 dark:bg-white/3 cursor-pointer"
               onClick={() =>
                 router.push(`/student/courses/${enrollment.course.id}`)
               }
             >
               {/* Thumbnail */}
-              <div className="relative h-40 sm:h-48 w-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+              <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
                 {enrollment.course.thumbnail ? (
                   <Image
                     src={enrollment.course.thumbnail}
                     alt={enrollment.course.title}
                     fill
-                    className="object-cover transition-transform group-hover:scale-105"
+                    className="object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center">
-                    <HiOutlineAcademicCap className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400 dark:text-gray-500" />
+                    <HiOutlineAcademicCap className="h-16 w-16 text-gray-400 dark:text-gray-500 opacity-50" />
                   </div>
                 )}
 
+                {/* Overlay Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+
                 {/* Status Badge */}
-                <div className="absolute right-2 top-2">
+                <div className="absolute right-3 top-3">
                   {enrollment.status === "COMPLETED" ? (
-                    <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
+                    <Badge color="success" variant="solid" size="sm">
+                      <HiOutlineCheckCircle className="h-3.5 w-3.5" />
                       Completed
-                    </span>
+                    </Badge>
                   ) : (
-                    <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                    <Badge color="primary" variant="solid" size="sm">
+                      <HiOutlinePlay className="h-3.5 w-3.5" />
                       In Progress
-                    </span>
+                    </Badge>
                   )}
                 </div>
-              </div>
 
-              {/* Content */}
-              <div className="p-3 sm:p-4">
-                {/* Category & Level */}
-                <div className="mb-2 flex items-center gap-2 flex-wrap">
-                  <span className="rounded-md bg-blue-100 px-2 py-0.5 text-[10px] sm:text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                    {formatCategory(enrollment.course.category)}
-                  </span>
-                  <span className="rounded-md bg-gray-100 px-2 py-0.5 text-[10px] sm:text-xs font-medium text-gray-800 dark:bg-gray-800 dark:text-gray-300">
-                    {enrollment.course.level}
-                  </span>
+                {/* Tier Badge */}
+                <div className="absolute left-3 top-3">
+                  <Badge 
+                    color={enrollment.course.tier === "premium" ? "warning" : "success"} 
+                    variant="solid" 
+                    size="sm"
+                  >
+                    {enrollment.course.tier.toUpperCase()}
+                  </Badge>
                 </div>
 
-                {/* Title */}
-                <h3 className="mb-2 line-clamp-2 text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-                  {enrollment.course.title}
-                </h3>
-
-                {/* Instructor */}
-                <div className="mb-3 flex items-center gap-2">
-                  {enrollment.course.instructor.avatar ? (
-                    <Image
-                      src={enrollment.course.instructor.avatar}
-                      alt={enrollment.course.instructor.name}
-                      width={20}
-                      height={20}
-                      className="rounded-full"
-                    />
-                  ) : (
-                    <FiUser className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                  )}
-                  <span className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
-                    {enrollment.course.instructor.name}
-                  </span>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="mb-3">
-                  <div className="mb-1 flex items-center justify-between text-[10px] sm:text-xs">
-                    <span className="text-gray-600 dark:text-gray-400">
-                      Progress
-                    </span>
-                    <span className="font-medium text-gray-900 dark:text-white">
-                      {Math.round(enrollment.progress)}%
-                    </span>
+                {/* Progress Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+                  <div className="flex items-center justify-between text-white text-xs font-medium mb-1.5">
+                    <span>Progress</span>
+                    <span>{Math.round(enrollment.progress)}%</span>
                   </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-white/20 backdrop-blur-sm">
                     <div
-                      className="h-full rounded-full bg-brand-500 transition-all"
+                      className={`h-full rounded-full transition-all ${
+                        enrollment.status === "COMPLETED" 
+                          ? "bg-green-500" 
+                          : "bg-brand-500"
+                      }`}
                       style={{ width: `${enrollment.progress}%` }}
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-4 sm:p-5">
+                {/* Category & Level */}
+                <div className="mb-3 flex items-center gap-2 flex-wrap">
+                  <Badge color="info" size="sm">
+                    {formatCategory(enrollment.course.category)}
+                  </Badge>
+                  <Badge 
+                    color={
+                      enrollment.course.level === "BEGINNER" ? "success" :
+                      enrollment.course.level === "INTERMEDIATE" ? "warning" : "error"
+                    }
+                    size="sm"
+                  >
+                    {enrollment.course.level}
+                  </Badge>
+                </div>
+
+                {/* Title */}
+                <h3 className="mb-2 line-clamp-2 text-base sm:text-lg font-bold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors min-h-[3rem]">
+                  {enrollment.course.title}
+                </h3>
+
+                {/* Description */}
+                <p className="mb-4 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+                  {enrollment.course.shortDescription}
+                </p>
+
+                {/* Instructor */}
+                <div className="mb-4 flex items-center gap-2 pb-4 border-b border-gray-100 dark:border-gray-700">
+                  {enrollment.course.instructor.avatar ? (
+                    <Image
+                      src={enrollment.course.instructor.avatar}
+                      alt={enrollment.course.instructor.name}
+                      width={24}
+                      height={24}
+                      className="rounded-full ring-2 ring-gray-200 dark:ring-gray-700"
+                    />
+                  ) : (
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
+                      <FiUser className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+                    </div>
+                  )}
+                  <span className="text-sm text-gray-700 dark:text-gray-300 font-medium line-clamp-1">
+                    {enrollment.course.instructor.name}
+                  </span>
+                </div>
 
                 {/* Stats */}
-                <div className="mb-3 flex items-center gap-3 sm:gap-4 text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
-                  <div className="flex items-center gap-1">
-                    <HiOutlineStar className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500" />
-                    <span>{enrollment.course.rating.toFixed(1)}</span>
+                <div className="mb-4 grid grid-cols-3 gap-2 text-center">
+                  <div className="rounded-lg bg-gray-50 dark:bg-gray-800/50 p-2">
+                    <div className="flex items-center justify-center gap-1 text-yellow-500 mb-1">
+                      <HiOutlineStar className="h-4 w-4" />
+                      <span className="text-sm font-bold text-gray-900 dark:text-white">
+                        {enrollment.course.rating.toFixed(1)}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400">Rating</p>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <HiOutlineBookOpen className="h-3 w-3 sm:h-4 sm:w-4" />
-                    <span>
-                      {getTotalLessons(enrollment.course.modules)} lessons
-                    </span>
+                  <div className="rounded-lg bg-gray-50 dark:bg-gray-800/50 p-2">
+                    <div className="flex items-center justify-center gap-1 text-blue-500 mb-1">
+                      <HiOutlineBookOpen className="h-4 w-4" />
+                      <span className="text-sm font-bold text-gray-900 dark:text-white">
+                        {getTotalLessons(enrollment.course.modules)}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400">Lessons</p>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <HiOutlineClock className="h-3 w-3 sm:h-4 sm:w-4" />
-                    <span>{Math.floor(enrollment.course.duration / 60)}h</span>
+                  <div className="rounded-lg bg-gray-50 dark:bg-gray-800/50 p-2">
+                    <div className="flex items-center justify-center gap-1 text-purple-500 mb-1">
+                      <HiOutlineClock className="h-4 w-4" />
+                      <span className="text-sm font-bold text-gray-900 dark:text-white">
+                        {Math.floor(enrollment.course.duration / 60)}h
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400">Duration</p>
                   </div>
                 </div>
 
@@ -361,9 +424,13 @@ export default function MyCoursesPage() {
                     e.stopPropagation();
                     router.push(`/student/courses/${enrollment.course.id}`);
                   }}
-                  className="flex w-full items-center justify-center gap-2 rounded-md bg-brand-500 px-4 py-2 text-xs sm:text-sm font-medium text-white transition-colors hover:bg-brand-600"
+                  className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition-all hover:shadow-md ${
+                    enrollment.status === "COMPLETED"
+                      ? "bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+                      : "bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700"
+                  }`}
                 >
-                  <HiOutlinePlay className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <HiOutlinePlay className="h-4 w-4" />
                   {enrollment.status === "COMPLETED"
                     ? "Review Course"
                     : "Continue Learning"}
