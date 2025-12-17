@@ -79,6 +79,9 @@ interface Lesson {
   videoUrl?: string;
   articleContent?: string;
   order: number;
+  quizzes?: any[];
+  assignments?: any[];
+  resources?: any[];
 }
 
 export default function EditCoursePage() {
@@ -1754,6 +1757,27 @@ export default function EditCoursePage() {
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
                                   {lesson.type} • {lesson.duration} min
                                 </p>
+                                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1.5">
+                                  {lesson.quizzes && lesson.quizzes.length > 0 && (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-medium text-purple-700 dark:bg-purple-500/15 dark:text-purple-400">
+                                      <HiOutlineQuestionMarkCircle className="h-3 w-3" />
+                                      {lesson.quizzes.length} Quiz{lesson.quizzes.length !== 1 ? 'zes' : ''}
+                                    </span>
+                                  )}
+                                  {lesson.assignments && lesson.assignments.length > 0 && (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-medium text-orange-700 dark:bg-orange-500/15 dark:text-orange-400">
+                                      <HiOutlineClipboardCheck className="h-3 w-3" />
+                                      {lesson.assignments.length} Assignment{lesson.assignments.length !== 1 ? 's' : ''}
+                                    </span>
+                                  )}
+                                  {lesson.resources && lesson.resources.length > 0 && (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700 dark:bg-green-500/15 dark:text-green-400">
+                                      <HiOutlinePaperClip className="h-3 w-3" />
+                                      {lesson.resources.length} Resource{lesson.resources.length !== 1 ? 's' : ''}
+                                    </span>
+                                  )}
+                                </div>
+                                
                               </div>
                               <div className="flex items-center gap-1 shrink-0">
                                 {lesson.type === 'ARTICLE' && (
