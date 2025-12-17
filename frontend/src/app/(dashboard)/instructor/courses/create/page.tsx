@@ -675,7 +675,11 @@ export default function CreateCoursePage() {
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
-                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px]"
+                  className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px] ${
+                    errors.category
+                      ? 'border-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:border-brand-500 dark:border-gray-600'
+                  }`}
                   style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
                 >
                   <option value="" disabled>Select Category</option>
@@ -699,7 +703,11 @@ export default function CreateCoursePage() {
                   name="level"
                   value={formData.level}
                   onChange={handleInputChange}
-                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px]"
+                  className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px] ${
+                    errors.level
+                      ? 'border-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:border-brand-500 dark:border-gray-600'
+                  }`}
                   style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
                 >
                   <option value="" disabled>Select Level</option>
@@ -718,7 +726,11 @@ export default function CreateCoursePage() {
                   name="deliveryMode"
                   value={formData.deliveryMode}
                   onChange={handleInputChange}
-                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px]"
+                  className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px] ${
+                    errors.deliveryMode
+                      ? 'border-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:border-brand-500 dark:border-gray-600'
+                  }`}
                   style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
                 >
                   <option value="" disabled>Select Delivery Mode</option>
