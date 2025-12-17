@@ -27,6 +27,8 @@ import {
   HiOutlineX,
   HiOutlineCamera,
   HiOutlineExclamationCircle,
+  HiOutlineCog,
+  HiOutlineCalendar,
 } from "react-icons/hi";
 
 interface Module {
@@ -480,27 +482,8 @@ export default function CreateCoursePage() {
       <div className="rounded-md border border-gray-200 bg-white p-4 sm:p-6 dark:border-white/5 dark:bg-white/3">
         {/* Step 1: Basic Info */}
         {currentStep === 1 && (
-          <div className="space-y-5">
-            {/* Validation Errors Summary */}
-            {Object.keys(errors).length > 0 && (
-              <div className="rounded-lg bg-red-50 border border-red-200 p-3 sm:p-4 dark:bg-red-900/20 dark:border-red-800/30">
-                <div className="flex gap-2">
-                  <HiOutlineExclamationCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-red-800 dark:text-red-300 mb-1">
-                      Please fix the following errors:
-                    </p>
-                    <ul className="list-disc list-inside text-xs text-red-700 dark:text-red-400 space-y-0.5">
-                      {Object.values(errors).map((error, index) => (
-                        <li key={index}>{error}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-white/5">
+          <div className="space-y-6">
+            <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/15">
                 <HiOutlineAcademicCap className="h-5 w-5 text-brand-600 dark:text-brand-400" />
               </div>
@@ -514,12 +497,14 @@ export default function CreateCoursePage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Course Thumbnail (2:1 ratio recommended)
-                </label>
-                <div className="flex items-start gap-4">
+            {/* Thumbnail Section */}
+            <div className="rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-5 dark:border-white/5 dark:from-gray-800/50 dark:to-gray-900/50">
+              <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                <HiOutlineCamera className="h-4 w-4 text-brand-500" />
+                Course Thumbnail
+                <span className="text-xs font-normal text-gray-500 dark:text-gray-400">(2:1 ratio recommended)</span>
+              </label>
+              <div className="flex items-start gap-4">
                   <div className="relative group">
                     <div className="w-40 h-20 overflow-hidden border-2 border-dashed border-gray-300 rounded-lg dark:border-gray-600 bg-gray-100 dark:bg-gray-800">
                       {thumbnailPreview ? (
@@ -562,19 +547,41 @@ export default function CreateCoursePage() {
                     />
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Upload a course thumbnail image with a 2:1 aspect ratio (e.g., 1200x600px). 
-                      Maximum file size: 5MB. Supported formats: JPG, PNG, WebP.
-                    </p>
+                    <div className="space-y-2">
+                      <p className="text-xs text-gray-600 dark:text-gray-300 font-medium">
+                        📸 Upload Guidelines
+                      </p>
+                      <ul className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                        <li className="flex items-start gap-1.5">
+                          <span className="text-brand-500 mt-0.5">•</span>
+                          <span>Recommended size: 1200x600px (2:1 ratio)</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <span className="text-brand-500 mt-0.5">•</span>
+                          <span>Maximum file size: 5MB</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <span className="text-brand-500 mt-0.5">•</span>
+                          <span>Formats: JPG, PNG, WebP</span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
-              </div>
+            </div>
 
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Course Title <span className="text-red-500">*</span>
-                </label>
-                <input
+            {/* Basic Details Section */}
+            <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-white/5 dark:bg-white/3">
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <HiOutlineInformationCircle className="h-4 w-4 text-brand-500" />
+                Basic Details
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Course Title <span className="text-red-500">*</span>
+                  </label>
+                  <input
                   type="text"
                   name="title"
                   value={formData.title}
@@ -650,11 +657,20 @@ export default function CreateCoursePage() {
                 />
                 {errors.description && <p className="mt-1.5 text-xs text-red-500">{errors.description}</p>}
               </div>
+              </div>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Category <span className="text-red-500">*</span>
-                </label>
+            {/* Course Settings Section */}
+            <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-white/5 dark:bg-white/3">
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <HiOutlineCog className="h-4 w-4 text-purple-500" />
+                Course Settings
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Category <span className="text-red-500">*</span>
+                  </label>
                 <select
                   name="category"
                   value={formData.category}
@@ -736,20 +752,24 @@ export default function CreateCoursePage() {
                 </div>
                 {errors.duration && <p className="mt-1.5 text-xs text-red-500">{errors.duration}</p>}
               </div>
+              </div>
+            </div>
 
               {/* Live Course Fields */}
               {formData.deliveryMode === 'LIVE' && (
-                <>
-                  <div className="md:col-span-2">
-                    <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 dark:bg-amber-900/20 dark:border-amber-800/30 mb-4">
-                      <div className="flex gap-2">
-                        <HiOutlineInformationCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                        <p className="text-xs text-amber-800 dark:text-amber-300">
-                          Live course settings: Configure schedule, dates, and meeting details for your live sessions.
-                        </p>
-                      </div>
+                <div className="rounded-xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-5 dark:border-amber-800/30 dark:from-amber-900/20 dark:to-orange-900/20">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-500/20">
+                      <HiOutlineCalendar className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-300">Live Session Configuration</h4>
+                      <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                        Configure schedule, dates, and meeting details for your live sessions
+                      </p>
                     </div>
                   </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -845,49 +865,61 @@ export default function CreateCoursePage() {
                       Provide the virtual meeting link (Zoom, Google Meet, Microsoft Teams, etc.) where live sessions will be conducted.
                     </p>
                   </div>
-                </>
+                  </div>
+                </div>
               )}
 
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Learning Outcomes (one per line)
-                </label>
-                <textarea
-                  name="learningOutcomes"
-                  value={formData.learningOutcomes}
-                  onChange={handleInputChange}
-                  rows={4}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                  placeholder="What will students learn?"
-                />
-              </div>
+            {/* Additional Details Section */}
+            <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-white/5 dark:bg-white/3">
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <HiOutlineDocumentText className="h-4 w-4 text-green-500" />
+                Additional Details
+              </h4>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Learning Outcomes
+                    <span className="text-xs font-normal text-gray-500 ml-2">(one per line)</span>
+                  </label>
+                  <textarea
+                    name="learningOutcomes"
+                    value={formData.learningOutcomes}
+                    onChange={handleInputChange}
+                    rows={4}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    placeholder="e.g., Master SQL injection techniques&#10;Understand OWASP Top 10 vulnerabilities&#10;Perform security audits"
+                  />
+                </div>
 
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Requirements (one per line)
-                </label>
-                <textarea
-                  name="requirements"
-                  value={formData.requirements}
-                  onChange={handleInputChange}
-                  rows={3}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                  placeholder="Prerequisites for this course"
-                />
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Requirements
+                    <span className="text-xs font-normal text-gray-500 ml-2">(one per line)</span>
+                  </label>
+                  <textarea
+                    name="requirements"
+                    value={formData.requirements}
+                    onChange={handleInputChange}
+                    rows={3}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    placeholder="e.g., Basic programming knowledge&#10;Familiarity with web technologies&#10;A computer with internet access"
+                  />
+                </div>
 
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Tags (comma separated)
-                </label>
-                <input
-                  type="text"
-                  name="tags"
-                  value={formData.tags}
-                  onChange={handleInputChange}
-                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                  placeholder="security, hacking, web, penetration testing"
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Tags
+                    <span className="text-xs font-normal text-gray-500 ml-2">(comma separated)</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="tags"
+                    value={formData.tags}
+                    onChange={handleInputChange}
+                    className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    placeholder="security, hacking, web, penetration testing"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -895,27 +927,8 @@ export default function CreateCoursePage() {
 
         {/* Step 2: Pricing */}
         {currentStep === 2 && (
-          <div className="space-y-5">
-            {/* Validation Errors Summary */}
-            {Object.keys(errors).length > 0 && (
-              <div className="rounded-lg bg-red-50 border border-red-200 p-3 sm:p-4 dark:bg-red-900/20 dark:border-red-800/30">
-                <div className="flex gap-2">
-                  <HiOutlineExclamationCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-red-800 dark:text-red-300 mb-1">
-                      Please fix the following errors:
-                    </p>
-                    <ul className="list-disc list-inside text-xs text-red-700 dark:text-red-400 space-y-0.5">
-                      {Object.values(errors).map((error, index) => (
-                        <li key={index}>{error}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-white/5">
+          <div className="space-y-6">
+            <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success-100 dark:bg-success-500/15">
                 <HiOutlineCurrencyDollar className="h-5 w-5 text-success-600 dark:text-success-500" />
               </div>
@@ -929,64 +942,79 @@ export default function CreateCoursePage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Course Tier <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="tier"
-                  value={formData.tier}
-                  onChange={handleInputChange}
-                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px]"
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
-                >
-                  <option value="" disabled>Select Tier</option>
-                  <option value="FREE">Free</option>
-                  <option value="PREMIUM">Premium</option>
-                </select>
-                {errors.tier && <p className="mt-1.5 text-xs text-red-500">{errors.tier}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Price (Tk) <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <HiOutlineCurrencyDollar className="h-4 w-4 text-gray-400" />
-                  </div>
-                  <input
-                    type="number"
-                    name="price"
-                    value={formData.price}
+            <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Course Tier <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="tier"
+                    value={formData.tier}
                     onChange={handleInputChange}
-                    min="0"
-                    step="0.01"
-                    disabled={formData.tier === 'FREE'}
-                    className={`w-full h-10 rounded-lg border pl-10 pr-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
-                      errors.price
+                    className={`w-full h-11 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px] ${
+                      errors.tier
                         ? 'border-red-500 focus:border-red-500'
                         : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
-                    } ${formData.tier === 'FREE' ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-900' : ''}`}
-                    placeholder="99.99"
-                  />
+                    }`}
+                    style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
+                  >
+                    <option value="" disabled>Select Tier</option>
+                    <option value="FREE">Free - Accessible to everyone</option>
+                    <option value="PREMIUM">Premium - Paid course</option>
+                  </select>
+                  {errors.tier && <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1"><HiOutlineExclamationCircle className="h-3.5 w-3.5" />{errors.tier}</p>}
                 </div>
-                {errors.price && <p className="mt-1.5 text-xs text-red-500">{errors.price}</p>}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Price (Tk) <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <HiOutlineCurrencyDollar className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleInputChange}
+                      min="0"
+                      step="0.01"
+                      disabled={formData.tier === 'FREE'}
+                      className={`w-full h-11 rounded-lg border pl-11 pr-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                        errors.price
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      } ${formData.tier === 'FREE' ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-900' : ''}`}
+                      placeholder="e.g., 2999.00"
+                    />
+                  </div>
+                  {errors.price && <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1"><HiOutlineExclamationCircle className="h-3.5 w-3.5" />{errors.price}</p>}
+                </div>
               </div>
 
-              <div className="md:col-span-2">
-                <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 dark:bg-blue-900/20 dark:border-blue-800/30">
-                  <div className="flex gap-3">
-                    <HiOutlineInformationCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-1">
-                        Pricing Guidelines
-                      </p>
-                      <p className="text-xs text-blue-800 dark:text-blue-400">
-                        Free courses will be accessible to all students. Premium courses require payment before enrollment.
-                      </p>
-                    </div>
+              <div className="mt-6 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 p-4 dark:from-blue-900/20 dark:to-indigo-900/20 dark:border-blue-800/30">
+                <div className="flex gap-3">
+                  <HiOutlineInformationCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-blue-900 dark:text-blue-300">
+                      💡 Pricing Guidelines
+                    </p>
+                    <ul className="text-xs text-blue-800 dark:text-blue-400 space-y-1">
+                      <li className="flex items-start gap-2">
+                        <span className="text-blue-500 mt-0.5">✓</span>
+                        <span><strong>Free courses:</strong> Accessible to all students without payment</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-blue-500 mt-0.5">✓</span>
+                        <span><strong>Premium courses:</strong> Require payment before enrollment</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-blue-500 mt-0.5">✓</span>
+                        <span>Set competitive prices based on course content and value</span>
+                      </li>
+                    </ul>
                   </div>
                 </div>
               </div>
@@ -996,27 +1024,9 @@ export default function CreateCoursePage() {
 
         {/* Step 3: Curriculum */}
         {currentStep === 3 && (
-          <div className="space-y-5">
-            {/* Validation Errors Summary */}
-            {Object.keys(errors).length > 0 && (
-              <div className="rounded-lg bg-red-50 border border-red-200 p-3 sm:p-4 dark:bg-red-900/20 dark:border-red-800/30">
-                <div className="flex gap-2">
-                  <HiOutlineExclamationCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-red-800 dark:text-red-300 mb-1">
-                      Please fix the following errors:
-                    </p>
-                    <ul className="list-disc list-inside text-xs text-red-700 dark:text-red-400 space-y-0.5">
-                      {Object.values(errors).map((error, index) => (
-                        <li key={index}>{error}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
+          <div className="space-y-6">
 
-            <div className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-white/5">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-500/15">
                   <HiOutlineBookOpen className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -1032,38 +1042,35 @@ export default function CreateCoursePage() {
               </div>
               <button
                 onClick={addModule}
-                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-brand-500 bg-brand-500 px-3 py-2 text-xs font-medium text-white transition-all hover:bg-brand-600 hover:border-brand-600 shadow-lg shadow-brand-500/30"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-brand-500 bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-brand-600 hover:border-brand-600 shadow-lg shadow-brand-500/30 hover:shadow-xl hover:shadow-brand-500/40"
               >
                 <HiOutlinePlus className="h-4 w-4" />
-                <span className="hidden sm:inline">Add Module</span>
+                <span>Add Module</span>
               </button>
             </div>
 
-            {errors.modules && (
-              <div className="rounded-lg bg-red-50 border border-red-200 p-3 dark:bg-red-900/20 dark:border-red-800/30">
-                <div className="flex gap-2">
-                  <HiOutlineX className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-                  <p className="text-xs text-red-800 dark:text-red-300">{errors.modules}</p>
+            {(errors.modules || errors.lessons) && (
+              <div className="rounded-xl bg-red-50 border border-red-200 p-4 dark:bg-red-900/20 dark:border-red-800/30">
+                <div className="flex gap-3">
+                  <HiOutlineExclamationCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-red-800 dark:text-red-300 mb-2">
+                      Curriculum Issues:
+                    </p>
+                    <ul className="text-xs text-red-700 dark:text-red-400 space-y-1">
+                      {errors.modules && <li className="flex items-center gap-1.5"><span>•</span>{errors.modules}</li>}
+                      {errors.lessons && <li className="flex items-center gap-1.5"><span>•</span>{errors.lessons}</li>}
+                    </ul>
+                  </div>
                 </div>
               </div>
             )}
 
-            {errors.lessons && (
-              <div className="rounded-lg bg-red-50 border border-red-200 p-3 dark:bg-red-900/20 dark:border-red-800/30">
-                <div className="flex gap-2">
-                  <HiOutlineX className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-                  <p className="text-xs text-red-800 dark:text-red-300">{errors.lessons}</p>
-                </div>
-              </div>
-            )}
-
-            <h4 className="text-sm font-semibold text-gray-900 dark:text-white">Modules</h4>
-
-            <div className="space-y-3">
+            <div className="space-y-4">
               {modules.map((module, moduleIndex) => (
                 <div
                   key={module.tempId}
-                  className="rounded-lg border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 overflow-hidden transition-all"
+                  className="rounded-xl border-2 border-gray-200 bg-white dark:border-white/10 dark:bg-white/3 overflow-hidden transition-all hover:border-brand-300 dark:hover:border-brand-500/30 hover:shadow-lg"
                 >
                   <div className="bg-gray-50 p-3 sm:p-4 dark:bg-gray-800/50">
                     <div className="flex items-start gap-3">
@@ -1225,14 +1232,25 @@ export default function CreateCoursePage() {
               ))}
 
               {modules.length === 0 && (
-                <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-lg dark:border-gray-600">
-                  <HiOutlineBookOpen className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-                  <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                    No modules yet
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Click "Add Module" to get started building your curriculum
-                  </p>
+                <div className="text-center py-20 border-2 border-dashed border-gray-300 rounded-xl dark:border-gray-600 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50">
+                  <div className="flex flex-col items-center">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-500/20 mb-4">
+                      <HiOutlineBookOpen className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <p className="text-base font-semibold text-gray-900 dark:text-white mb-2">
+                      No modules yet
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                      Start building your course curriculum
+                    </p>
+                    <button
+                      onClick={addModule}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-brand-500 bg-brand-500 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-brand-600 hover:border-brand-600 shadow-lg shadow-brand-500/30"
+                    >
+                      <HiOutlinePlus className="h-4 w-4" />
+                      Add Your First Module
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
