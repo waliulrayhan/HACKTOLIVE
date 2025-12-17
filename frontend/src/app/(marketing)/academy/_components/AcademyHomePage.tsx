@@ -36,7 +36,8 @@ import {
   FiTarget,
   FiActivity,
   FiCloud,
-  FiLock
+  FiLock,
+  FiUser
 } from "react-icons/fi";
 import { Course } from "@/types/academy";
 import academyService from "@/lib/academy-service";
@@ -684,8 +685,9 @@ export default function AcademyHomePage() {
                       h="full"
                     >
                       <Box position="relative" overflow="hidden">
+                      {instructor.avatar ? (
                         <Image
-                          src={instructor.avatar || ''}
+                          src={instructor.avatar}
                           alt={instructor.name}
                           width={400}
                           height={400}
@@ -696,6 +698,20 @@ export default function AcademyHomePage() {
                             objectFit: "cover"
                           }}
                         />
+                      ) : (
+                        <Box
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                          bg={useColorModeValue('gray.200', 'gray.700')}
+                          style={{
+                            width: "100%",
+                            height: "280px"
+                          }}
+                        >
+                          <Icon as={FiUser} boxSize="80px" color={useColorModeValue('gray.500', 'gray.400')} />
+                        </Box>
+                      )}
                         <Box
                           position="absolute"
                           bottom="0"

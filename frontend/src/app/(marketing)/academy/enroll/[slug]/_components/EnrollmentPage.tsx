@@ -58,6 +58,7 @@ import {
   FiGift,
   FiLock,
   FiEye,
+  FiUser
 } from "react-icons/fi";
 import { FaEyeSlash } from "react-icons/fa";
 import academyService from "@/lib/academy-service";
@@ -908,13 +909,27 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                       <Heading size="md">Your Instructor</Heading>
                     </HStack>
                     <Flex gap="4">
-                      <Image
-                        src={course.instructor.avatar || ''}
-                        alt={course.instructor.name}
-                        width={70}
-                        height={70}
-                        style={{ borderRadius: "12px", objectFit: "cover" }}
-                      />
+                      {course.instructor.avatar ? (
+                        <Image
+                          src={course.instructor.avatar}
+                          alt={course.instructor.name}
+                          width={70}
+                          height={70}
+                          style={{ borderRadius: "12px", objectFit: "cover" }}
+                        />
+                      ) : (
+                        <Box
+                          w="70px"
+                          h="70px"
+                          borderRadius="12px"
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                          bg={useColorModeValue('gray.200', 'gray.700')}
+                        >
+                          <Icon as={FiUser} boxSize="35px" color={useColorModeValue('gray.500', 'gray.400')} />
+                        </Box>
+                      )}
                       <VStack align="start" spacing="1" flex="1">
                         <Text fontWeight="bold" fontSize="lg">{course.instructor.name}</Text>
                         <Text fontSize="sm" color="muted" noOfLines={2}>

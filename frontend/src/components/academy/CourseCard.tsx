@@ -140,6 +140,8 @@ export default function CourseCard({ course, variant = "default" }: CourseCardPr
         <HStack spacing="2">
           <Image
             src={course.instructor.avatar || undefined}
+            fallbackSrc="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E"
+            objectFit="cover"
             alt={course.instructor.name}
             boxSize="24px"
             borderRadius="full"

@@ -20,7 +20,7 @@ import {
 import Image from "next/image";
 import { FallInPlace } from "@/components/shared/motion/fall-in-place";
 import { ButtonLink } from "@/components/shared/button-link/button-link";
-import { FiStar, FiUsers, FiBook, FiAward, FiTrendingUp, FiMapPin, FiMail } from "react-icons/fi";
+import { FiStar, FiUsers, FiBook, FiAward, FiTrendingUp, FiMapPin, FiMail, FiUser } from "react-icons/fi";
 import { Instructor } from "@/types/academy";
 import academyService from "@/lib/academy-service";
 
@@ -203,16 +203,25 @@ export default function InstructorsListPage() {
                     >
                       {/* Instructor Image */}
                     <Box position="relative" h="280px" w="full" overflow="hidden">
-                      <Image
-                        src={instructor.avatar || ''}
-                        alt={instructor.name}
-                        fill
-                        style={{ objectFit: "cover" }}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = '';
-                        }}
-                      />
+                      {instructor.avatar ? (
+                        <Image
+                          src={instructor.avatar}
+                          alt={instructor.name}
+                          fill
+                          style={{ objectFit: "cover" }}
+                        />
+                      ) : (
+                        <Box
+                          position="absolute"
+                          inset={0}
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                          bg={useColorModeValue('gray.200', 'gray.700')}
+                        >
+                          <Icon as={FiUser} boxSize="80px" color={useColorModeValue('gray.500', 'gray.400')} />
+                        </Box>
+                      )}
                       <Box
                         position="absolute"
                         top={4}
@@ -247,19 +256,9 @@ export default function InstructorsListPage() {
                           borderRadius="full"
                           fontWeight="semibold"
                         >
-                          {instructor.experience}
+                          {instructor.bio}
                         </Badge>
                       </Box>
-
-                      {/* Bio */}
-                      <Text
-                        fontSize="sm"
-                        color={textMuted}
-                        lineHeight="tall"
-                        noOfLines={3}
-                      >
-                        {instructor.bio}
-                      </Text>
 
                       {/* Additional Info - Location and Email if available */}
                       {(instructor.user?.city || instructor.user?.country || instructor.user?.email) && (

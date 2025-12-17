@@ -44,6 +44,7 @@ import {
   FiFacebook,
   FiInstagram,
   FiMessageCircle,
+  FiUser
 } from "react-icons/fi";
 import academyService from "@/lib/academy-service";
 
@@ -159,21 +160,30 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
                   overflow="hidden"
                   boxShadow="2xl"
                 >
-                  <Image
-                    src={instructor.avatar || ''}
-                    alt={instructor.name}
-                    width={600}
-                    height={600}
-                    style={{
-                      width: "100%",
-                      height: "auto",
-                      display: "block",
-                    }}
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = '';
-                    }}
-                  />
+                  {instructor.avatar ? (
+                    <Image
+                      src={instructor.avatar}
+                      alt={instructor.name}
+                      width={600}
+                      height={600}
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        display: "block",
+                      }}
+                    />
+                  ) : (
+                    <Box
+                      w="100%"
+                      h="600px"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      bg={useColorModeValue('gray.200', 'gray.700')}
+                    >
+                      <Icon as={FiUser} boxSize="200px" color={useColorModeValue('gray.500', 'gray.400')} />
+                    </Box>
+                  )}
                 </Box>
                 {/* Floating Rating Badge */}
                 <Box

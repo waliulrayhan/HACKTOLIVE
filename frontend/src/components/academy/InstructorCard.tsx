@@ -1,8 +1,8 @@
 "use client";
 
-import { Box, HStack, VStack, Text, Image, Badge, Icon } from "@chakra-ui/react";
+import { Box, HStack, VStack, Text, Image, Badge, Icon, useColorModeValue } from "@chakra-ui/react";
 import { Instructor } from "@/types/academy";
-import { FiStar, FiUsers, FiBook } from "react-icons/fi";
+import { FiStar, FiUsers, FiBook, FiUser } from "react-icons/fi";
 import { ButtonLink } from "@/components/shared/button-link";
 
 interface InstructorCardProps {
@@ -25,15 +25,31 @@ export default function InstructorCard({ instructor, showFullBio = false }: Inst
     >
       <VStack spacing="5" align="center" textAlign="center">
         {/* Avatar */}
-        <Image
-          src={instructor.avatar || undefined}
-          alt={instructor.name}
-          boxSize="120px"
-          borderRadius="full"
-          objectFit="cover"
-          border="4px solid"
-          borderColor="primary.500"
-        />
+        {instructor.avatar ? (
+          <Image
+            src={instructor.avatar}
+            alt={instructor.name}
+            boxSize="120px"
+            borderRadius="full"
+            objectFit="cover"
+            border="4px solid"
+            borderColor="primary.500"
+          />
+        ) : (
+          <Box
+            w="120px"
+            h="120px"
+            borderRadius="full"
+            border="4px solid"
+            borderColor="primary.500"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            bg={useColorModeValue('gray.200', 'gray.700')}
+          >
+            <Icon as={FiUser} boxSize="60px" color={useColorModeValue('gray.500', 'gray.400')} />
+          </Box>
+        )}
 
         {/* Name */}
         <VStack spacing="2">
