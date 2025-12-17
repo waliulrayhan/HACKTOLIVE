@@ -51,14 +51,14 @@ export default function DashboardLayout({
             path: "/student/progress",
           },
           {
+            icon: <TaskIcon />,
+            name: "Assignments",
+            path: "/student/assignments",
+          },
+          {
             icon: <CheckCircleIcon />,
             name: "Certificates",
             path: "/student/certificates",
-          },
-          {
-            icon: <FileIcon />,
-            name: "Assignments",
-            path: "/student/assignments",
           },
           {
             icon: <BoxIconLine />,
@@ -130,11 +130,6 @@ export default function DashboardLayout({
             name: "Students",
             path: "/instructor/students",
           },
-          // {
-          //   icon: <PieChartIcon />,
-          //   name: "Analytics",
-          //   path: "/instructor/analytics",
-          // },
           {
             icon: <TaskIcon />,
             name: "Assignments",
@@ -145,6 +140,11 @@ export default function DashboardLayout({
             name: "Certificates",
             path: "/instructor/certificates",
           },
+          // {
+          //   icon: <PieChartIcon />,
+          //   name: "Analytics",
+          //   path: "/instructor/analytics",
+          // },
           {
             icon: <UserCircleIcon />,
             name: "Profile",
