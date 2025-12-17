@@ -29,6 +29,7 @@ import {
   HiOutlineExclamationCircle,
   HiOutlineX,
   HiOutlineCamera,
+  HiOutlineCalendar,
   HiOutlineQuestionMarkCircle,
   HiOutlineClipboardCheck,
   HiOutlinePaperClip,
@@ -73,14 +74,11 @@ interface Lesson {
   id: string;
   title: string;
   description: string;
-  type: string;
+  type: 'VIDEO' | 'ARTICLE' | 'QUIZ' | 'ASSIGNMENT';
   duration: number;
   videoUrl?: string;
   articleContent?: string;
   order: number;
-  quizzes?: any[];
-  assignments?: any[];
-  resources?: any[];
 }
 
 export default function EditCoursePage() {
@@ -104,10 +102,10 @@ export default function EditCoursePage() {
     slug: "",
     shortDescription: "",
     description: "",
-    category: "WEB_SECURITY",
-    level: "FUNDAMENTAL",
-    tier: "FREE",
-    deliveryMode: "RECORDED",
+    category: "",
+    level: "",
+    tier: "",
+    deliveryMode: "",
     price: 0,
     duration: 0,
     learningOutcomes: "",
@@ -201,6 +199,43 @@ export default function EditCoursePage() {
       ...prev,
       [name]: value
     }));
+
+    // Clear related errors when delivery mode changes
+    if (name === 'deliveryMode') {
+      const newErrors = { ...errors };
+      delete newErrors.liveSchedule;
+      delete newErrors.startDate;
+      delete newErrors.endDate;
+      delete newErrors.meetingLink;
+      setErrors(newErrors);
+      
+      // Reset live course fields if switching to RECORDED
+      if (value === 'RECORDED') {
+        setFormData(prev => ({
+          ...prev,
+          liveSchedule: '',
+          startDate: '',
+          endDate: '',
+          maxStudents: 0,
+          meetingLink: '',
+        }));
+      }
+    }
+
+    // Reset price to 0 when tier is FREE
+    if (name === 'tier' && value === 'FREE') {
+      setFormData(prev => ({ ...prev, price: 0 }));
+      const newErrors = { ...errors };
+      delete newErrors.price;
+      setErrors(newErrors);
+    }
+
+    // Clear specific field error when user starts typing
+    if (errors[name]) {
+      const newErrors = { ...errors };
+      delete newErrors[name];
+      setErrors(newErrors);
+    }
   };
 
   const handleThumbnailClick = () => {
@@ -295,6 +330,42 @@ export default function EditCoursePage() {
     if (!formData.slug.trim()) newErrors.slug = "Slug is required";
     if (!formData.shortDescription.trim()) newErrors.shortDescription = "Short description is required";
     if (!formData.description.trim()) newErrors.description = "Description is required";
+    if (!formData.category.trim()) newErrors.category = "Category is required";
+    if (!formData.level.trim()) newErrors.level = "Level is required";
+    if (!formData.deliveryMode.trim()) newErrors.deliveryMode = "Delivery mode is required";
+    if (formData.duration <= 0) newErrors.duration = "Duration must be greater than 0";
+    
+    // Validate live course specific fields
+    if (formData.deliveryMode === 'LIVE') {
+      if (!formData.liveSchedule.trim()) newErrors.liveSchedule = "Live schedule is required for live courses";
+      if (!formData.startDate.trim()) newErrors.startDate = "Start date is required for live courses";
+      if (!formData.endDate.trim()) newErrors.endDate = "End date is required for live courses";
+      if (!formData.meetingLink.trim()) {
+        newErrors.meetingLink = "Meeting link is required for live courses";
+      } else {
+        // Validate URL format
+        try {
+          new URL(formData.meetingLink);
+        } catch {
+          newErrors.meetingLink = "Please enter a valid meeting URL";
+        }
+      }
+      
+      // Validate date logic
+      if (formData.startDate && formData.endDate) {
+        const start = new Date(formData.startDate);
+        const end = new Date(formData.endDate);
+        if (end <= start) {
+          newErrors.endDate = "End date must be after start date";
+        }
+      }
+    }
+
+    // Validate tier and pricing
+    if (!formData.tier.trim()) newErrors.tier = "Tier is required";
+    if (formData.tier === 'PREMIUM' && formData.price <= 0) {
+      newErrors.price = "Premium courses must have a price greater than 0";
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -800,25 +871,27 @@ export default function EditCoursePage() {
         <div className="p-4 sm:p-6">
           {/* Details Tab */}
           {activeTab === 'details' && (
-            <div className="space-y-5">
-              <div className="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-white/5">
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/15">
                   <HiOutlineAcademicCap className="h-5 w-5 text-brand-600 dark:text-brand-400" />
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-                    Course Details
+                    Course Basic Information
                   </h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Update your course information
+                    Update essential details about your course
                   </p>
                 </div>
               </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Course Thumbnail (2:1 ratio recommended)
+              {/* Thumbnail Section */}
+              <div className="rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-5 dark:border-white/5 dark:from-gray-800/50 dark:to-gray-900/50">
+                <label className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                  <HiOutlineCamera className="h-4 w-4 text-brand-500" />
+                  Course Thumbnail
+                  <span className="text-xs font-normal text-gray-500 dark:text-gray-400">(2:1 ratio recommended)</span>
                 </label>
                 <div className="flex items-start gap-4">
                   <div className="relative group">
@@ -863,326 +936,467 @@ export default function EditCoursePage() {
                     />
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Upload a course thumbnail image with a 2:1 aspect ratio (e.g., 1200x600px). 
-                      Maximum file size: 5MB. Supported formats: JPG, PNG, WebP.
-                    </p>
+                    <div className="space-y-2">
+                      <p className="text-xs text-gray-600 dark:text-gray-300 font-medium">
+                        📸 Upload Guidelines
+                      </p>
+                      <ul className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                        <li className="flex items-start gap-1.5">
+                          <span className="text-brand-500 mt-0.5">•</span>
+                          <span>Recommended size: 1200x600px (2:1 ratio)</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <span className="text-brand-500 mt-0.5">•</span>
+                          <span>Maximum file size: 5MB</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <span className="text-brand-500 mt-0.5">•</span>
+                          <span>Formats: JPG, PNG, WebP</span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Course Title <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
-                    errors.title
-                      ? 'border-red-500 focus:border-red-500'
-                      : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
-                  }`}
-                />
-                {errors.title && <p className="mt-1.5 text-xs text-red-500">{errors.title}</p>}
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Slug <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <HiOutlineTag className="h-4 w-4 text-gray-400" />
+              {/* Basic Details Section */}
+              <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-white/5 dark:bg-white/3">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <HiOutlineInformationCircle className="h-4 w-4 text-brand-500" />
+                  Basic Details
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Course Title <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="title"
+                      value={formData.title}
+                      onChange={handleInputChange}
+                      className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                        errors.title
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      }`}
+                      placeholder="e.g., Advanced Web Application Security"
+                    />
+                    {errors.title && <p className="mt-1.5 text-xs text-red-500">{errors.title}</p>}
                   </div>
-                  <input
-                    type="text"
-                    name="slug"
-                    value={formData.slug}
-                    onChange={handleInputChange}
-                    className={`w-full h-10 rounded-lg border pl-10 pr-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
-                      errors.slug
-                        ? 'border-red-500 focus:border-red-500'
-                        : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
-                    }`}
-                  />
-                </div>
-                {errors.slug && <p className="mt-1.5 text-xs text-red-500">{errors.slug}</p>}
-              </div>
 
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Short Description <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  name="shortDescription"
-                  value={formData.shortDescription}
-                  onChange={handleInputChange}
-                  rows={3}
-                  className={`w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
-                    errors.shortDescription
-                      ? 'border-red-500 focus:border-red-500'
-                      : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
-                  }`}
-                />
-                {errors.shortDescription && <p className="mt-1.5 text-xs text-red-500">{errors.shortDescription}</p>}
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Full Description <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows={6}
-                  className={`w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
-                    errors.description
-                      ? 'border-red-500 focus:border-red-500'
-                      : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
-                  }`}
-                />
-                {errors.description && <p className="mt-1.5 text-xs text-red-500">{errors.description}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Category
-                </label>
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleInputChange}
-                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none"
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '16px 16px' }}
-                >
-                  <option value="WEB_SECURITY">Web Security</option>
-                  <option value="NETWORK_SECURITY">Network Security</option>
-                  <option value="MALWARE_ANALYSIS">Malware Analysis</option>
-                  <option value="PENETRATION_TESTING">Penetration Testing</option>
-                  <option value="CLOUD_SECURITY">Cloud Security</option>
-                  <option value="CRYPTOGRAPHY">Cryptography</option>
-                  <option value="INCIDENT_RESPONSE">Incident Response</option>
-                  <option value="SECURITY_FUNDAMENTALS">Security Fundamentals</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Level
-                </label>
-                <select
-                  name="level"
-                  value={formData.level}
-                  onChange={handleInputChange}
-                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none"
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '16px 16px' }}
-                >
-                  <option value="FUNDAMENTAL">Fundamental</option>
-                  <option value="INTERMEDIATE">Intermediate</option>
-                  <option value="ADVANCED">Advanced</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Tier
-                </label>
-                <select
-                  name="tier"
-                  value={formData.tier}
-                  onChange={handleInputChange}
-                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none"
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '16px 16px' }}
-                >
-                  <option value="FREE">Free</option>
-                  <option value="PREMIUM">Premium</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Price (USD)
-                </label>
-                <div className="relative">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <HiOutlineCurrencyDollar className="h-4 w-4 text-gray-400" />
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Slug (URL-friendly) <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <HiOutlineTag className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="text"
+                        name="slug"
+                        value={formData.slug}
+                        onChange={handleInputChange}
+                        className={`w-full h-10 rounded-lg border pl-10 pr-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                          errors.slug
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                        }`}
+                        placeholder="advanced-web-application-security"
+                      />
+                    </div>
+                    {errors.slug && <p className="mt-1.5 text-xs text-red-500">{errors.slug}</p>}
                   </div>
-                  <input
-                    type="number"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleInputChange}
-                    min="0"
-                    step="0.01"
-                    disabled={formData.tier === 'FREE'}
-                    className="w-full h-10 rounded-lg border border-gray-300 pl-10 pr-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50 dark:disabled:bg-gray-900"
-                  />
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Short Description <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      name="shortDescription"
+                      value={formData.shortDescription}
+                      onChange={handleInputChange}
+                      rows={3}
+                      className={`w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                        errors.shortDescription
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      }`}
+                      placeholder="Brief overview of the course (2-3 sentences)"
+                    />
+                    {errors.shortDescription && <p className="mt-1.5 text-xs text-red-500">{errors.shortDescription}</p>}
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Full Description <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      name="description"
+                      value={formData.description}
+                      onChange={handleInputChange}
+                      rows={6}
+                      className={`w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                        errors.description
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      }`}
+                      placeholder="Detailed course description..."
+                    />
+                    {errors.description && <p className="mt-1.5 text-xs text-red-500">{errors.description}</p>}
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Delivery Mode
-                </label>
-                <select
-                  name="deliveryMode"
-                  value={formData.deliveryMode}
-                  onChange={handleInputChange}
-                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none"
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '16px 16px' }}
-                >
-                  <option value="RECORDED">Recorded</option>
-                  <option value="LIVE">Live</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Duration (hours)
-                </label>
-                <div className="relative">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <HiOutlineClock className="h-4 w-4 text-gray-400" />
+              {/* Course Settings Section */}
+              <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-white/5 dark:bg-white/3">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <HiOutlineCog className="h-4 w-4 text-purple-500" />
+                  Course Settings
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Category <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleInputChange}
+                      className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px] ${
+                        errors.category
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      }`}
+                      style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
+                    >
+                      <option value="" disabled>Select Category</option>
+                      <option value="WEB_SECURITY">Web Security</option>
+                      <option value="NETWORK_SECURITY">Network Security</option>
+                      <option value="MALWARE_ANALYSIS">Malware Analysis</option>
+                      <option value="PENETRATION_TESTING">Penetration Testing</option>
+                      <option value="CLOUD_SECURITY">Cloud Security</option>
+                      <option value="CRYPTOGRAPHY">Cryptography</option>
+                      <option value="INCIDENT_RESPONSE">Incident Response</option>
+                      <option value="SECURITY_FUNDAMENTALS">Security Fundamentals</option>
+                    </select>
+                    {errors.category && <p className="mt-1.5 text-xs text-red-500">{errors.category}</p>}
                   </div>
-                  <input
-                    type="number"
-                    name="duration"
-                    value={formData.duration}
-                    onChange={handleInputChange}
-                    min="0"
-                    className="w-full h-10 rounded-lg border border-gray-300 pl-10 pr-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                  />
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Level <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="level"
+                      value={formData.level}
+                      onChange={handleInputChange}
+                      className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px] ${
+                        errors.level
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      }`}
+                      style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
+                    >
+                      <option value="" disabled>Select Level</option>
+                      <option value="FUNDAMENTAL">Fundamental</option>
+                      <option value="INTERMEDIATE">Intermediate</option>
+                      <option value="ADVANCED">Advanced</option>
+                    </select>
+                    {errors.level && <p className="mt-1.5 text-xs text-red-500">{errors.level}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Delivery Mode <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="deliveryMode"
+                      value={formData.deliveryMode}
+                      onChange={handleInputChange}
+                      className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px] ${
+                        errors.deliveryMode
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      }`}
+                      style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
+                    >
+                      <option value="" disabled>Select Delivery Mode</option>
+                      <option value="RECORDED">Recorded</option>
+                      <option value="LIVE">Live</option>
+                    </select>
+                    {errors.deliveryMode && <p className="mt-1.5 text-xs text-red-500">{errors.deliveryMode}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Duration (hours) <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <HiOutlineClock className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="number"
+                        name="duration"
+                        value={formData.duration}
+                        onChange={handleInputChange}
+                        min="0"
+                        className={`w-full h-10 rounded-lg border pl-10 pr-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                          errors.duration
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                        }`}
+                        placeholder="10"
+                      />
+                    </div>
+                    {errors.duration && <p className="mt-1.5 text-xs text-red-500">{errors.duration}</p>}
+                  </div>
                 </div>
               </div>
 
               {/* Live Course Fields */}
               {formData.deliveryMode === 'LIVE' && (
-                <>
-                  <div className="md:col-span-2">
+                <div className="rounded-xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-5 dark:border-amber-800/30 dark:from-amber-900/20 dark:to-orange-900/20">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-500/20">
+                      <HiOutlineCalendar className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-300">Live Session Configuration</h4>
+                      <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                        Configure schedule, dates, and meeting details for your live sessions
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-amber-900 dark:text-amber-300 mb-2">
+                        Live Schedule <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="liveSchedule"
+                        value={formData.liveSchedule}
+                        onChange={handleInputChange}
+                        placeholder="e.g., Every Monday and Wednesday at 7:00 PM EST"
+                        className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                          errors.liveSchedule
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                        }`}
+                      />
+                      {errors.liveSchedule && <p className="mt-1.5 text-xs text-red-500">{errors.liveSchedule}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-amber-900 dark:text-amber-300 mb-2">
+                        Start Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        name="startDate"
+                        value={formData.startDate}
+                        onChange={handleInputChange}
+                        className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                          errors.startDate
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                        }`}
+                      />
+                      {errors.startDate && <p className="mt-1.5 text-xs text-red-500">{errors.startDate}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-amber-900 dark:text-amber-300 mb-2">
+                        End Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        name="endDate"
+                        value={formData.endDate}
+                        onChange={handleInputChange}
+                        className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                          errors.endDate
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                        }`}
+                      />
+                      {errors.endDate && <p className="mt-1.5 text-xs text-red-500">{errors.endDate}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-amber-900 dark:text-amber-300 mb-2">
+                        Max Students
+                        <span className="text-xs font-normal text-amber-700 dark:text-amber-400 ml-2">(optional)</span>
+                      </label>
+                      <input
+                        type="number"
+                        name="maxStudents"
+                        value={formData.maxStudents}
+                        onChange={handleInputChange}
+                        min="0"
+                        placeholder="Leave 0 for unlimited"
+                        className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-amber-900 dark:text-amber-300 mb-2">
+                        Meeting Link <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="url"
+                        name="meetingLink"
+                        value={formData.meetingLink}
+                        onChange={handleInputChange}
+                        placeholder="e.g., https://zoom.us/j/123456789"
+                        className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                          errors.meetingLink
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                        }`}
+                      />
+                      {errors.meetingLink && <p className="mt-1.5 text-xs text-red-500">{errors.meetingLink}</p>}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Pricing Section */}
+              <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-white/5 dark:bg-white/3">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <HiOutlineCurrencyDollar className="h-4 w-4 text-success-600" />
+                  Pricing
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Live Schedule <span className="text-red-500">*</span>
+                      Course Tier <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="tier"
+                      value={formData.tier}
+                      onChange={handleInputChange}
+                      className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px] ${
+                        errors.tier
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      }`}
+                      style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
+                    >
+                      <option value="" disabled>Select Tier</option>
+                      <option value="FREE">Free - Accessible to everyone</option>
+                      <option value="PREMIUM">Premium - Paid course</option>
+                    </select>
+                    {errors.tier && <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1"><HiOutlineExclamationCircle className="h-3.5 w-3.5" />{errors.tier}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Price (Tk) <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <HiOutlineCurrencyDollar className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="number"
+                        name="price"
+                        value={formData.price}
+                        onChange={handleInputChange}
+                        min="0"
+                        step="0.01"
+                        disabled={formData.tier === 'FREE'}
+                        className={`w-full h-10 rounded-lg border pl-11 pr-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                          errors.price
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                        } ${formData.tier === 'FREE' ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-900' : ''}`}
+                        placeholder="e.g., 2999.00"
+                      />
+                    </div>
+                    {errors.price && <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1"><HiOutlineExclamationCircle className="h-3.5 w-3.5" />{errors.price}</p>}
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Details Section */}
+              <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-white/5 dark:bg-white/3">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <HiOutlineDocumentText className="h-4 w-4 text-green-500" />
+                  Additional Details
+                </h4>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Learning Outcomes
+                      <span className="text-xs font-normal text-gray-500 ml-2">(one per line)</span>
+                    </label>
+                    <textarea
+                      name="learningOutcomes"
+                      value={formData.learningOutcomes}
+                      onChange={handleInputChange}
+                      rows={4}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      placeholder="e.g., Master SQL injection techniques&#10;Understand OWASP Top 10 vulnerabilities&#10;Perform security audits"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Requirements
+                      <span className="text-xs font-normal text-gray-500 ml-2">(one per line)</span>
+                    </label>
+                    <textarea
+                      name="requirements"
+                      value={formData.requirements}
+                      onChange={handleInputChange}
+                      rows={3}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      placeholder="e.g., Basic programming knowledge&#10;Familiarity with web technologies&#10;A computer with internet access"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Tags
+                      <span className="text-xs font-normal text-gray-500 ml-2">(comma separated)</span>
                     </label>
                     <input
                       type="text"
-                      name="liveSchedule"
-                      value={formData.liveSchedule}
-                      onChange={handleInputChange}
-                      placeholder="e.g., Every Monday and Wednesday at 7:00 PM EST"
-                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Start Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      name="startDate"
-                      value={formData.startDate}
+                      name="tags"
+                      value={formData.tags}
                       onChange={handleInputChange}
                       className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      placeholder="security, hacking, web, penetration testing"
                     />
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      End Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      name="endDate"
-                      value={formData.endDate}
-                      onChange={handleInputChange}
-                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Max Students
-                    </label>
-                    <input
-                      type="number"
-                      name="maxStudents"
-                      value={formData.maxStudents}
-                      onChange={handleInputChange}
-                      min="0"
-                      placeholder="Leave 0 for unlimited"
-                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                    />
-                  </div>
-                </>
-              )}
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Learning Outcomes (one per line)
-                </label>
-                <textarea
-                  name="learningOutcomes"
-                  value={formData.learningOutcomes}
-                  onChange={handleInputChange}
-                  rows={4}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                />
+                </div>
               </div>
 
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Requirements (one per line)
-                </label>
-                <textarea
-                  name="requirements"
-                  value={formData.requirements}
-                  onChange={handleInputChange}
-                  rows={3}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Tags (comma separated)
-                </label>
-                <input
-                  type="text"
-                  name="tags"
-                  value={formData.tags}
-                  onChange={handleInputChange}
-                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                />
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-white/5">
+                <button
+                  onClick={handleSaveDetails}
+                  disabled={saving}
+                  className="inline-flex items-center justify-center gap-2 h-10 rounded-lg border border-brand-500 bg-brand-500 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-brand-600 hover:border-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {saving ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <HiOutlineSave className="h-4 w-4" />
+                      Save Changes
+                    </>
+                  )}
+                </button>
               </div>
             </div>
-
-            <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-white/5">
-              <button
-                onClick={handleSaveDetails}
-                disabled={saving}
-                className="inline-flex items-center justify-center gap-2 h-10 font-medium rounded-lg transition px-5 text-sm bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {saving ? (
-                  <>
-                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <HiOutlineSave className="h-4 w-4" />
-                    Save Changes
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        )}
+          )}
 
         {/* Curriculum Tab */}
         {activeTab === 'curriculum' && (
@@ -1409,7 +1623,7 @@ export default function EditCoursePage() {
                                             return {
                                               ...m,
                                               lessons: m.lessons.map(l =>
-                                                l.id === lesson.id ? { ...l, type: e.target.value } : l
+                                                l.id === lesson.id ? { ...l, type: e.target.value as 'VIDEO' | 'ARTICLE' | 'QUIZ' | 'ASSIGNMENT' } : l
                                               )
                                             };
                                           }
@@ -1540,26 +1754,6 @@ export default function EditCoursePage() {
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
                                   {lesson.type} • {lesson.duration} min
                                 </p>
-                                <div className="flex flex-wrap items-center gap-2 mt-1.5">
-                                  {lesson.quizzes && lesson.quizzes.length > 0 && (
-                                    <div className="flex items-center gap-1 text-[10px] text-purple-600 dark:text-purple-400">
-                                      <HiOutlineQuestionMarkCircle className="h-3 w-3" />
-                                      <span>{lesson.quizzes.length} Quiz{lesson.quizzes.length !== 1 ? 'zes' : ''}</span>
-                                    </div>
-                                  )}
-                                  {lesson.assignments && lesson.assignments.length > 0 && (
-                                    <div className="flex items-center gap-1 text-[10px] text-orange-600 dark:text-orange-400">
-                                      <HiOutlineClipboardCheck className="h-3 w-3" />
-                                      <span>{lesson.assignments.length} Assignment{lesson.assignments.length !== 1 ? 's' : ''}</span>
-                                    </div>
-                                  )}
-                                  {lesson.resources && lesson.resources.length > 0 && (
-                                    <div className="flex items-center gap-1 text-[10px] text-green-600 dark:text-green-400">
-                                      <HiOutlinePaperClip className="h-3 w-3" />
-                                      <span>{lesson.resources.length} Resource{lesson.resources.length !== 1 ? 's' : ''}</span>
-                                    </div>
-                                  )}
-                                </div>
                               </div>
                               <div className="flex items-center gap-1 shrink-0">
                                 {lesson.type === 'ARTICLE' && (
