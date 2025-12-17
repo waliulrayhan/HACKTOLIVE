@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { toast } from "@/components/ui/toast";
+import { getFullImageUrl } from '@/lib/image-utils';
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import { DashboardLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
 import { getInitials, getAvatarColorClass } from "@/lib/utils";
@@ -186,7 +187,7 @@ export default function AdminDashboard() {
                 <div className="flex items-center gap-3">
                   {enrollment.student?.avatar ? (
                     <img 
-                      src={`${process.env.NEXT_PUBLIC_API_URL}${enrollment.student.avatar}`}
+                      src={getFullImageUrl(enrollment.student.avatar, 'avatar')}
                       alt={enrollment.student?.name || 'Student'}
                       className="h-10 w-10 rounded-full object-cover"
                     />
@@ -231,7 +232,7 @@ export default function AdminDashboard() {
                 <div className="flex items-center gap-3">
                   {course.instructor?.avatar ? (
                     <img 
-                      src={`${process.env.NEXT_PUBLIC_API_URL}${course.instructor.avatar}`}
+                      src={getFullImageUrl(course.instructor.avatar, 'avatar')}
                       alt={course.instructor?.name || 'Instructor'}
                       className="h-10 w-10 rounded-full object-cover"
                     />

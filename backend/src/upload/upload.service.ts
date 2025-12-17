@@ -54,12 +54,8 @@ export class UploadService {
   }
 
   getFileUrl(filename: string, folder = 'images'): string {
-    const isProduction = process.env.NODE_ENV === 'production';
-    const baseUrl = isProduction 
-      ? (process.env.API_URL || 'https://api.hacktolive.io')
-      : '';
-    
-    return `${baseUrl}/uploads/${folder}/${filename}`;
+    // Always return relative path - frontend will add the correct base URL
+    return `/uploads/${folder}/${filename}`;
   }
 
   deleteFile(filePath: string): boolean {

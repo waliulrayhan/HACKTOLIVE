@@ -28,6 +28,7 @@ import {
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
 import Badge from "@/components/ui/badge/Badge";
+import { getFullImageUrl } from '@/lib/image-utils';
 import {
   Table,
   TableBody,
@@ -104,7 +105,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
 
 const getUserAvatarSrc = (user: User) => {
   const avatarPath = user.student?.avatar ?? user.instructor?.avatar ?? user.avatar;
-  return avatarPath ? `${process.env.NEXT_PUBLIC_API_URL}${avatarPath}` : undefined;
+  return getFullImageUrl(avatarPath, 'avatar');
 };
 
 export default function UsersManagementPage() {

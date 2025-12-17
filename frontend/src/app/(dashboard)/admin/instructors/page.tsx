@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { toast } from "@/components/ui/toast";
-import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
+import { toast } from "@/components/ui/toast";import { getFullImageUrl } from '@/lib/image-utils';import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
 import { getInitials, getAvatarColorClass } from "@/lib/utils";
 import {
@@ -319,7 +318,7 @@ export default function InstructorsManagementPage() {
                         <div className="flex items-center gap-2 sm:gap-3">
                           {instructor.avatar ? (
                             <img 
-                              src={`${process.env.NEXT_PUBLIC_API_URL}${instructor.avatar}`}
+                              src={getFullImageUrl(instructor.avatar, 'avatar')}
                               alt={instructor.name}
                               className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-full object-cover"
                             />
@@ -502,8 +501,8 @@ export default function InstructorsManagementPage() {
               {/* Instructor Avatar and Name */}
               <div className="flex items-center gap-4 pb-5 border-b border-gray-200 dark:border-gray-800">
                 {selectedInstructor.avatar ? (
-                  <img 
-                    src={`${process.env.NEXT_PUBLIC_API_URL}${selectedInstructor.avatar}`}
+                  <img
+                    src={getFullImageUrl(selectedInstructor.avatar, 'avatar')}
                     alt={selectedInstructor.name}
                     className="h-16 w-16 shrink-0 rounded-full object-cover"
                   />
