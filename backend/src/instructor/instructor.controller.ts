@@ -450,7 +450,17 @@ export class InstructorController {
         },
       },
       include: {
-        student: true,
+        student: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+                avatar: true,
+              },
+            },
+          },
+        },
         course: true,
       },
       orderBy: {

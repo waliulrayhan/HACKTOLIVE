@@ -113,13 +113,14 @@ export default function InstructorStudentsPage() {
       
       enrollments.forEach((enrollment: any) => {
         const studentData = enrollment.student;
+        const userData = enrollment.student.user;
         
         if (!studentsMap.has(studentData.id)) {
           studentsMap.set(studentData.id, {
             id: studentData.id,
-            name: studentData.name,
-            email: studentData.email,
-            avatar: studentData.avatar,
+            name: userData?.name || 'Unknown',
+            email: userData?.email || 'No email',
+            avatar: userData?.avatar,
             enrolledCourses: studentData.enrolledCourses || 0,
             completedCourses: studentData.completedCourses || 0,
             certificatesEarned: studentData.certificatesEarned || 0,
