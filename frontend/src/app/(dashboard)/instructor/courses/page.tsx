@@ -29,6 +29,7 @@ import {
   HiOutlineQuestionMarkCircle,
   HiOutlineClipboardCheck,
   HiOutlinePaperClip,
+  HiOutlineInformationCircle,
 } from "react-icons/hi";
 import {
   Table,
@@ -599,8 +600,8 @@ export default function InstructorCoursesPage() {
                     <button
                       onClick={() => setCurrentPage(page)}
                       className={`flex h-7 w-7 items-center justify-center rounded-md border text-xs font-medium transition-colors ${pagination.page === page
-                          ? 'border-brand-500 bg-brand-500 text-white'
-                          : 'border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3'
+                        ? 'border-brand-500 bg-brand-500 text-white'
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3'
                         }`}
                     >
                       {page}
@@ -634,201 +635,281 @@ export default function InstructorCoursesPage() {
 
       {/* View Modal */}
       {showViewModal && selectedCourse && (
-        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
-          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col border border-gray-200 dark:border-white/10">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-white/5">
-              <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                Course Details
-              </h3>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-white/5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/15">
+                  <HiOutlineAcademicCap className="h-5 w-5 text-brand-600 dark:text-brand-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Course Details
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    View course information
+                  </p>
+                </div>
+              </div>
               <button
                 onClick={() => {
                   setShowViewModal(false);
                   setSelectedCourse(null);
                 }}
-                className="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-white/5 transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-white/5 transition-colors"
               >
-                <HiOutlineX className="h-4 w-4" />
+                <HiOutlineX className="h-5 w-5" />
               </button>
             </div>
 
             {/* Body */}
-            <div className="p-4 space-y-4">
-              {/* Thumbnail */}
-              {selectedCourse.thumbnail && (
-                <div className="w-full aspect-[2/1] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-                  <Image
-                    width={600}
-                    height={300}
-                    src={`${process.env.NEXT_PUBLIC_API_URL}${selectedCourse.thumbnail}`}
-                    alt={selectedCourse.title}
-                    className="object-cover w-full h-full"
-                    unoptimized
-                  />
-                </div>
-              )}
-
-              {/* Title & Description */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 dark:text-white">
-                  {selectedCourse.title}
-                </h4>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  {selectedCourse.shortDescription}
-                </p>
-              </div>
-
-              {/* Stats Grid */}
-              <div className="grid grid-cols-4 gap-3">
-                <div className="text-center p-2 rounded-md border border-gray-200 bg-gray-50 dark:border-white/5 dark:bg-white/3">
-                  <HiOutlineUsers className="h-4 w-4 mx-auto text-gray-400 mb-1" />
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {selectedCourse.totalStudents}
-                  </p>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400">Students</p>
-                </div>
-                <div className="text-center p-2 rounded-md border border-gray-200 bg-gray-50 dark:border-white/5 dark:bg-white/3">
-                  <HiOutlineStar className="h-4 w-4 mx-auto text-yellow-400 mb-1" />
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {selectedCourse.rating.toFixed(1)}
-                  </p>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400">Rating</p>
-                </div>
-                <div className="text-center p-2 rounded-md border border-gray-200 bg-gray-50 dark:border-white/5 dark:bg-white/3">
-                  <HiOutlineClock className="h-4 w-4 mx-auto text-gray-400 mb-1" />
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {selectedCourse.duration}h
-                  </p>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400">Duration</p>
-                </div>
-                <div className="text-center p-2 rounded-md border border-gray-200 bg-gray-50 dark:border-white/5 dark:bg-white/3">
-                  <HiOutlineBookOpen className="h-4 w-4 mx-auto text-gray-400 mb-1" />
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {selectedCourse._count?.modules || 0}
-                  </p>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400">Modules</p>
-                </div>
-              </div>
-
-              {/* Content Breakdown */}
-              {selectedCourse.contentStats && (
-                <div className="rounded-md border border-info-200 bg-info-50 p-3 dark:border-info-500/20 dark:bg-info-950/20">
-                  <h5 className="text-xs font-semibold text-gray-900 dark:text-white mb-2">Course Content</h5>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
-                      <HiOutlineBookOpen className="h-4 w-4 text-info-600 dark:text-info-400" />
-                      <span>{selectedCourse.contentStats.lessons} Lessons</span>
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Left Column */}
+                <div className="space-y-4">
+                  {/* Thumbnail */}
+                  {selectedCourse.thumbnail && (
+                    <div className="w-full aspect-[2/1] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+                      <Image
+                        width={600}
+                        height={300}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}${selectedCourse.thumbnail}`}
+                        alt={selectedCourse.title}
+                        className="object-cover w-full h-full"
+                        unoptimized
+                      />
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
-                      <HiOutlineQuestionMarkCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                      <span>{selectedCourse.contentStats.quizzes} Quizzes</span>
+                  )}
+
+                  {/* Title & Description */}
+                  <div>
+                    <div className="flex items-start gap-2 mb-2">
+                      <h4 className="text-base font-semibold text-gray-900 dark:text-white flex-1">
+                        {selectedCourse.title}
+                      </h4>
+                      {/* <Badge color={getTierBadge(selectedCourse.tier) as any} size="sm">
+                        {selectedCourse.tier}
+                      </Badge> */}
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
-                      <HiOutlineClipboardCheck className="h-4 w-4 text-warning-600 dark:text-warning-400" />
-                      <span>{selectedCourse.contentStats.assignments} Assignments</span>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {selectedCourse.shortDescription}
+                    </p>
+                  </div>
+
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-4 gap-3">
+                    <div className="text-center p-3 rounded-lg border border-gray-200 bg-gray-50 dark:border-white/5 dark:bg-white/3">
+                      <HiOutlineUsers className="h-5 w-5 mx-auto text-info-600 dark:text-info-400 mb-1" />
+                      <p className="text-lg font-bold text-gray-900 dark:text-white">
+                        {selectedCourse.totalStudents}
+                      </p>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400">Students</p>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
-                      <HiOutlinePaperClip className="h-4 w-4 text-success-600 dark:text-success-400" />
-                      <span>{selectedCourse.contentStats.resources} Resources</span>
+                    <div className="text-center p-3 rounded-lg border border-gray-200 bg-gray-50 dark:border-white/5 dark:bg-white/3">
+                      <HiOutlineStar className="h-5 w-5 mx-auto text-yellow-500 mb-1" />
+                      <p className="text-lg font-bold text-gray-900 dark:text-white">
+                        {selectedCourse.rating.toFixed(1)}
+                      </p>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400">Rating</p>
+                    </div>
+                    <div className="text-center p-3 rounded-lg border border-gray-200 bg-gray-50 dark:border-white/5 dark:bg-white/3">
+                      <HiOutlineClock className="h-5 w-5 mx-auto text-purple-600 dark:text-purple-400 mb-1" />
+                      <p className="text-lg font-bold text-gray-900 dark:text-white">
+                        {selectedCourse.duration}h
+                      </p>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400">Duration</p>
+                    </div>
+                    <div className="text-center p-3 rounded-lg border border-gray-200 bg-gray-50 dark:border-white/5 dark:bg-white/3">
+                      <HiOutlineBookOpen className="h-5 w-5 mx-auto text-success-600 dark:text-success-400 mb-1" />
+                      <p className="text-lg font-bold text-gray-900 dark:text-white">
+                        {selectedCourse._count?.modules || 0}
+                      </p>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400">Modules</p>
                     </div>
                   </div>
-                </div>
-              )}
 
-              {/* Details */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-white/5">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Category</span>
-                  <Badge color="info" size="sm">
-                    {selectedCourse.category.replace(/_/g, ' ')}
-                  </Badge>
+                  {/* Course Content */}
+                  {selectedCourse.contentStats && (
+                    <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-white/5 dark:bg-white/3">
+                      <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                        <HiOutlineBookOpen className="h-4 w-4 text-brand-500" />
+                        Course Content
+                      </h5>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-info-100 dark:bg-info-500/15">
+                            <HiOutlineBookOpen className="h-4 w-4 text-info-600 dark:text-info-400" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Lessons</p>
+                            <p className="font-semibold">{selectedCourse.contentStats.lessons}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-500/15">
+                            <HiOutlineQuestionMarkCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Quizzes</p>
+                            <p className="font-semibold">{selectedCourse.contentStats.quizzes}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-warning-100 dark:bg-warning-500/15">
+                            <HiOutlineClipboardCheck className="h-4 w-4 text-warning-600 dark:text-warning-400" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Assignments</p>
+                            <p className="font-semibold">{selectedCourse.contentStats.assignments}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-success-100 dark:bg-success-500/15">
+                            <HiOutlinePaperClip className="h-4 w-4 text-success-600 dark:text-success-400" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Resources</p>
+                            <p className="font-semibold">{selectedCourse.contentStats.resources}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-white/5">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Level</span>
-                  <span className="text-xs font-medium text-gray-900 dark:text-white">
-                    {selectedCourse.level}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-white/5">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Status</span>
-                  <Badge color={getStatusBadge(selectedCourse.status).color as any} size="sm">
-                    {React.createElement(getStatusBadge(selectedCourse.status).Icon, { className: "h-3 w-3 mr-1" })}
-                    {selectedCourse.status}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-white/5">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Tier</span>
-                  <Badge color={getTierBadge(selectedCourse.tier) as any} size="sm">
-                    {selectedCourse.tier}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-white/5">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Delivery</span>
-                  <span className="text-xs font-medium text-gray-900 dark:text-white">
-                    {selectedCourse.deliveryMode}
-                  </span>
-                </div>
-                {selectedCourse.deliveryMode === 'LIVE' && selectedCourse.liveSchedule && (
-                  <div className="flex items-start justify-between py-2 border-b border-gray-100 dark:border-white/5">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Schedule</span>
-                    <span className="text-xs font-medium text-gray-900 dark:text-white text-right max-w-[200px]">
-                      {selectedCourse.liveSchedule}
-                    </span>
+
+                {/* Right Column */}
+                <div className="space-y-4">
+                  {/* Basic Information */}
+                  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-white/5 dark:bg-white/3">
+                    <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                      <HiOutlineInformationCircle className="h-4 w-4 text-brand-500" />
+                      Basic Information
+                    </h5>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Category</span>
+                        <Badge color="info" size="sm">
+                          <HiOutlineTag className="h-3 w-3 mr-1" />
+                          {selectedCourse.category.replace(/_/g, ' ')}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Status</span>
+                        <Badge color={getStatusBadge(selectedCourse.status).color as any} size="sm">
+                          {React.createElement(getStatusBadge(selectedCourse.status).Icon, { className: "h-3 w-3 mr-1" })}
+                          {selectedCourse.status}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Level</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {selectedCourse.level}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Delivery Mode</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {selectedCourse.deliveryMode}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-white/5">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Price</span>
+                        <span className="text-base font-bold text-brand-600 dark:text-brand-400">
+                          {selectedCourse.price.toFixed(2)} Tk
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                )}
-                {selectedCourse.deliveryMode === 'LIVE' && (selectedCourse.startDate || selectedCourse.endDate) && (
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-white/5">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Duration</span>
-                    <span className="text-xs font-medium text-gray-900 dark:text-white">
-                      {selectedCourse.startDate && new Date(selectedCourse.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                      {selectedCourse.startDate && selectedCourse.endDate && ' - '}
-                      {selectedCourse.endDate && new Date(selectedCourse.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </span>
+
+                  {/* Live Course Details */}
+                  {selectedCourse.deliveryMode === 'LIVE' && (
+                    <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-500/20 dark:bg-amber-950/20">
+                      <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                        <HiOutlineClock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                        Live Session Details
+                      </h5>
+                      <div className="space-y-3">
+                        {selectedCourse.liveSchedule && (
+                          <div>
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Schedule</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              {selectedCourse.liveSchedule}
+                            </p>
+                          </div>
+                        )}
+                        {selectedCourse.meetingLink && (
+                          <div>
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Meeting Link</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              {selectedCourse.meetingLink}
+                            </p>
+                          </div>
+                        )}
+                        {/* {(selectedCourse.startDate || selectedCourse.endDate) && (
+                          <div>
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Duration</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              {selectedCourse.startDate && new Date(selectedCourse.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              {selectedCourse.startDate && selectedCourse.endDate && ' - '}
+                              {selectedCourse.endDate && new Date(selectedCourse.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </p>
+                          </div>
+                        )} */}
+                        {selectedCourse.maxStudents && selectedCourse.maxStudents > 0 && (
+                          <div>
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Enrollment</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              {selectedCourse.enrolledStudents || 0} / {selectedCourse.maxStudents} students
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Additional Info */}
+                  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-white/5 dark:bg-white/3">
+                    <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Additional Info</h5>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600 dark:text-gray-400">Created</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {new Date(selectedCourse.createdAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600 dark:text-gray-400">Course ID</span>
+                        <span className="font-mono text-xs text-gray-500 dark:text-gray-400">
+                          {selectedCourse.id.slice(0, 8)}...
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                )}
-                {selectedCourse.deliveryMode === 'LIVE' && selectedCourse.maxStudents && selectedCourse.maxStudents > 0 && (
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-white/5">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Max Students</span>
-                    <span className="text-xs font-medium text-gray-900 dark:text-white">
-                      {selectedCourse.enrolledStudents || 0} / {selectedCourse.maxStudents}
-                    </span>
-                  </div>
-                )}
-                <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-white/5">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Price</span>
-                  <span className="text-xs font-semibold text-brand-600 dark:text-brand-400">
-                    ${selectedCourse.price.toFixed(2)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Created</span>
-                  <span className="text-xs font-medium text-gray-900 dark:text-white">
-                    {new Date(selectedCourse.createdAt).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
-                  </span>
                 </div>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-2 p-4 border-t border-gray-200 dark:border-white/5">
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-gray-800/50">
               <button
                 onClick={() => {
                   setShowViewModal(false);
                   setSelectedCourse(null);
                 }}
-                className="h-9 inline-flex items-center justify-center px-4 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700"
+                className="h-10 inline-flex items-center justify-center px-4 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700"
               >
                 Close
               </button>
               <button
                 onClick={() => router.push(`/instructor/courses/${selectedCourse.id}/edit`)}
-                className="h-9 inline-flex items-center justify-center gap-1.5 px-4 text-xs font-medium text-white bg-brand-500 rounded-lg hover:bg-brand-600 transition-colors"
+                className="h-10 inline-flex items-center justify-center gap-2 px-5 text-sm font-medium text-white bg-brand-500 rounded-lg hover:bg-brand-600 transition-colors shadow-lg shadow-brand-500/30"
               >
-                <HiOutlinePencil className="h-3.5 w-3.5" />
+                <HiOutlinePencil className="h-4 w-4" />
                 Edit Course
               </button>
             </div>
