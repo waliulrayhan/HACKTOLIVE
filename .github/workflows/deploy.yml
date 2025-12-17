@@ -1,0 +1,39 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🚀 Deploy to Production Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            cd /var/www/hacktolive
+            echo "📦 Pulling latest code..."
+            git stash
+            git pull origin main
+            
+            echo "🔧 Building backend..."
+            cd backend
+            pnpm install
+            pnpm run build
+            pm2 restart hacktolive-backend
+            
+            echo "🔧 Building frontend..."
+            cd ../frontend
+            npm install
+            npm run build
+            pm2 restart hacktolive-frontend
+            
+            echo "✅ Deployment complete!"
+            pm2 status
