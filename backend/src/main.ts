@@ -7,7 +7,13 @@ import { join } from 'path';
 import * as express from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: isProduction 
+      ? ['error', 'warn'] // Only log errors and warnings in production
+      : ['log', 'error', 'warn', 'debug', 'verbose'], // All logs in development
+  });
 
   // Serve static files from uploads directory
   // In development: uploads folder is at project root
@@ -35,25 +41,32 @@ async function bootstrap() {
     }),
   );
 
-  // Swagger configuration
-  const config = new DocumentBuilder()
-    .setTitle('HACKTOLIVE API')
-    .setDescription('The HACKTOLIVE API documentation')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .addTag('auth')
-    .addTag('users')
-    .addTag('upload')
-    .addTag('academy')
-    .addTag('student')
-    .addTag('admin')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  // Swagger configuration - Only in development
+  if (!isProduction) {
+    const config = new DocumentBuilder()
+      .setTitle('HACKTOLIVE API')
+      .setDescription('The HACKTOLIVE API documentation')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .addTag('auth')
+      .addTag('users')
+      .addTag('upload')
+      .addTag('academy')
+      .addTag('student')
+      .addTag('admin')
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, document);
+  }
 
   const port = process.env.PORT ?? 4000;
   await app.listen(port, '0.0.0.0');
-  console.log(`🚀 Application is running on: http://localhost:${port}`);
-  console.log(`🌐 Network: http://192.168.0.166:${port}`);
+  
+  if (isProduction) {
+    console.log(`🚀 Application is running on port: ${port}`);
+  } else {
+    console.log(`🚀 Application is running on: http://localhost:${port}`);
+    console.log(`🌐 Network: http://192.168.0.166:${port}`);
+  }
 }
 bootstrap();
