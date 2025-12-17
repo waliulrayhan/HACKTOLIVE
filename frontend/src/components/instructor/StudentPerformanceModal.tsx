@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { toast } from "@/components/ui/toast";
-import Button from "@/components/ui/button/Button";
 import Badge from "@/components/ui/badge/Badge";
 import {
   HiOutlineX,
@@ -12,9 +11,6 @@ import {
   HiOutlineAcademicCap,
   HiOutlineClipboardCheck,
   HiOutlineQuestionMarkCircle,
-  HiOutlineDocumentText,
-  HiOutlineTrendingUp,
-  HiOutlineChartBar,
 } from "react-icons/hi";
 
 interface PerformanceModalProps {
@@ -72,60 +68,60 @@ export default function StudentPerformanceModal({
   const getScoreColor = (percentage: number) => {
     if (percentage >= 80) return "text-success-600 dark:text-success-400";
     if (percentage >= 60) return "text-warning-600 dark:text-warning-400";
-    return "text-danger-600 dark:text-danger-400";
-  };
-
-  const getScoreBg = (percentage: number) => {
-    if (percentage >= 80) return "bg-success-100 dark:bg-success-900/20";
-    if (percentage >= 60) return "bg-warning-100 dark:bg-warning-900/20";
-    return "bg-danger-100 dark:bg-danger-900/20";
+    return "text-error-600 dark:text-error-400";
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-lg bg-white shadow-2xl dark:bg-gray-900">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+      <div className="relative w-full max-w-3xl max-h-[92vh] overflow-hidden rounded-xl bg-white shadow-xl border border-gray-200 dark:border-white/10 dark:bg-gray-900">
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4 dark:border-white/5 dark:bg-gray-900">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              Student Performance Review
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-5 py-3 sm:py-4 dark:border-white/5 dark:bg-gray-900">
+          <div className="flex-1 min-w-0 mr-3">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate">
+              Performance Review
             </h2>
             {performance && (
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
                 {performance.student.name} • {performance.course.title}
               </p>
             )}
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+            className="rounded-lg p-1.5 sm:p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300 transition-colors"
           >
-            <HiOutlineX className="h-5 w-5" />
+            <HiOutlineX className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto p-6" style={{ maxHeight: "calc(90vh - 140px)" }}>
+        <div className="overflow-y-auto p-4 sm:p-5" style={{ maxHeight: "calc(92vh - 140px)" }}>
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-500 border-t-transparent"></div>
+              <div className="h-6 w-6 sm:h-8 sm:w-8 animate-spin rounded-full border-3 border-brand-500 border-t-transparent"></div>
             </div>
           ) : performance ? (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-5">
               {/* Overall Summary */}
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-2 sm:gap-3 grid-cols-3">
                 {/* Lessons */}
-                <div className={`rounded-lg p-4 ${getScoreBg(performance.performance.lessons.percentage)}`}>
-                  <div className="flex items-center gap-3">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-full ${getScoreBg(performance.performance.lessons.percentage)}`}>
-                      <HiOutlineAcademicCap className={`h-6 w-6 ${getScoreColor(performance.performance.lessons.percentage)}`} />
+                <div className="rounded-md border border-gray-200 bg-white p-2.5 sm:p-3 dark:border-white/5 dark:bg-white/3">
+                  <div className="flex flex-col items-center text-center gap-1.5 sm:gap-2">
+                    <div className={`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg ${
+                      performance.performance.lessons.percentage >= 80 
+                        ? "bg-success-100 dark:bg-success-500/15" 
+                        : performance.performance.lessons.percentage >= 60
+                        ? "bg-warning-100 dark:bg-warning-500/15"
+                        : "bg-error-100 dark:bg-error-500/15"
+                    }`}>
+                      <HiOutlineAcademicCap className={`h-4 w-4 sm:h-5 sm:w-5 ${getScoreColor(performance.performance.lessons.percentage)}`} />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Lessons Completed</p>
-                      <p className={`text-2xl font-bold ${getScoreColor(performance.performance.lessons.percentage)}`}>
+                      <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Lessons</p>
+                      <p className={`text-sm sm:text-base font-bold ${getScoreColor(performance.performance.lessons.percentage)}`}>
                         {performance.performance.lessons.completed}/{performance.performance.lessons.total}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-[9px] sm:text-[10px] text-gray-400">
                         {Math.round(performance.performance.lessons.percentage)}%
                       </p>
                     </div>
@@ -133,17 +129,23 @@ export default function StudentPerformanceModal({
                 </div>
 
                 {/* Quizzes */}
-                <div className={`rounded-lg p-4 ${getScoreBg(performance.performance.quizzes.averageScore)}`}>
-                  <div className="flex items-center gap-3">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-full ${getScoreBg(performance.performance.quizzes.averageScore)}`}>
-                      <HiOutlineQuestionMarkCircle className={`h-6 w-6 ${getScoreColor(performance.performance.quizzes.averageScore)}`} />
+                <div className="rounded-md border border-gray-200 bg-white p-2.5 sm:p-3 dark:border-white/5 dark:bg-white/3">
+                  <div className="flex flex-col items-center text-center gap-1.5 sm:gap-2">
+                    <div className={`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg ${
+                      performance.performance.quizzes.averageScore >= 80 
+                        ? "bg-success-100 dark:bg-success-500/15" 
+                        : performance.performance.quizzes.averageScore >= 60
+                        ? "bg-warning-100 dark:bg-warning-500/15"
+                        : "bg-error-100 dark:bg-error-500/15"
+                    }`}>
+                      <HiOutlineQuestionMarkCircle className={`h-4 w-4 sm:h-5 sm:w-5 ${getScoreColor(performance.performance.quizzes.averageScore)}`} />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Quiz Average</p>
-                      <p className={`text-2xl font-bold ${getScoreColor(performance.performance.quizzes.averageScore)}`}>
+                      <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Quizzes</p>
+                      <p className={`text-sm sm:text-base font-bold ${getScoreColor(performance.performance.quizzes.averageScore)}`}>
                         {performance.performance.quizzes.averageScore}%
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-[9px] sm:text-[10px] text-gray-400">
                         {performance.performance.quizzes.passed}/{performance.performance.quizzes.total} Passed
                       </p>
                     </div>
@@ -151,17 +153,23 @@ export default function StudentPerformanceModal({
                 </div>
 
                 {/* Assignments */}
-                <div className={`rounded-lg p-4 ${getScoreBg(performance.performance.assignments.averageScore)}`}>
-                  <div className="flex items-center gap-3">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-full ${getScoreBg(performance.performance.assignments.averageScore)}`}>
-                      <HiOutlineClipboardCheck className={`h-6 w-6 ${getScoreColor(performance.performance.assignments.averageScore)}`} />
+                <div className="rounded-md border border-gray-200 bg-white p-2.5 sm:p-3 dark:border-white/5 dark:bg-white/3">
+                  <div className="flex flex-col items-center text-center gap-1.5 sm:gap-2">
+                    <div className={`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg ${
+                      performance.performance.assignments.averageScore >= 80 
+                        ? "bg-success-100 dark:bg-success-500/15" 
+                        : performance.performance.assignments.averageScore >= 60
+                        ? "bg-warning-100 dark:bg-warning-500/15"
+                        : "bg-error-100 dark:bg-error-500/15"
+                    }`}>
+                      <HiOutlineClipboardCheck className={`h-4 w-4 sm:h-5 sm:w-5 ${getScoreColor(performance.performance.assignments.averageScore)}`} />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Assignment Average</p>
-                      <p className={`text-2xl font-bold ${getScoreColor(performance.performance.assignments.averageScore)}`}>
+                      <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Assignments</p>
+                      <p className={`text-sm sm:text-base font-bold ${getScoreColor(performance.performance.assignments.averageScore)}`}>
                         {performance.performance.assignments.averageScore}%
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-[9px] sm:text-[10px] text-gray-400">
                         {performance.performance.assignments.graded}/{performance.performance.assignments.total} Graded
                       </p>
                     </div>
@@ -171,43 +179,40 @@ export default function StudentPerformanceModal({
 
               {/* Quiz Details */}
               {performance.details.quizAttempts.length > 0 && (
-                <div className="rounded-lg border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
-                  <div className="border-b border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/5 dark:bg-white/5">
-                    <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                      <HiOutlineQuestionMarkCircle className="h-5 w-5" />
-                      Recent Quiz Attempts
+                <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+                  <div className="border-b border-gray-200 px-3 sm:px-4 py-2 sm:py-2.5 dark:border-white/5">
+                    <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-1.5 sm:gap-2">
+                      <HiOutlineQuestionMarkCircle className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+                      Quiz Attempts
                     </h3>
                   </div>
                   <div className="divide-y divide-gray-200 dark:divide-white/5">
-                    {performance.details.quizAttempts.map((attempt: any) => (
-                      <div key={attempt.id} className="flex items-center justify-between p-4">
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-900 dark:text-white">
+                    {performance.details.quizAttempts.slice(0, 5).map((attempt: any) => (
+                      <div key={attempt.id} className="flex items-center justify-between gap-3 p-3 sm:p-3.5">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">
                             {attempt.quiz.title}
                           </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
                             {new Date(attempt.attemptedAt).toLocaleDateString("en-US", {
-                              year: "numeric",
                               month: "short",
                               day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
                             })}
                           </p>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-2.5">
                           <div className="text-right">
-                            <p className={`text-lg font-bold ${getScoreColor(attempt.score)}`}>
+                            <p className={`text-sm sm:text-base font-bold ${getScoreColor(attempt.score)}`}>
                               {attempt.score}%
                             </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Passing: {attempt.quiz.passingScore}%
+                            <p className="text-[9px] sm:text-[10px] text-gray-400">
+                              Pass: {attempt.quiz.passingScore}%
                             </p>
                           </div>
                           {attempt.passed ? (
-                            <HiOutlineCheckCircle className="h-6 w-6 text-success-600" />
+                            <HiOutlineCheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-success-600 dark:text-success-500" />
                           ) : (
-                            <HiOutlineXCircle className="h-6 w-6 text-danger-600" />
+                            <HiOutlineXCircle className="h-4 w-4 sm:h-5 sm:w-5 text-error-600 dark:text-error-500" />
                           )}
                         </div>
                       </div>
@@ -218,37 +223,40 @@ export default function StudentPerformanceModal({
 
               {/* Assignment Details */}
               {performance.details.assignmentSubmissions.length > 0 && (
-                <div className="rounded-lg border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
-                  <div className="border-b border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/5 dark:bg-white/5">
-                    <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                      <HiOutlineClipboardCheck className="h-5 w-5" />
-                      Assignment Submissions
+                <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+                  <div className="border-b border-gray-200 px-3 sm:px-4 py-2 sm:py-2.5 dark:border-white/5">
+                    <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-1.5 sm:gap-2">
+                      <HiOutlineClipboardCheck className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+                      Assignments
                     </h3>
                   </div>
                   <div className="divide-y divide-gray-200 dark:divide-white/5">
-                    {performance.details.assignmentSubmissions.map((submission: any) => (
-                      <div key={submission.id} className="flex items-center justify-between p-4">
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-900 dark:text-white">
+                    {performance.details.assignmentSubmissions.slice(0, 5).map((submission: any) => (
+                      <div key={submission.id} className="flex items-center justify-between gap-3 p-3 sm:p-3.5">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">
                             {submission.assignment.title}
                           </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Submitted: {new Date(submission.submittedAt).toLocaleDateString()}
+                          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                            {new Date(submission.submittedAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                            })}
                           </p>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                           {submission.status === "GRADED" && submission.score !== null ? (
                             <div className="text-right">
-                              <p className={`text-lg font-bold ${getScoreColor((submission.score / submission.assignment.maxScore) * 100)}`}>
+                              <p className={`text-sm sm:text-base font-bold ${getScoreColor((submission.score / submission.assignment.maxScore) * 100)}`}>
                                 {submission.score}/{submission.assignment.maxScore}
                               </p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                              <p className="text-[9px] sm:text-[10px] text-gray-400">
                                 {Math.round((submission.score / submission.assignment.maxScore) * 100)}%
                               </p>
                             </div>
                           ) : (
                             <Badge color={submission.status === "PENDING" ? "warning" : "light"}>
-                              {submission.status}
+                              <span className="text-[10px] sm:text-xs">{submission.status}</span>
                             </Badge>
                           )}
                         </div>
@@ -259,41 +267,39 @@ export default function StudentPerformanceModal({
               )}
 
               {/* Recommendation */}
-              <div className={`rounded-lg border p-4 ${
+              <div className={`rounded-md border p-3 sm:p-3.5 ${
                 performance.performance.lessons.percentage === 100 &&
                 performance.performance.quizzes.averageScore >= 70 &&
                 performance.performance.assignments.submitted === performance.performance.assignments.total
-                  ? "border-success-200 bg-success-50 dark:border-success-800 dark:bg-success-900/20"
-                  : "border-warning-200 bg-warning-50 dark:border-warning-800 dark:bg-warning-900/20"
+                  ? "border-success-200 bg-success-50 dark:border-success-800/50 dark:bg-success-900/20"
+                  : "border-warning-200 bg-warning-50 dark:border-warning-800/50 dark:bg-warning-900/20"
               }`}>
-                <div className="flex gap-3">
+                <div className="flex gap-2 sm:gap-2.5">
                   {performance.performance.lessons.percentage === 100 &&
                   performance.performance.quizzes.averageScore >= 70 &&
                   performance.performance.assignments.submitted === performance.performance.assignments.total ? (
                     <>
-                      <HiOutlineCheckCircle className="h-6 w-6 shrink-0 text-success-600 dark:text-success-400" />
+                      <HiOutlineCheckCircle className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 text-success-600 dark:text-success-400 mt-0.5" />
                       <div>
-                        <h4 className="font-semibold text-success-900 dark:text-success-100">
+                        <h4 className="text-xs sm:text-sm font-semibold text-success-900 dark:text-success-100">
                           Ready for Certification
                         </h4>
-                        <p className="text-sm text-success-800 dark:text-success-200">
-                          This student has completed all requirements and demonstrated strong performance. 
-                          They are eligible for certification.
+                        <p className="text-[10px] sm:text-xs text-success-800 dark:text-success-200 mt-0.5">
+                          Student completed all requirements with strong performance.
                         </p>
                       </div>
                     </>
                   ) : (
                     <>
-                      <HiOutlineClock className="h-6 w-6 shrink-0 text-warning-600 dark:text-warning-400" />
+                      <HiOutlineClock className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 text-warning-600 dark:text-warning-400 mt-0.5" />
                       <div>
-                        <h4 className="font-semibold text-warning-900 dark:text-warning-100">
+                        <h4 className="text-xs sm:text-sm font-semibold text-warning-900 dark:text-warning-100">
                           Review Required
                         </h4>
-                        <p className="text-sm text-warning-800 dark:text-warning-200">
-                          {performance.performance.lessons.percentage < 100 && "Not all lessons completed. "}
-                          {performance.performance.quizzes.averageScore < 70 && "Quiz average below 70%. "}
-                          {performance.performance.assignments.submitted < performance.performance.assignments.total && "Some assignments not submitted. "}
-                          Consider reviewing before issuing the certificate.
+                        <p className="text-[10px] sm:text-xs text-warning-800 dark:text-warning-200 mt-0.5">
+                          {performance.performance.lessons.percentage < 100 && "Incomplete lessons. "}
+                          {performance.performance.quizzes.averageScore < 70 && "Low quiz average. "}
+                          {performance.performance.assignments.submitted < performance.performance.assignments.total && "Missing assignments."}
                         </p>
                       </div>
                     </>
@@ -309,33 +315,33 @@ export default function StudentPerformanceModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="sticky bottom-0 flex items-center justify-end gap-3 border-t border-gray-200 bg-white px-6 py-4 dark:border-white/5 dark:bg-gray-900">
-          <Button onClick={onClose} variant="outline" size="md">
+        <div className="sticky bottom-0 flex items-center justify-end gap-2 sm:gap-2.5 border-t border-gray-200 bg-white px-4 sm:px-5 py-3 sm:py-3.5 dark:border-white/5 dark:bg-gray-900">
+          <button
+            onClick={onClose}
+            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors dark:text-gray-300 dark:hover:bg-gray-800"
+          >
             Cancel
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={() => {
               onReject(certificateId);
               onClose();
             }}
-            variant="outline"
-            size="md"
-            startIcon={<HiOutlineXCircle className="h-4 w-4" />}
-            className="border-red-500 text-red-600 hover:bg-red-50 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-500/10"
+            className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-red-600 border border-red-500 hover:bg-red-50 rounded-md transition-colors dark:text-red-500 dark:hover:bg-red-500/10"
           >
+            <HiOutlineXCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             Reject
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={() => {
               onIssue(certificateId);
               onClose();
             }}
-            variant="primary"
-            size="md"
-            startIcon={<HiOutlineCheckCircle className="h-4 w-4" />}
+            className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 rounded-md transition-colors"
           >
+            <HiOutlineCheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             Issue Certificate
-          </Button>
+          </button>
         </div>
       </div>
     </div>
