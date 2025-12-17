@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
@@ -264,15 +263,17 @@ export default function CertificatesPage() {
                 {/* Instructor */}
                 <div className="mb-3 sm:mb-4 flex items-center gap-2">
                   {certificate.course.instructor.avatar ? (
-                    <Image
-                      src={certificate.course.instructor.avatar}
+                    <img
+                      src={certificate.course.instructor.avatar.startsWith('http') 
+                        ? certificate.course.instructor.avatar 
+                        : `${process.env.NEXT_PUBLIC_API_URL}${certificate.course.instructor.avatar}`}
                       alt={certificate.course.instructor.name}
-                      width={20}
-                      height={20}
-                      className="rounded-full"
+                      className="h-5 w-5 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="h-5 w-5 rounded-full bg-gray-300 dark:bg-gray-600" />
+                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-500 text-white text-[10px] font-semibold">
+                      {certificate.course.instructor.name.charAt(0).toUpperCase()}
+                    </div>
                   )}
                   <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
                     {certificate.course.instructor.name}

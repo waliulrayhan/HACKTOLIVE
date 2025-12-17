@@ -111,7 +111,7 @@ export default function CourseCompletionModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/90 backdrop-blur-md dark:bg-gray-950/90 dark:backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
       <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
         {/* Banner Header */}
         <div className="relative bg-gradient-to-r from-brand-500 to-brand-600 px-4 sm:px-6 py-6 sm:py-8">
@@ -213,23 +213,6 @@ export default function CourseCompletionModal({
                 Leave a Review
               </button>
             </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-3 pt-2">
-            <button
-              onClick={handleViewCertificates}
-              className="rounded-lg border border-brand-600 bg-transparent px-4 py-2.5 text-sm font-medium text-brand-600 hover:bg-brand-50 dark:border-brand-400 dark:text-brand-400 dark:hover:bg-brand-900/20 transition-colors"
-            >
-              My Certificates
-            </button>
-            <button
-              onClick={handleShareAchievement}
-              className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
-            >
-              <HiOutlineShare className="h-4 w-4" />
-              Share
-            </button>
           </div>
 
           {/* Continue Learning Link */}

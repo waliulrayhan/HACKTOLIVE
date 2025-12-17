@@ -481,7 +481,9 @@ export default function InstructorCertificatesPage() {
                         <div className="flex items-center gap-2 sm:gap-3">
                           {cert.student.user.avatar ? (
                             <img
-                              src={cert.student.user.avatar}
+                              src={cert.student.user.avatar.startsWith('http') 
+                                ? cert.student.user.avatar 
+                                : `${process.env.NEXT_PUBLIC_API_URL}${cert.student.user.avatar}`}
                               alt={cert.student.user.name}
                               className="h-8 w-8 rounded-full object-cover"
                             />
@@ -532,21 +534,23 @@ export default function InstructorCertificatesPage() {
                         <div className="flex items-center justify-center gap-1 sm:gap-2">
                           {cert.status === "PENDING" ? (
                             <>
-                              <button
+                                <button
                                 onClick={() => handleReviewPerformance(cert.id)}
-                                className="rounded p-1 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10 transition-colors"
+                                className="flex items-center gap-1 rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10 transition-colors"
                                 title="Review Performance"
-                              >
-                                <HiOutlineChartBar className="h-4 w-4" />
-                              </button>
-                              <button
+                                >
+                                <HiOutlineChartBar className="h-3.5 w-3.5" />
+                                Review
+                                </button>
+                                <button
                                 onClick={() => handleRejectCertificate(cert.id)}
                                 disabled={processing === cert.id}
-                                className="rounded p-1 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                                className="flex items-center gap-1 rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors disabled:opacity-50"
                                 title="Reject"
-                              >
-                                <HiOutlineXCircle className="h-4 w-4" />
-                              </button>
+                                >
+                                <HiOutlineXCircle className="h-3.5 w-3.5" />
+                                Reject
+                                </button>
                             </>
                           ) : (
                             <span className="text-xs text-gray-400">-</span>
