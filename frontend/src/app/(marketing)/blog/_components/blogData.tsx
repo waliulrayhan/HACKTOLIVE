@@ -12,7 +12,7 @@ const BlogData: Blog[] = [
     blogType: "Threat Alerts",
     author: {
       name: "Dr. Sarah Mitchell",
-      avatar: "/images/user/user-01.jpg",
+      avatar: "",
       role: "Chief Security Analyst",
       bio: "15+ years in cybersecurity research and threat intelligence",
       twitter: "@sarahmitchell",
@@ -34,7 +34,7 @@ const BlogData: Blog[] = [
     blogType: "How-to Tutorials",
     author: {
       name: "Michael Chen",
-      avatar: "/images/user/user-02.jpg",
+      avatar: "",
       role: "Cloud Security Engineer",
       bio: "Expert in cloud security and zero trust implementations",
       linkedin: "michaelchen",
@@ -56,7 +56,7 @@ const BlogData: Blog[] = [
     blogType: "Best Security Practices",
     author: {
       name: "Jessica Rodriguez",
-      avatar: "/images/user/user-03.jpg",
+      avatar: "",
       role: "Security Operations Lead",
       bio: "Specializing in incident response and threat mitigation",
       twitter: "@jrodriguez_sec",
@@ -78,7 +78,7 @@ const BlogData: Blog[] = [
     blogType: "Compliance Guides",
     author: {
       name: "Thomas Anderson",
-      avatar: "/images/user/user-04.jpg",
+      avatar: "",
       role: "Compliance Officer",
       bio: "15 years of experience in regulatory compliance and data protection",
       linkedin: "thomasanderson"
@@ -99,7 +99,7 @@ const BlogData: Blog[] = [
     blogType: "How-to Tutorials",
     author: {
       name: "Alex Kumar",
-      avatar: "/images/user/user-05.jpg",
+      avatar: "",
       role: "DevSecOps Engineer",
       bio: "Kubernetes security specialist with focus on container orchestration",
       github: "alexkumar",
@@ -121,7 +121,7 @@ const BlogData: Blog[] = [
     blogType: "Case Study Stories",
     author: {
       name: "Dr. Sarah Mitchell",
-      avatar: "/images/user/user-01.jpg",
+      avatar: "",
       role: "Chief Security Analyst",
       bio: "15+ years in cybersecurity research and threat intelligence",
       twitter: "@sarahmitchell",
@@ -143,7 +143,7 @@ const BlogData: Blog[] = [
     blogType: "Best Security Practices",
     author: {
       name: "Emily Watson",
-      avatar: "/images/user/user-06.jpg",
+      avatar: "",
       role: "Security Awareness Manager",
       bio: "Specialist in security awareness and human risk management",
       linkedin: "emilywatson"
@@ -164,7 +164,7 @@ const BlogData: Blog[] = [
     blogType: "Threat Alerts",
     author: {
       name: "Marcus Thompson",
-      avatar: "/images/user/user-07.jpg",
+      avatar: "",
       role: "Vulnerability Research Lead",
       bio: "Security researcher focusing on critical infrastructure vulnerabilities",
       twitter: "@mthompson_sec",
@@ -186,7 +186,7 @@ const BlogData: Blog[] = [
     blogType: "How-to Tutorials",
     author: {
       name: "Priya Sharma",
-      avatar: "/images/user/user-08.jpg",
+      avatar: "",
       role: "Application Security Engineer",
       bio: "API security expert with focus on secure software development",
       github: "priyasharma",

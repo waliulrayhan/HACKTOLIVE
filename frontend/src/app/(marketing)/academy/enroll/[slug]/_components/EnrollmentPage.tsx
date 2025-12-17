@@ -909,7 +909,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                     </HStack>
                     <Flex gap="4">
                       <Image
-                        src={course.instructor.avatar || '/images/user/default-avatar.png'}
+                        src={course.instructor.avatar || ''}
                         alt={course.instructor.name}
                         width={70}
                         height={70}

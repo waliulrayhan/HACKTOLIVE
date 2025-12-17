@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
+import { getInitials, getAvatarColorClass } from "@/lib/utils";
 import {
   HiOutlineAcademicCap,
   HiOutlineUsers,
@@ -316,12 +317,17 @@ export default function InstructorsManagementPage() {
                     <TableRow key={instructor.id} className="group border-b border-gray-100 transition-colors hover:bg-gray-50/50 dark:border-white/5 dark:hover:bg-white/2">
                       <TableCell className="px-3 py-2.5 sm:px-4 sm:py-3">
                         <div className="flex items-center gap-2 sm:gap-3">
-                          <img 
-                            src={`${process.env.NEXT_PUBLIC_API_URL}${instructor.avatar}` || '/images/user/user-01.png'} 
-                            alt={instructor.name}
-                            className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-full object-cover"
-                            onError={(e) => { e.currentTarget.src = '/images/user/user-01.png'; }}
-                          />
+                          {instructor.avatar ? (
+                            <img 
+                              src={`${process.env.NEXT_PUBLIC_API_URL}${instructor.avatar}`}
+                              alt={instructor.name}
+                              className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className={`h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold ${getAvatarColorClass(instructor.name)}`}>
+                              {getInitials(instructor.name)}
+                            </div>
+                          )}
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-1.5">
                               <p className="truncate text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
@@ -495,12 +501,17 @@ export default function InstructorsManagementPage() {
             <div className="px-6 pb-6">
               {/* Instructor Avatar and Name */}
               <div className="flex items-center gap-4 pb-5 border-b border-gray-200 dark:border-gray-800">
-                <img 
-                  src={`${process.env.NEXT_PUBLIC_API_URL}${selectedInstructor.avatar}` || '/images/user/user-01.png'} 
-                  alt={selectedInstructor.name}
-                  className="h-16 w-16 shrink-0 rounded-full object-cover"
-                  onError={(e) => { e.currentTarget.src = '/images/user/user-01.png'; }}
-                />
+                {selectedInstructor.avatar ? (
+                  <img 
+                    src={`${process.env.NEXT_PUBLIC_API_URL}${selectedInstructor.avatar}`}
+                    alt={selectedInstructor.name}
+                    className="h-16 w-16 shrink-0 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className={`h-16 w-16 shrink-0 rounded-full flex items-center justify-center text-xl font-semibold ${getAvatarColorClass(selectedInstructor.name)}`}>
+                    {getInitials(selectedInstructor.name)}
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <h4 className="text-lg font-bold text-gray-900 dark:text-white truncate">
                     {selectedInstructor.name}

@@ -160,7 +160,7 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
                   boxShadow="2xl"
                 >
                   <Image
-                    src={instructor.avatar || '/images/user/user-01.jpg'}
+                    src={instructor.avatar || ''}
                     alt={instructor.name}
                     width={600}
                     height={600}
@@ -171,7 +171,7 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
                     }}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = '/images/user/user-01.jpg';
+                      target.src = '';
                     }}
                   />
                 </Box>

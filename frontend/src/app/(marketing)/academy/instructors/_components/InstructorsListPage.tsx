@@ -204,13 +204,13 @@ export default function InstructorsListPage() {
                       {/* Instructor Image */}
                     <Box position="relative" h="280px" w="full" overflow="hidden">
                       <Image
-                        src={instructor.avatar || '/images/user/user-01.jpg'}
+                        src={instructor.avatar || ''}
                         alt={instructor.name}
                         fill
                         style={{ objectFit: "cover" }}
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.src = '/images/user/user-01.jpg';
+                          target.src = '';
                         }}
                       />
                       <Box

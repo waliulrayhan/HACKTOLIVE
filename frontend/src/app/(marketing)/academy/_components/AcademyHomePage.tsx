@@ -583,7 +583,7 @@ export default function AcademyHomePage() {
                         </Text>
                         <HStack spacing="3" mt="auto">
                           <Image
-                            src={testimonial.studentAvatar || "/images/user/user-05.jpg"}
+                            src={testimonial.studentAvatar || ""}
                             alt={testimonial.studentName}
                             width={48}
                             height={48}
@@ -685,7 +685,7 @@ export default function AcademyHomePage() {
                     >
                       <Box position="relative" overflow="hidden">
                         <Image
-                          src={instructor.avatar || '/images/user/default-avatar.png'}
+                          src={instructor.avatar || ''}
                           alt={instructor.name}
                           width={400}
                           height={400}

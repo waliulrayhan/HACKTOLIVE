@@ -688,7 +688,7 @@ const AcademyProgramsSection = () => {
       instructor: {
         name: 'Md. Rayhan Ahmed',
         title: 'Senior Security Researcher',
-        avatar: '/images/user/user-01.jpg',
+        avatar: '',
         certifications: ['OSCP', 'CEH']
       },
       rating: 4.8,
@@ -707,7 +707,7 @@ const AcademyProgramsSection = () => {
       instructor: {
         name: 'Fahim Hassan',
         title: 'Penetration Testing Lead',
-        avatar: '/images/user/user-02.jpg',
+        avatar: '',
         certifications: ['OSWE', 'OSCE']
       },
       rating: 4.9,
@@ -726,7 +726,7 @@ const AcademyProgramsSection = () => {
       instructor: {
         name: 'Sakib Rahman',
         title: 'Red Team Specialist',
-        avatar: '/images/user/user-03.jpg',
+        avatar: '',
         certifications: ['OSEP', 'CRTO']
       },
       rating: 4.7,
@@ -745,7 +745,7 @@ const AcademyProgramsSection = () => {
       instructor: {
         name: 'Tanvir Islam',
         title: 'Bug Bounty Hunter',
-        avatar: '/images/user/user-04.jpg',
+        avatar: '',
         certifications: ['CTF Champion', 'HackerOne MVH']
       },
       rating: 4.9,

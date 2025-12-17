@@ -326,7 +326,7 @@ class AcademyService {
    */
   private transformImageUrl(url: string | null | undefined, type: 'course' | 'avatar' = 'course'): string {
     if (!url || url.trim() === '') {
-      return type === 'avatar' ? '/images/user/user-01.jpg' : '/images/placeholder-course.jpg';
+      return type === 'avatar' ? '' : '/images/placeholder-course.jpg';
     }
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return url;

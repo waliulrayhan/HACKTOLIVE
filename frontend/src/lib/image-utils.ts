@@ -14,7 +14,7 @@ export function getFullImageUrl(
 ): string {
   // Return default image if URL is empty
   if (!url || url.trim() === '') {
-    if (type === 'avatar') return '/images/user/user-01.jpg';
+    if (type === 'avatar') return '';
     if (type === 'course') return '/images/placeholder-course.jpg';
     return '/images/placeholder.jpg';
   }

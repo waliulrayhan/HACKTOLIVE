@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import { DashboardLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
+import { getInitials, getAvatarColorClass } from "@/lib/utils";
 import {
   HiOutlineUsers,
   HiOutlineAcademicCap,
@@ -183,12 +184,17 @@ export default function AdminDashboard() {
             {stats?.recentEnrollments.slice(0, 5).map((enrollment: any, index: number) => (
               <div key={index} className="flex items-center justify-between p-3 sm:p-4 border border-gray-200 rounded-lg dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 transition-colors">
                 <div className="flex items-center gap-3">
-                  <img 
-                    src={`${process.env.NEXT_PUBLIC_API_URL}${enrollment.student?.avatar}` || '/images/user/user-01.png'} 
-                    alt={enrollment.student?.name || 'Student'}
-                    className="h-10 w-10 rounded-full object-cover"
-                    onError={(e) => { e.currentTarget.src = '/images/user/user-01.png'; }}
-                  />
+                  {enrollment.student?.avatar ? (
+                    <img 
+                      src={`${process.env.NEXT_PUBLIC_API_URL}${enrollment.student.avatar}`}
+                      alt={enrollment.student?.name || 'Student'}
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-semibold ${getAvatarColorClass(enrollment.student?.name || 'U')}`}>
+                      {getInitials(enrollment.student?.name || 'Unknown')}
+                    </div>
+                  )}
                   <div>
                     <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">{enrollment.student?.name || 'Unknown Student'}</p>
                     <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{enrollment.course?.title || 'Unknown Course'}</p>
@@ -223,12 +229,17 @@ export default function AdminDashboard() {
             {stats?.recentCourses.slice(0, 5).map((course: any, index: number) => (
               <div key={index} className="flex items-center justify-between p-3 sm:p-4 border border-gray-200 rounded-lg dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 transition-colors">
                 <div className="flex items-center gap-3">
-                  <img 
-                    src={`${process.env.NEXT_PUBLIC_API_URL}${course.instructor?.avatar}` || '/images/user/user-01.png'} 
-                    alt={course.instructor?.name || 'Instructor'}
-                    className="h-10 w-10 rounded-full object-cover"
-                    onError={(e) => { e.currentTarget.src = '/images/user/user-01.png'; }}
-                  />
+                  {course.instructor?.avatar ? (
+                    <img 
+                      src={`${process.env.NEXT_PUBLIC_API_URL}${course.instructor.avatar}`}
+                      alt={course.instructor?.name || 'Instructor'}
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-semibold ${getAvatarColorClass(course.instructor?.name || 'U')}`}>
+                      {getInitials(course.instructor?.name || 'Unknown')}
+                    </div>
+                  )}
                   <div>
                     <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">{course.title}</p>
                     <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">By: {course.instructor?.name || 'Unknown'}</p>
