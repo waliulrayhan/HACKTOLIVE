@@ -55,8 +55,8 @@ RUN mkdir -p /app/uploads/avatars /app/uploads/documents /app/uploads/images && 
     chown -R node:node /app/uploads && \
     chown -R node:node /app/node_modules
 
-# Don't switch to node user yet - we'll do it in docker-compose to allow permission fixes
-# USER node
+# Use non-root user
+USER node
 
 # Expose port
 EXPOSE 4000
