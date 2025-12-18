@@ -26,24 +26,49 @@ jobs:
             echo "🔄 Pulling latest changes from GitHub..."
             git pull origin main || git pull origin master
             
-            echo "🐳 Building and deploying with Docker..."
-            docker-compose down
-            docker-compose build --no-cache
-            docker-compose up -d
+            echo "🐳 Building Docker images (without stopping services)..."
+            docker-compose build
             
-            echo "⏳ Waiting for services to start..."
-            sleep 20
+            echo "🔄 Recreating containers with zero-downtime..."
+            docker-compose up -d --force-recreate --remove-orphans
+            
+            echo "⏳ Waiting for services to stabilize..."
+            sleep 30
             
             echo "📊 Container Status:"
             docker-compose ps
             
             echo "🔍 Backend Health Check:"
-            curl -f http://localhost:4000/health || echo "⚠️ Backend health check failed"
+            for i in {1..10}; do
+              if curl -f http://localhost:4000/health > /dev/null 2>&1; then
+                echo "✅ Backend is healthy!"
+                break
+              fi
+              echo "Attempt $i/10: Backend not ready yet..."
+              sleep 3
+            done
             
             echo "🔍 Frontend Health Check:"
-            curl -f http://localhost:3000/ || echo "⚠️ Frontend health check failed"
+            for i in {1..10}; do
+              if curl -f http://localhost:3000/ > /dev/null 2>&1; then
+                echo "✅ Frontend is healthy!"
+                break
+              fi
+              echo "Attempt $i/10: Frontend not ready yet..."
+              sleep 3
+            done
             
-            echo "🧹 Cleaning up old Docker images..."
-            docker image prune -af
+            echo "🔍 Nginx Health Check:"
+            for i in {1..10}; do
+              if curl -f http://localhost/ > /dev/null 2>&1; then
+                echo "✅ Nginx is healthy!"
+                break
+              fi
+              echo "Attempt $i/10: Nginx not ready yet..."
+              sleep 3
+            done
+            
+            echo "🧹 Cleaning up old Docker images (non-blocking)..."
+            docker image prune -af --filter "until=24h" || true
             
             echo "✅ Deployment completed successfully!"

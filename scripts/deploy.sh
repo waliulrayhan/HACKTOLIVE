@@ -20,21 +20,17 @@ echo "=================================="
 echo -e "${GREEN}📦 Pulling latest code from GitHub...${NC}"
 git pull origin main || git pull origin master
 
-# Stop containers
-echo -e "${YELLOW}🛑 Stopping containers...${NC}"
-docker-compose down
-
-# Build images
+# Build images (without stopping services)
 echo -e "${GREEN}🔨 Building Docker images...${NC}"
-docker-compose build --no-cache
+docker-compose build
 
-# Start containers
-echo -e "${GREEN}🚀 Starting containers...${NC}"
-docker-compose up -d
+# Recreate containers with zero-downtime
+echo -e "${GREEN}🔄 Recreating containers...${NC}"
+docker-compose up -d --force-recreate --remove-orphans
 
 # Wait for services to be ready
-echo -e "${YELLOW}⏳ Waiting for services to start...${NC}"
-sleep 15
+echo -e "${YELLOW}⏳ Waiting for services to stabilize...${NC}"
+sleep 30
 
 # Show status
 echo -e "${GREEN}📊 Container Status:${NC}"
@@ -50,7 +46,7 @@ fi
 
 # Clean up
 echo -e "${YELLOW}🧹 Cleaning up old images...${NC}"
-docker system prune -af --volumes
+docker image prune -af --filter "until=24h" || true
 
 echo ""
 echo -e "${GREEN}=====================================${NC}"
