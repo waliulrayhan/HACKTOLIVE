@@ -31,16 +31,18 @@ RUN apk add --no-cache dumb-init
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install only production dependencies and generate Prisma Client
+RUN npm ci --only=production && \
+    npx prisma generate && \
+    npm cache clean --force
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # Create uploads directory
 RUN mkdir -p /app/uploads/avatars /app/uploads/documents /app/uploads/images && \
-    chown -R node:node /app/uploads
+    chown -R node:node /app/uploads && \
+    chown -R node:node /app/node_modules
 
 # Use non-root user
 USER node
