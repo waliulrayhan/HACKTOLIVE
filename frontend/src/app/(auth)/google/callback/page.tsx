@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Box, Spinner, Text, VStack } from '@chakra-ui/react'
 import { useAuth } from '@/context/AuthContext'
 import { toast } from 'sonner'
 
-export default function GoogleCallbackPage() {
+function GoogleCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { setUser, setToken } = useAuth()
@@ -72,5 +72,31 @@ export default function GoogleCallbackPage() {
         </Text>
       </VStack>
     </Box>
+  )
+}
+
+export default function GoogleCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <Box
+          minH="100vh"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          bg="gray.50"
+          _dark={{ bg: 'gray.900' }}
+        >
+          <VStack spacing={4}>
+            <Spinner size="xl" color="blue.500" thickness="4px" />
+            <Text fontSize="lg" fontWeight="medium">
+              Loading...
+            </Text>
+          </VStack>
+        </Box>
+      }
+    >
+      <GoogleCallbackContent />
+    </Suspense>
   )
 }
