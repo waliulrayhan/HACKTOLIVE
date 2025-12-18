@@ -37,7 +37,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
-      - backend_dev_uploads:/app/uploads
+      - ./backend/uploads:/app/uploads
     ports:
       - "3001:3001"
     depends_on:
@@ -75,4 +75,3 @@ networks:
 
 volumes:
   mysql_dev_data:
-  backend_dev_uploads:
