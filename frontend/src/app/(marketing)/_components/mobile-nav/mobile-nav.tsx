@@ -120,7 +120,9 @@ export function MobileNavContent(props: MobileNavContentProps) {
   }
 
   const handleSignOut = () => {
-    localStorage.clear()
+    // Clear only auth-related localStorage data (preserve theme)
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
     toast.success('Signed out successfully!', {
       description: 'You have been logged out of your account.',
       duration: 3000,

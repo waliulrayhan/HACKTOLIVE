@@ -72,8 +72,9 @@ export default function MarketingUserDropdown() {
     e.preventDefault();
     closeDropdown();
     
-    // Clear all localStorage data
-    localStorage.clear();
+    // Clear only auth-related localStorage data (preserve theme)
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     
     // Show success toast
     toast.success('Signed out successfully!', {
