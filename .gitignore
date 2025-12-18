@@ -56,7 +56,7 @@ backups/
 
 # SSL Certificates (if using Let's Encrypt)
 nginx/ssl/*.pem
-nginx/
+# nginx/ - commented out to allow nginx config files in git
 ecosystem.config.js
 
 # Database
