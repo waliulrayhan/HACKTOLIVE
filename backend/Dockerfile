@@ -49,13 +49,14 @@ RUN npm ci --only=production && \
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
 
-# Create uploads directory
+# Create uploads directory with full permissions
 RUN mkdir -p /app/uploads/avatars /app/uploads/documents /app/uploads/images && \
+    chmod -R 777 /app/uploads && \
     chown -R node:node /app/uploads && \
     chown -R node:node /app/node_modules
 
-# Use non-root user
-USER node
+# Don't switch to node user yet - we'll do it in docker-compose to allow permission fixes
+# USER node
 
 # Expose port
 EXPOSE 4000
