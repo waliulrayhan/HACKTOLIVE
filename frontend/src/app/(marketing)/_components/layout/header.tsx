@@ -14,12 +14,14 @@ import * as React from 'react'
 
 import { Logo } from './logo'
 import Navigation from './navigation'
+import { MegaMenu } from '../mega-menu'
 
 export interface HeaderProps extends Omit<BoxProps, 'children'> {}
 
 export const Header = (props: HeaderProps) => {
   const ref = React.useRef<HTMLHeadingElement>(null)
   const [y, setY] = React.useState(0)
+  const [activeMenu, setActiveMenu] = React.useState<string | null>(null)
   const { height = 0 } = ref.current?.getBoundingClientRect() ?? {}
   const pathname = usePathname()
 
@@ -69,11 +71,18 @@ export const Header = (props: HeaderProps) => {
             }}
           />
           <Flex position="absolute" left="50%" transform="translateX(-50%)">
-            <Navigation showOnlyLinks />
+            <Navigation 
+              showOnlyLinks 
+              activeMenu={activeMenu}
+              onMenuChange={setActiveMenu}
+            />
           </Flex>
           <Navigation showOnlyActions />
         </Flex>
       </Container>
+      
+      {/* Mega Menu */}
+      <MegaMenu activeMenu={activeMenu} onMenuChange={setActiveMenu} />
     </Box>
   )
 }

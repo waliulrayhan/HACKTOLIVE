@@ -15,13 +15,22 @@ import siteConfig from '@/lib/config/data/config'
 import ThemeToggle from './theme-toggle'
 import MarketingUserDropdown from './MarketingUserDropdown'
 import { authService } from '@/lib/auth-service'
+import { MegaMenuItem } from '../mega-menu'
+import { megaMenuData } from '../mega-menu'
 
 interface NavigationProps {
   showOnlyLinks?: boolean
   showOnlyActions?: boolean
+  activeMenu?: string | null
+  onMenuChange?: (menu: string | null) => void
 }
 
-const Navigation: React.FC<NavigationProps> = ({ showOnlyLinks = false, showOnlyActions = false }) => {
+const Navigation: React.FC<NavigationProps> = ({ 
+  showOnlyLinks = false, 
+  showOnlyActions = false,
+  activeMenu = null,
+  onMenuChange = () => {},
+}) => {
   const mobileNav = useDisclosure()
   const router = useRouter()
   const path = usePathname()
@@ -63,21 +72,30 @@ const Navigation: React.FC<NavigationProps> = ({ showOnlyLinks = false, showOnly
             return null
           }
           
+          const hasMegaMenu = megaMenuData[label]
+          
           return (
-            <NavLink
-              display={['none', null, 'block']}
-              href={href || `/#${id}`}
+            <MegaMenuItem
               key={i}
-              isActive={
-                !!(
-                  (id && activeId === id) ||
-                  (href && !!path?.match(new RegExp(href)))
-                )
-              }
-              {...props}
+              label={label}
+              onMouseEnter={() => hasMegaMenu && onMenuChange(label)}
+              onMouseLeave={() => {}}
             >
-              {label}
-            </NavLink>
+              <NavLink
+                display={['none', null, 'block']}
+                href={href || `/#${id}`}
+                isActive={
+                  !!(
+                    (id && activeId === id) ||
+                    (href && !!path?.match(new RegExp(href)))
+                  )
+                }
+                hasMegaMenu={hasMegaMenu}
+                {...props}
+              >
+                {label}
+              </NavLink>
+            </MegaMenuItem>
           )
         })}
       </HStack>
