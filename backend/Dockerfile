@@ -1,7 +1,13 @@
 # Stage 1: Build
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 
 WORKDIR /app
+
+# Install OpenSSL and other dependencies
+RUN apt-get update && apt-get install -y \
+    openssl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy package files
 COPY package*.json ./
@@ -20,12 +26,16 @@ RUN npx prisma generate
 RUN npm run build
 
 # Stage 2: Production
-FROM node:20-alpine AS production
+FROM node:20-slim AS production
 
 WORKDIR /app
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Install OpenSSL and dumb-init for proper signal handling
+RUN apt-get update && apt-get install -y \
+    openssl \
+    ca-certificates \
+    dumb-init \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy package files
 COPY package*.json ./
