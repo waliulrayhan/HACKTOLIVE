@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // output: 'standalone', // Required for Docker
+  output: 'standalone', // Required for Docker
   images: {
     remotePatterns: [
       {
@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
         protocol: 'http',
         hostname: '192.168.0.166',
         port: '4000',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.hacktolive.io',
         pathname: '/uploads/**',
       },
       {

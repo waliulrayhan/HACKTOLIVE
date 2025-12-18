@@ -33,10 +33,11 @@ A comprehensive cybersecurity education platform with courses, certificates, qui
 - File Upload (Multer)
 
 **Infrastructure:**
-- VPS: Hostinger Ubuntu 24.04
-- Web Server: Nginx
-- Process Manager: PM2
-- SSL: Let's Encrypt
+- Docker & Docker Compose
+- MySQL 8.0 (Containerized)
+- Nginx Reverse Proxy
+- VPS: 72.62.71.250
+- CI/CD: GitHub Actions
 
 ## ✨ Features
 
@@ -176,27 +177,59 @@ npm run lint
 
 ## 🌐 Deployment
 
-The application is deployed on Hostinger VPS. For complete deployment instructions, see [COMPLETE_DEPLOYMENT_REFERENCE.md](COMPLETE_DEPLOYMENT_REFERENCE.md).
+### 🐳 Docker Deployment (Recommended)
 
-### Quick Update Process
+The application uses Docker for consistent, production-ready deployment.
 
-After making changes locally and pushing to GitHub:
+**Quick Start:**
 
-
-```bash
-# SSH to server and run update script
-ssh root@72.62.71.250 '/var/www/hacktolive/quick-update.sh'
-```
-
-Or manually:
+1. **On your server (one-time setup):**
 ```bash
 ssh root@72.62.71.250
-cd /var/www/hacktolive
-git pull
-cd backend && pnpm install && pnpm run build && pm2 restart hacktolive-backend
-cd ../frontend && npm install && pm2 restart hacktolive-frontend
+cd /root
+git clone https://github.com/YOUR_USERNAME/HACKTOLIVE.git
+cd HACKTOLIVE
+chmod +x scripts/setup-server.sh
+./scripts/setup-server.sh
 ```
 
+2. **Configure GitHub Actions:**
+   - Go to: Settings → Secrets → Actions
+   - Add: `VPS_HOST`, `VPS_USERNAME`, `VPS_PASSWORD`
+
+3. **Deploy automatically:**
+```bash
+git push origin main  # Automatic deployment via GitHub Actions
+```
+
+**Documentation:**
+- 📖 [Complete Deployment Guide](DEPLOYMENT.md)
+- 🚀 [Quick Start](QUICK_START.md)
+- ✅ [Deployment Checklist](DEPLOYMENT_CHECKLIST.md)
+- 🏗️ [Architecture Diagram](ARCHITECTURE.txt)
+
+**Benefits:**
+- ✅ Identical development and production environments
+- ✅ Automatic deployment on Git push
+- ✅ Easy rollback and version control
+- ✅ Built-in health monitoring
+- ✅ Simplified scaling
+
+### Manual Update (If needed)
+
+```bash
+ssh root@72.62.71.250
+### Deployment
+- [Complete Deployment Guide](DEPLOYMENT.md) - Full Docker deployment guide
+- [Quick Start](QUICK_START.md) - Quick reference
+- [Deployment Checklist](DEPLOYMENT_CHECKLIST.md) - Pre-deployment checklist
+- [Docker Setup Summary](DOCKER_SETUP.md) - Overview of Docker configuration
+- [Architecture](ARCHITECTURE.txt) - System architecture diagram
+
+### Development
+- [Authentication Guide](AUTHENTICATION_GUIDE.md) - JWT auth implementation (if exists)
+- [Course Completion](COURSE_COMPLETION_IMPLEMENTATION.md) - Course progress tracking (if exists)
+- [Security Guidelines](SECURITY.md) - Security best practices (if exists)
 ## 🔐 Environment Variables
 
 ### Backend (.env)

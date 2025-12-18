@@ -16,8 +16,9 @@ out/
 # Environment variables
 .env
 .env*.local
-.env.production
-.env.development
+# Keep production templates for reference
+# .env.production
+# .env.development
 .env.docker
 
 # Logs
@@ -42,12 +43,19 @@ lerna-debug.log*
 # Docker
 *.tar
 docker-compose.override.yml
-docker-compose.yml
+# Keep main docker-compose files
+# docker-compose.yml
+# docker-compose.dev.yml
 exports/*.tar
-.dockerignore
+# Keep .dockerignore files
 
-# Deployment (scripts on server)
-scripts/
+# Database backups
+backups/
+*.sql
+*.sql.gz
+
+# SSL Certificates (if using Let's Encrypt)
+nginx/ssl/*.pem
 nginx/
 ecosystem.config.js
 

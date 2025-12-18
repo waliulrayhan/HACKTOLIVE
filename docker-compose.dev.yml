@@ -1,0 +1,78 @@
+version: '3.8'
+
+# Development Docker Compose Configuration
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: hacktolive-mysql-dev
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: hacktolive
+      MYSQL_USER: hacktolive_user
+      MYSQL_PASSWORD: password
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - hacktolive-dev-network
+
+  # Backend API (Development with hot reload)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: builder
+    container_name: hacktolive-backend-dev
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: mysql://hacktolive_user:password@mysql:3306/hacktolive
+      PORT: 3001
+      NODE_ENV: development
+      JWT_SECRET: dev-secret-key
+      FRONTEND_URL: http://localhost:3000
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - backend_dev_uploads:/app/uploads
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mysql
+    networks:
+      - hacktolive-dev-network
+    command: npm run start:dev
+
+  # Frontend (Development with hot reload)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: deps
+    container_name: hacktolive-frontend-dev
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api
+      NODE_ENV: development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - hacktolive-dev-network
+    command: npm run dev
+
+networks:
+  hacktolive-dev-network:
+    driver: bridge
+
+volumes:
+  mysql_dev_data:
+  backend_dev_uploads:
