@@ -250,6 +250,62 @@ export class AuthService {
     return { message: 'Password changed successfully' };
   }
 
+  async googleLogin(profile: { email: string; name: string; avatar?: string }) {
+    // Check if user exists
+    let user = await this.prisma.user.findUnique({
+      where: { email: profile.email },
+      include: {
+        student: true,
+        instructor: true,
+      },
+    });
+
+    // If user doesn't exist, create one
+    if (!user) {
+      // Generate a random password for OAuth users (they won't use it)
+      const randomPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+      const newUser = await this.prisma.user.create({
+        data: {
+          email: profile.email,
+          password: hashedPassword,
+          name: profile.name,
+          avatar: profile.avatar,
+          role: UserRole.STUDENT, // Default role for OAuth signups
+        },
+      });
+
+      // Create student profile
+      await this.prisma.student.create({
+        data: {
+          userId: newUser.id,
+        },
+      });
+
+      // Fetch user with student data
+      user = await this.prisma.user.findUnique({
+        where: { id: newUser.id },
+        include: {
+          student: true,
+          instructor: true,
+        },
+      });
+    }
+
+    if (!user) {
+      throw new UnauthorizedException('Failed to authenticate with Google');
+    }
+
+    // Generate token
+    const token = this.generateToken(user);
+
+    return {
+      user: this.sanitizeUser(user),
+      token,
+    };
+  }
+
   private generateToken(user: User): string {
     const payload: JwtPayload = {
       sub: user.id,

@@ -69,6 +69,7 @@ const Login: NextPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    e.stopPropagation()
     
     // Reset errors
     setErrors({ email: '', password: '', captcha: '' })
@@ -102,24 +103,29 @@ const Login: NextPage = () => {
     
     try {
       await login(email, password)
+      // Show success toast after login completes, before redirect
       toast.success('Login successful!', {
         description: 'Welcome back to HACKTOLIVE',
-        duration: 3000,
+        duration: 2000,
       })
       // Router redirect is handled in AuthContext based on role
     } catch (error: any) {
       console.error('Login error:', error)
+      // Only show error toast without page refresh
       toast.error('Login failed', {
         description: error.response?.data?.message || 'Invalid email or password. Please try again.',
         duration: 5000,
       })
+    } finally {
+      // Always set loading to false on error or success
       setIsLoading(false)
     }
   }
 
   const handleGoogleLogin = () => {
-    console.log('Google login clicked')
-    // Implement Google OAuth logic here
+    // Redirect to Google OAuth endpoint
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    window.location.href = `${backendUrl}/auth/google`
   }
 
   return (
@@ -235,22 +241,6 @@ const Login: NextPage = () => {
           />
         </Box>
         
-        {/* Back to Home Button */}
-        {/* <Button
-          as={NextLink}
-          href="/"
-          leftIcon={<FaHome />}
-          variant="ghost"
-          size="sm"
-          position="absolute"
-          top={6}
-          left={6}
-          color="white"
-          _hover={{ bg: 'whiteAlpha.200' }}
-          zIndex={2}
-        >
-          Back to Home
-        </Button> */}
         
         <VStack spacing={4} zIndex={1} px={8}>
           <Image 
@@ -270,133 +260,6 @@ const Login: NextPage = () => {
       <GridItem bg={rightBgColor} position="relative">
         {/* <BackgroundGradient zIndex="-1" opacity={0.1} /> */}
         
-        {/* Animated Geometric Background for right column */}
-        {/* <Box
-          position="absolute"
-          top="0"
-          left="0"
-          right="0"
-          bottom="0"
-          zIndex={0}
-          pointerEvents="none"
-          overflow="hidden"
-          opacity={{ base: 0.1, md: 0.5, lg: 1 }}
-        > */}
-          {/* Rotating geometric shapes */}
-          {/* <Box
-            position="absolute"
-            top="20%"
-            right="10%"
-            w="120px"
-            h="120px"
-            border="2px solid"
-            borderColor={colorMode === 'light' ? 'blue.200' : 'blue.500'}
-            borderRadius="20px"
-            transform="rotate(25deg)"
-            animation="rotateShape 18s linear infinite"
-            opacity={0.4}
-          />
-          <Box
-            position="absolute"
-            bottom="25%"
-            left="15%"
-            w="90px"
-            h="90px"
-            border="2px solid"
-            borderColor={colorMode === 'light' ? 'purple.200' : 'purple.500'}
-            borderRadius="50%"
-            animation="floatReverse 20s ease-in-out infinite"
-            opacity={0.3}
-          />
-          <Box
-            position="absolute"
-            top="50%"
-            left="5%"
-            w="60px"
-            h="60px"
-            border="2px solid"
-            borderColor={colorMode === 'light' ? 'cyan.200' : 'cyan.500'}
-            transform="rotate(60deg)"
-            animation="rotateShapeReverse 22s linear infinite"
-            opacity={0.35}
-          /> */}
-          {/* Diagonal lines */}
-          {/* <Box
-            position="absolute"
-            top="10%"
-            left="-10%"
-            w="150%"
-            h="1px"
-            bg={colorMode === 'light' 
-              ? 'linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent)'
-              : 'linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent)'
-            }
-            transform="rotate(-15deg)"
-            animation="slideRight 12s linear infinite"
-          />
-          <Box
-            position="absolute"
-            bottom="20%"
-            left="-10%"
-            w="150%"
-            h="1px"
-            bg={colorMode === 'light'
-              ? 'linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.2), transparent)'
-              : 'linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.3), transparent)'
-            }
-            transform="rotate(15deg)"
-            animation="slideLeft 15s linear infinite"
-          /> */}
-          {/* Floating dots grid pattern */}
-          {/* <Box
-            position="absolute"
-            top="15%"
-            left="20%"
-            w="6px"
-            h="6px"
-            borderRadius="full"
-            bg={colorMode === 'light' ? 'blue.300' : 'blue.400'}
-            animation="floatDot 5s ease-in-out infinite"
-            opacity={0.4}
-          /> */}
-          {/* <Box
-            position="absolute"
-            top="35%"
-            right="25%"
-            w="8px"
-            h="8px"
-            borderRadius="full"
-            bg={colorMode === 'light' ? 'purple.300' : 'purple.400'}
-            animation="floatDot 7s ease-in-out infinite"
-            sx={{ animationDelay: '-2s' }}
-            opacity={0.4}
-          /> */}
-          {/* <Box
-            position="absolute"
-            bottom="30%"
-            left="30%"
-            w="7px"
-            h="7px"
-            borderRadius="full"
-            bg={colorMode === 'light' ? 'cyan.300' : 'cyan.400'}
-            animation="floatDot 6s ease-in-out infinite"
-            sx={{ animationDelay: '-4s' }}
-            opacity={0.4}
-          /> */}
-          {/* <Box
-            position="absolute"
-            top="60%"
-            right="15%"
-            w="5px"
-            h="5px"
-            borderRadius="full"
-            bg={colorMode === 'light' ? 'pink.300' : 'pink.400'}
-            animation="floatDot 8s ease-in-out infinite"
-            sx={{ animationDelay: '-1s' }}
-            opacity={0.4}
-          /> */}
-        {/* </Box> */}
-        
         {/* Header - Back to Home (mobile) and Theme Toggle */}
         <Flex
           position="absolute"
@@ -407,23 +270,6 @@ const Login: NextPage = () => {
           align="center"
           zIndex={10}
         >
-          {/* <Button
-            as={NextLink}
-            href="/"
-            leftIcon={<FaHome />}
-            variant="ghost"
-            size="sm"
-            display={{ base: 'flex', lg: 'none' }}
-          >
-            Back to Home
-          </Button>
-          <IconButton
-            aria-label="Toggle theme"
-            icon={colorMode === 'light' ? <FaMoon /> : <FaSun />}
-            onClick={toggleColorMode}
-            variant="ghost"
-            size="md"
-          /> */}
         </Flex>
 
         {/* Form Content */}

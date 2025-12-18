@@ -81,6 +81,7 @@ const Signup: NextPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    e.stopPropagation()
     
     // Reset errors
     setErrors({
@@ -147,24 +148,29 @@ const Signup: NextPage = () => {
     try {
       // Signup is only for students
       await signup(formData.name, formData.email, formData.password)
+      // Show success toast after signup completes, before redirect
       toast.success('Account created successfully!', {
         description: 'Welcome to HACKTOLIVE! Redirecting to your dashboard...',
-        duration: 3000,
+        duration: 2000,
       })
       // Router redirect is handled in AuthContext
     } catch (error: any) {
       console.error('Signup error:', error)
+      // Only show error toast without page refresh
       toast.error('Signup failed', {
         description: error.response?.data?.message || 'Unable to create account. Please try again.',
         duration: 5000,
       })
+    } finally {
+      // Always set loading to false on error or success
       setIsLoading(false)
     }
   }
 
   const handleGoogleSignup = () => {
-    console.log('Google signup clicked')
-    // Implement Google OAuth logic here
+    // Redirect to Google OAuth endpoint
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    window.location.href = `${backendUrl}/auth/google`
   }
 
   return (

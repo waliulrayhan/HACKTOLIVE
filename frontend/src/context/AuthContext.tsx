@@ -12,6 +12,8 @@ interface AuthContextType {
   signup: (name: string, email: string, password: string, role?: string) => Promise<void>;
   logout: () => void;
   updateUser: (user: User) => void;
+  setUser: (user: User | null) => void;
+  setToken: (token: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -108,8 +110,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(mergedUser);
   };
 
+  const setUserAndStore = (newUser: User | null) => {
+    setUser(newUser);
+    if (newUser) {
+      authService.setUser(newUser);
+    }
+  };
+
+  const setTokenAndStore = (token: string) => {
+    authService.setToken(token);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, isLoading: loading, login, signup, logout, updateUser }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      isLoading: loading, 
+      login, 
+      signup, 
+      logout, 
+      updateUser,
+      setUser: setUserAndStore,
+      setToken: setTokenAndStore
+    }}>
       {children}
     </AuthContext.Provider>
   );

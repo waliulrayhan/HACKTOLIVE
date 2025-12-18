@@ -25,11 +25,16 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Don't auto-logout for password change failures (wrong old password)
+      // Don't auto-logout for:
+      // 1. Login failures (wrong credentials)
+      // 2. Signup failures
+      // 3. Password change failures (wrong old password)
+      const isLoginError = error.config?.url?.includes('/auth/login');
+      const isSignupError = error.config?.url?.includes('/auth/signup');
       const isPasswordChangeError = error.config?.url?.includes('/auth/change-password');
       
-      if (!isPasswordChangeError) {
-        // Clear token and redirect to login for other 401 errors
+      if (!isLoginError && !isSignupError && !isPasswordChangeError) {
+        // Clear token and redirect to login for other 401 errors (expired token, etc.)
         if (typeof window !== 'undefined') {
           localStorage.removeItem('token');
           localStorage.removeItem('user');

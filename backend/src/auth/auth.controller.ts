@@ -8,13 +8,16 @@ import {
   Patch,
   HttpCode,
   HttpStatus,
+  Res,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import type { Response } from 'express';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { UpdateProfileDto, UpdateSocialLinksDto, ChangePasswordDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { GoogleAuthGuard } from './google-auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -99,5 +102,25 @@ export class AuthController {
       valid: true,
       user: req.user,
     };
+  }
+
+  @Get('google')
+  @UseGuards(GoogleAuthGuard)
+  @ApiOperation({ summary: 'Initiate Google OAuth login' })
+  async googleAuth() {
+    // Guard redirects to Google
+  }
+
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard)
+  @ApiOperation({ summary: 'Google OAuth callback' })
+  async googleAuthCallback(@Request() req: any, @Res() res: Response) {
+    const result = await this.authService.googleLogin(req.user);
+    
+    // Redirect to frontend with token
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const redirectUrl = `${frontendUrl}/auth/google/callback?token=${result.token}&user=${encodeURIComponent(JSON.stringify(result.user))}`;
+    
+    return res.redirect(redirectUrl);
   }
 }
