@@ -222,9 +222,9 @@ const HeroSection: React.FC = () => {
                 lineHeight="1.2"
                 textAlign={{ base: 'center', md: 'left' }}
               >
-                Master Cybersecurity
+                Master Cybersecurity Skills
                 <Br />
-                Defend Bangladesh
+                Defend Bangladesh 🇧🇩
               </Heading>
             </FallInPlace>
 
