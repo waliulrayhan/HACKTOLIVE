@@ -41,6 +41,7 @@ import {
 } from "react-icons/fi";
 import { Course } from "@/types/academy";
 import academyService from "@/lib/academy-service";
+import { getFullImageUrl } from "@/lib/image-utils";
 
 export default function AcademyHomePage() {
   const bgColor = useColorModeValue('gray.50', 'gray.900');
@@ -584,7 +585,7 @@ export default function AcademyHomePage() {
                         </Text>
                         <HStack spacing="3" mt="auto">
                           <Image
-                            src={testimonial.studentAvatar || ""}
+                            src={getFullImageUrl(testimonial.studentAvatar, 'avatar')}
                             alt={testimonial.studentName}
                             width={48}
                             height={48}
@@ -687,7 +688,7 @@ export default function AcademyHomePage() {
                       <Box position="relative" overflow="hidden">
                       {instructor.avatar ? (
                         <Image
-                          src={instructor.avatar}
+                          src={getFullImageUrl(instructor.avatar, 'avatar')}
                           alt={instructor.name}
                           width={400}
                           height={400}

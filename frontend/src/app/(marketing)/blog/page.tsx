@@ -34,14 +34,16 @@ import {
   useBreakpointValue,
 } from "@chakra-ui/react";
 import { FiSearch, FiArrowRight, FiMail } from "react-icons/fi";
+import SearchBar from "@/components/academy/SearchBar";
 import BlogData from "./_components/blogData";
 import { useState, useMemo } from "react";
+import { chakra } from "@chakra-ui/react";
 import { BlogCategory, BlogType, Blog } from "@/types/blog";
 import { FallInPlace } from "@/components/shared/motion/fall-in-place";
 import Link from "next/link";
 import Image from "next/image";
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 10;
 
 const BlogPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<BlogCategory | "All">("All");
@@ -79,11 +81,11 @@ const BlogPage = () => {
     return BlogData.filter(blog => {
       const matchesCategory = selectedCategory === "All" || blog.category === selectedCategory;
       const matchesType = selectedType === "All" || blog.blogType === selectedType;
-      const matchesSearch = searchQuery === "" || 
+      const matchesSearch = searchQuery === "" ||
         blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         blog.metadata.toLowerCase().includes(searchQuery.toLowerCase()) ||
         blog.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-      
+
       return matchesCategory && matchesType && matchesSearch;
     });
   }, [selectedCategory, selectedType, searchQuery]);
@@ -127,11 +129,11 @@ const BlogPage = () => {
         <Container maxW="container.xl" position="relative" zIndex={1}>
           <VStack spacing={{ base: "4", md: "6" }} textAlign="center">
             <FallInPlace>
-              <Badge 
-                colorScheme="green" 
-                fontSize="sm" 
-                px="4" 
-                py="2" 
+              <Badge
+                colorScheme="green"
+                fontSize="sm"
+                px="4"
+                py="2"
                 borderRadius="full"
                 textTransform="uppercase"
                 letterSpacing="wide"
@@ -140,7 +142,7 @@ const BlogPage = () => {
               </Badge>
             </FallInPlace>
             <FallInPlace delay={0.1}>
-              <Heading 
+              <Heading
                 fontSize={{ base: "3xl", md: "4xl", lg: "5xl", xl: "6xl" }}
                 fontWeight="bold"
                 color="white"
@@ -149,9 +151,9 @@ const BlogPage = () => {
               </Heading>
             </FallInPlace>
             <FallInPlace delay={0.2}>
-              <Text 
-                fontSize={{ base: "lg", md: "xl" }} 
-                color="whiteAlpha.900" 
+              <Text
+                fontSize={{ base: "lg", md: "xl" }}
+                color="whiteAlpha.900"
                 maxW="2xl"
               >
                 Stay informed with the latest security insights, tutorials, and threat intelligence
@@ -174,10 +176,10 @@ const BlogPage = () => {
                 <VStack spacing="4" align="stretch" position="sticky" top="24">
                   {/* Category Filter */}
                   <Box>
-                    <Text 
-                      fontSize="xs" 
-                      fontWeight="bold" 
-                      textTransform="uppercase" 
+                    <Text
+                      fontSize="xs"
+                      fontWeight="bold"
+                      textTransform="uppercase"
                       letterSpacing="wider"
                       mb="3"
                       color="muted"
@@ -211,10 +213,10 @@ const BlogPage = () => {
 
                   {/* Blog Type Filter */}
                   <Box>
-                    <Text 
-                      fontSize="xs" 
-                      fontWeight="bold" 
-                      textTransform="uppercase" 
+                    <Text
+                      fontSize="xs"
+                      fontWeight="bold"
+                      textTransform="uppercase"
                       letterSpacing="wider"
                       mb="3"
                       color="muted"
@@ -250,49 +252,58 @@ const BlogPage = () => {
             {/* Right Panel - Blog List */}
             <GridItem>
               <VStack spacing="6" align="stretch">
-                {/* Filters Button for Mobile */}
-                <Box display={{ base: "block", lg: "none" }}>
-                  <Button onClick={onOpen} variant="outline" colorScheme="green" size="sm">
-                    Open Filters
-                  </Button>
+                {/* Search & Filters */}
+                <Box>
+                  {/* Search Bar - Full width */}
+                  <Box mb="4">
+                    <SearchBar
+                      placeholder="Search articles, tags, or topics..."
+                      onSearch={setSearchQuery}
+                    />
+                  </Box>
+
+                  {/* Results Count - Mobile Only (Above Sort/Filter) */}
+                  <Text
+                    fontSize="sm"
+                    color="muted"
+                    fontWeight="medium"
+                    display={{ base: "block", lg: "none" }}
+                    mb="3"
+                  >
+                    Showing <chakra.span color="primary.500" fontWeight="semibold">{currentBlogs.length}</chakra.span> of {filteredBlogs.length} articles
+                  </Text>
+
+                  {/* Sort & Filter Row - Mobile */}
+                  <Flex
+                    gap="3"
+                    display={{ base: "flex", lg: "none" }}
+                    align="center"
+                  >
+                    <Button
+                      onClick={onOpen}
+                      colorScheme="primary"
+                      variant="outline"
+                      size="sm"
+                      flexShrink={0}
+                    >
+                      Filters
+                    </Button>
+                  </Flex>
                 </Box>
 
-                {/* Search Bar */}
-                <FallInPlace delay={0.3}>
-                  <InputGroup size="lg">
-                      <Input
-                        placeholder="Search articles, tags, or topics..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        bg={cardBg}
-                        borderColor={borderColor}
-                        borderWidth="2px"
-                        borderRadius="xl"
-                        _hover={{ borderColor: accentColor }}
-                        _focus={{ borderColor: accentColor, boxShadow: "lg" }}
-                        fontSize={{ base: "md", md: "lg" }}
-                        py={{ base: "6", md: "7" }}
-                      />
-                      <InputRightElement h="full" pr="4">
-                        <Icon as={FiSearch} boxSize="5" color="gray.400" />
-                      </InputRightElement>
-                    </InputGroup>
-                </FallInPlace>
-
-                {/* Results Header */}
-                <Flex 
-                  justify="space-between" 
-                  align="center" 
-                  pb="4"
-                  borderBottomWidth="2px"
-                  borderColor={borderColor}
-                >
-                  <Text fontSize="lg" fontWeight="semibold">
-                    {filteredBlogs.length} {filteredBlogs.length === 1 ? 'Article' : 'Articles'} Found
+                {/* Results Header - Desktop Only */}
+                <Flex justify="space-between" align="center" wrap="wrap" gap="4" display={{ base: "none", lg: "flex" }}>
+                  <Text fontSize="md" color="muted" fontWeight="medium">
+                    Showing <chakra.span color="primary.500" fontWeight="semibold">{currentBlogs.length}</chakra.span> of {filteredBlogs.length} articles
                   </Text>
-                  <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
-                    Page {currentPage} of {totalPages || 1}
-                  </Badge>
+                  <HStack spacing="3">
+                    <Text fontSize="sm" color="muted">
+                      Sort by:
+                    </Text>
+                    <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+                      Page {currentPage} of {totalPages || 1}
+                    </Badge>
+                  </HStack>
                 </Flex>
 
                 {/* Blog List */}
@@ -366,10 +377,10 @@ const BlogPage = () => {
             <VStack spacing="4" align="stretch">
               {/* Category Filter */}
               <Box>
-                <Text 
-                  fontSize="xs" 
-                  fontWeight="bold" 
-                  textTransform="uppercase" 
+                <Text
+                  fontSize="xs"
+                  fontWeight="bold"
+                  textTransform="uppercase"
                   letterSpacing="wider"
                   mb="3"
                   color="muted"
@@ -403,10 +414,10 @@ const BlogPage = () => {
 
               {/* Blog Type Filter */}
               <Box>
-                <Text 
-                  fontSize="xs" 
-                  fontWeight="bold" 
-                  textTransform="uppercase" 
+                <Text
+                  fontSize="xs"
+                  fontWeight="bold"
+                  textTransform="uppercase"
                   letterSpacing="wider"
                   mb="3"
                   color="muted"
@@ -441,8 +452,8 @@ const BlogPage = () => {
       </Drawer>
 
       {/* CTA Section */}
-      <Box 
-        py={{ base: "16", md: "20" }} 
+      <Box
+        py={{ base: "16", md: "20" }}
         bg={useColorModeValue("green.50", "green.900")}
         borderTopWidth="1px"
         borderColor={borderColor}
@@ -458,10 +469,10 @@ const BlogPage = () => {
             <Text fontSize="lg" color="muted" maxW="xl">
               Get the latest cybersecurity insights, threat alerts, and tutorials delivered directly to your inbox.
             </Text>
-            <Stack 
-              as="form" 
-              w="full" 
-              maxW="md" 
+            <Stack
+              as="form"
+              w="full"
+              maxW="md"
               spacing="3"
               direction={{ base: "column", md: "row" }}
               px={{ base: "4", md: "0" }}
@@ -523,17 +534,21 @@ const BlogListItem = ({ blog }: { blog: Blog }) => {
       <CardBody p="0">
         <Flex direction={{ base: "column", md: "row" }}>
           {/* Image */}
-          <Box 
-            position="relative" 
+          <Box
+            position="relative"
             width={{ base: "100%", md: "280px" }}
-            height={{ base: "170px", sm: "220px", md: "220px" }}
+            aspectRatio={2 / 1}
             flexShrink={0}
+            minH={{ base: "120px", sm: "160px", md: "140px" }}
+            maxH={{ base: "180px", md: "180px" }}
+            overflow="hidden"
           >
-            <Image 
-              src={blog.mainImage} 
-              alt={blog.title} 
-              fill 
+            <Image
+              src={blog.mainImage}
+              alt={blog.title}
+              fill
               style={{ objectFit: "cover" }}
+              sizes="(max-width: 768px) 100vw, 280px"
             />
             {blog.featured && (
               <Badge
@@ -551,9 +566,9 @@ const BlogListItem = ({ blog }: { blog: Blog }) => {
           </Box>
 
           {/* Content */}
-          <VStack 
-            align="stretch" 
-            spacing={{ base: "3", md: "4" }} 
+          <VStack
+            align="stretch"
+            spacing={{ base: "3", md: "4" }}
             p={{ base: "4", sm: "5", md: "6" }}
             flex="1"
           >
@@ -568,8 +583,8 @@ const BlogListItem = ({ blog }: { blog: Blog }) => {
               </HStack>
 
               <LinkOverlay as={Link} href={`/blog/${blog.slug}`}>
-                <Heading 
-                  size={{ base: "sm", sm: "md", md: "lg" , lg: "lg" }}
+                <Heading
+                  size={{ base: "sm", sm: "md", md: "lg", lg: "lg" }}
                   noOfLines={2}
                   _hover={{ color: accentColor }}
                   transition="color 0.2s"
@@ -579,30 +594,45 @@ const BlogListItem = ({ blog }: { blog: Blog }) => {
                 </Heading>
               </LinkOverlay>
 
-              <Text 
-                color={mutedColor} 
-                noOfLines={{ base: 3, md: 2 }} 
+              <Text
+                color={mutedColor}
+                noOfLines={{ base: 3, md: 2 }}
                 fontSize={{ base: "xs", sm: "sm" }}
                 lineHeight="short"
               >
                 {blog.metadata}
               </Text>
+
+              <Link href={`/blog/${blog.slug}`}>
+                <Button
+                  variant="link"
+                  colorScheme="green"
+                  size="sm"
+                  rightIcon={<Icon as={FiArrowRight} />}
+                  fontWeight="semibold"
+                  _hover={{ textDecoration: "none", transform: "translateX(4px)" }}
+                  transition="transform 0.2s"
+                  flexShrink={0}
+                >
+                  Read More
+                </Button>
+              </Link>
             </VStack>
 
             {/* Author Info - Responsive Layout */}
-            <Stack 
+            <Stack
               direction={{ base: "column", sm: "row" }}
-              spacing={{ base: "2", sm: "4" }} 
-              pt={{ base: "2", md: "2" }} 
-              borderTopWidth="1px" 
+              spacing={{ base: "2", sm: "4" }}
+              pt={{ base: "2", md: "2" }}
+              borderTopWidth="1px"
               borderColor={borderColor}
               align={{ base: "flex-start", sm: "center" }}
             >
               <HStack spacing="3" flex={{ base: "auto", sm: "1" }}>
-                <Avatar 
-                  size={{ base: "xs", sm: "sm" }} 
-                  name={blog.author.name} 
-                  src={blog.author.avatar} 
+                <Avatar
+                  size={{ base: "xs", sm: "sm" }}
+                  name={blog.author.name}
+                  src={blog.author.avatar}
                 />
                 <VStack align="start" spacing="0">
                   <Text fontSize={{ base: "xs", sm: "sm" }} fontWeight="semibold" noOfLines={1}>
@@ -613,9 +643,9 @@ const BlogListItem = ({ blog }: { blog: Blog }) => {
                   </Text>
                 </VStack>
               </HStack>
-              <Text 
-                fontSize="xs" 
-                color={mutedColor} 
+              <Text
+                fontSize="xs"
+                color={mutedColor}
                 flexShrink={0}
                 whiteSpace={{ base: "normal", sm: "nowrap" }}
               >
