@@ -108,7 +108,7 @@ const BlogPage = () => {
         }
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/blog?${params}`
+          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/blog?${params}`
         );
         
         if (!response.ok) throw new Error("Failed to fetch blogs");
