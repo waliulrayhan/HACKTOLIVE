@@ -863,12 +863,12 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
                         <HStack spacing={3} mt="auto">
                           <Avatar
                             size="sm"
-                            name={review.studentName}
-                            src={review.studentAvatar}
+                            name={review.user?.name || 'User'}
+                            src={review.user?.avatar || '/images/default-avatar.png'}
                           />
                           <VStack align="start" spacing={0}>
                             <Text fontWeight="bold" fontSize="sm">
-                              {review.studentName}
+                              {review.user?.name || 'Anonymous'}
                             </Text>
                             <Text fontSize="xs" color="muted">
                               Verified Student

@@ -330,7 +330,7 @@ export default function StudentDashboard() {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white line-clamp-1">
-                      {certificate.courseName}
+                      {certificate.course?.title || 'Course'}
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400">
                       Issued on{" "}

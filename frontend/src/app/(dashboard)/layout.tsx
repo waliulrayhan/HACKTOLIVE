@@ -101,11 +101,11 @@ export default function DashboardLayout({
             name: "Blogs",
             path: "/admin/blogs",
           },
-          {
-            icon: <PieChartIcon />,
-            name: "System Analytics",
-            path: "/admin/analytics",
-          },
+          // {
+          //   icon: <PieChartIcon />,
+          //   name: "System Analytics",
+          //   path: "/admin/analytics",
+          // },
           {
             icon: <UserCircleIcon />,
             name: "Profile",

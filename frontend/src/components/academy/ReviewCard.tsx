@@ -42,14 +42,14 @@ export default function ReviewCard({ review }: ReviewCardProps) {
         <HStack justify="space-between" align="start">
           <HStack spacing="3">
             <Image
-              src={review.studentAvatar}
-              alt={review.studentName}
+              src={review.user?.avatar || '/images/default-avatar.png'}
+              alt={review.user?.name || 'User'}
               boxSize="48px"
               borderRadius="full"
               objectFit="cover"
             />
             <VStack align="start" spacing="0">
-              <Text fontWeight="bold">{review.studentName}</Text>
+              <Text fontWeight="bold">{review.user?.name || 'Anonymous'}</Text>
               <Text fontSize="xs" color="gray.500">
                 {formatDate(review.createdAt)}
               </Text>

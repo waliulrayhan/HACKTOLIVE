@@ -65,9 +65,6 @@ export class AuthService {
       await this.prisma.instructor.create({
         data: {
           userId: user.id,
-          name: user.name || 'Instructor',
-          avatar: '/images/user/default-avatar.jpg',
-          bio: 'New instructor',
           skills: JSON.stringify([]),
         },
       });
@@ -184,14 +181,8 @@ export class AuthService {
       // Student avatar is now in User table, no need to update Student
       // The update to user.avatar above already handles this
     } else if (user.role === UserRole.INSTRUCTOR) {
-      await this.prisma.instructor.update({
-        where: { userId },
-        data: {
-          name: data.name,
-          avatar: data.avatar,
-          bio: data.bio,
-        },
-      });
+      // Instructor profile data is now in User table
+      // All updates are already handled in the user update above
     }
 
     return this.sanitizeUser(user);

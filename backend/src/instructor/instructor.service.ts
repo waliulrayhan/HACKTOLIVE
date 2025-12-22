@@ -37,13 +37,19 @@ export class InstructorService {
       include: {
         user: {
           select: {
+            id: true,
             email: true,
             name: true,
-            phone: true,
             avatar: true,
+            bio: true,
+            phone: true,
             city: true,
             state: true,
             country: true,
+            linkedinUrl: true,
+            twitterUrl: true,
+            githubUrl: true,
+            websiteUrl: true,
           },
         },
         courses: {
@@ -1225,8 +1231,8 @@ export class InstructorService {
         id: certificate.id,
         status: certificate.status,
         requestedAt: certificate.requestedAt,
-        courseName: certificate.courseName,
-        studentName: certificate.studentName,
+        courseName: certificate.course.title,
+        studentName: certificate.student.user.name,
       },
       student: {
         id: certificate.student.id,

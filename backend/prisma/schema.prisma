@@ -4,26 +4,31 @@ generator client {
 
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id           String      @id @default(uuid())
-  email        String      @unique
+  id           String        @id @default(uuid())
+  email        String        @unique
   name         String?
   password     String
-  role         UserRole    @default(STUDENT)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  avatar       String?     @db.VarChar(500)
+  role         UserRole      @default(STUDENT)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  avatar       String?       @db.VarChar(500)
   bio          String?
   city         String?
   country      String?
-  facebookUrl  String?     @db.VarChar(500)
-  instagramUrl String?     @db.VarChar(500)
-  linkedinUrl  String?     @db.VarChar(500)
+  facebookUrl  String?       @db.VarChar(500)
+  instagramUrl String?       @db.VarChar(500)
+  linkedinUrl  String?       @db.VarChar(500)
   phone        String?
   state        String?
-  twitterUrl   String?     @db.VarChar(500)
+  twitterUrl   String?       @db.VarChar(500)
+  githubUrl    String?       @db.VarChar(500)
+  websiteUrl   String?       @db.VarChar(500)
+  blogs        Blog[]
+  comments     BlogComment[]
   instructor   Instructor?
   reviews      Review[]
   student      Student?
@@ -32,22 +37,15 @@ model User {
 model Instructor {
   id            String        @id @default(uuid())
   userId        String        @unique
-  name          String
-  avatar        String?       @db.VarChar(500)
-  bio           String?       @db.Text
   experience    String?       @db.VarChar(500)
   skills        String        @db.Text
   rating        Float         @default(0)
   totalStudents Int           @default(0)
   totalCourses  Int           @default(0)
-  linkedinUrl   String?
-  twitterUrl    String?
-  githubUrl     String?
-  websiteUrl    String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
-  courses       Course[]
   certificates  Certificate[]
+  courses       Course[]
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([rating])
@@ -206,17 +204,15 @@ model LessonProgress {
 }
 
 model Review {
-  id            String   @id @default(uuid())
-  courseId      String
-  userId        String
-  studentName   String   @db.VarChar(255)
-  studentAvatar String?  @db.VarChar(500)
-  rating        Int
-  comment       String?  @db.Text
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(uuid())
+  courseId  String
+  userId    String
+  rating    Int
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([courseId])
   @@index([userId])
@@ -228,8 +224,6 @@ model Certificate {
   studentId        String
   courseId         String
   instructorId     String
-  studentName      String            @db.VarChar(255)
-  courseName       String            @db.VarChar(255)
   status           CertificateStatus @default(PENDING)
   requestedAt      DateTime          @default(now())
   issuedAt         DateTime?
@@ -238,20 +232,14 @@ model Certificate {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   course           Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  student          Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
   instructor       Instructor        @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+  student          Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@index([studentId])
   @@index([courseId])
   @@index([instructorId])
   @@index([verificationCode])
   @@index([status])
-}
-
-enum CertificateStatus {
-  PENDING
-  ISSUED
-  REJECTED
 }
 
 model Quiz {
@@ -341,6 +329,70 @@ model AssignmentSubmission {
   @@index([status])
 }
 
+model Blog {
+  id          String        @id @default(uuid())
+  slug        String        @unique @db.VarChar(255)
+  title       String        @db.VarChar(500)
+  mainImage   String?       @db.VarChar(500)
+  metadata    String        @db.Text
+  content     String?       @db.LongText
+  category    BlogCategory
+  blogType    BlogType
+  authorId    String
+  publishDate DateTime      @default(now())
+  readTime    String?       @db.VarChar(50)
+  tags        String        @db.Text
+  featured    Boolean       @default(false)
+  status      BlogStatus    @default(DRAFT)
+  views       Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  author      User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments    BlogComment[]
+  likes       BlogLike[]
+
+  @@index([slug])
+  @@index([category])
+  @@index([blogType])
+  @@index([status])
+  @@index([featured])
+  @@index([publishDate])
+  @@index([authorId])
+}
+
+model BlogComment {
+  id        String   @id @default(uuid())
+  blogId    String
+  userId    String
+  comment   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([blogId])
+  @@index([userId])
+}
+
+model BlogLike {
+  id        String   @id @default(uuid())
+  blogId    String
+  userId    String?
+  userEmail String?  @db.VarChar(255)
+  createdAt DateTime @default(now())
+  blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+
+  @@unique([blogId, userEmail])
+  @@index([blogId])
+  @@index([userId])
+}
+
+enum CertificateStatus {
+  PENDING
+  ISSUED
+  REJECTED
+}
+
 enum UserRole {
   STUDENT
   INSTRUCTOR
@@ -411,70 +463,6 @@ enum SubmissionStatus {
   SUBMITTED
   GRADED
   RETURNED
-}
-
-model Blog {
-  id               String        @id @default(uuid())
-  slug             String        @unique @db.VarChar(255)
-  title            String        @db.VarChar(500)
-  mainImage        String?       @db.VarChar(500)
-  metadata         String        @db.Text
-  content          String?       @db.LongText
-  category         BlogCategory
-  blogType         BlogType
-  authorName       String        @db.VarChar(255)
-  authorAvatar     String?       @db.VarChar(500)
-  authorRole       String?       @db.VarChar(255)
-  authorBio        String?       @db.Text
-  authorTwitter    String?       @db.VarChar(255)
-  authorLinkedin   String?       @db.VarChar(255)
-  authorGithub     String?       @db.VarChar(255)
-  publishDate      DateTime      @default(now())
-  readTime         String?       @db.VarChar(50)
-  tags             String        @db.Text
-  featured         Boolean       @default(false)
-  status           BlogStatus    @default(DRAFT)
-  views            Int           @default(0)
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  comments         BlogComment[]
-  likes            BlogLike[]
-
-  @@index([slug])
-  @@index([category])
-  @@index([blogType])
-  @@index([status])
-  @@index([featured])
-  @@index([publishDate])
-}
-
-model BlogComment {
-  id        String   @id @default(uuid())
-  blogId    String
-  userId    String?
-  userName  String   @db.VarChar(255)
-  userEmail String   @db.VarChar(255)
-  userAvatar String? @db.VarChar(500)
-  comment   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
-
-  @@index([blogId])
-  @@index([userId])
-}
-
-model BlogLike {
-  id        String   @id @default(uuid())
-  blogId    String
-  userId    String?
-  userEmail String?  @db.VarChar(255)
-  createdAt DateTime @default(now())
-  blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
-
-  @@unique([blogId, userEmail])
-  @@index([blogId])
-  @@index([userId])
 }
 
 enum BlogCategory {

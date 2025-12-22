@@ -53,13 +53,7 @@ export class UploadController {
       },
     });
 
-    // Also update in instructor table if exists (Student avatar is now only in User table)
-    if (req.user.role === 'INSTRUCTOR') {
-      await this.prisma.instructor.updateMany({
-        where: { userId: req.user.id },
-        data: { avatar: avatarUrl },
-      });
-    }
+    // Instructor avatar is now only in User table, no need to update separately
 
     return {
       message: 'Avatar uploaded successfully',

@@ -135,9 +135,14 @@ export class StudentService {
         instructor: {
           select: {
             id: true,
-            name: true,
-            avatar: true,
             rating: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                avatar: true,
+              },
+            },
           },
         },
         _count: {
@@ -1233,10 +1238,17 @@ export class StudentService {
       data: {
         courseId,
         userId,
-        studentName: student.user.name || 'Student',
-        studentAvatar: student.user.avatar,
         rating,
         comment,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+          },
+        },
       },
     });
 
@@ -1316,8 +1328,6 @@ export class StudentService {
         student: { connect: { id: student.id } },
         course: { connect: { id: courseId } },
         instructor: { connect: { id: course.instructorId } },
-        studentName: student.user.name || 'Student',
-        courseName: course.title,
         status: 'PENDING',
       },
       include: {

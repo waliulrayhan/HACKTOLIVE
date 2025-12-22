@@ -155,7 +155,6 @@ export class AdminService {
       await this.prisma.instructor.create({
         data: {
           userId: user.id,
-          name,
           skills: JSON.stringify([]),
         },
       });

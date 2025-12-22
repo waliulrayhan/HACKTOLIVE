@@ -244,7 +244,7 @@ export default function InstructorDashboard() {
               .slice(0, 5)
               .map((item: any, index: number) => (
                 <div key={index} className="p-3 sm:p-4 border border-gray-200 rounded-lg dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 transition-colors">
-                  <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white line-clamp-1">{item.courseName}</p>
+                  <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white line-clamp-1">{item.course?.title || item.courseName || 'Course'}</p>
                   <div className="flex items-center gap-3 mt-1">
                     <div className="flex items-center gap-1">
                       {[...Array(5)].map((_, i) => (

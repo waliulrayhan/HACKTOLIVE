@@ -149,8 +149,14 @@ export interface AssignmentFeedback {
 export interface Certificate {
   id: string;
   courseId: string;
-  courseName: string;
-  studentName: string;
+  course: {
+    title: string;
+  };
+  student: {
+    user: {
+      name: string;
+    };
+  };
   issueDate: string;
   certificateNumber: string;
   instructorName: string;

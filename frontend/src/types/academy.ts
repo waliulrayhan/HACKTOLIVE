@@ -121,8 +121,12 @@ export interface Course {
 export interface Review {
   id: string;
   courseId: string;
-  studentName: string;
-  studentAvatar: string;
+  userId: string;
+  user: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
   rating: number;
   comment: string;
   createdAt: string;
@@ -143,9 +147,18 @@ export interface Enrollment {
 export interface Certificate {
   id: string;
   studentId: string;
-  studentName: string;
+  student: {
+    id: string;
+    user: {
+      name: string;
+      email: string;
+    };
+  };
   courseId: string;
-  courseName: string;
+  course: {
+    id: string;
+    title: string;
+  };
   issuedAt: string;
   verificationCode: string;
   certificateUrl: string;

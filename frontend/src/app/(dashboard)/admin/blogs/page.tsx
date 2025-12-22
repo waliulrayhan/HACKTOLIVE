@@ -43,9 +43,12 @@ interface Blog {
   content: string;
   category: string;
   blogType: string;
-  authorName: string;
-  authorAvatar?: string;
-  authorRole?: string;
+  author: {
+    id: string;
+    name: string;
+    avatar?: string;
+    role: string;
+  };
   readTime?: string;
   tags?: string[];
   status: string;
@@ -124,7 +127,7 @@ export default function BlogsManagementPage() {
       if (searchTerm.trim()) {
         filteredData = filteredData.filter((blog: Blog) =>
           blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          blog.authorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          blog.author.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           blog.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
           blog.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
         );
@@ -472,11 +475,11 @@ export default function BlogsManagementPage() {
                     </TableCell>
                     <TableCell className="px-3 py-2.5 sm:px-4 sm:py-3">
                       <div className="flex items-center justify-center gap-2">
-                        {blog.authorAvatar ? (
+                        {blog.author?.avatar ? (
                           <div className="h-6 w-6 shrink-0 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
                             <img
-                              src={getFullImageUrl(blog.authorAvatar, 'avatar')}
-                              alt={blog.authorName}
+                              src={getFullImageUrl(blog.author.avatar, 'avatar')}
+                              alt={blog.author.name}
                               className="h-full w-full object-cover"
                             />
                           </div>
@@ -487,11 +490,11 @@ export default function BlogsManagementPage() {
                         )}
                         <div className="min-w-0">
                           <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
-                            {blog.authorName}
+                            {blog.author?.name || 'Unknown'}
                           </p>
-                          {blog.authorRole && (
+                          {blog.author?.role && (
                             <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">
-                              {blog.authorRole}
+                              {blog.author.role}
                             </p>
                           )}
                         </div>
@@ -721,9 +724,9 @@ export default function BlogsManagementPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Author</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedBlog.authorName}</p>
-                    {selectedBlog.authorRole && (
-                      <p className="text-xs text-gray-600 dark:text-gray-400">{selectedBlog.authorRole}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedBlog.author?.name || 'Unknown'}</p>
+                    {selectedBlog.author?.role && (
+                      <p className="text-xs text-gray-600 dark:text-gray-400">{selectedBlog.author.role}</p>
                     )}
                   </div>
                 </div>

@@ -585,15 +585,15 @@ export default function AcademyHomePage() {
                         </Text>
                         <HStack spacing="3" mt="auto">
                           <Image
-                            src={getFullImageUrl(testimonial.studentAvatar, 'avatar')}
-                            alt={testimonial.studentName}
+                            src={getFullImageUrl(testimonial.user?.avatar || '/images/default-avatar.png', 'avatar')}
+                            alt={testimonial.user?.name || 'User'}
                             width={48}
                             height={48}
                             style={{ borderRadius: "50%" }}
                           />
                           <VStack align="start" spacing="0">
                             <Text fontWeight="bold" fontSize="sm">
-                              {testimonial.studentName}
+                              {testimonial.user?.name || 'Anonymous'}
                             </Text>
                             <Text fontSize="xs" color="muted">
                               Verified Student

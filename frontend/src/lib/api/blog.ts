@@ -22,13 +22,16 @@ export interface Blog {
   content?: string;
   category: string;
   blogType: string;
-  authorName: string;
-  authorAvatar?: string;
-  authorRole?: string;
-  authorBio?: string;
-  authorTwitter?: string;
-  authorLinkedin?: string;
-  authorGithub?: string;
+  author: {
+    id: string;
+    name: string;
+    avatar?: string;
+    bio?: string;
+    role: string;
+    twitterUrl?: string;
+    linkedinUrl?: string;
+    githubUrl?: string;
+  };
   publishDate: string;
   readTime?: string;
   tags: string[];

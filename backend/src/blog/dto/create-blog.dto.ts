@@ -30,40 +30,8 @@ export class CreateBlogDto {
   @IsEnum(BlogType)
   blogType: BlogType;
 
-  @IsOptional()
-  @Transform(({ value }) => value === '' || value === null ? undefined : value)
   @IsString()
-  authorName?: string;
-
-  @IsOptional()
-  @Transform(({ value }) => value === '' || value === null ? undefined : value)
-  @IsString()
-  authorAvatar?: string;
-
-  @IsOptional()
-  @Transform(({ value }) => value === '' || value === null ? undefined : value)
-  @IsString()
-  authorRole?: string;
-
-  @IsOptional()
-  @Transform(({ value }) => value === '' || value === null ? undefined : value)
-  @IsString()
-  authorBio?: string;
-
-  @IsOptional()
-  @Transform(({ value }) => value === '' || value === null ? undefined : value)
-  @IsString()
-  authorTwitter?: string;
-
-  @IsOptional()
-  @Transform(({ value }) => value === '' || value === null ? undefined : value)
-  @IsString()
-  authorLinkedin?: string;
-
-  @IsOptional()
-  @Transform(({ value }) => value === '' || value === null ? undefined : value)
-  @IsString()
-  authorGithub?: string;
+  authorId: string;
 
   @IsOptional()
   @IsString()

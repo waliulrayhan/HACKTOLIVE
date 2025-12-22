@@ -20,8 +20,13 @@ import { HiOutlineTrophy } from "react-icons/hi2";
 
 interface Certificate {
   id: string;
-  studentName: string;
-  courseName: string;
+  student: {
+    id: string;
+    user: {
+      name: string;
+      email: string;
+    };
+  };
   status: "PENDING" | "ISSUED" | "REJECTED";
   requestedAt: string;
   issuedAt?: string;
@@ -248,7 +253,7 @@ export default function CertificatesPage() {
                       {certificate.status === "ISSUED" ? "Certificate of Completion" : "Certificate Request"}
                     </h3>
                     <p className="mt-1 text-xs sm:text-sm opacity-90 line-clamp-1">
-                      {certificate.studentName}
+                      {certificate.student?.user?.name || 'Student'}
                     </p>
                   </div>
                 </div>
@@ -257,7 +262,7 @@ export default function CertificatesPage() {
               {/* Certificate Details */}
               <div className="p-4 sm:p-6">
                 <h4 className="mb-2 line-clamp-2 text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-                  {certificate.courseName}
+                  {certificate.course?.title || 'Course'}
                 </h4>
 
                 {/* Instructor */}

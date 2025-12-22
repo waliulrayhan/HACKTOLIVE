@@ -20,54 +20,28 @@ export class BlogService {
     // Convert tags array to JSON string
     const tagsString = JSON.stringify(createBlogDto.tags);
 
-    // Auto-fill author information from logged-in user
-    let authorData: {
-      authorName: string;
-      authorAvatar: string;
-      authorRole: string;
-      authorBio: string;
-      authorTwitter: string;
-      authorLinkedin: string;
-      authorGithub: string;
-    } = {
-      authorName: createBlogDto.authorName || 'Anonymous',
-      authorAvatar: createBlogDto.authorAvatar || '',
-      authorRole: createBlogDto.authorRole || 'Admin',
-      authorBio: createBlogDto.authorBio || '',
-      authorTwitter: createBlogDto.authorTwitter || '',
-      authorLinkedin: createBlogDto.authorLinkedin || '',
-      authorGithub: createBlogDto.authorGithub || '',
-    };
-
-    // If user is provided, auto-fill author information
-    if (user) {
-      const userData = await this.prisma.user.findUnique({
-        where: { id: user.id },
-        include: {
-          instructor: true,
-        },
-      });
-
-      if (userData) {
-        authorData = {
-          authorName: userData.name || authorData.authorName,
-          authorAvatar: userData.avatar || authorData.authorAvatar,
-          authorRole: userData.instructor ? 'Instructor' : 'Admin',
-          authorBio: userData.instructor?.bio || authorData.authorBio,
-          authorTwitter: authorData.authorTwitter,
-          authorLinkedin: authorData.authorLinkedin,
-          authorGithub: authorData.authorGithub,
-        };
-      }
-    }
+    // If user is provided, use their ID as authorId
+    const authorId = user ? user.id : createBlogDto.authorId;
 
     return this.prisma.blog.create({
       data: {
         ...createBlogDto,
-        ...authorData,
+        authorId,
         tags: tagsString,
       },
       include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            bio: true,
+            role: true,
+            twitterUrl: true,
+            linkedinUrl: true,
+            githubUrl: true,
+          },
+        },
         comments: true,
         likes: true,
       },
@@ -114,6 +88,14 @@ export class BlogService {
         take: limit,
         orderBy: { [sortBy]: sortOrder },
         include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              avatar: true,
+              role: true,
+            },
+          },
           _count: {
             select: {
               comments: true,
@@ -146,7 +128,28 @@ export class BlogService {
     const blog = await this.prisma.blog.findUnique({
       where: { id },
       include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            bio: true,
+            role: true,
+            twitterUrl: true,
+            linkedinUrl: true,
+            githubUrl: true,
+          },
+        },
         comments: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                avatar: true,
+              },
+            },
+          },
           orderBy: { createdAt: 'desc' },
         },
         _count: {
@@ -172,7 +175,28 @@ export class BlogService {
     const blog = await this.prisma.blog.findUnique({
       where: { slug },
       include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            bio: true,
+            role: true,
+            twitterUrl: true,
+            linkedinUrl: true,
+            githubUrl: true,
+          },
+        },
         comments: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                avatar: true,
+              },
+            },
+          },
           orderBy: { createdAt: 'desc' },
         },
         _count: {
@@ -234,6 +258,15 @@ export class BlogService {
       where: { id },
       data,
       include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            bio: true,
+            role: true,
+          },
+        },
         comments: true,
         _count: {
           select: {
@@ -281,6 +314,14 @@ export class BlogService {
       take: limit,
       orderBy: { publishDate: 'desc' },
       include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            role: true,
+          },
+        },
         _count: {
           select: {
             likes: true,
@@ -305,6 +346,14 @@ export class BlogService {
       take: limit,
       orderBy: { publishDate: 'desc' },
       include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            role: true,
+          },
+        },
         _count: {
           select: {
             likes: true,
@@ -335,12 +384,30 @@ export class BlogService {
         blogId,
         ...createCommentDto,
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+          },
+        },
+      },
     });
   }
 
   async getComments(blogId: string) {
     return this.prisma.blogComment.findMany({
       where: { blogId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
   }

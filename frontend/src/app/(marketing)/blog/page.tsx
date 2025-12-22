@@ -121,13 +121,13 @@ const BlogPage = () => {
           category: Object.keys(categoryMap).find(key => categoryMap[key] === blog.category) || blog.category,
           blogType: Object.keys(blogTypeMap).find(key => blogTypeMap[key] === blog.blogType) || blog.blogType,
           author: {
-            name: blog.authorName,
-            avatar: blog.authorAvatar,
-            role: blog.authorRole,
-            bio: blog.authorBio,
-            twitter: blog.authorTwitter,
-            linkedin: blog.authorLinkedin,
-            github: blog.authorGithub,
+            name: blog.author.name,
+            avatar: blog.author.avatar,
+            role: blog.author.role,
+            bio: blog.author.bio,
+            twitter: blog.author.twitterUrl,
+            linkedin: blog.author.linkedinUrl,
+            github: blog.author.githubUrl,
           },
         }));
 
