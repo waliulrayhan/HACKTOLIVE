@@ -1,29 +1,69 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import BlogData from "./blogData";
+import { blogApi } from "@/lib/api/blog";
 import {
   Box,
   Text,
   HStack,
   VStack,
   useColorModeValue,
+  Spinner,
 } from "@chakra-ui/react";
 
 interface RelatedPostProps {
   currentBlogId?: string | number;
 }
 
+interface RelatedBlog {
+  id: string;
+  slug: string;
+  title: string;
+  mainImage?: string;
+  author: {
+    name: string;
+  };
+  readTime?: string;
+}
+
 const RelatedPost = ({ currentBlogId }: RelatedPostProps) => {
+  const [relatedPosts, setRelatedPosts] = useState<RelatedBlog[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const accentColor = useColorModeValue("green.500", "green.400");
   const mutedColor = useColorModeValue("gray.600", "gray.400");
   const hoverBg = useColorModeValue("gray.50", "gray.700");
   
-  // Filter out current blog and get 3 related posts
-  const relatedPosts = BlogData
-    .filter(post => post._id !== currentBlogId)
-    .slice(0, 3);
+  useEffect(() => {
+    const fetchRelatedPosts = async () => {
+      if (!currentBlogId) return;
+      
+      try {
+        setLoading(true);
+        const posts = await blogApi.getRelatedBlogs(currentBlogId.toString(), 3);
+        setRelatedPosts(posts);
+      } catch (error) {
+        console.error("Error fetching related posts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRelatedPosts();
+  }, [currentBlogId]);
+
+  if (loading) {
+    return (
+      <Box textAlign="center" py={4}>
+        <Spinner size="sm" color="green.500" />
+      </Box>
+    );
+  }
+
+  if (relatedPosts.length === 0) {
+    return null;
+  }
 
   return (
     <Box>

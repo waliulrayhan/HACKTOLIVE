@@ -1,7 +1,7 @@
-import { getBlogBySlug, SingleBlogContent } from "../_components";
-import BlogData from "../_components/blogData";
+import { SingleBlogContent } from "../_components";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { blogApi } from "@/lib/api/blog";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -9,45 +9,40 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const blog = getBlogBySlug(slug);
+  
+  try {
+    const blog = await blogApi.getBlogBySlug(slug);
 
-  if (!blog) {
+    return {
+      title: `${blog.title} - Cybersecurity Blog`,
+      description: blog.metadata,
+      keywords: blog.tags.join(", "),
+      authors: [{ name: blog.author.name }],
+      openGraph: {
+        title: blog.title,
+        description: blog.metadata,
+        type: "article",
+        publishedTime: blog.publishDate,
+        authors: [blog.author.name],
+        tags: blog.tags,
+      },
+    };
+  } catch {
     return {
       title: "Blog Not Found",
     };
   }
-
-  return {
-    title: `${blog.title} - Cybersecurity Blog`,
-    description: blog.metadata,
-    keywords: blog.tags.join(", "),
-    authors: [{ name: blog.author.name }],
-    openGraph: {
-      title: blog.title,
-      description: blog.metadata,
-      type: "article",
-      publishedTime: blog.publishDate,
-      authors: [blog.author.name],
-      tags: blog.tags,
-    },
-  };
-}
-
-export async function generateStaticParams() {
-  return BlogData.map((blog) => ({
-    slug: blog.slug,
-  }));
 }
 
 const SingleBlogPage = async ({ params }: Props) => {
   const { slug } = await params;
-  const blog = getBlogBySlug(slug);
-
-  if (!blog) {
+  
+  try {
+    const blog = await blogApi.getBlogBySlug(slug);
+    return <SingleBlogContent blog={blog as any} />;
+  } catch {
     notFound();
   }
-
-  return <SingleBlogContent blog={blog as any} />;
 };
 
 export default SingleBlogPage;

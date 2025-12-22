@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -412,4 +411,88 @@ enum SubmissionStatus {
   SUBMITTED
   GRADED
   RETURNED
+}
+
+model Blog {
+  id               String        @id @default(uuid())
+  slug             String        @unique @db.VarChar(255)
+  title            String        @db.VarChar(500)
+  mainImage        String?       @db.VarChar(500)
+  metadata         String        @db.Text
+  content          String?       @db.LongText
+  category         BlogCategory
+  blogType         BlogType
+  authorName       String        @db.VarChar(255)
+  authorAvatar     String?       @db.VarChar(500)
+  authorRole       String?       @db.VarChar(255)
+  authorBio        String?       @db.Text
+  authorTwitter    String?       @db.VarChar(255)
+  authorLinkedin   String?       @db.VarChar(255)
+  authorGithub     String?       @db.VarChar(255)
+  publishDate      DateTime      @default(now())
+  readTime         String?       @db.VarChar(50)
+  tags             String        @db.Text
+  featured         Boolean       @default(false)
+  status           BlogStatus    @default(DRAFT)
+  views            Int           @default(0)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  comments         BlogComment[]
+  likes            BlogLike[]
+
+  @@index([slug])
+  @@index([category])
+  @@index([blogType])
+  @@index([status])
+  @@index([featured])
+  @@index([publishDate])
+}
+
+model BlogComment {
+  id        String   @id @default(uuid())
+  blogId    String
+  userId    String?
+  userName  String   @db.VarChar(255)
+  userEmail String   @db.VarChar(255)
+  userAvatar String? @db.VarChar(500)
+  comment   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+
+  @@index([blogId])
+  @@index([userId])
+}
+
+model BlogLike {
+  id        String   @id @default(uuid())
+  blogId    String
+  userId    String?
+  userEmail String?  @db.VarChar(255)
+  createdAt DateTime @default(now())
+  blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+
+  @@unique([blogId, userEmail])
+  @@index([blogId])
+  @@index([userId])
+}
+
+enum BlogCategory {
+  CYBERSECURITY_INSIGHTS
+  NEWS
+  TUTORIALS
+}
+
+enum BlogType {
+  THREAT_ALERTS
+  HOW_TO_TUTORIALS
+  BEST_SECURITY_PRACTICES
+  COMPLIANCE_GUIDES
+  CASE_STUDY_STORIES
+}
+
+enum BlogStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }

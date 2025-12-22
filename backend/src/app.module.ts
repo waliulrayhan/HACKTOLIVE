@@ -8,6 +8,7 @@ import { StudentModule } from './student/student.module';
 import { InstructorModule } from './instructor/instructor.module';
 import { AdminModule } from './admin/admin.module';
 import { UploadModule } from './upload/upload.module';
+import { BlogModule } from './blog/blog.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UploadModule } from './upload/upload.module';
     InstructorModule,
     AdminModule,
     UploadModule,
+    BlogModule,
   ],
   controllers: [AppController],
   providers: [AppService],
