@@ -36,6 +36,7 @@ interface Blog {
   title: string;
   metadata: string;
   mainImage: string;
+  content?: string;
   category: string;
   blogType: string;
   author: {
@@ -63,6 +64,24 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
   const accentColor = useColorModeValue("green.500", "green.400");
   const mutedColor = useColorModeValue("gray.600", "gray.400");
 
+  // Construct full image URLs
+  const mainImageUrl = blog.mainImage.startsWith('http') 
+    ? blog.mainImage 
+    : `${process.env.NEXT_PUBLIC_API_URL}${blog.mainImage}`;
+  
+  const avatarUrl = blog.author.avatar 
+    ? (blog.author.avatar.startsWith('http') 
+        ? blog.author.avatar 
+        : `${process.env.NEXT_PUBLIC_API_URL}${blog.author.avatar}`)
+    : undefined;
+
+  // Format publish date
+  const formattedDate = new Date(blog.publishDate).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
   return (
     <Box bg={bgColor} minH="100vh">
       {/* Hero Section with Image */}
@@ -73,7 +92,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
           width="100%"
         >
           <Image
-            src={blog.mainImage}
+            src={mainImageUrl}
             alt={blog.title}
             fill
             style={{ objectFit: "cover" }}
@@ -115,7 +134,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                     py={{ base: "1", md: "2" }}
                     borderRadius="full"
                   >
-                    {blog.blogType}
+                    {blog.blogType.replace(/_/g, ' ')}
                   </Badge>
                 </Wrap>
                 <Heading
@@ -178,7 +197,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                               <Avatar
                                 size="md"
                                 name={blog.author.name}
-                                src={blog.author.avatar}
+                                src={avatarUrl}
                                 borderWidth="2px"
                                 borderColor={accentColor}
                               />
@@ -195,7 +214,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                               <HStack spacing="2" fontSize="2xs" color={mutedColor} pt="0.5">
                                 <HStack spacing="1">
                                   <Icon as={FiCalendar} boxSize="2.5" />
-                                  <Text>{blog.publishDate}</Text>
+                                  <Text>{formattedDate}</Text>
                                 </HStack>
                                 <Text>•</Text>
                                 <HStack spacing="1">
@@ -312,11 +331,11 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                       <Box display={{ base: "none", lg: "flex" }}>
                         <HStack spacing="6" justify="space-between" w="full" align="center">
                           <HStack spacing="4" flex="1">
-                            {blog.author.avatar && (
+                            {avatarUrl && (
                               <Avatar
                                 size="xl"
                                 name={blog.author.name}
-                                src={blog.author.avatar}
+                                src={avatarUrl}
                                 borderWidth="3px"
                                 borderColor={accentColor}
                               />
@@ -333,7 +352,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                               <HStack spacing="4" fontSize="sm" color={mutedColor} pt="1">
                                 <HStack spacing="2">
                                   <Icon as={FiCalendar} boxSize="4" />
-                                  <Text>{blog.publishDate}</Text>
+                                  <Text>{formattedDate}</Text>
                                 </HStack>
                                 <Text>•</Text>
                                 <HStack spacing="2">
@@ -440,84 +459,71 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
 
                   <Divider opacity={0.3} />
 
-                  {/* Article Content - Cleaner Layout */}
+                  {/* Article Content - Real Data */}
                   <FallInPlace delay={0.2}>
-                    <VStack align="stretch" spacing="8">
-                      <Text fontSize="lg" lineHeight="1.8" color={mutedColor}>
-                        {blog.metadata}
-                      </Text>
-
-                      <Text fontSize="md" lineHeight="1.8">
-                        In today's rapidly evolving digital landscape, cybersecurity
-                        has become more critical than ever. Organizations face an
-                        unprecedented array of threats, from sophisticated ransomware
-                        attacks to advanced persistent threats (APTs) that can remain
-                        undetected for months or even years.
-                      </Text>
-
-                      <Text fontSize="md" lineHeight="1.8">
-                        This comprehensive guide explores the latest developments in
-                        the field, providing actionable insights and practical
-                        strategies that security professionals can implement
-                        immediately. We'll examine real-world case studies, discuss
-                        emerging trends, and outline best practices that have been
-                        proven effective across various industries.
-                      </Text>
-
-                      <SimpleGrid columns={{ base: 1, md: 2 }} spacing="4" py="2">
-                        <Box position="relative" height="220px" borderRadius="md" overflow="hidden">
-                          <Image
-                            src={blog.mainImage}
-                            alt="Security illustration 1"
-                            fill
-                            style={{ objectFit: "cover" }}
-                          />
-                        </Box>
-                        <Box position="relative" height="220px" borderRadius="md" overflow="hidden">
-                          <Image
-                            src="/images/grid-image/image-06.png"
-                            alt="Security illustration 2"
-                            fill
-                            style={{ objectFit: "cover" }}
-                          />
-                        </Box>
-                      </SimpleGrid>
-
-                      <Heading size="md" pt="4" fontWeight="semibold">
-                        Key Takeaways
-                      </Heading>
-
-                      <Text fontSize="md" lineHeight="1.8">
-                        Understanding the evolving threat landscape is crucial for
-                        maintaining a robust security posture. Whether you're dealing
-                        with zero-day vulnerabilities, implementing new security
-                        frameworks, or training your team on security awareness, the
-                        principles outlined in this article will help guide your
-                        decision-making process.
-                      </Text>
-
-                      <Box
-                        py="4"
-                        px="6"
-                        borderLeft="3px solid"
-                        borderColor={accentColor}
-                      >
-                        <Text fontSize="md" lineHeight="1.8" fontStyle="italic" color={mutedColor}>
-                          "By staying informed about the latest security trends,
-                          leveraging modern security tools, and fostering a
-                          security-conscious culture within your organization, you can
-                          significantly reduce your risk exposure and better protect
-                          your critical assets."
+                    <VStack align="stretch" spacing="6">
+                      {/* Metadata/Description */}
+                      {blog.metadata && (
+                        <Text 
+                          fontSize="lg" 
+                          lineHeight="1.8" 
+                          color={mutedColor}
+                          fontWeight="medium"
+                        >
+                          {blog.metadata}
                         </Text>
-                      </Box>
+                      )}
 
-                      <Text fontSize="md" lineHeight="1.8">
-                        The cybersecurity landscape continues to evolve, and staying ahead
-                        requires constant vigilance, continuous learning, and adaptation.
-                        Organizations that prioritize security and invest in robust
-                        protective measures will be better positioned to face future
-                        challenges and protect their valuable digital assets.
-                      </Text>
+                      {/* Main Content */}
+                      {blog.content ? (
+                        <Box
+                          className="blog-content"
+                          fontSize="md"
+                          lineHeight="1.8"
+                          sx={{
+                            '& h1': { fontSize: '2xl', fontWeight: 'bold', mt: 6, mb: 4 },
+                            '& h2': { fontSize: 'xl', fontWeight: 'bold', mt: 6, mb: 3 },
+                            '& h3': { fontSize: 'lg', fontWeight: 'semibold', mt: 5, mb: 3 },
+                            '& p': { mb: 4 },
+                            '& ul, & ol': { pl: 6, mb: 4 },
+                            '& li': { mb: 2 },
+                            '& blockquote': {
+                              borderLeft: '4px solid',
+                              borderColor: accentColor,
+                              pl: 6,
+                              py: 4,
+                              fontStyle: 'italic',
+                              color: mutedColor,
+                              bg: useColorModeValue('gray.50', 'gray.900'),
+                              borderRadius: 'md',
+                              my: 6
+                            },
+                            '& strong': { fontWeight: 'bold' },
+                            '& em': { fontStyle: 'italic' },
+                            '& u': { textDecoration: 'underline' },
+                            '& a': { color: accentColor, textDecoration: 'underline' },
+                            '& code': {
+                              bg: useColorModeValue('gray.100', 'gray.700'),
+                              px: 2,
+                              py: 1,
+                              borderRadius: 'sm',
+                              fontSize: 'sm'
+                            },
+                            '& pre': {
+                              bg: useColorModeValue('gray.100', 'gray.700'),
+                              p: 4,
+                              borderRadius: 'md',
+                              overflowX: 'auto',
+                              my: 4
+                            }
+                          }}
+                          dangerouslySetInnerHTML={{ __html: blog.content }}
+                        />
+                      ) : (
+                        <Text fontSize="md" lineHeight="1.8" color={mutedColor}>
+                          No content available for this article.
+                        </Text>
+                      )}
                     </VStack>
                   </FallInPlace>
 

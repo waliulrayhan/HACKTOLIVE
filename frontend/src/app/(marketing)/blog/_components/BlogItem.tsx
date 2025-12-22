@@ -71,7 +71,7 @@ const BlogItem = ({ blog }: { blog: Blog }) => {
         bg={cardBg}
         borderWidth="1px"
         borderColor={featured ? accentColor : borderColor}
-        borderRadius="2xl"
+        borderRadius="xl"
         overflow="hidden"
         transition="all 0.3s ease"
         cursor="pointer"
@@ -125,38 +125,35 @@ const BlogItem = ({ blog }: { blog: Blog }) => {
             bgGradient={overlayGradient}
           />
           
-          {/* Category Badge on Image */}
-          <Badge
-            position="absolute"
-            bottom="4"
-            left="4"
-            colorScheme="green"
-            fontSize="xs"
-            px="3"
-            py="1.5"
-            borderRadius="full"
-            textTransform="uppercase"
-            fontWeight="bold"
-            letterSpacing="wide"
-          >
-            {category}
-          </Badge>
         </Box>
 
         <CardBody p="6">
           <VStack align="stretch" spacing="4">
-            {/* Blog Type Badge */}
-            <Flex justify="space-between" align="center">
-              <Badge
-                colorScheme="purple"
-                fontSize="xs"
-                px="3"
-                py="1"
-                borderRadius="full"
-                variant="subtle"
-              >
-                {blogType.replace(/_/g, ' ')}
-              </Badge>
+            {/* Category, Blog Type & Date */}
+            <Flex justify="space-between" align="center" wrap="wrap" gap="2">
+              <HStack spacing="2">
+                <Badge
+                  colorScheme="green"
+                  fontSize="xs"
+                  px="3"
+                  py="1"
+                  borderRadius="full"
+                  textTransform="uppercase"
+                  fontWeight="bold"
+                >
+                  {category}
+                </Badge>
+                <Badge
+                  colorScheme="purple"
+                  fontSize="xs"
+                  px="3"
+                  py="1"
+                  borderRadius="full"
+                  variant="subtle"
+                >
+                  {blogType.replace(/_/g, ' ')}
+                </Badge>
+              </HStack>
               
               {/* Publish Date */}
               <HStack spacing="1" fontSize="xs" color={mutedColor}>
