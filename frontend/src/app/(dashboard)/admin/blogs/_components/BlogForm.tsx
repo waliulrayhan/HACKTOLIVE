@@ -284,6 +284,15 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
 
     try {
       const token = localStorage.getItem("token");
+      const userStr = localStorage.getItem("user");
+      const user = userStr ? JSON.parse(userStr) : null;
+
+      if (!user || !user.id) {
+        toast.error("User not authenticated");
+        router.push("/login");
+        return;
+      }
+
       const url =
         mode === "create"
           ? `${process.env.NEXT_PUBLIC_API_URL}/blog`
@@ -291,13 +300,18 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
 
       const method = mode === "create" ? "POST" : "PATCH";
 
+      // Include authorId for create mode
+      const payload = mode === "create" 
+        ? { ...formData, authorId: user.id }
+        : formData;
+
       const response = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
