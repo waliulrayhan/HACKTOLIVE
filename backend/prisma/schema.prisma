@@ -361,17 +361,22 @@ model Blog {
 }
 
 model BlogComment {
-  id        String   @id @default(uuid())
+  id        String            @id @default(uuid())
   blogId    String
   userId    String
-  comment   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   String            @db.Text
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  parentId  String?
+  blog      Blog              @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  parent    BlogComment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   BlogComment[]     @relation("CommentReplies")
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes     BlogCommentLike[]
 
   @@index([blogId])
   @@index([userId])
+  @@index([parentId])
 }
 
 model BlogLike {
@@ -385,6 +390,17 @@ model BlogLike {
   @@unique([blogId, userEmail])
   @@index([blogId])
   @@index([userId])
+}
+
+model BlogCommentLike {
+  id        String      @id @default(uuid())
+  commentId String
+  userEmail String?     @db.VarChar(255)
+  createdAt DateTime    @default(now())
+  comment   BlogComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userEmail])
+  @@index([commentId])
 }
 
 enum CertificateStatus {

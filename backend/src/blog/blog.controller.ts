@@ -13,7 +13,7 @@ import {
   Request,
 } from '@nestjs/common';
 import { BlogService } from './blog.service';
-import { CreateBlogDto, UpdateBlogDto, FilterBlogDto, CreateCommentDto, CreateLikeDto } from './dto';
+import { CreateBlogDto, UpdateBlogDto, FilterBlogDto, CreateCommentDto, CreateCommentReplyDto, CreateLikeDto, ToggleCommentLikeDto } from './dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 
@@ -100,12 +100,47 @@ export class BlogController {
   toggleLike(
     @Param('id') blogId: string,
     @Body() createLikeDto: CreateLikeDto,
+    @Request() req?,
   ) {
+    // If user is authenticated, add their userId to the DTO
+    if (req?.user?.userId) {
+      createLikeDto.userId = req.user.userId;
+    }
     return this.blogService.toggleLike(blogId, createLikeDto);
   }
 
-  @Get(':id/likes/count')
+  @Get(':id/like/check')
+  hasUserLiked(@Param('id') blogId: string, @Query('userEmail') userEmail: string) {
+    return this.blogService.hasUserLiked(blogId, userEmail);
+  }
+
+  @Get(':id/like/count')
   getLikesCount(@Param('id') blogId: string) {
     return this.blogService.getLikesCount(blogId);
+  }
+
+  // Comment reply endpoints
+  @Post('comments/:commentId/reply')
+  @UseGuards(JwtAuthGuard)
+  addCommentReply(
+    @Param('commentId') commentId: string,
+    @Body() createReplyDto: CreateCommentReplyDto,
+    @Request() req,
+  ) {
+    return this.blogService.addCommentReply(commentId, createReplyDto, req.user);
+  }
+
+  // Comment like endpoints
+  @Post('comments/:commentId/like')
+  toggleCommentLike(
+    @Param('commentId') commentId: string,
+    @Body() toggleLikeDto: ToggleCommentLikeDto,
+  ) {
+    return this.blogService.toggleCommentLike(commentId, toggleLikeDto);
+  }
+
+  @Get('comments/:commentId/likes/count')
+  getCommentLikesCount(@Param('commentId') commentId: string) {
+    return this.blogService.getCommentLikesCount(commentId);
   }
 }

@@ -213,9 +213,9 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                               <Text fontSize="sm" fontWeight="bold">
                                 {blog.author.name}
                               </Text>
-                              {blog.author.role && (
+                              {(blog.author.role || blog.author.bio) && (
                                 <Text fontSize="xs" color={mutedColor}>
-                                  {blog.author.role}
+                                  {[blog.author.role, blog.author.bio].filter(Boolean).join(' | ')}
                                 </Text>
                               )}
                               <HStack spacing="2" fontSize="2xs" color={mutedColor} pt="0.5">
@@ -378,9 +378,9 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                               <Text fontSize="lg" fontWeight="bold">
                                 {blog.author.name}
                               </Text>
-                              {blog.author.role && (
+                              {(blog.author.role || blog.author.bio) && (
                                 <Text fontSize="md" color={mutedColor}>
-                                  {blog.author.role}
+                                  {[blog.author.role, blog.author.bio].filter(Boolean).join(' | ')}
                                 </Text>
                               )}
                               <HStack spacing="4" fontSize="sm" color={mutedColor} pt="1">

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { CreateBlogDto, UpdateBlogDto, FilterBlogDto, CreateCommentDto, CreateLikeDto } from './dto';
+import { CreateBlogDto, UpdateBlogDto, FilterBlogDto, CreateCommentDto, CreateCommentReplyDto, CreateLikeDto, ToggleCommentLikeDto } from './dto';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -409,18 +409,142 @@ export class BlogService {
   }
 
   async getComments(blogId: string) {
-    return this.prisma.blogComment.findMany({
-      where: { blogId },
+    // Get only top-level comments (no parentId)
+    const comments = await this.prisma.blogComment.findMany({
+      where: { 
+        blogId,
+        parentId: null,
+      },
       include: {
         user: {
           select: {
             id: true,
             name: true,
             avatar: true,
+            role: true,
+          },
+        },
+        replies: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                avatar: true,
+                role: true,
+              },
+            },
+            _count: {
+              select: {
+                likes: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'asc' },
+        },
+        _count: {
+          select: {
+            likes: true,
           },
         },
       },
       orderBy: { createdAt: 'desc' },
+    });
+
+    // Transform to include likes count
+    return comments.map(comment => ({
+      ...comment,
+      likes: comment._count.likes,
+      replies: comment.replies.map(reply => ({
+        ...reply,
+        likes: reply._count.likes,
+      })),
+    }));
+  }
+
+  async addCommentReply(commentId: string, createReplyDto: CreateCommentReplyDto, user?: any) {
+    const parentComment = await this.prisma.blogComment.findUnique({
+      where: { id: commentId },
+    });
+
+    if (!parentComment) {
+      throw new NotFoundException('Parent comment not found');
+    }
+
+    if (!user || !user.id) {
+      throw new Error('User must be authenticated to reply');
+    }
+
+    const reply = await this.prisma.blogComment.create({
+      data: {
+        blogId: parentComment.blogId,
+        userId: user.id,
+        comment: createReplyDto.comment,
+        parentId: commentId,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            role: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+          },
+        },
+      },
+    });
+
+    return {
+      ...reply,
+      likes: reply._count.likes,
+    };
+  }
+
+  async toggleCommentLike(commentId: string, toggleLikeDto: ToggleCommentLikeDto) {
+    const comment = await this.prisma.blogComment.findUnique({
+      where: { id: commentId },
+    });
+
+    if (!comment) {
+      throw new NotFoundException('Comment not found');
+    }
+
+    // Check if like exists
+    const existingLike = await this.prisma.blogCommentLike.findUnique({
+      where: {
+        commentId_userEmail: {
+          commentId,
+          userEmail: toggleLikeDto.userEmail || '',
+        },
+      },
+    });
+
+    if (existingLike) {
+      // Unlike
+      await this.prisma.blogCommentLike.delete({
+        where: { id: existingLike.id },
+      });
+      return { liked: false, message: 'Comment unliked successfully' };
+    } else {
+      // Like
+      await this.prisma.blogCommentLike.create({
+        data: {
+          commentId,
+          userEmail: toggleLikeDto.userEmail || '',
+        },
+      });
+      return { liked: true, message: 'Comment liked successfully' };
+    }
+  }
+
+  async getCommentLikesCount(commentId: string) {
+    return this.prisma.blogCommentLike.count({
+      where: { commentId },
     });
   }
 
@@ -480,6 +604,18 @@ export class BlogService {
     return this.prisma.blogLike.count({
       where: { blogId },
     });
+  }
+
+  async hasUserLiked(blogId: string, userEmail: string) {
+    const like = await this.prisma.blogLike.findUnique({
+      where: {
+        blogId_userEmail: {
+          blogId,
+          userEmail: userEmail || '',
+        },
+      },
+    });
+    return !!like;
   }
 
   async getBlogStats() {

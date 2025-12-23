@@ -65,6 +65,8 @@ export interface Comment {
     avatar?: string;
     role?: string;
   };
+  likes: number;
+  replies: Comment[];
 }
 
 // Convert API format to frontend format
@@ -226,12 +228,18 @@ export const blogApi = {
   },
 
   // Toggle like
-  async toggleLike(blogId: string, userEmail: string): Promise<{ liked: boolean; message: string }> {
+  async toggleLike(blogId: string, userEmail: string, token?: string): Promise<{ liked: boolean; message: string }> {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_URL}/blog/${blogId}/like`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({ userEmail }),
     });
     
@@ -244,10 +252,68 @@ export const blogApi = {
 
   // Get likes count
   async getLikesCount(blogId: string): Promise<number> {
-    const response = await fetch(`${API_URL}/blog/${blogId}/likes/count`);
+    const response = await fetch(`${API_URL}/blog/${blogId}/like/count`);
     
     if (!response.ok) {
       throw new Error('Failed to fetch likes count');
+    }
+
+    return response.json();
+  },
+
+  // Check if user has liked a blog post
+  async hasUserLiked(blogId: string, userEmail: string): Promise<boolean> {
+    const response = await fetch(`${API_URL}/blog/${blogId}/like/check?userEmail=${encodeURIComponent(userEmail)}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to check like status');
+    }
+
+    return response.json();
+  },
+
+  // Add a reply to a comment (requires authentication)
+  async addCommentReply(commentId: string, comment: string, token: string): Promise<Comment> {
+    const response = await fetch(`${API_URL}/blog/comments/${commentId}/reply`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ comment }),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to add reply');
+    }
+
+    return response.json();
+  },
+
+  // Toggle comment like
+  async toggleCommentLike(commentId: string, userEmail: string): Promise<{ liked: boolean; message: string }> {
+    const response = await fetch(`${API_URL}/blog/comments/${commentId}/like`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userEmail }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to toggle comment like');
+    }
+
+    return response.json();
+  },
+
+  // Get comment likes count
+  async getCommentLikesCount(commentId: string): Promise<number> {
+    const response = await fetch(`${API_URL}/blog/comments/${commentId}/likes/count`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch comment likes count');
     }
 
     return response.json();
