@@ -101,6 +101,14 @@ export default function BlogsManagementPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : null;
+
+      if (!user || !user.id) {
+        toast.error('User not authenticated');
+        setLoading(false);
+        return;
+      }
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/blog`,
@@ -115,7 +123,10 @@ export default function BlogsManagementPage() {
       if (!response.ok) throw new Error('Failed to fetch blogs');
       
       const result = await response.json();
-      const data = result.data || result || [];
+      const allData = result.data || result || [];
+      
+      // Filter to only show student's own blogs
+      const data = allData.filter((blog: Blog) => blog.author?.id === user.id);
       setAllBlogs(data);
       
       // Apply filters
@@ -234,11 +245,11 @@ export default function BlogsManagementPage() {
   };
 
   const handleEditBlog = (blogId: string) => {
-    router.push(`/admin/blogs/${blogId}/edit`);
+    router.push(`/student/blogs/${blogId}/edit`);
   };
 
   const handleCreateBlog = () => {
-    router.push('/admin/blogs/create');
+    router.push('/student/blogs/create');
   };
 
   const getStatusBadgeClass = (status: string) => {

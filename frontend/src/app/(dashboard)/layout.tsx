@@ -66,6 +66,11 @@ export default function DashboardLayout({
             path: "/academy/courses",
           },
           {
+            icon: <DocsIcon />,
+            name: "Blogs",
+            path: "/student/blogs",
+          },
+          {
             icon: <UserCircleIcon />,
             name: "Profile",
             path: "/student/profile",
@@ -151,6 +156,11 @@ export default function DashboardLayout({
           //   path: "/instructor/analytics",
           // },
           {
+            icon: <DocsIcon />,
+            name: "Blogs",
+            path: "/instructor/blogs",
+          },
+          {
             icon: <UserCircleIcon />,
             name: "Profile",
             path: "/instructor/profile",
@@ -171,8 +181,8 @@ export default function DashboardLayout({
   const mainContentMargin = isMobileOpen
     ? "ml-0"
     : isExpanded || isHovered
-    ? "lg:ml-[290px]"
-    : "lg:ml-[90px]";
+      ? "lg:ml-[290px]"
+      : "lg:ml-[90px]";
 
   return (
     <div className="min-h-screen xl:flex">

@@ -324,7 +324,7 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
       toast.success(
         `Blog ${mode === "create" ? "created" : "updated"} successfully!`
       );
-      router.push("/admin/blogs");
+      router.push("/instructor/blogs");
     } catch (error: any) {
       console.error("Error saving blog:", error);
       toast.error(error.message || "Failed to save blog");
@@ -370,7 +370,7 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
       {/* Back Button */}
       <div>
         <button
-          onClick={() => router.push("/admin/blogs")}
+          onClick={() => router.push("/instructor/blogs")}
           className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
         >
           <HiOutlineArrowLeft className="h-4 w-4" />
@@ -730,28 +730,6 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
                   ))}
                 </div>
               )}
-            </div>
-
-            {/* Featured */}
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                id="featured"
-                checked={formData.featured}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    featured: e.target.checked,
-                  }))
-                }
-                className="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
-              />
-              <label
-                htmlFor="featured"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Featured Blog (will appear on homepage)
-              </label>
             </div>
           </div>
         </div>
