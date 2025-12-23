@@ -63,6 +63,10 @@ export default function CertificateIssuancePage() {
 
   const fetchControllerRef = useRef<AbortController | null>(null);
 
+  useEffect(() => {
+    document.title = "Course Certificates - HACKTOLIVE Academy";
+  }, []);
+
   const fetchData = useCallback(async () => {
     if (fetchControllerRef.current) {
       fetchControllerRef.current.abort();

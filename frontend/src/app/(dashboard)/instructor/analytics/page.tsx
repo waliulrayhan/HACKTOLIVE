@@ -34,6 +34,10 @@ export default function InstructorAnalyticsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    document.title = "Analytics - HACKTOLIVE Academy";
+  }, []);
+
+  useEffect(() => {
     fetchAnalytics();
   }, []);
 

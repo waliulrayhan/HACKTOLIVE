@@ -33,6 +33,10 @@ export default function InstructorDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    document.title = "Instructor Dashboard - HACKTOLIVE Academy";
+  }, []);
+
+  useEffect(() => {
     fetchDashboardStats();
   }, []);
 

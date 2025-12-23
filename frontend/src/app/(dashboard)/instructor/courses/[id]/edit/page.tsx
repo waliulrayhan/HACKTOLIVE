@@ -141,6 +141,10 @@ export default function EditCoursePage() {
   const [savingLesson, setSavingLesson] = useState<string | null>(null);
 
   useEffect(() => {
+    document.title = "Edit Course - HACKTOLIVE Academy";
+  }, []);
+
+  useEffect(() => {
     if (courseId) {
       fetchCourse();
     }

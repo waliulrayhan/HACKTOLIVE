@@ -87,6 +87,10 @@ export default function CreateCoursePage() {
   const [modules, setModules] = useState<Module[]>([]);
   const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null);
 
+  useEffect(() => {
+    document.title = "Create Course - HACKTOLIVE Academy";
+  }, []);
+
   const steps = [
     { number: 1, title: "Basic Info", icon: HiOutlineInformationCircle },
     { number: 2, title: "Pricing", icon: HiOutlineCurrencyDollar },

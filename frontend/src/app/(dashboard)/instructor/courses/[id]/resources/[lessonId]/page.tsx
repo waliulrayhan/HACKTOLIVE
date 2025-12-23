@@ -51,6 +51,10 @@ export default function LessonResourcesPage() {
   });
 
   useEffect(() => {
+    document.title = "Lesson Resources - HACKTOLIVE Academy";
+  }, []);
+
+  useEffect(() => {
     fetchResources();
   }, [lessonId]);
 

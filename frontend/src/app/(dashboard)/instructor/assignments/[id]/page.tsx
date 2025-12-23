@@ -80,6 +80,10 @@ export default function AssignmentSubmissionsPage() {
 
   const fetchControllerRef = useRef<AbortController | null>(null);
 
+  useEffect(() => {
+    document.title = "Assignment Submissions - HACKTOLIVE Academy";
+  }, []);
+
   const fetchSubmissions = useCallback(async () => {
     if (fetchControllerRef.current) {
       fetchControllerRef.current.abort();

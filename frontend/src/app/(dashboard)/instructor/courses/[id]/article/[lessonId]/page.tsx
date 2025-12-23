@@ -48,6 +48,10 @@ export default function ArticleManagementPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    document.title = "Edit Article - HACKTOLIVE Academy";
+  }, []);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
