@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { instructorInclude, transformCourse, transformEnrollment } from '../utils/transform.util';
 
 @Injectable()
 export class StudentService {
@@ -13,7 +14,9 @@ export class StudentService {
           include: {
             course: {
               include: {
-                instructor: true,
+                instructor: {
+                  include: instructorInclude,
+                },
                 modules: {
                   include: {
                     lessons: true,
@@ -89,7 +92,7 @@ export class StudentService {
 
     return {
       student,
-      recentCourses: student.enrollments,
+      recentCourses: student.enrollments.map(transformEnrollment),
       recentCertificates: student.certificates,
       stats: {
         totalEnrollments,
@@ -133,17 +136,7 @@ export class StudentService {
       where,
       include: {
         instructor: {
-          select: {
-            id: true,
-            rating: true,
-            user: {
-              select: {
-                id: true,
-                name: true,
-                avatar: true,
-              },
-            },
-          },
+          include: instructorInclude,
         },
         _count: {
           select: {
@@ -159,7 +152,7 @@ export class StudentService {
       ],
     });
 
-    return courses;
+    return courses.map(transformCourse);
   }
 
   async enrollInCourse(userId: string, courseId: string) {
@@ -216,7 +209,9 @@ export class StudentService {
       include: {
         course: {
           include: {
-            instructor: true,
+            instructor: {
+              include: instructorInclude,
+            },
             modules: {
               include: {
                 lessons: true,
@@ -253,7 +248,7 @@ export class StudentService {
       });
     }
 
-    return enrollment;
+    return transformEnrollment(enrollment);
   }
 
   async getEnrolledCourses(userId: string) {
@@ -265,12 +260,14 @@ export class StudentService {
       throw new NotFoundException('Student profile not found');
     }
 
-    return this.prisma.enrollment.findMany({
+    const enrollments = await this.prisma.enrollment.findMany({
       where: { studentId: student.id },
       include: {
         course: {
           include: {
-            instructor: true,
+            instructor: {
+              include: instructorInclude,
+            },
             modules: {
               include: {
                 lessons: true,
@@ -288,6 +285,8 @@ export class StudentService {
         enrolledAt: 'desc',
       },
     });
+
+    return enrollments.map(transformEnrollment);
   }
 
   async getCourseDetail(userId: string, courseId: string) {
@@ -315,7 +314,9 @@ export class StudentService {
     const course = await this.prisma.course.findUnique({
       where: { id: courseId },
       include: {
-        instructor: true,
+        instructor: {
+          include: instructorInclude,
+        },
         modules: {
           include: {
             lessons: {
@@ -403,7 +404,7 @@ export class StudentService {
     };
 
     return {
-      course: courseWithLocks,
+      course: transformCourse(courseWithLocks),
       enrollment,
     };
   }
@@ -566,9 +567,23 @@ export class StudentService {
     return this.prisma.certificate.findMany({
       where: { studentId: student.id },
       include: {
+        student: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                avatar: true,
+              },
+            },
+          },
+        },
         course: {
           include: {
-            instructor: true,
+            instructor: {
+              include: instructorInclude,
+            },
           },
         },
       },

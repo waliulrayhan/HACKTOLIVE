@@ -64,33 +64,31 @@ export function transformEnrollment(enrollment: any) {
 
 /**
  * Prisma include object for instructor with user data
+ * Use with: instructor: { include: instructorInclude }
  */
 export const instructorInclude = {
-  include: {
-    user: {
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        avatar: true,
-        bio: true,
-      },
+  user: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      avatar: true,
+      bio: true,
     },
   },
-};
+} as const;
 
 /**
  * Prisma include object for student with user data
+ * Use with: student: { include: studentInclude }
  */
 export const studentInclude = {
-  include: {
-    user: {
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        avatar: true,
-      },
+  user: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      avatar: true,
     },
   },
-};
+} as const;

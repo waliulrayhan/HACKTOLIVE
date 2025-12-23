@@ -45,7 +45,9 @@ export class AdminService {
       take: 10,
       orderBy: { enrolledAt: 'desc' },
       include: {
-        student: studentInclude,
+        student: {
+          include: studentInclude,
+        },
         course: true,
       },
     });
@@ -54,7 +56,9 @@ export class AdminService {
       take: 5,
       orderBy: { createdAt: 'desc' },
       include: {
-        instructor: instructorInclude,
+        instructor: {
+          include: instructorInclude,
+        },
       },
     });
 
@@ -202,7 +206,9 @@ export class AdminService {
         take,
         where,
         include: {
-          instructor: instructorInclude,
+          instructor: {
+            include: instructorInclude,
+          },
           _count: {
             select: {
               enrollments: true,
@@ -315,7 +321,9 @@ export class AdminService {
         status: CourseStatus.PUBLISHED,
       },
       include: {
-        instructor: instructorInclude,
+        instructor: {
+          include: instructorInclude,
+        },
         _count: {
           select: {
             enrollments: true,

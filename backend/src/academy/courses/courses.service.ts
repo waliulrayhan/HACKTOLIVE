@@ -77,7 +77,9 @@ export class CoursesService {
       where,
       orderBy,
       include: {
-        instructor: instructorInclude,
+        instructor: {
+          include: instructorInclude,
+        },
         modules: {
           include: {
             lessons: true,
@@ -101,7 +103,9 @@ export class CoursesService {
     const course = await this.prisma.course.findUnique({
       where: { id },
       include: {
-        instructor: instructorInclude,
+        instructor: {
+          include: instructorInclude,
+        },
         modules: {
           include: {
             lessons: {
@@ -167,7 +171,9 @@ export class CoursesService {
     const course = await this.prisma.course.findUnique({
       where: { slug },
       include: {
-        instructor: instructorInclude,
+        instructor: {
+          include: instructorInclude,
+        },
         modules: {
           include: {
             lessons: {
@@ -230,7 +236,9 @@ export class CoursesService {
     const courses = await this.prisma.course.findMany({
       where: { category },
       include: {
-        instructor: instructorInclude,
+        instructor: {
+          include: instructorInclude,
+        },
         modules: {
           include: {
             lessons: true,
@@ -253,7 +261,9 @@ export class CoursesService {
     const courses = await this.prisma.course.findMany({
       where: { level },
       include: {
-        instructor: instructorInclude,
+        instructor: {
+          include: instructorInclude,
+        },
         modules: {
           include: {
             lessons: true,
@@ -276,7 +286,9 @@ export class CoursesService {
     const courses = await this.prisma.course.findMany({
       where: { tier },
       include: {
-        instructor: instructorInclude,
+        instructor: {
+          include: instructorInclude,
+        },
         modules: {
           include: {
             lessons: true,
@@ -299,7 +311,9 @@ export class CoursesService {
     const courses = await this.prisma.course.findMany({
       where: { instructorId },
       include: {
-        instructor: instructorInclude,
+        instructor: {
+          include: instructorInclude,
+        },
         modules: {
           include: {
             lessons: true,
@@ -328,7 +342,9 @@ export class CoursesService {
         ],
       },
       include: {
-        instructor: instructorInclude,
+        instructor: {
+          include: instructorInclude,
+        },
         modules: {
           include: {
             lessons: true,
@@ -358,7 +374,9 @@ export class CoursesService {
         { rating: 'desc' },
       ],
       include: {
-        instructor: instructorInclude,
+        instructor: {
+          include: instructorInclude,
+        },
         modules: {
           include: {
             lessons: true,
@@ -390,7 +408,9 @@ export class CoursesService {
         rating: 'desc',
       },
       include: {
-        instructor: instructorInclude,
+        instructor: {
+          include: instructorInclude,
+        },
         modules: {
           include: {
             lessons: true,
