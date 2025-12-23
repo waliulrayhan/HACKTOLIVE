@@ -336,9 +336,9 @@ export default function InstructorsManagementPage() {
                                 <rank.icon className={`h-3 w-3 shrink-0 ${rank.color}`} />
                               )}
                             </div>
-                            {instructor.experience && (
+                            {instructor.bio && (
                               <p className="truncate text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                                {instructor.experience}
+                                {instructor.bio}
                               </p>
                             )}
                           </div>
@@ -554,7 +554,7 @@ export default function InstructorsManagementPage() {
                   </div>
                 )}
 
-                {selectedInstructor.experience && (
+                {/* {selectedInstructor.experience && (
                   <div className="flex items-start gap-3">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
                       <HiOutlineBriefcase className="h-4 w-4 text-gray-600 dark:text-gray-400" />
@@ -564,7 +564,7 @@ export default function InstructorsManagementPage() {
                       <p className="text-sm text-gray-900 dark:text-white">{selectedInstructor.experience}</p>
                     </div>
                   </div>
-                )}
+                )} */}
 
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-800">
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10">

@@ -2,6 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { UserRole, CourseStatus } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import {
+  transformEnrollment,
+  transformCourse,
+  instructorInclude,
+  studentInclude,
+} from '../utils/transform.util';
 
 @Injectable()
 export class AdminService {
@@ -39,7 +45,7 @@ export class AdminService {
       take: 10,
       orderBy: { enrolledAt: 'desc' },
       include: {
-        student: true,
+        student: studentInclude,
         course: true,
       },
     });
@@ -48,7 +54,7 @@ export class AdminService {
       take: 5,
       orderBy: { createdAt: 'desc' },
       include: {
-        instructor: true,
+        instructor: instructorInclude,
       },
     });
 
@@ -66,8 +72,8 @@ export class AdminService {
         totalCertificates,
         totalRevenue,
       },
-      recentEnrollments,
-      recentCourses,
+      recentEnrollments: recentEnrollments.map(transformEnrollment),
+      recentCourses: recentCourses.map(transformCourse),
     };
   }
 
@@ -196,7 +202,7 @@ export class AdminService {
         take,
         where,
         include: {
-          instructor: true,
+          instructor: instructorInclude,
           _count: {
             select: {
               enrollments: true,
@@ -211,7 +217,10 @@ export class AdminService {
       this.prisma.course.count({ where }),
     ]);
 
-    return { courses, total };
+    return { 
+      courses: courses.map(transformCourse), 
+      total 
+    };
   }
 
   async approveCourse(courseId: string) {
@@ -300,13 +309,13 @@ export class AdminService {
   }
 
   async getPopularCourses(limit: number = 10) {
-    return this.prisma.course.findMany({
+    const courses = await this.prisma.course.findMany({
       take: limit,
       where: {
         status: CourseStatus.PUBLISHED,
       },
       include: {
-        instructor: true,
+        instructor: instructorInclude,
         _count: {
           select: {
             enrollments: true,
@@ -318,12 +327,23 @@ export class AdminService {
         totalStudents: 'desc',
       },
     });
+    
+    return courses.map(transformCourse);
   }
 
   async getTopInstructors(limit: number = 10) {
-    return this.prisma.instructor.findMany({
+    const instructors = await this.prisma.instructor.findMany({
       take: limit,
       include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true,
+            bio: true,
+          },
+        },
         _count: {
           select: {
             courses: true,
@@ -335,6 +355,14 @@ export class AdminService {
         { rating: 'desc' },
       ],
     });
+    
+    return instructors.map(instructor => ({
+      ...instructor,
+      name: instructor.user.name,
+      email: instructor.user.email,
+      avatar: instructor.user.avatar,
+      bio: instructor.user.bio,
+    }));
   }
 
   async syncInstructorStats() {

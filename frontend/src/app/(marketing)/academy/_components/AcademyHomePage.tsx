@@ -739,7 +739,7 @@ export default function AcademyHomePage() {
                             {instructor.name}
                           </Heading>
                           <Text fontSize="sm" color={textMuted} noOfLines={2} lineHeight="tall">
-                            {instructor.experience || instructor.bio || "Expert Cybersecurity Instructor"}
+                            {instructor.bio || "Expert Cybersecurity Instructor"}
                           </Text>
                         </VStack>
 

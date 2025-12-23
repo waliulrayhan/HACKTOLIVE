@@ -933,7 +933,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                       <VStack align="start" spacing="1" flex="1">
                         <Text fontWeight="bold" fontSize="lg">{course.instructor.name}</Text>
                         <Text fontSize="sm" color="muted" noOfLines={2}>
-                          {course.instructor.experience}
+                          {course.instructor.bio}
                         </Text>
                         <HStack spacing="4" fontSize="xs" color="muted" mt="1">
                           <HStack spacing="1">

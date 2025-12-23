@@ -88,7 +88,7 @@ const BlogItem = ({ blog }: { blog: Blog }) => {
           <Badge
             position="absolute"
             top="4"
-            right="4"
+            left="4"
             colorScheme="yellow"
             fontSize="xs"
             px="3"
@@ -108,140 +108,147 @@ const BlogItem = ({ blog }: { blog: Blog }) => {
           </Badge>
         )}
 
-        {/* Image with Overlay */}
-        <Box position="relative" width="100%" height="280px" overflow="hidden">
-          <Image 
-            src={imageUrl} 
-            alt={title} 
-            fill 
-            style={{ objectFit: "cover" }}
-          />
-          <Box
-            position="absolute"
-            top="0"
-            left="0"
-            right="0"
-            bottom="0"
-            bgGradient={overlayGradient}
-          />
-          
-        </Box>
+        <Flex direction={{ base: "column", md: "row" }} height="100%">
+          {/* Image with Overlay - Left Side */}
+          <Box 
+            position="relative" 
+            width={{ base: "100%", md: "320px" }} 
+            height={{ base: "220px", md: "100%" }}
+            minHeight={{ md: "300px" }}
+            overflow="hidden"
+            flexShrink="0"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Image 
+              src={imageUrl} 
+              alt={title} 
+              fill 
+              style={{ objectFit: "cover" }}
+            />
+            <Box
+              position="absolute"
+              top="0"
+              left="0"
+              right="0"
+              bottom="0"
+              bgGradient={overlayGradient}
+            />
+          </Box>
 
-        <CardBody p="6">
-          <VStack align="stretch" spacing="4">
-            {/* Category, Blog Type & Date */}
-            <Flex justify="space-between" align="center" wrap="wrap" gap="2">
-              <HStack spacing="2">
-                <Badge
-                  colorScheme="green"
-                  fontSize="xs"
-                  px="3"
-                  py="1"
-                  borderRadius="full"
-                  textTransform="uppercase"
-                  fontWeight="bold"
-                >
-                  {category}
-                </Badge>
-                <Badge
-                  colorScheme="purple"
-                  fontSize="xs"
-                  px="3"
-                  py="1"
-                  borderRadius="full"
-                  variant="subtle"
-                >
-                  {blogType.replace(/_/g, ' ')}
-                </Badge>
-              </HStack>
-              
-              {/* Publish Date */}
-              <HStack spacing="1" fontSize="xs" color={mutedColor}>
-                <Icon as={FiCalendar} />
-                <Text>{formattedDate}</Text>
-              </HStack>
-            </Flex>
+          {/* Content - Right Side */}
+          <CardBody p="6" flex="1">
+            <VStack align="stretch" spacing="4" height="100%">
+              {/* Category, Blog Type & Date */}
+              <Flex justify="space-between" align="center" wrap="wrap" gap="2">
+                <HStack spacing="2">
+                  <Badge
+                    colorScheme="green"
+                    fontSize="xs"
+                    px="3"
+                    py="1"
+                    borderRadius="full"
+                    textTransform="uppercase"
+                    fontWeight="bold"
+                  >
+                    {category}
+                  </Badge>
+                  <Badge
+                    colorScheme="purple"
+                    fontSize="xs"
+                    px="3"
+                    py="1"
+                    borderRadius="full"
+                    variant="subtle"
+                  >
+                    {blogType.replace(/_/g, ' ')}
+                  </Badge>
+                </HStack>
+                
+                {/* Publish Date */}
+                <HStack spacing="1" fontSize="xs" color={mutedColor}>
+                  <Icon as={FiCalendar} />
+                  <Text>{formattedDate}</Text>
+                </HStack>
+              </Flex>
 
-            {/* Title */}
-            <Heading
-              size="lg"
-              fontWeight="bold"
-              noOfLines={2}
-              transition="color 0.2s"
-              _hover={{ color: accentColor }}
-              lineHeight="1.3"
-            >
-              {title}
-            </Heading>
-
-            {/* Description */}
-            <Text 
-              fontSize="md" 
-              color={mutedColor} 
-              noOfLines={3} 
-              lineHeight="1.6"
-              flex="1"
-            >
-              {metadata}
-            </Text>
-
-            <Divider borderColor={dividerColor} />
-
-            {/* Author Info */}
-            <HStack spacing="3" align="start">
-              <Avatar
-                size="md"
-                name={author.name}
-                src={avatarUrl}
-              />
-              <VStack align="start" spacing="0" flex="1">
-                <Text fontWeight="bold" fontSize="sm">
-                  {author.name}
-                </Text>
-                {author.role && (
-                  <Text fontSize="xs" color={mutedColor}>
-                    {author.role}
-                  </Text>
-                )}
-                {author.bio && (
-                  <Text fontSize="xs" color={mutedColor} noOfLines={2} mt="1">
-                    {author.bio}
-                  </Text>
-                )}
-              </VStack>
-              
-              {/* Read Time */}
-              {readTime && (
-                <Flex
-                  align="center"
-                  gap="1"
-                  px="3"
-                  py="1.5"
-                  bg={useColorModeValue("gray.100", "gray.700")}
-                  borderRadius="full"
-                  fontSize="xs"
-                  color={mutedColor}
-                  flexShrink="0"
-                >
-                  <Icon as={FiClock} />
-                  <Text fontWeight="medium">{readTime}</Text>
-                </Flex>
-              )}
-            </HStack>
-
-            {/* Read More Link */}
-            <Flex justify="space-between" align="center" pt="2">
-              <Text
-                fontSize="sm"
+              {/* Title */}
+              <Heading
+                size="lg"
                 fontWeight="bold"
-                color={accentColor}
-                _hover={{ textDecoration: "underline" }}
+                noOfLines={2}
+                transition="color 0.2s"
+                _hover={{ color: accentColor }}
+                lineHeight="1.3"
               >
-                Read full article →
+                {title}
+              </Heading>
+
+              {/* Description */}
+              <Text 
+                fontSize="md" 
+                color={mutedColor} 
+                noOfLines={3} 
+                lineHeight="1.6"
+                flex="1"
+              >
+                {metadata}
               </Text>
-            </Flex>
-          </VStack>
-        </CardBody>
+
+              {/* Read More Link */}
+              <Flex justify="space-between" align="center" pt="2">
+                <Text
+                  fontSize="sm"
+                  fontWeight="bold"
+                  color={accentColor}
+                  _hover={{ textDecoration: "underline" }}
+                >
+                  Read full article →
+                </Text>
+              </Flex>
+
+              <Divider borderColor={dividerColor} />
+
+              {/* Author Info */}
+              <HStack spacing="3" align="start">
+                <Avatar
+                  size="sm"
+                  name={author.name}
+                  src={avatarUrl}
+                />
+                <VStack align="start" spacing="0" flex="1">
+                  <Text fontWeight="bold" fontSize="sm">
+                    {author.name}
+                  </Text>
+                  {author.role || author.bio ? (
+                    <Text fontSize="xs" color={mutedColor}>
+                      {author.role} | {author.bio}
+                    </Text>
+                  ) : null}
+                </VStack>
+                
+                {/* Read Time */}
+                {readTime && (
+                  <Flex
+                    align="center"
+                    gap="1"
+                    px="3"
+                    py="1.5"
+                    bg={useColorModeValue("gray.100", "gray.700")}
+                    borderRadius="full"
+                    fontSize="xs"
+                    color={mutedColor}
+                    flexShrink="0"
+                  >
+                    <Icon as={FiClock} />
+                    <Text fontWeight="medium">{readTime}</Text>
+                  </Flex>
+                )}
+              </HStack>
+            </VStack>
+          </CardBody>
+        </Flex>
       </Card>
     </Link>
   );

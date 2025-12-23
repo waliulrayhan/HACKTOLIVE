@@ -33,6 +33,8 @@ export function getAvatarColorClass(name: string): string {
     "bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-200",
   ];
 
+  if (!name) return colors[0]; // Default color for undefined names
+
   const index = name
     .split("")
     .reduce((acc, char) => acc + char.charCodeAt(0), 0);

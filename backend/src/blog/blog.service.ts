@@ -93,7 +93,11 @@ export class BlogService {
               id: true,
               name: true,
               avatar: true,
+              bio: true,
               role: true,
+              twitterUrl: true,
+              linkedinUrl: true,
+              githubUrl: true,
             },
           },
           _count: {

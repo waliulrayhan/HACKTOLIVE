@@ -9,6 +9,10 @@ import {
   DeliveryMode,
   Prisma,
 } from '@prisma/client';
+import {
+  transformCourse,
+  instructorInclude,
+} from '../../utils/transform.util';
 
 @Injectable()
 export class CoursesService {
@@ -73,7 +77,7 @@ export class CoursesService {
       where,
       orderBy,
       include: {
-        instructor: true,
+        instructor: instructorInclude,
         modules: {
           include: {
             lessons: true,
@@ -82,8 +86,8 @@ export class CoursesService {
       },
     });
 
-    // Calculate totalModules and totalLessons for each course
-    return courses.map(course => ({
+    // Calculate totalModules and totalLessons for each course and transform instructor
+    return courses.map(course => transformCourse({
       ...course,
       totalModules: course.modules?.length || 0,
       totalLessons: course.modules?.reduce(
@@ -97,7 +101,7 @@ export class CoursesService {
     const course = await this.prisma.course.findUnique({
       where: { id },
       include: {
-        instructor: true,
+        instructor: instructorInclude,
         modules: {
           include: {
             lessons: {
@@ -118,6 +122,7 @@ export class CoursesService {
               select: {
                 name: true,
                 email: true,
+                avatar: true,
               },
             },
           },
@@ -150,19 +155,19 @@ export class CoursesService {
       });
     }
 
-    // Return the course with updated values
-    return {
+    // Return the course with updated values and transformed instructor
+    return transformCourse({
       ...course,
       totalModules,
       totalLessons,
-    };
+    });
   }
 
   async findBySlug(slug: string): Promise<Course | null> {
     const course = await this.prisma.course.findUnique({
       where: { slug },
       include: {
-        instructor: true,
+        instructor: instructorInclude,
         modules: {
           include: {
             lessons: {
@@ -200,12 +205,12 @@ export class CoursesService {
       });
     }
 
-    // Return the course with updated values
-    return {
+    // Return the course with updated values and transformed instructor
+    return transformCourse({
       ...course,
       totalModules,
       totalLessons,
-    };
+    });
   }
 
   async update(id: string, data: Prisma.CourseUpdateInput): Promise<Course> {
@@ -225,7 +230,7 @@ export class CoursesService {
     const courses = await this.prisma.course.findMany({
       where: { category },
       include: {
-        instructor: true,
+        instructor: instructorInclude,
         modules: {
           include: {
             lessons: true,
@@ -234,7 +239,7 @@ export class CoursesService {
       },
     });
 
-    return courses.map(course => ({
+    return courses.map(course => transformCourse({
       ...course,
       totalModules: course.modules?.length || 0,
       totalLessons: course.modules?.reduce(
@@ -248,7 +253,7 @@ export class CoursesService {
     const courses = await this.prisma.course.findMany({
       where: { level },
       include: {
-        instructor: true,
+        instructor: instructorInclude,
         modules: {
           include: {
             lessons: true,
@@ -257,7 +262,7 @@ export class CoursesService {
       },
     });
 
-    return courses.map(course => ({
+    return courses.map(course => transformCourse({
       ...course,
       totalModules: course.modules?.length || 0,
       totalLessons: course.modules?.reduce(
@@ -271,7 +276,7 @@ export class CoursesService {
     const courses = await this.prisma.course.findMany({
       where: { tier },
       include: {
-        instructor: true,
+        instructor: instructorInclude,
         modules: {
           include: {
             lessons: true,
@@ -280,7 +285,7 @@ export class CoursesService {
       },
     });
 
-    return courses.map(course => ({
+    return courses.map(course => transformCourse({
       ...course,
       totalModules: course.modules?.length || 0,
       totalLessons: course.modules?.reduce(
@@ -294,7 +299,7 @@ export class CoursesService {
     const courses = await this.prisma.course.findMany({
       where: { instructorId },
       include: {
-        instructor: true,
+        instructor: instructorInclude,
         modules: {
           include: {
             lessons: true,
@@ -303,7 +308,7 @@ export class CoursesService {
       },
     });
 
-    return courses.map(course => ({
+    return courses.map(course => transformCourse({
       ...course,
       totalModules: course.modules?.length || 0,
       totalLessons: course.modules?.reduce(
@@ -323,7 +328,7 @@ export class CoursesService {
         ],
       },
       include: {
-        instructor: true,
+        instructor: instructorInclude,
         modules: {
           include: {
             lessons: true,
@@ -332,7 +337,7 @@ export class CoursesService {
       },
     });
 
-    return courses.map(course => ({
+    return courses.map(course => transformCourse({
       ...course,
       totalModules: course.modules?.length || 0,
       totalLessons: course.modules?.reduce(
@@ -353,7 +358,7 @@ export class CoursesService {
         { rating: 'desc' },
       ],
       include: {
-        instructor: true,
+        instructor: instructorInclude,
         modules: {
           include: {
             lessons: true,
@@ -362,7 +367,7 @@ export class CoursesService {
       },
     });
 
-    return courses.map(course => ({
+    return courses.map(course => transformCourse({
       ...course,
       totalModules: course.modules?.length || 0,
       totalLessons: course.modules?.reduce(
@@ -385,7 +390,7 @@ export class CoursesService {
         rating: 'desc',
       },
       include: {
-        instructor: true,
+        instructor: instructorInclude,
         modules: {
           include: {
             lessons: true,
@@ -394,7 +399,7 @@ export class CoursesService {
       },
     });
 
-    return courses.map(course => ({
+    return courses.map(course => transformCourse({
       ...course,
       totalModules: course.modules?.length || 0,
       totalLessons: course.modules?.reduce(
