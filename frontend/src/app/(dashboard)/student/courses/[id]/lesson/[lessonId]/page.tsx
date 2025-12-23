@@ -490,12 +490,25 @@ export default function StudentLessonPage() {
     }
   };
 
-  const getYouTubeEmbedUrl = (url: string) => {
-    const videoIdMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
-    if (videoIdMatch) {
-      return `https://www.youtube.com/embed/${videoIdMatch[1]}`;
+  const isYouTubeUrl = (url: string) => {
+    return /(?:youtube\.com|youtu\.be)/.test(url);
+  };
+
+  const getYouTubeVideoId = (url: string) => {
+    if (!url) return null;
+    
+    // Match various YouTube URL formats
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+      /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    ];
+    
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) return match[1];
     }
-    return url;
+    return null;
   };
 
   const parseOptions = (options: string | string[]) => {
@@ -787,13 +800,23 @@ export default function StudentLessonPage() {
             <div className="space-y-3">
               {hasVideoContent && (
                 <div className="aspect-video w-full overflow-hidden rounded-lg bg-gray-900">
-                  <iframe
-                    src={getYouTubeEmbedUrl(lesson.videoUrl!)}
-                    title={lesson.title}
-                    className="h-full w-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+                  {isYouTubeUrl(lesson.videoUrl!) ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${getYouTubeVideoId(lesson.videoUrl!)}`}
+                      title={lesson.title}
+                      className="h-full w-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video
+                      src={lesson.videoUrl!}
+                      title={lesson.title}
+                      className="h-full w-full"
+                      controls
+                      controlsList="nodownload"
+                    />
+                  )}
                 </div>
               )}
 

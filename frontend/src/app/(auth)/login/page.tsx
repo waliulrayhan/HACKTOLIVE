@@ -123,9 +123,10 @@ const Login: NextPage = () => {
   }
 
   const handleGoogleLogin = () => {
-    // Redirect to Google OAuth endpoint
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-    window.location.href = `${backendUrl}/auth/google`
+    toast.info('This feature will be coming soon!', {
+      description: 'Google login is under development.',
+      duration: 3000,
+    })
   }
 
   return (

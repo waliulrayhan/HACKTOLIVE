@@ -23,14 +23,15 @@ import {
   GridItem,
   Flex,
   Image,
+  Icon,
 } from '@chakra-ui/react'
 import { Link } from '@saas-ui/react'
 import { BackgroundGradient } from '@/components/shared/gradients/background-gradient'
 import { PageTransition } from '@/components/shared/motion/page-transition'
 import { Header } from '../../(marketing)/_components/layout/header'
 import { NextPage } from 'next'
-import { FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa'
-import { useState, useRef } from 'react'
+import { FaGoogle, FaEye, FaEyeSlash, FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
+import { useState, useRef, useMemo } from 'react'
 import ReCAPTCHA from 'react-google-recaptcha'
 import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -64,6 +65,21 @@ const Signup: NextPage = () => {
   const leftBgColor = useColorModeValue('#4d7c0f', '#365314')
   const rightBgColor = useColorModeValue('white', 'gray.800')
   const { colorMode, toggleColorMode } = useColorMode()
+
+  // Password complexity requirements
+  const passwordRequirements = useMemo(() => {
+    return {
+      minLength: formData.password.length >= 8,
+      hasUpperCase: /[A-Z]/.test(formData.password),
+      hasLowerCase: /[a-z]/.test(formData.password),
+      hasNumber: /[0-9]/.test(formData.password),
+      hasSpecialChar: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password),
+    }
+  }, [formData.password])
+
+  const isPasswordValid = useMemo(() => {
+    return Object.values(passwordRequirements).every(req => req)
+  }, [passwordRequirements])
 
   const handleCaptchaChange = (value: string | null) => {
     setCaptchaValue(value)
@@ -120,8 +136,8 @@ const Signup: NextPage = () => {
     if (!formData.password) {
       newErrors.password = 'Password is required'
       hasError = true
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters'
+    } else if (!isPasswordValid) {
+      newErrors.password = 'Password does not meet all requirements'
       hasError = true
     }
 
@@ -168,9 +184,10 @@ const Signup: NextPage = () => {
   }
 
   const handleGoogleSignup = () => {
-    // Redirect to Google OAuth endpoint
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-    window.location.href = `${backendUrl}/auth/google`
+    toast.info('This feature will be coming soon!', {
+      description: 'Google signup is under development.',
+      duration: 3000,
+    })
   }
 
   return (
@@ -385,6 +402,65 @@ const Signup: NextPage = () => {
                             />
                           </InputRightElement>
                         </InputGroup>
+                        {formData.password && (
+                          <Box mt={2} p={3} bg={useColorModeValue('gray.50', 'gray.700')} borderRadius="md">
+                            <Text fontSize="xs" fontWeight="semibold" mb={2}>
+                              Password requirements:
+                            </Text>
+                            <Grid templateColumns="repeat(2, 1fr)" gap={2}>
+                              <GridItem>
+                                <HStack spacing={1}>
+                                  <Icon
+                                    as={passwordRequirements.minLength ? FaCheckCircle : FaTimesCircle}
+                                    color={passwordRequirements.minLength ? 'green.500' : 'gray.400'}
+                                    boxSize={3}
+                                  />
+                                  <Text fontSize="xs">8+ characters</Text>
+                                </HStack>
+                              </GridItem>
+                              <GridItem>
+                                <HStack spacing={1}>
+                                  <Icon
+                                    as={passwordRequirements.hasUpperCase ? FaCheckCircle : FaTimesCircle}
+                                    color={passwordRequirements.hasUpperCase ? 'green.500' : 'gray.400'}
+                                    boxSize={3}
+                                  />
+                                  <Text fontSize="xs">Uppercase</Text>
+                                </HStack>
+                              </GridItem>
+                              <GridItem>
+                                <HStack spacing={1}>
+                                  <Icon
+                                    as={passwordRequirements.hasLowerCase ? FaCheckCircle : FaTimesCircle}
+                                    color={passwordRequirements.hasLowerCase ? 'green.500' : 'gray.400'}
+                                    boxSize={3}
+                                  />
+                                  <Text fontSize="xs">Lowercase</Text>
+                                </HStack>
+                              </GridItem>
+                              <GridItem>
+                                <HStack spacing={1}>
+                                  <Icon
+                                    as={passwordRequirements.hasNumber ? FaCheckCircle : FaTimesCircle}
+                                    color={passwordRequirements.hasNumber ? 'green.500' : 'gray.400'}
+                                    boxSize={3}
+                                  />
+                                  <Text fontSize="xs">Number</Text>
+                                </HStack>
+                              </GridItem>
+                              <GridItem colSpan={2}>
+                                <HStack spacing={1}>
+                                  <Icon
+                                    as={passwordRequirements.hasSpecialChar ? FaCheckCircle : FaTimesCircle}
+                                    color={passwordRequirements.hasSpecialChar ? 'green.500' : 'gray.400'}
+                                    boxSize={3}
+                                  />
+                                  <Text fontSize="xs">Special character</Text>
+                                </HStack>
+                              </GridItem>
+                            </Grid>
+                          </Box>
+                        )}
                         <FormErrorMessage>{errors.password}</FormErrorMessage>
                       </FormControl>
 
