@@ -80,19 +80,27 @@ const convertBlogFormat = (blog: any) => {
     'CASE_STUDY_STORIES': 'Case Study Stories',
   };
 
+  // Extract social URLs from author object if they exist
+  const extractUsername = (url: string | null | undefined): string | undefined => {
+    if (!url) return undefined;
+    // Extract username from URL (e.g., "https://twitter.com/username" -> "username")
+    const match = url.match(/\/([^\/]+)\/?$/);
+    return match ? match[1] : url;
+  };
+
   return {
     ...blog,
     _id: blog.id,
     category: categoryMap[blog.category] || blog.category,
     blogType: blogTypeMap[blog.blogType] || blog.blogType,
     author: {
-      name: blog.authorName,
-      avatar: blog.authorAvatar,
-      role: blog.authorRole,
-      bio: blog.authorBio,
-      twitter: blog.authorTwitter,
-      linkedin: blog.authorLinkedin,
-      github: blog.authorGithub,
+      name: blog.author?.name || blog.authorName,
+      avatar: blog.author?.avatar || blog.authorAvatar,
+      role: blog.author?.role || blog.authorRole,
+      bio: blog.author?.bio || blog.authorBio,
+      twitter: extractUsername(blog.author?.twitterUrl),
+      linkedin: extractUsername(blog.author?.linkedinUrl),
+      github: extractUsername(blog.author?.githubUrl),
     },
   };
 };

@@ -31,7 +31,8 @@ import NewsletterSection from "./NewsletterSection";
 import RecommendedPosts from "./RecommendedPosts";
 
 interface Blog {
-  _id: string;
+  _id?: string;
+  id?: string;
   slug: string;
   title: string;
   metadata: string;
@@ -64,12 +65,15 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
   const accentColor = useColorModeValue("green.500", "green.400");
   const mutedColor = useColorModeValue("gray.600", "gray.400");
 
+  // Get blog ID (support both _id and id)
+  const blogId = blog._id || blog.id || '';
+
   // Construct full image URLs
-  const mainImageUrl = blog.mainImage.startsWith('http') 
+  const mainImageUrl = blog.mainImage?.startsWith('http') 
     ? blog.mainImage 
     : `${process.env.NEXT_PUBLIC_API_URL}${blog.mainImage}`;
   
-  const avatarUrl = blog.author.avatar 
+  const avatarUrl = blog.author?.avatar 
     ? (blog.author.avatar.startsWith('http') 
         ? blog.author.avatar 
         : `${process.env.NEXT_PUBLIC_API_URL}${blog.author.avatar}`)
@@ -164,7 +168,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
               {/* Blog Types */}
               <BlogTypesSidebar />
 
-              <Divider />
+              <Divider />I
 
               {/* Related Posts */}
               <RelatedPost currentBlogId={blog._id} />
@@ -582,7 +586,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
       {/* Recommended Posts Section - Full Width */}
       <Container maxW="container.xl" py="12">
         <FallInPlace delay={0.6}>
-          <RecommendedPosts currentBlogId={blog._id} />
+          <RecommendedPosts currentBlogId={blogId} />
         </FallInPlace>
       </Container>
 
