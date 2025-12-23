@@ -20,9 +20,17 @@ import StudentPerformanceModal from "@/components/instructor/StudentPerformanceM
 
 interface Student {
   id: string;
-  name: string;
-  email: string;
-  avatar?: string;
+  userId: string;
+  enrolledCourses: number;
+  completedCourses: number;
+  certificatesEarned: number;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    name: string;
+    email: string;
+    avatar?: string;
+  };
 }
 
 interface Enrollment {
@@ -322,16 +330,16 @@ export default function CertificateIssuancePage() {
                 >
                   <div className="flex items-center gap-2 sm:gap-3">
                     <Avatar
-                      src={cert.student?.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${cert.student.avatar}` : '/images/default-avatar.png'}
-                      alt={cert.student?.name || 'Student'}
+                      src={cert.student?.user?.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${cert.student.user.avatar}` : '/images/default-avatar.png'}
+                      alt={cert.student?.user?.name || 'Student'}
                       size="medium"
                     />
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {cert.student?.name || 'Unknown Student'}
+                        {cert.student?.user?.name || 'Unknown Student'}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {cert.student?.email || 'No email'}
+                        {cert.student?.user?.email || 'No email'}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge color="warning" size="sm">
@@ -383,7 +391,7 @@ export default function CertificateIssuancePage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {cert.student?.name}
+                        {cert.student?.user?.name}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
                         Verification: <span className="font-mono">{cert.verificationCode}</span>
@@ -437,16 +445,16 @@ export default function CertificateIssuancePage() {
                   >
                     <div className="flex items-center gap-2 sm:gap-3">
                       <Avatar
-                        src={enrollment.student?.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${enrollment.student.avatar}` : '/images/default-avatar.png'}
-                        alt={enrollment.student?.name || 'Student'}
+                        src={enrollment.student?.user?.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${enrollment.student.user.avatar}` : '/images/default-avatar.png'}
+                        alt={enrollment.student?.user?.name || 'Student'}
                         size="medium"
                       />
                       <div>
                         <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          {enrollment.student?.name || 'Unknown Student'}
+                          {enrollment.student?.user?.name || 'Unknown Student'}
                         </p>
                         <p className="text-xs text-gray-600 dark:text-gray-400">
-                          {enrollment.student?.email || 'No email'}
+                          {enrollment.student?.user?.email || 'No email'}
                         </p>
                         <div className="flex items-center gap-2 mt-1">
                           <Badge color="success" size="sm">
@@ -503,7 +511,7 @@ export default function CertificateIssuancePage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {certificate.student?.name}
+                        {certificate.student?.user?.name}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
                         Verification: <span className="font-mono">{certificate.verificationCode}</span>
@@ -541,16 +549,16 @@ export default function CertificateIssuancePage() {
                 >
                   <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                     <Avatar
-                      src={enrollment.student?.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${enrollment.student.avatar}` : '/images/default-avatar.png'}
-                      alt={enrollment.student?.name || 'Student'}
+                      src={enrollment.student?.user?.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${enrollment.student.user.avatar}` : '/images/default-avatar.png'}
+                      alt={enrollment.student?.user?.name || 'Student'}
                       size="medium"
                     />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {enrollment.student?.name || 'Unknown Student'}
+                        {enrollment.student?.user?.name || 'Unknown Student'}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {enrollment.student?.email || 'No email'}
+                        {enrollment.student?.user?.email || 'No email'}
                       </p>
                       <div className="mt-2">
                         <div className="flex items-center gap-2">

@@ -385,9 +385,15 @@ export const certificates: Certificate[] = [
   {
     id: 'cert-1',
     courseId: 'course-2',
-    courseName: 'Advanced React & TypeScript',
-    studentName: 'John Student',
-    issueDate: '2024-11-20',
+    course: {
+      title: 'Advanced React & TypeScript',
+    },
+    student: {
+      user: {
+        name: 'John Student',
+      },
+    },
+    issueDate: '2024-11-20T00:00:00Z',
     certificateNumber: 'CERT-2024-001234',
     instructorName: 'Jane Smith',
     thumbnail: '/images/cards/cards-02.png',
@@ -396,9 +402,15 @@ export const certificates: Certificate[] = [
   {
     id: 'cert-2',
     courseId: 'course-5',
-    courseName: 'Python for Data Science',
-    studentName: 'John Student',
-    issueDate: '2024-10-15',
+    course: {
+      title: 'Python for Data Science',
+    },
+    student: {
+      user: {
+        name: 'John Student',
+      },
+    },
+    issueDate: '2024-10-15T00:00:00Z',
     certificateNumber: 'CERT-2024-000987',
     instructorName: 'David Brown',
     thumbnail: '/images/cards/cards-02.png',

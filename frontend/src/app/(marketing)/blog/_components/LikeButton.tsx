@@ -11,6 +11,7 @@ import {
 import { FiHeart } from "react-icons/fi";
 import { blogApi } from "@/lib/api/blog";
 import { useAuth } from "@/context/AuthContext";
+import { authService } from "@/lib/auth-service";
 
 interface LikeButtonProps {
   blogId: string;
@@ -68,7 +69,7 @@ const LikeButton = ({ blogId }: LikeButtonProps) => {
       const result = await blogApi.toggleLike(
         blogId, 
         userEmail,
-        user?.token // Pass token if user is authenticated
+        authService.getToken() || undefined // Get token from authService
       );
       
       // Update local state

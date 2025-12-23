@@ -43,9 +43,18 @@ export const certificates: Certificate[] = [
   {
     id: "cert-001",
     studentId: "student-001",
-    studentName: "John Doe",
+    student: {
+      id: "student-001",
+      user: {
+        name: "John Doe",
+        email: "john.doe@example.com",
+      },
+    },
     courseId: "course-002",
-    courseName: "Ethical Hacking & Penetration Testing for Beginners",
+    course: {
+      id: "course-002",
+      title: "Ethical Hacking & Penetration Testing for Beginners",
+    },
     issuedAt: "2024-10-15T14:00:00Z",
     verificationCode: "HACK-2024-ETH-12345",
     certificateUrl: "/certificates/cert-001.pdf",
@@ -53,9 +62,18 @@ export const certificates: Certificate[] = [
   {
     id: "cert-002",
     studentId: "student-001",
-    studentName: "John Doe",
+    student: {
+      id: "student-001",
+      user: {
+        name: "John Doe",
+        email: "john.doe@example.com",
+      },
+    },
     courseId: "course-006",
-    courseName: "Cryptography & Encryption Fundamentals",
+    course: {
+      id: "course-006",
+      title: "Cryptography & Encryption Fundamentals",
+    },
     issuedAt: "2024-09-20T16:30:00Z",
     verificationCode: "HACK-2024-CRY-67890",
     certificateUrl: "/certificates/cert-002.pdf",
