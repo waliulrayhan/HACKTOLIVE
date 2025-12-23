@@ -95,9 +95,10 @@ export class BlogService {
               avatar: true,
               bio: true,
               role: true,
+              facebookUrl: true,
               twitterUrl: true,
               linkedinUrl: true,
-              githubUrl: true,
+              instagramUrl: true,
             },
           },
           _count: {
@@ -186,9 +187,10 @@ export class BlogService {
             avatar: true,
             bio: true,
             role: true,
+            facebookUrl: true,
             twitterUrl: true,
             linkedinUrl: true,
-            githubUrl: true,
+            instagramUrl: true,
           },
         },
         comments: {
@@ -374,7 +376,7 @@ export class BlogService {
   }
 
   // Comment operations
-  async addComment(blogId: string, createCommentDto: CreateCommentDto) {
+  async addComment(blogId: string, createCommentDto: CreateCommentDto, user?: any) {
     const blog = await this.prisma.blog.findUnique({
       where: { id: blogId },
     });
@@ -383,10 +385,15 @@ export class BlogService {
       throw new NotFoundException('Blog not found');
     }
 
+    if (!user || !user.id) {
+      throw new Error('User must be authenticated to comment');
+    }
+
     return this.prisma.blogComment.create({
       data: {
         blogId,
-        ...createCommentDto,
+        userId: user.id,
+        comment: createCommentDto.comment,
       },
       include: {
         user: {
@@ -394,6 +401,7 @@ export class BlogService {
             id: true,
             name: true,
             avatar: true,
+            role: true,
           },
         },
       },

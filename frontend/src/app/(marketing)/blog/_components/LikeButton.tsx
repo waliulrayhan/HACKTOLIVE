@@ -1,33 +1,86 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   IconButton,
   Text,
   HStack,
   useColorModeValue,
   Icon,
+  useToast,
 } from "@chakra-ui/react";
 import { FiHeart } from "react-icons/fi";
+import { blogApi } from "@/lib/api/blog";
 
 interface LikeButtonProps {
-  initialLikes?: number;
-  articleId?: string;
+  blogId: string;
 }
 
-const LikeButton = ({ initialLikes = 0, articleId }: LikeButtonProps) => {
-  const [likes, setLikes] = useState(initialLikes);
+const LikeButton = ({ blogId }: LikeButtonProps) => {
+  const [likes, setLikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   const accentColor = useColorModeValue("red.500", "red.400");
   const mutedColor = useColorModeValue("gray.600", "gray.400");
+  const toast = useToast();
 
-  const handleLike = () => {
-    if (isLiked) {
-      setLikes(likes - 1);
-      setIsLiked(false);
-    } else {
-      setLikes(likes + 1);
-      setIsLiked(true);
+  // Fetch likes count on mount
+  useEffect(() => {
+    const fetchLikes = async () => {
+      try {
+        const count = await blogApi.getLikesCount(blogId);
+        setLikes(count);
+        
+        // Check if user has liked (from localStorage)
+        const likedBlogs = JSON.parse(localStorage.getItem('likedBlogs') || '[]');
+        setIsLiked(likedBlogs.includes(blogId));
+      } catch (error) {
+        console.error('Error fetching likes:', error);
+      }
+    };
+
+    if (blogId) {
+      fetchLikes();
+    }
+  }, [blogId]);
+
+  const handleLike = async () => {
+    if (isLoading) return;
+
+    setIsLoading(true);
+    try {
+      // Use a guest email for anonymous users
+      const userEmail = localStorage.getItem('userEmail') || `guest-${Date.now()}@anonymous.com`;
+      localStorage.setItem('userEmail', userEmail);
+
+      const result = await blogApi.toggleLike(blogId, userEmail);
+      
+      // Update local state
+      if (result.liked) {
+        setLikes(likes + 1);
+        setIsLiked(true);
+        // Store in localStorage
+        const likedBlogs = JSON.parse(localStorage.getItem('likedBlogs') || '[]');
+        likedBlogs.push(blogId);
+        localStorage.setItem('likedBlogs', JSON.stringify(likedBlogs));
+      } else {
+        setLikes(likes - 1);
+        setIsLiked(false);
+        // Remove from localStorage
+        const likedBlogs = JSON.parse(localStorage.getItem('likedBlogs') || '[]');
+        const filtered = likedBlogs.filter((id: string) => id !== blogId);
+        localStorage.setItem('likedBlogs', JSON.stringify(filtered));
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to toggle like',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -46,6 +99,7 @@ const LikeButton = ({ initialLikes = 0, articleId }: LikeButtonProps) => {
         variant="ghost"
         size="sm"
         onClick={handleLike}
+        isLoading={isLoading}
         _hover={{ 
           color: accentColor,
         }}

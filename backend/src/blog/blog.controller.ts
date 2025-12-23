@@ -74,11 +74,13 @@ export class BlogController {
 
   // Comment endpoints
   @Post(':id/comments')
+  @UseGuards(JwtAuthGuard)
   addComment(
     @Param('id') blogId: string,
     @Body() createCommentDto: CreateCommentDto,
+    @Request() req,
   ) {
-    return this.blogService.addComment(blogId, createCommentDto);
+    return this.blogService.addComment(blogId, createCommentDto, req.user);
   }
 
   @Get(':id/comments')

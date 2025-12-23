@@ -28,9 +28,10 @@ export interface Blog {
     avatar?: string;
     bio?: string;
     role: string;
+    facebookUrl?: string;
     twitterUrl?: string;
     linkedinUrl?: string;
-    githubUrl?: string;
+    instagramUrl?: string;
   };
   publishDate: string;
   readTime?: string;
@@ -56,11 +57,14 @@ export interface BlogResponse {
 
 export interface Comment {
   id: string;
-  userName: string;
-  userEmail: string;
-  userAvatar?: string;
   comment: string;
   createdAt: string;
+  user: {
+    id: string;
+    name: string;
+    avatar?: string;
+    role?: string;
+  };
 }
 
 // Convert API format to frontend format
@@ -98,9 +102,10 @@ const convertBlogFormat = (blog: any) => {
       avatar: blog.author?.avatar || blog.authorAvatar,
       role: blog.author?.role || blog.authorRole,
       bio: blog.author?.bio || blog.authorBio,
+      facebook: extractUsername(blog.author?.facebookUrl),
       twitter: extractUsername(blog.author?.twitterUrl),
       linkedin: extractUsername(blog.author?.linkedinUrl),
-      github: extractUsername(blog.author?.githubUrl),
+      instagram: extractUsername(blog.author?.instagramUrl),
     },
   };
 };
@@ -190,23 +195,20 @@ export const blogApi = {
     return blogs.map(convertBlogFormat);
   },
 
-  // Add a comment
-  async addComment(blogId: string, data: {
-    userName: string;
-    userEmail: string;
-    comment: string;
-    userAvatar?: string;
-  }): Promise<Comment> {
+  // Add a comment (requires authentication)
+  async addComment(blogId: string, comment: string, token: string): Promise<Comment> {
     const response = await fetch(`${API_URL}/blog/${blogId}/comments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({ comment }),
     });
     
     if (!response.ok) {
-      throw new Error('Failed to add comment');
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to add comment');
     }
 
     return response.json();

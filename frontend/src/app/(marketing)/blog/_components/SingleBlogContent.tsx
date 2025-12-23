@@ -18,7 +18,8 @@ import {
   useColorModeValue,
   SimpleGrid,
 } from "@chakra-ui/react";
-import { FiCalendar, FiClock, FiUser, FiTwitter, FiLinkedin, FiGithub } from "react-icons/fi";
+import { FiCalendar, FiClock, FiUser, FiLinkedin, FiFacebook, FiInstagram } from "react-icons/fi";
+import { RiTwitterXLine } from "react-icons/ri";
 import Image from "next/image";
 import Link from "next/link";
 import { FallInPlace } from "@/components/shared/motion/fall-in-place";
@@ -29,6 +30,7 @@ import BlogTypesSidebar from "./BlogTypesSidebar";
 import LikeButton from "./LikeButton";
 import NewsletterSection from "./NewsletterSection";
 import RecommendedPosts from "./RecommendedPosts";
+import CommentSection from "./CommentSection";
 
 interface Blog {
   _id?: string;
@@ -45,9 +47,10 @@ interface Blog {
     role?: string;
     bio?: string;
     avatar?: string;
+    facebook?: string;
     twitter?: string;
     linkedin?: string;
-    github?: string;
+    instagram?: string;
   };
   publishDate: string;
   readTime: string;
@@ -168,10 +171,10 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
               {/* Blog Types */}
               <BlogTypesSidebar />
 
-              <Divider />I
+              <Divider />
 
               {/* Related Posts */}
-              <RelatedPost currentBlogId={blog._id} />
+              <RelatedPost currentBlogId={blogId} />
             </VStack>
           </Box>
 
@@ -230,7 +233,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                           </HStack>
                           
                           {/* Social Links for Base */}
-                          {(blog.author.twitter || blog.author.linkedin || blog.author.github) && (
+                          {(blog.author.facebook || blog.author.twitter || blog.author.linkedin || blog.author.instagram) && (
                             <HStack 
                               spacing="2" 
                               justify="space-between"
@@ -244,9 +247,9 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                                 Follow on
                               </Text>
                               <HStack spacing="2">
-                                {blog.author.twitter && (
+                                {blog.author.facebook && (
                                   <Link
-                                    href={`https://twitter.com/${blog.author.twitter}`}
+                                    href={`https://facebook.com/${blog.author.facebook}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                   >
@@ -255,18 +258,45 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                                         p="1.5"
                                         borderRadius="md"
                                         bg={cardBg}
-                                        _hover={{ bg: accentColor, transform: "translateY(-2px)" }}
+                                        _hover={{ bg: "#1877F2", transform: "translateY(-2px)" }}
                                         transition="all 0.3s"
                                       >
                                         <Icon
-                                          as={FiTwitter}
+                                          as={FiFacebook}
                                           boxSize="3.5"
                                           color={mutedColor}
                                           _hover={{ color: "white" }}
                                         />
                                       </Box>
                                       <Text fontSize="2xs" color={mutedColor} display={{ base: "none", sm: "block" }}>
-                                        Twitter
+                                        Facebook
+                                      </Text>
+                                    </HStack>
+                                  </Link>
+                                )}
+                                {blog.author.twitter && (
+                                  <Link
+                                    href={`https://x.com/${blog.author.twitter}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <HStack spacing="1" align="center">
+                                      <Box
+                                        p="1.5"
+                                        borderRadius="md"
+                                        bg={cardBg}
+                                        _hover={{ bg: "#000000", transform: "translateY(-2px)" }}
+                                        transition="all 0.3s"
+                                      >
+                                        <Icon
+                                          as={RiTwitterXLine}
+                                          boxSize="3.5"
+                                          color={mutedColor}
+                                          _hover={{ color: "white" }}
+                                        />
+                                      </Box>
+                                      <Text fontSize="2xs" color={mutedColor} display={{ base: "none", sm: "block" }}>
+                                        X
                                       </Text>
                                     </HStack>
                                   </Link>
@@ -282,7 +312,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                                         p="1.5"
                                         borderRadius="md"
                                         bg={cardBg}
-                                        _hover={{ bg: accentColor, transform: "translateY(-2px)" }}
+                                        _hover={{ bg: "#0A66C2", transform: "translateY(-2px)" }}
                                         transition="all 0.3s"
                                       >
                                         <Icon
@@ -298,9 +328,9 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                                     </HStack>
                                   </Link>
                                 )}
-                                {blog.author.github && (
+                                {blog.author.instagram && (
                                   <Link
-                                    href={`https://github.com/${blog.author.github}`}
+                                    href={`https://instagram.com/${blog.author.instagram}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                   >
@@ -309,18 +339,18 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                                         p="1.5"
                                         borderRadius="md"
                                         bg={cardBg}
-                                        _hover={{ bg: accentColor, transform: "translateY(-2px)" }}
+                                        _hover={{ bg: "#E4405F", transform: "translateY(-2px)" }}
                                         transition="all 0.3s"
                                       >
                                         <Icon
-                                          as={FiGithub}
+                                          as={FiInstagram}
                                           boxSize="3.5"
                                           color={mutedColor}
                                           _hover={{ color: "white" }}
                                         />
                                       </Box>
                                       <Text fontSize="2xs" color={mutedColor} display={{ base: "none", sm: "block" }}>
-                                        GitHub
+                                        Instagram
                                       </Text>
                                     </HStack>
                                   </Link>
@@ -368,11 +398,11 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                           </HStack>
 
                           {/* Social Links for Large Device */}
-                          {(blog.author.twitter || blog.author.linkedin || blog.author.github) && (
+                          {(blog.author.facebook || blog.author.twitter || blog.author.linkedin || blog.author.instagram) && (
                             <HStack spacing="3">
-                              {blog.author.twitter && (
+                              {blog.author.facebook && (
                                 <Link
-                                  href={`https://twitter.com/${blog.author.twitter}`}
+                                  href={`https://facebook.com/${blog.author.facebook}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                 >
@@ -382,15 +412,43 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                                     borderWidth="1px"
                                     borderColor={borderColor}
                                     _hover={{ 
-                                      borderColor: accentColor, 
-                                      bg: accentColor,
+                                      borderColor: "#1877F2", 
+                                      bg: "#1877F2",
                                       transform: "translateY(-3px)",
                                       boxShadow: "lg"
                                     }}
                                     transition="all 0.3s"
                                   >
                                     <Icon
-                                      as={FiTwitter}
+                                      as={FiFacebook}
+                                      boxSize="5"
+                                      color={mutedColor}
+                                      _hover={{ color: "white" }}
+                                    />
+                                  </Box>
+                                </Link>
+                              )}
+                              {blog.author.twitter && (
+                                <Link
+                                  href={`https://x.com/${blog.author.twitter}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <Box
+                                    p="3"
+                                    borderRadius="lg"
+                                    borderWidth="1px"
+                                    borderColor={borderColor}
+                                    _hover={{ 
+                                      borderColor: "#000000", 
+                                      bg: "#000000",
+                                      transform: "translateY(-3px)",
+                                      boxShadow: "lg"
+                                    }}
+                                    transition="all 0.3s"
+                                  >
+                                    <Icon
+                                      as={RiTwitterXLine}
                                       boxSize="5"
                                       color={mutedColor}
                                       _hover={{ color: "white" }}
@@ -410,8 +468,8 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                                     borderWidth="1px"
                                     borderColor={borderColor}
                                     _hover={{ 
-                                      borderColor: accentColor, 
-                                      bg: accentColor,
+                                      borderColor: "#0A66C2", 
+                                      bg: "#0A66C2",
                                       transform: "translateY(-3px)",
                                       boxShadow: "lg"
                                     }}
@@ -426,9 +484,9 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                                   </Box>
                                 </Link>
                               )}
-                              {blog.author.github && (
+                              {blog.author.instagram && (
                                 <Link
-                                  href={`https://github.com/${blog.author.github}`}
+                                  href={`https://instagram.com/${blog.author.instagram}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                 >
@@ -438,15 +496,15 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                                     borderWidth="1px"
                                     borderColor={borderColor}
                                     _hover={{ 
-                                      borderColor: accentColor, 
-                                      bg: accentColor,
+                                      borderColor: "#E4405F", 
+                                      bg: "#E4405F",
                                       transform: "translateY(-3px)",
                                       boxShadow: "lg"
                                     }}
                                     transition="all 0.3s"
                                   >
                                     <Icon
-                                      as={FiGithub}
+                                      as={FiInstagram}
                                       boxSize="5"
                                       color={mutedColor}
                                       _hover={{ color: "white" }}
@@ -566,7 +624,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                       justify="space-between"
                       flexWrap="wrap"
                     >
-                      <LikeButton initialLikes={42} articleId={blog.slug} />
+                      <LikeButton blogId={blogId} />
                       
                       <HStack spacing="3">
                         <Text fontSize="xs" fontWeight="medium" color={mutedColor}>
@@ -575,6 +633,13 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                         <SharePost title={blog.title} />
                       </HStack>
                     </HStack>
+                  </FallInPlace>
+
+                  <Divider opacity={0.3} />
+
+                  {/* Comments Section - Inside Card */}
+                  <FallInPlace delay={0.5}>
+                    <CommentSection blogId={blogId} />
                   </FallInPlace>
                 </VStack>
               </CardBody>

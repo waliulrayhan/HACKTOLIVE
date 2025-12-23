@@ -79,54 +79,60 @@ const RelatedPost = ({ currentBlogId }: RelatedPostProps) => {
       </Text>
 
       <VStack spacing="4" align="stretch">
-        {relatedPosts.map((post, key) => (
-          <Link key={key} href={`/blog/${post.slug}`}>
-            <Box
-              p="2"
-              transition="all 0.2s"
-              _hover={{ 
-                bg: hoverBg,
-              }}
-            >
-              <HStack spacing="3" align="start">
-                <Box
-                  position="relative"
-                  width="100px"
-                  height="60px"
-                  flexShrink={0}
-                  borderRadius="md"
-                  overflow="hidden"
-                >
-                  {post.mainImage ? (
-                    <Image 
-                      fill 
-                      src={post.mainImage} 
-                      alt={post.title}
-                      style={{ objectFit: "cover" }}
-                    />
-                  ) : (
-                    <Box bg="gray.200" width="100%" height="100%" />
-                  )}
-                </Box>
-                <VStack align="start" spacing="1" flex="1">
-                  <Text
-                    fontSize="sm"
-                    fontWeight="medium"
-                    noOfLines={2}
-                    lineHeight="1.3"
-                    transition="color 0.2s"
-                    _hover={{ color: accentColor }}
+        {relatedPosts.map((post, key) => {
+          const imageUrl = post.mainImage?.startsWith('http') 
+            ? post.mainImage 
+            : `${process.env.NEXT_PUBLIC_API_URL}${post.mainImage}`;
+          
+          return (
+            <Link key={key} href={`/blog/${post.slug}`}>
+              <Box
+                p="2"
+                transition="all 0.2s"
+                _hover={{ 
+                  bg: hoverBg,
+                }}
+              >
+                <HStack spacing="3" align="start">
+                  <Box
+                    position="relative"
+                    width="100px"
+                    height="60px"
+                    flexShrink={0}
+                    borderRadius="md"
+                    overflow="hidden"
                   >
-                    {post.title}
-                  </Text>
-                  <Text color={mutedColor} fontSize="xs">
-                    {post.author.name} · {post.readTime}
-                  </Text>
-                </VStack>
-              </HStack>
-            </Box>
-          </Link>
-        ))}
+                    {post.mainImage ? (
+                      <Image 
+                        fill 
+                        src={imageUrl} 
+                        alt={post.title}
+                        style={{ objectFit: "cover" }}
+                      />
+                    ) : (
+                      <Box bg="gray.200" width="100%" height="100%" />
+                    )}
+                  </Box>
+                  <VStack align="start" spacing="1" flex="1">
+                    <Text
+                      fontSize="sm"
+                      fontWeight="medium"
+                      noOfLines={2}
+                      lineHeight="1.3"
+                      transition="color 0.2s"
+                      _hover={{ color: accentColor }}
+                    >
+                      {post.title}
+                    </Text>
+                    <Text color={mutedColor} fontSize="xs">
+                      {post.author.name} · {post.readTime}
+                    </Text>
+                  </VStack>
+                </HStack>
+              </Box>
+            </Link>
+          );
+        })}
       </VStack>
     </Box>
   );

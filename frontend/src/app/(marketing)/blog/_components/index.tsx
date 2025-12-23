@@ -12,6 +12,7 @@ export { default as BlogTypesSidebar } from "./BlogTypesSidebar";
 export { default as LikeButton } from "./LikeButton";
 export { default as NewsletterSection } from "./NewsletterSection";
 export { default as RecommendedPosts } from "./RecommendedPosts";
+export { default as CommentSection } from "./CommentSection";
 export * from "./blogData";
 
 const Blog = async () => {
