@@ -177,6 +177,10 @@ export default function StudentLessonPage() {
     }
   }, [quizStarted, timeRemaining]);
 
+  useEffect(() => {
+    document.title = "Lesson - HACKTOLIVE Academy";
+  }, []);
+
   const fetchLesson = async () => {
     try {
       setLoading(true);

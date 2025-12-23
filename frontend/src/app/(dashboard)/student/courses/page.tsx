@@ -57,6 +57,10 @@ export default function MyCoursesPage() {
   const [filter, setFilter] = useState<string>("ALL");
 
   useEffect(() => {
+    document.title = "My Courses - HACKTOLIVE Academy";
+  }, []);
+
+  useEffect(() => {
     fetchEnrolledCourses();
   }, []);
 

@@ -38,6 +38,10 @@ export default function ProgressPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    document.title = "Learning Progress - HACKTOLIVE Academy";
+  }, []);
+
+  useEffect(() => {
     fetchProgress();
   }, []);
 

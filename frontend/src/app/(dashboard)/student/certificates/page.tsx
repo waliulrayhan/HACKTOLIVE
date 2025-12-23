@@ -50,6 +50,10 @@ export default function CertificatesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    document.title = "My Certificates - HACKTOLIVE Academy";
+  }, []);
+
+  useEffect(() => {
     fetchCertificates();
   }, []);
 
