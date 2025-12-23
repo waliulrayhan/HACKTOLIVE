@@ -56,8 +56,10 @@ export default function AnalyticsPage() {
   const [topInstructors, setTopInstructors] = useState<TopInstructor[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchAnalytics();
+  useEffect(() => {    document.title = "Platform Analytics - HACKTOLIVE Academy";
+  }, []);
+
+  useEffect(() => {    fetchAnalytics();
   }, []);
 
   const fetchAnalytics = async () => {

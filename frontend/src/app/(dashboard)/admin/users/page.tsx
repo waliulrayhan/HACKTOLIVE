@@ -140,6 +140,10 @@ export default function UsersManagementPage() {
   // Use ref to prevent duplicate API calls
   const fetchControllerRef = useRef<AbortController | null>(null);
 
+  useEffect(() => {
+    document.title = "User Management - HACKTOLIVE Academy";
+  }, []);
+
   // Debounced fetch function
   const fetchUsers = useCallback(async () => {
     // Cancel previous request if exists

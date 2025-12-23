@@ -91,6 +91,10 @@ export default function BlogsManagementPage() {
 
   const fetchControllerRef = useRef<AbortController | null>(null);
 
+  useEffect(() => {
+    document.title = "Blog Management - HACKTOLIVE Academy";
+  }, []);
+
   const fetchBlogs = useCallback(async () => {
     if (fetchControllerRef.current) {
       fetchControllerRef.current.abort();

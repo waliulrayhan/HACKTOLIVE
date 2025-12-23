@@ -66,6 +66,10 @@ export default function InstructorsManagementPage() {
   
   const fetchControllerRef = useRef<AbortController | null>(null);
 
+  useEffect(() => {
+    document.title = "Instructor Management - HACKTOLIVE Academy";
+  }, []);
+
   const fetchInstructors = useCallback(async () => {
     if (fetchControllerRef.current) {
       fetchControllerRef.current.abort();
