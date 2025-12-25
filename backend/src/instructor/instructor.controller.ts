@@ -29,7 +29,7 @@ export class InstructorController {
 
   @Get('dashboard')
   async getDashboard(@Request() req: any) {
-    const instructor = await this.prisma.instructor.findUnique({
+    let instructor = await this.prisma.instructor.findUnique({
       where: { userId: req.user.id },
       include: {
         courses: {
@@ -44,6 +44,28 @@ export class InstructorController {
         },
       },
     });
+
+    // Auto-create instructor record if missing
+    if (!instructor) {
+      instructor = await this.prisma.instructor.create({
+        data: {
+          userId: req.user.id,
+          skills: JSON.stringify([]),
+        },
+        include: {
+          courses: {
+            include: {
+              _count: {
+                select: {
+                  enrollments: true,
+                  reviews: true,
+                },
+              },
+            },
+          },
+        },
+      });
+    }
 
     const totalStudents = instructor?.courses.reduce(
       (sum, course) => sum + course.totalStudents,
@@ -68,12 +90,22 @@ export class InstructorController {
 
   @Get('courses')
   async getMyCourses(@Request() req: any) {
-    const instructor = await this.prisma.instructor.findUnique({
+    let instructor = await this.prisma.instructor.findUnique({
       where: { userId: req.user.id },
     });
 
+    // Auto-create instructor record if missing
+    if (!instructor) {
+      instructor = await this.prisma.instructor.create({
+        data: {
+          userId: req.user.id,
+          skills: JSON.stringify([]),
+        },
+      });
+    }
+
     const courses = await this.prisma.course.findMany({
-      where: { instructorId: instructor?.id },
+      where: { instructorId: instructor.id },
       include: {
         modules: {
           include: {
@@ -139,14 +171,24 @@ export class InstructorController {
 
   @Get('courses/:courseId')
   async getCourse(@Request() req: any, @Param('courseId') courseId: string) {
-    const instructor = await this.prisma.instructor.findUnique({
+    let instructor = await this.prisma.instructor.findUnique({
       where: { userId: req.user.id },
     });
+
+    // Auto-create instructor record if missing
+    if (!instructor) {
+      instructor = await this.prisma.instructor.create({
+        data: {
+          userId: req.user.id,
+          skills: JSON.stringify([]),
+        },
+      });
+    }
 
     return this.prisma.course.findFirst({
       where: {
         id: courseId,
-        instructorId: instructor?.id,
+        instructorId: instructor.id,
       },
       include: {
         modules: {
@@ -194,9 +236,19 @@ export class InstructorController {
     @Request() req: any,
     @Body() data: any,
   ) {
-    const instructor = await this.prisma.instructor.findUnique({
+    let instructor = await this.prisma.instructor.findUnique({
       where: { userId: req.user.id },
     });
+
+    // Auto-create instructor record if missing
+    if (!instructor) {
+      instructor = await this.prisma.instructor.create({
+        data: {
+          userId: req.user.id,
+          skills: JSON.stringify([]),
+        },
+      });
+    }
 
     if (!instructor) {
       throw new Error('Instructor profile not found');

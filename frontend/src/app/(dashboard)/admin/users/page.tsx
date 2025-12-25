@@ -132,7 +132,7 @@ export default function UsersManagementPage() {
     email: '',
     password: '',
     name: '',
-    role: 'STUDENT'
+    role: '' as any
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -372,7 +372,7 @@ export default function UsersManagementPage() {
       email: '',
       password: '',
       name: '',
-      role: 'STUDENT'
+      role: '' as any
     });
   };
 
@@ -894,7 +894,10 @@ export default function UsersManagementPage() {
                       required
                       disabled={isSubmitting}
                     >
-                      <option value="STUDENT">Student</option>
+                      {modalMode === 'create' && <option value="" disabled>Select a role</option>}
+                      {modalMode === 'edit' && formData.role === 'STUDENT' && (
+                        <option value="STUDENT" disabled>Student (Legacy - Please select new role)</option>
+                      )}
                       <option value="INSTRUCTOR">Instructor</option>
                       <option value="ADMIN">Admin</option>
                     </select>

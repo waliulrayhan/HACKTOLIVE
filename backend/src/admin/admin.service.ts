@@ -154,14 +154,9 @@ export class AdminService {
       },
     });
 
-    // Create associated profile
-    if (role === UserRole.STUDENT) {
-      await this.prisma.student.create({
-        data: {
-          userId: user.id,
-        },
-      });
-    } else if (role === UserRole.INSTRUCTOR) {
+    // Create instructor profile for both INSTRUCTOR and ADMIN roles
+    // ADMIN users may need to create courses, so they need instructor profiles
+    if (role === UserRole.INSTRUCTOR || role === UserRole.ADMIN) {
       await this.prisma.instructor.create({
         data: {
           userId: user.id,
@@ -175,10 +170,54 @@ export class AdminService {
   }
 
   async updateUser(userId: string, data: { name?: string; role?: UserRole }) {
+    // Get current user with profiles
+    const currentUser = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        student: true,
+        instructor: true,
+      },
+    });
+
+    if (!currentUser) {
+      throw new Error('User not found');
+    }
+
+    // Update user
     const user = await this.prisma.user.update({
       where: { id: userId },
       data,
     });
+
+    // Handle role changes between INSTRUCTOR and ADMIN
+    if (data.role && data.role !== currentUser.role) {
+      // If changing to INSTRUCTOR, ensure instructor profile exists
+      if (data.role === UserRole.INSTRUCTOR && !currentUser.instructor) {
+        await this.prisma.instructor.create({
+          data: {
+            userId: user.id,
+            skills: JSON.stringify([]),
+          },
+        });
+      }
+      // If changing from INSTRUCTOR to ADMIN, optionally keep instructor profile
+      // (No deletion to preserve course relationships)
+      // If changing to ADMIN from INSTRUCTOR, create instructor profile if needed
+      else if (data.role === UserRole.ADMIN && currentUser.role === UserRole.INSTRUCTOR) {
+        // Keep instructor profile for data integrity
+      }
+      // If changing from ADMIN to INSTRUCTOR, ensure instructor profile exists
+      else if (data.role === UserRole.INSTRUCTOR && currentUser.role === UserRole.ADMIN) {
+        if (!currentUser.instructor) {
+          await this.prisma.instructor.create({
+            data: {
+              userId: user.id,
+              skills: JSON.stringify([]),
+            },
+          });
+        }
+      }
+    }
 
     const { password, ...sanitized } = user;
     return sanitized;

@@ -797,16 +797,16 @@ export default function EditCoursePage() {
           <Badge color={course.status === 'PUBLISHED' ? 'success' : 'warning'} size="sm">
             {course.status}
           </Badge>
-          {course.status !== 'PUBLISHED' && (
+            {course.status !== 'PUBLISHED' && (
             <button
               onClick={handlePublish}
-              disabled={saving}
+              disabled={saving || true}
               className="inline-flex items-center justify-center gap-1.5 h-9 rounded-lg border border-brand-500 bg-brand-500 px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-brand-600 hover:border-brand-600 shadow-lg shadow-brand-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <HiOutlineEye className="h-4 w-4" />
-              <span className="sm:inline">Publish Course</span>
+              {/* <HiOutlineEye className="h-4 w-4" /> */}
+              <span className="sm:inline">Needs Admin Approval to Publish</span>
             </button>
-          )}
+            )}
         </div>
       </div>
 
