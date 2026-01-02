@@ -193,7 +193,7 @@ export default function AssignmentModal({
                       value={submissionText}
                       onChange={(e) => setSubmissionText(e.target.value)}
                       rows={8}
-                      className="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all resize-none"
+                      className="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all"
                       placeholder="Enter your assignment response here..."
                     />
                   </div>
