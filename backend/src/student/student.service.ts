@@ -289,6 +289,25 @@ export class StudentService {
     return enrollments.map(transformEnrollment);
   }
 
+  async getEnrolledCourseIds(userId: string) {
+    const student = await this.prisma.student.findUnique({
+      where: { userId },
+    });
+
+    if (!student) {
+      throw new NotFoundException('Student profile not found');
+    }
+
+    const enrollments = await this.prisma.enrollment.findMany({
+      where: { studentId: student.id },
+      select: {
+        courseId: true,
+      },
+    });
+
+    return enrollments.map(enrollment => enrollment.courseId);
+  }
+
   async getCourseDetail(userId: string, courseId: string) {
     const student = await this.prisma.student.findUnique({
       where: { userId },

@@ -307,6 +307,19 @@ class AcademyService {
   }
 
   /**
+   * Get enrolled course IDs for the current user (requires auth)
+   */
+  async getEnrolledCourseIds(): Promise<string[]> {
+    try {
+      const response = await api.get<string[]>('/student/enrolled-course-ids');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching enrolled course IDs:', error);
+      return [];
+    }
+  }
+
+  /**
    * Get enrollments for a course
    */
   async getCourseEnrollments(courseId: string): Promise<Enrollment[]> {

@@ -48,6 +48,7 @@ import SearchBar from "@/components/academy/SearchBar";
 import { EmptyState } from "@/components/academy/UIStates";
 import { Course } from "@/types/academy";
 import academyService from "@/lib/academy-service";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AllCoursesPage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -67,6 +68,9 @@ export default function AllCoursesPage() {
   // API state
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [enrolledCourseIds, setEnrolledCourseIds] = useState<string[]>([]);
+  
+  const { user } = useAuth();
 
   // Fetch courses from API
   useEffect(() => {
@@ -84,6 +88,22 @@ export default function AllCoursesPage() {
 
     fetchCourses();
   }, []);
+
+  // Fetch enrolled course IDs if user is logged in
+  useEffect(() => {
+    const fetchEnrolledCourses = async () => {
+      if (user && user.role === 'STUDENT') {
+        try {
+          const enrolledIds = await academyService.getEnrolledCourseIds();
+          setEnrolledCourseIds(enrolledIds);
+        } catch (error) {
+          console.error("Error fetching enrolled courses:", error);
+        }
+      }
+    };
+
+    fetchEnrolledCourses();
+  }, [user]);
 
   const levels = [
     { value: "fundamental", label: "Fundamental" },
@@ -563,7 +583,10 @@ export default function AllCoursesPage() {
                   <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} spacing="6">
                     {currentCourses.map((course, index) => (
                       <FallInPlace key={course.id} delay={0.05 * index}>
-                        <CourseCard course={course} />
+                        <CourseCard 
+                          course={course} 
+                          isEnrolled={enrolledCourseIds.includes(course.id)}
+                        />
                       </FallInPlace>
                     ))}
                   </SimpleGrid>

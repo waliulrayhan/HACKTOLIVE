@@ -55,6 +55,7 @@ import InstructorCard from "@/components/academy/InstructorCard";
 import RatingStars from "@/components/academy/RatingStars";
 import { Course, Review } from "@/types/academy";
 import academyService from "@/lib/academy-service";
+import { useAuth } from "@/context/AuthContext";
 
 interface CourseDetailsPageProps {
   slug: string;
@@ -65,9 +66,12 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
   const [courseReviews, setCourseReviews] = useState<Review[]>([]);
   const [ratingStats, setRatingStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isEnrolled, setIsEnrolled] = useState(false);
 
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
+  
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -93,6 +97,22 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
 
     fetchCourseData();
   }, [slug]);
+
+  // Check if user is enrolled in this course
+  useEffect(() => {
+    const checkEnrollment = async () => {
+      if (user && user.role === 'STUDENT' && course) {
+        try {
+          const enrolledIds = await academyService.getEnrolledCourseIds();
+          setIsEnrolled(enrolledIds.includes(course.id));
+        } catch (error) {
+          console.error("Error checking enrollment:", error);
+        }
+      }
+    };
+
+    checkEnrollment();
+  }, [user, course]);
 
   const scrollToCurriculum = () => {
     const element = document.getElementById("curriculum-tab");
@@ -259,14 +279,26 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   pt="2"
                   width="100%"
                 >
-                  <ButtonLink 
-                    href={`/academy/enroll/${course.slug}`} 
-                    colorScheme="primary" 
-                    size={{ base: "md", md: "lg" }}
-                    width={{ base: "100%", sm: "auto" }}
-                  >
-                    {course.tier === "premium" ? `Enroll Now - ${course.price} Tk` : "Start Free Course"}
-                  </ButtonLink>
+                  {isEnrolled ? (
+                    <ButtonLink 
+                      href={`/student/courses/${course.id}`} 
+                      colorScheme="green" 
+                      size={{ base: "md", md: "lg" }}
+                      width={{ base: "100%", sm: "auto" }}
+                      rightIcon={<Icon as={FiPlay} />}
+                    >
+                      Continue Learning
+                    </ButtonLink>
+                  ) : (
+                    <ButtonLink 
+                      href={`/academy/enroll/${course.slug}`} 
+                      colorScheme="primary" 
+                      size={{ base: "md", md: "lg" }}
+                      width={{ base: "100%", sm: "auto" }}
+                    >
+                      {course.tier === "premium" ? `Enroll Now - ${course.price} Tk` : "Start Free Course"}
+                    </ButtonLink>
+                  )}
                   <Button 
                     onClick={scrollToCurriculum} 
                     variant="outline" 

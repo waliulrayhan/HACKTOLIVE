@@ -3,14 +3,15 @@
 import { Box, Badge, HStack, VStack, Text, Image, useColorModeValue, Flex, Icon } from "@chakra-ui/react";
 import { ButtonLink } from "@/components/shared/button-link/button-link";
 import { Course } from "@/types/academy";
-import { FiStar, FiUsers, FiClock, FiBook, FiArrowRight, FiVideo } from "react-icons/fi";
+import { FiStar, FiUsers, FiClock, FiBook, FiArrowRight, FiVideo, FiPlay } from "react-icons/fi";
 
 interface CourseCardProps {
   course: Course;
   variant?: "default" | "compact";
+  isEnrolled?: boolean;
 }
 
-export default function CourseCard({ course, variant = "default" }: CourseCardProps) {
+export default function CourseCard({ course, variant = "default", isEnrolled = false }: CourseCardProps) {
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const hoverBorderColor = useColorModeValue("green.500", "green.400");
@@ -206,14 +207,25 @@ export default function CourseCard({ course, variant = "default" }: CourseCardPr
           <Text fontSize="2xl" fontWeight="bold" color="green.500">
             {course.price === 0 ? "Free" : `${course.price} Tk`}
           </Text>
-          <ButtonLink
-            href={`/academy/courses/${course.slug}`}
-            colorScheme="primary"
-            size={variant === "compact" ? "sm" : "md"}
-            rightIcon={<Icon as={FiArrowRight} boxSize="14px" />}
-          >
-            Enroll Now
-          </ButtonLink>
+          {isEnrolled ? (
+            <ButtonLink
+              href={`/student/courses/${course.id}`}
+              colorScheme="green"
+              size={variant === "compact" ? "sm" : "md"}
+              rightIcon={<Icon as={FiPlay} boxSize="14px" />}
+            >
+              Continue Learning
+            </ButtonLink>
+          ) : (
+            <ButtonLink
+              href={`/academy/courses/${course.slug}`}
+              colorScheme="primary"
+              size={variant === "compact" ? "sm" : "md"}
+              rightIcon={<Icon as={FiArrowRight} boxSize="14px" />}
+            >
+              Enroll Now
+            </ButtonLink>
+          )}
         </HStack>
       </VStack>
     </Box>

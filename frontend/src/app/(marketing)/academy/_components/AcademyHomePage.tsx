@@ -42,6 +42,7 @@ import {
 import { Course } from "@/types/academy";
 import academyService from "@/lib/academy-service";
 import { getFullImageUrl } from "@/lib/image-utils";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AcademyHomePage() {
   const bgColor = useColorModeValue('gray.50', 'gray.900');
@@ -61,6 +62,9 @@ export default function AcademyHomePage() {
   const [premiumCourses, setPremiumCourses] = useState<Course[]>([]);
   const [featuredReviews, setFeaturedReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [enrolledCourseIds, setEnrolledCourseIds] = useState<string[]>([]);
+  
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,6 +101,22 @@ export default function AcademyHomePage() {
 
     fetchData();
   }, []);
+
+  // Fetch enrolled course IDs if user is logged in
+  useEffect(() => {
+    const fetchEnrolledCourses = async () => {
+      if (user && user.role === 'STUDENT') {
+        try {
+          const enrolledIds = await academyService.getEnrolledCourseIds();
+          setEnrolledCourseIds(enrolledIds);
+        } catch (error) {
+          console.error("Error fetching enrolled courses:", error);
+        }
+      }
+    };
+
+    fetchEnrolledCourses();
+  }, [user]);
 
   return (
     <Box>
@@ -385,7 +405,10 @@ export default function AcademyHomePage() {
               ) : freeCourses.length > 0 ? (
                 freeCourses.map((course, index) => (
                   <FallInPlace key={course.id} delay={0.1 * index}>
-                    <CourseCard course={course} />
+                    <CourseCard 
+                      course={course} 
+                      isEnrolled={enrolledCourseIds.includes(course.id)}
+                    />
                   </FallInPlace>
                 ))
               ) : (
@@ -439,7 +462,10 @@ export default function AcademyHomePage() {
               ) : premiumCourses.length > 0 ? (
                 premiumCourses.map((course, index) => (
                   <FallInPlace key={course.id} delay={0.1 * index}>
-                    <CourseCard course={course} />
+                    <CourseCard 
+                      course={course} 
+                      isEnrolled={enrolledCourseIds.includes(course.id)}
+                    />
                   </FallInPlace>
                 ))
               ) : (

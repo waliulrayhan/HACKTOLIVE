@@ -45,6 +45,12 @@ export class StudentController {
     return this.studentService.getEnrolledCourses(req.user.id);
   }
 
+  @Get('enrolled-course-ids')
+  @ApiOperation({ summary: 'Get IDs of all enrolled courses' })
+  getEnrolledCourseIds(@Request() req: any) {
+    return this.studentService.getEnrolledCourseIds(req.user.id);
+  }
+
   @Post('courses/:courseId/request-certificate')
   @ApiOperation({ summary: 'Request certificate for completed course' })
   requestCertificate(@Request() req: any, @Param('courseId') courseId: string) {
