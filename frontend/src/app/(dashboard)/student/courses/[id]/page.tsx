@@ -24,6 +24,8 @@ import {
   HiOutlinePaperClip,
   HiOutlineDownload,
   HiOutlineTrendingUp,
+  HiOutlineCalendar,
+  HiOutlineVideoCamera,
 } from "react-icons/hi";
 import { HiOutlineTrophy } from "react-icons/hi2";
 
@@ -44,11 +46,59 @@ export default function CourseDetailPage() {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [isLiveSessionNear, setIsLiveSessionNear] = useState(false);
+  const [timeUntilSession, setTimeUntilSession] = useState<string>("");
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
   useEffect(() => {
     document.title = "Course Details - HACKTOLIVE Academy";
   }, []);
+
+  // Timer for live sessions
+  useEffect(() => {
+    if (!course || course.deliveryMode !== 'LIVE') return;
+
+    const timer = setInterval(() => {
+      const now = new Date();
+      setCurrentTime(now);
+
+      // Check if course is within active period
+      if (course.startDate && course.endDate) {
+        const startDate = new Date(course.startDate);
+        const endDate = new Date(course.endDate);
+        
+        if (now < startDate || now > endDate) {
+          setIsLiveSessionNear(false);
+          return;
+        }
+      }
+
+      // For simplicity, show meeting link 30 minutes before any session
+      // You can enhance this to parse liveSchedule for exact times
+      const showWindow = 30 * 60 * 1000; // 30 minutes in milliseconds
+      
+      // Calculate next session time based on current day/time
+      // This is a simplified version - for production, you'd parse liveSchedule properly
+      const nextSessionTime = getNextSessionTime(course.liveSchedule, now);
+      
+      if (nextSessionTime) {
+        const timeDiff = nextSessionTime.getTime() - now.getTime();
+        
+        if (timeDiff > 0 && timeDiff <= showWindow) {
+          setIsLiveSessionNear(true);
+          setTimeUntilSession(formatTimeRemaining(timeDiff));
+        } else if (timeDiff <= 0 && timeDiff > -2 * 60 * 60 * 1000) { // Show for 2 hours after start
+          setIsLiveSessionNear(true);
+          setTimeUntilSession("Session in progress");
+        } else {
+          setIsLiveSessionNear(false);
+        }
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [course]);
 
   useEffect(() => {
     if (courseId) {
@@ -204,6 +254,53 @@ export default function CourseDetailPage() {
 
   const handleViewCertificates = () => {
     router.push("/student/certificates");
+  };
+
+  // Helper function to get next session time
+  const getNextSessionTime = (schedule: string, now: Date): Date | null => {
+    if (!schedule) return null;
+
+    // Simple parsing - looks for time patterns like "7:00 PM" or "19:00"
+    const timePattern = /(\d{1,2}):(\d{2})\s*(AM|PM)?/gi;
+    const matches = [...schedule.matchAll(timePattern)];
+    
+    if (matches.length === 0) return null;
+
+    const match = matches[0];
+    let hours = parseInt(match[1]);
+    const minutes = parseInt(match[2]);
+    const period = match[3]?.toUpperCase();
+
+    // Convert to 24-hour format
+    if (period === 'PM' && hours !== 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+
+    // Create a date object for today with the session time
+    const sessionTime = new Date(now);
+    sessionTime.setHours(hours, minutes, 0, 0);
+
+    // If session time has passed today, assume it's tomorrow
+    if (sessionTime <= now) {
+      sessionTime.setDate(sessionTime.getDate() + 1);
+    }
+
+    return sessionTime;
+  };
+
+  // Format time remaining
+  const formatTimeRemaining = (milliseconds: number): string => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    if (hours > 0) {
+      return `Starts in ${hours}h ${minutes}m ${seconds}s`;
+    } else if (minutes > 0) {
+      return `Starts in ${minutes}m ${seconds}s`;
+    } else {
+      return `Starts in ${seconds}s`;
+    }
   };
 
   if (loading) {
@@ -540,6 +637,111 @@ export default function CourseDetailPage() {
                 )}
               </div>
             </div>
+
+            {/* Live Course Information */}
+            {course.deliveryMode === "LIVE" && (
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-error-100 dark:bg-error-500/15">
+                    <HiOutlineCalendar className="h-3.5 w-3.5 text-error-600 dark:text-error-400" />
+                  </div>
+                  <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
+                    Live Session Details
+                  </h4>
+                </div>
+                
+                <div className="space-y-2.5">
+                  {course.liveSchedule && (
+                    <div className="p-2 rounded-lg bg-white/50 dark:bg-white/5">
+                      <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mb-0.5">Schedule</p>
+                      <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                        {course.liveSchedule}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {course.startDate && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="p-2 rounded-lg bg-white/50 dark:bg-white/5">
+                        <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mb-0.5">Start Date</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                          {new Date(course.startDate).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                          })}
+                        </p>
+                      </div>
+                      
+                      {course.endDate && (
+                        <div className="p-2 rounded-lg bg-white/50 dark:bg-white/5">
+                          <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mb-0.5">End Date</p>
+                          <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                            {new Date(course.endDate).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            })}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {course.maxStudents > 0 && (
+                    <div className="p-2 rounded-lg bg-white/50 dark:bg-white/5">
+                      <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mb-0.5">Available Seats</p>
+                      <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                        {course.maxStudents - course.enrolledStudents} of {course.maxStudents} remaining
+                      </p>
+                      <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-error-500 to-orange-500 transition-all"
+                          style={{ 
+                            width: `${Math.min((course.enrolledStudents / course.maxStudents) * 100, 100)}%` 
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {course.meetingLink && isLiveSessionNear && (
+                    <div className="p-3 rounded-lg bg-gradient-to-r from-error-50 to-orange-50 dark:from-error-900/20 dark:to-orange-900/20 border border-error-200 dark:border-error-800/30 animate-pulse">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="relative flex h-2 w-2">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-error-400 opacity-75" />
+                          <span className="relative inline-flex h-2 w-2 rounded-full bg-error-500" />
+                        </div>
+                        <p className="text-xs sm:text-sm font-semibold text-error-700 dark:text-error-400">
+                          {timeUntilSession}
+                        </p>
+                      </div>
+                      <a
+                        href={course.meetingLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 w-full rounded-lg bg-gradient-to-r from-error-600 to-orange-600 hover:from-error-700 hover:to-orange-700 px-4 py-2.5 text-sm font-semibold text-white transition-all shadow-md hover:shadow-lg group"
+                      >
+                        <HiOutlineVideoCamera className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                        Join Live Session
+                      </a>
+                      <p className="mt-2 text-[10px] text-center text-gray-600 dark:text-gray-400 truncate">
+                        {course.meetingLink.replace(/^https?:\/\//, '')}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {/* Show next session info when not near session time */}
+                  {course.meetingLink && !isLiveSessionNear && course.liveSchedule && (
+                    <div className="p-2 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/5">
+                      <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 text-center">
+                        Meeting link will appear 30 minutes before session
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
