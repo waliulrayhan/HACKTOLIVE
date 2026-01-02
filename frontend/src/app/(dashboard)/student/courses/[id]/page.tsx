@@ -7,6 +7,7 @@ import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
 import CourseCompletionModal from "@/components/student/CourseCompletionModal";
+import ReviewModal from "@/components/student/ReviewModal";
 import {
   HiOutlineAcademicCap,
   HiOutlineStar,
@@ -67,31 +68,34 @@ export default function CourseDetailPage() {
       if (course.startDate && course.endDate) {
         const startDate = new Date(course.startDate);
         const endDate = new Date(course.endDate);
-        
+
         if (now < startDate || now > endDate) {
           setIsLiveSessionNear(false);
           return;
         }
       }
 
-      // For simplicity, show meeting link 30 minutes before any session
-      // You can enhance this to parse liveSchedule for exact times
-      const showWindow = 30 * 60 * 1000; // 30 minutes in milliseconds
-      
-      // Calculate next session time based on current day/time
-      // This is a simplified version - for production, you'd parse liveSchedule properly
+      const showWindow = 30 * 60 * 1000; // 30 minutes before session
       const nextSessionTime = getNextSessionTime(course.liveSchedule, now);
-      
+
       if (nextSessionTime) {
-        const timeDiff = nextSessionTime.getTime() - now.getTime();
-        
-        if (timeDiff > 0 && timeDiff <= showWindow) {
+        const sessionEndTime = getSessionEndTime(nextSessionTime);
+        const timeDiffToStart = nextSessionTime.getTime() - now.getTime();
+        const timeDiffToEnd = sessionEndTime.getTime() - now.getTime();
+
+        // Show if:
+        // 1. Within 30 minutes before session start
+        // 2. Session is currently in progress (between start and end time)
+        if (timeDiffToStart > 0 && timeDiffToStart <= showWindow) {
+          // Before session starts (within 30 min)
           setIsLiveSessionNear(true);
-          setTimeUntilSession(formatTimeRemaining(timeDiff));
-        } else if (timeDiff <= 0 && timeDiff > -2 * 60 * 60 * 1000) { // Show for 2 hours after start
+          setTimeUntilSession(formatTimeRemaining(timeDiffToStart));
+        } else if (timeDiffToStart <= 0 && timeDiffToEnd > 0) {
+          // Session is in progress
           setIsLiveSessionNear(true);
           setTimeUntilSession("Session in progress");
         } else {
+          // Outside the window
           setIsLiveSessionNear(false);
         }
       }
@@ -104,11 +108,11 @@ export default function CourseDetailPage() {
     if (courseId) {
       fetchCourseDetail();
     }
-    
+
     // Check if redirected from lesson completion
     const completedParam = searchParams.get('completed');
     console.log('🔍 Checking completion parameter:', completedParam);
-    
+
     if (completedParam === 'true') {
       console.log('✅ Completion parameter found! Opening modal...');
       setShowCompletionModal(true);
@@ -119,7 +123,7 @@ export default function CourseDetailPage() {
     } else {
       console.log('❌ No completion parameter found');
     }
-    
+
     // Check if review parameter is present
     if (searchParams.get('review') === 'true') {
       setShowReviewForm(true);
@@ -208,7 +212,7 @@ export default function CourseDetailPage() {
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       setSubmittingReview(true);
       const token = localStorage.getItem("token");
@@ -235,11 +239,11 @@ export default function CourseDetailPage() {
       toast.success("Review submitted!", {
         description: "Thank you for your feedback!",
       });
-      
+
       setShowReviewForm(false);
       setReviewComment("");
       setReviewRating(5);
-      
+
       // Refresh course data to show updated rating
       fetchCourseDetail();
     } catch (error: any) {
@@ -263,7 +267,7 @@ export default function CourseDetailPage() {
     // Simple parsing - looks for time patterns like "7:00 PM" or "19:00"
     const timePattern = /(\d{1,2}):(\d{2})\s*(AM|PM)?/gi;
     const matches = [...schedule.matchAll(timePattern)];
-    
+
     if (matches.length === 0) return null;
 
     const match = matches[0];
@@ -279,12 +283,14 @@ export default function CourseDetailPage() {
     const sessionTime = new Date(now);
     sessionTime.setHours(hours, minutes, 0, 0);
 
-    // If session time has passed today, assume it's tomorrow
-    if (sessionTime <= now) {
-      sessionTime.setDate(sessionTime.getDate() + 1);
-    }
-
     return sessionTime;
+  };
+
+  // Get session end time (assuming 2 hour session duration)
+  const getSessionEndTime = (sessionStartTime: Date): Date => {
+    const endTime = new Date(sessionStartTime);
+    endTime.setHours(endTime.getHours() + 2);
+    return endTime;
   };
 
   // Format time remaining
@@ -397,72 +403,17 @@ export default function CourseDetailPage() {
         </div>
       )}
 
-      {/* Review Form */}
-      {showReviewForm && (
-        <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
-          <div className="border-b border-gray-200 px-3 sm:px-4 py-2.5 sm:py-3 dark:border-white/5">
-            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-              Leave a Review
-            </h3>
-            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              Share your experience with this course
-            </p>
-          </div>
-          <form onSubmit={handleSubmitReview} className="p-3 sm:p-4 space-y-3 sm:space-y-4">
-            <div>
-              <label className="mb-1.5 sm:mb-2 block text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300">
-                Rating
-              </label>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => setReviewRating(star)}
-                    className="transition-transform hover:scale-110 active:scale-95"
-                  >
-                    <HiOutlineStar
-                      className={`h-6 w-6 sm:h-7 sm:w-7 ${
-                        star <= reviewRating
-                          ? "fill-warning-500 text-warning-500"
-                          : "text-gray-300 dark:text-gray-600"
-                      }`}
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="mb-1.5 sm:mb-2 block text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300">
-                Comment (Optional)
-              </label>
-              <textarea
-                value={reviewComment}
-                onChange={(e) => setReviewComment(e.target.value)}
-                rows={3}
-                className="w-full rounded-md border border-gray-300 bg-white px-2.5 sm:px-3 py-2 text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 transition-colors"
-                placeholder="Share your thoughts about this course..."
-              />
-            </div>
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                disabled={submittingReview}
-                className="rounded-md bg-brand-500 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {submittingReview ? "Submitting..." : "Submit Review"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowReviewForm(false)}
-                className="rounded-md border border-gray-300 bg-transparent px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={showReviewForm}
+        onClose={() => setShowReviewForm(false)}
+        reviewRating={reviewRating}
+        setReviewRating={setReviewRating}
+        reviewComment={reviewComment}
+        setReviewComment={setReviewComment}
+        onSubmit={handleSubmitReview}
+        submitting={submittingReview}
+      />
 
       {/* Course Header */}
       <div className="overflow-hidden rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 shadow-sm">
@@ -479,11 +430,10 @@ export default function CourseDetailPage() {
                 {course.level}
               </span>
               {/* Delivery Mode Badge */}
-              <span className={`inline-flex items-center gap-1 rounded-md px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium ${
-                course.deliveryMode === "LIVE"
+              <span className={`inline-flex items-center gap-1 rounded-md px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium ${course.deliveryMode === "LIVE"
                   ? "bg-error-100 text-error-700 dark:bg-error-500/15 dark:text-error-400"
                   : "bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-400"
-              }`}>
+                }`}>
                 {course.deliveryMode === "LIVE" ? (
                   <>
                     <span className="relative flex h-2 w-2">
@@ -508,34 +458,6 @@ export default function CourseDetailPage() {
             <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
               {course.shortDescription}
             </p>
-
-            {/* Instructor */}
-            <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5">
-              {course.instructor.avatar ? (
-                <Image
-                  src={`${apiUrl}${course.instructor.avatar}`}
-                  alt={course.instructor.name}
-                  width={40}
-                  height={40}
-                  className="rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-700"
-                  unoptimized
-                />
-              ) : (
-                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-700">
-                  <span className="text-sm sm:text-base font-semibold text-white">
-                    {course.instructor.name?.charAt(0).toUpperCase() || 'I'}
-                  </span>
-                </div>
-              )}
-              <div>
-                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
-                  Instructor
-                </p>
-                <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
-                  {course.instructor.name}
-                </p>
-              </div>
-            </div>
 
             {/* Stats */}
             {/* <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm">
@@ -581,353 +503,389 @@ export default function CourseDetailPage() {
             </div> */}
           </div>
 
-          {/* Progress Card */}
-          <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-brand-50 via-white to-purple-50 p-4 sm:p-5 dark:border-white/5 dark:from-brand-950/30 dark:via-white/5 dark:to-purple-950/30 shadow-sm">
-            <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-                Your Progress
+          {/* Right Side - Instructor & Progress */}
+          <div className="space-y-4">
+            {/* Instructor Card */}
+            <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-gray-50 via-white to-gray-50 p-4 dark:border-white/5 dark:from-white/5 dark:via-white/3 dark:to-white/5 shadow-sm">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                <HiOutlineAcademicCap className="h-4 w-4 text-brand-500" />
+                Instructor
               </h3>
-              <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/20">
-                <HiOutlineTrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-brand-600 dark:text-brand-400" />
-              </div>
-            </div>
-
-            <div className="mb-4 sm:mb-5">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400">
-                  Course Completion
-                </span>
-                <span className="text-xl sm:text-2xl font-bold text-brand-600 dark:text-brand-400">
-                  {Math.round(enrollment.progress)}%
-                </span>
-              </div>
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-brand-500 via-brand-600 to-purple-600 transition-all shadow-sm"
-                  style={{ width: `${enrollment.progress}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-3 text-xs sm:text-sm">
-              <div className="flex justify-between items-center p-2 rounded-lg bg-white/50 dark:bg-white/5">
-                <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
-                  <HiOutlineBookOpen className="h-3.5 w-3.5" />
-                  Completed Lessons
-                </span>
-                <span className="font-semibold text-gray-900 dark:text-white">
-                  {completedLessons} / {totalLessons}
-                </span>
-              </div>
-              <div className="flex justify-between items-center p-2 rounded-lg bg-white/50 dark:bg-white/5">
-                <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
-                  <HiOutlineCheckCircle className="h-3.5 w-3.5" />
-                  Status
-                </span>
-                {enrollment.status === "COMPLETED" ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-success-100 px-2.5 py-0.5 text-[10px] sm:text-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-400">
-                    <HiOutlineCheckCircle className="h-3.5 w-3.5" />
-                    Completed
-                  </span>
+              <div className="flex items-center gap-3">
+                {course.instructor.avatar ? (
+                  <Image
+                    src={`${apiUrl}${course.instructor.avatar}`}
+                    alt={course.instructor.name}
+                    width={48}
+                    height={48}
+                    className="rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-700"
+                    unoptimized
+                  />
                 ) : (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-info-100 px-2.5 py-0.5 text-[10px] sm:text-xs font-medium text-info-700 dark:bg-info-500/15 dark:text-gray-400">
-                    <HiOutlineClock className="h-3.5 w-3.5" />
-                    In Progress
-                  </span>
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-700">
+                    <span className="text-base font-semibold text-white">
+                      {course.instructor.name?.charAt(0).toUpperCase() || 'I'}
+                    </span>
+                  </div>
                 )}
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {course.instructor.name}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {course.instructor.bio}
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Live Course Information */}
-            {course.deliveryMode === "LIVE" && (
-              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/5">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-error-100 dark:bg-error-500/15">
-                    <HiOutlineCalendar className="h-3.5 w-3.5 text-error-600 dark:text-error-400" />
-                  </div>
-                  <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
-                    Live Session Details
-                  </h4>
-                </div>
-                
-                <div className="space-y-2.5">
-                  {course.liveSchedule && (
-                    <div className="p-2 rounded-lg bg-white/50 dark:bg-white/5">
-                      <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mb-0.5">Schedule</p>
-                      <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                        {course.liveSchedule}
-                      </p>
-                    </div>
-                  )}
+            {/* Progress Card */}
+            <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-brand-50 via-white to-purple-50 p-4 sm:p-5 dark:border-white/5 dark:from-brand-950/30 dark:via-white/5 dark:to-purple-950/30 shadow-sm">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+                  Your Progress
+                </h3>
+                <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/20">
                   
-                  {course.startDate && (
-                    <div className="grid grid-cols-2 gap-2">
+                  <HiOutlineTrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-brand-600 dark:text-brand-400" />
+                </div>
+              </div>
+
+              <div className="mb-4 sm:mb-5">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400">
+                    Course Completion
+                  </span>
+                  <span className="text-xl sm:text-2xl font-bold text-brand-600 dark:text-brand-400">
+                    {Math.round(enrollment.progress)}%
+                  </span>
+                </div>
+                <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-brand-500 via-brand-600 to-purple-600 transition-all shadow-sm"
+                    style={{ width: `${enrollment.progress}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-3 text-xs sm:text-sm">
+                <div className="flex justify-between items-center p-2 rounded-lg bg-white/50 dark:bg-white/5">
+                  <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
+                    <HiOutlineBookOpen className="h-3.5 w-3.5" />
+                    Completed Lessons
+                  </span>
+                  <span className="font-semibold text-gray-900 dark:text-white">
+                    {completedLessons} / {totalLessons}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-2 rounded-lg bg-white/50 dark:bg-white/5">
+                  <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
+                    <HiOutlineCheckCircle className="h-3.5 w-3.5" />
+                    Status
+                  </span>
+                  {enrollment.status === "COMPLETED" ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-success-100 px-2.5 py-0.5 text-[10px] sm:text-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-400">
+                      <HiOutlineCheckCircle className="h-3.5 w-3.5" />
+                      Completed
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-info-100 px-2.5 py-0.5 text-[10px] sm:text-xs font-medium text-info-700 dark:bg-info-500/15 dark:text-gray-400">
+                      <HiOutlineClock className="h-3.5 w-3.5" />
+                      In Progress
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Live Course Information */}
+              {course.deliveryMode === "LIVE" && (
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-error-100 dark:bg-error-500/15">
+                      <HiOutlineCalendar className="h-3.5 w-3.5 text-error-600 dark:text-error-400" />
+                    </div>
+                    <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
+                      Live Session Details
+                    </h4>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {course.liveSchedule && (
                       <div className="p-2 rounded-lg bg-white/50 dark:bg-white/5">
-                        <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mb-0.5">Start Date</p>
+                        <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mb-0.5">Schedule</p>
                         <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                          {new Date(course.startDate).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
+                          {course.liveSchedule}
                         </p>
                       </div>
-                      
-                      {course.endDate && (
+                    )}
+
+                    {course.startDate && (
+                      <div className="grid grid-cols-2 gap-2">
                         <div className="p-2 rounded-lg bg-white/50 dark:bg-white/5">
-                          <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mb-0.5">End Date</p>
+                          <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mb-0.5">Start Date</p>
                           <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                            {new Date(course.endDate).toLocaleDateString('en-US', {
+                            {new Date(course.startDate).toLocaleDateString('en-US', {
                               month: 'short',
                               day: 'numeric',
                               year: 'numeric'
                             })}
                           </p>
                         </div>
-                      )}
-                    </div>
-                  )}
-                  
-                  {course.maxStudents > 0 && (
-                    <div className="p-2 rounded-lg bg-white/50 dark:bg-white/5">
-                      <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mb-0.5">Available Seats</p>
-                      <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                        {course.maxStudents - course.enrolledStudents} of {course.maxStudents} remaining
-                      </p>
-                      <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-error-500 to-orange-500 transition-all"
-                          style={{ 
-                            width: `${Math.min((course.enrolledStudents / course.maxStudents) * 100, 100)}%` 
-                          }}
-                        />
+
+                        {course.endDate && (
+                          <div className="p-2 rounded-lg bg-white/50 dark:bg-white/5">
+                            <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mb-0.5">End Date</p>
+                            <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                              {new Date(course.endDate).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric'
+                              })}
+                            </p>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  )}
-                  
-                  {course.meetingLink && isLiveSessionNear && (
-                    <div className="p-3 rounded-lg bg-gradient-to-r from-error-50 to-orange-50 dark:from-error-900/20 dark:to-orange-900/20 border border-error-200 dark:border-error-800/30 animate-pulse">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="relative flex h-2 w-2">
-                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-error-400 opacity-75" />
-                          <span className="relative inline-flex h-2 w-2 rounded-full bg-error-500" />
+                    )}
+
+                    {course.maxStudents > 0 && (
+                      <div className="p-2 rounded-lg bg-white/50 dark:bg-white/5">
+                        <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mb-0.5">Available Seats</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                          {course.maxStudents - course.enrolledStudents} of {course.maxStudents} remaining
+                        </p>
+                        <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-error-500 to-orange-500 transition-all"
+                            style={{
+                              width: `${Math.min((course.enrolledStudents / course.maxStudents) * 100, 100)}%`
+                            }}
+                          />
                         </div>
-                        <p className="text-xs sm:text-sm font-semibold text-error-700 dark:text-error-400">
-                          {timeUntilSession}
+                      </div>
+                    )}
+
+                    {course.meetingLink && isLiveSessionNear && (
+                      <div className="p-3 rounded-lg bg-gradient-to-r from-error-50 to-orange-50 dark:from-error-900/20 dark:to-orange-900/20 border border-error-200 dark:border-error-800/30 animate-pulse">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="relative flex h-2 w-2">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-error-400 opacity-75" />
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-error-500" />
+                          </div>
+                          <p className="text-xs sm:text-sm font-semibold text-error-700 dark:text-error-400">
+                            {timeUntilSession}
+                          </p>
+                        </div>
+                        <a
+                          href={course.meetingLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 w-full rounded-lg bg-gradient-to-r from-error-600 to-orange-600 hover:from-error-700 hover:to-orange-700 px-4 py-2.5 text-sm font-semibold text-white transition-all shadow-md hover:shadow-lg group"
+                        >
+                          <HiOutlineVideoCamera className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                          Join Live Session
+                        </a>
+                        <p className="mt-2 text-[10px] text-center text-gray-600 dark:text-gray-400 truncate">
+                          {course.meetingLink.replace(/^https?:\/\//, '')}
                         </p>
                       </div>
-                      <a
-                        href={course.meetingLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 w-full rounded-lg bg-gradient-to-r from-error-600 to-orange-600 hover:from-error-700 hover:to-orange-700 px-4 py-2.5 text-sm font-semibold text-white transition-all shadow-md hover:shadow-lg group"
-                      >
-                        <HiOutlineVideoCamera className="h-4 w-4 group-hover:scale-110 transition-transform" />
-                        Join Live Session
-                      </a>
-                      <p className="mt-2 text-[10px] text-center text-gray-600 dark:text-gray-400 truncate">
-                        {course.meetingLink.replace(/^https?:\/\//, '')}
-                      </p>
-                    </div>
-                  )}
-                  
-                  {/* Show next session info when not near session time */}
-                  {course.meetingLink && !isLiveSessionNear && course.liveSchedule && (
-                    <div className="p-2 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/5">
-                      <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 text-center">
-                        Meeting link will appear 30 minutes before session
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+                    )}
 
-      {/* Course Content */}
-      <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 shadow-sm">
-        <div className="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white p-4 sm:p-5 dark:border-white/5 dark:from-white/5 dark:to-white/3">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
-                Course Content
-              </h2>
-              <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                {course.modules.length} modules • {totalLessons} lessons
-              </p>
-            </div>
-            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/20">
-              <HiOutlineBookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-brand-600 dark:text-brand-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="p-3 sm:p-4 space-y-3">
-          {course.modules.map((module: any, moduleIndex: number) => {
-            const isExpanded = expandedModules.has(module.id);
-            const moduleLessons = module.lessons.length;
-            const moduleCompleted = module.lessons.filter(
-              (l: any) => l.progress.length > 0
-            ).length;
-
-            return (
-              <div
-                key={module.id}
-                className="overflow-hidden rounded-lg border border-gray-200 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow"
-              >
-                {/* Module Header */}
-                <button
-                  onClick={() => toggleModule(module.id)}
-                  className="flex w-full items-center justify-between bg-gradient-to-r from-gray-50 via-gray-50/50 to-white p-3 sm:p-4 text-left hover:from-gray-100 hover:via-gray-100/50 hover:to-gray-50 dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:hover:from-white/10 dark:hover:via-white/8 dark:hover:to-white/5 transition-all"
-                >
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <span className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-600 text-xs sm:text-sm font-bold text-white shadow-sm dark:from-brand-600 dark:to-brand-700">
-                      {moduleIndex + 1}
-                    </span>
-                    <div>
-                      <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-                        {module.title}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
-                          {moduleLessons} lessons
-                        </p>
-                        <span className="text-gray-300 dark:text-gray-600">•</span>
-                        <p className="text-[10px] sm:text-xs text-success-600 dark:text-success-400 font-medium">
-                          {moduleCompleted} completed
+                    {/* Show next session info when not near session time */}
+                    {course.meetingLink && !isLiveSessionNear && course.liveSchedule && (
+                      <div className="p-2 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/5">
+                        <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 text-center">
+                          Meeting link will appear 30 minutes before session
                         </p>
                       </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="hidden sm:block text-[10px] text-gray-500 dark:text-gray-400 font-medium">
-                      {Math.round((moduleCompleted / moduleLessons) * 100)}%
-                    </div>
-                    {isExpanded ? (
-                      <HiOutlineChevronUp className="h-5 w-5 text-brand-500 dark:text-brand-400" />
-                    ) : (
-                      <HiOutlineChevronDown className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                     )}
                   </div>
-                </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
 
-                {/* Module Lessons */}
-                {isExpanded && (
-                  <div className="divide-y divide-gray-200 bg-gradient-to-b from-white to-gray-50/30 dark:divide-white/5 dark:from-white/3 dark:to-white/5">
-                    {module.lessons.map((lesson: any, lessonIndex: number) => {
-                      const isCompleted = lesson.progress.length > 0;
-                      const isLocked = lesson.isLocked || false;
+        {/* Course Content */}
+        <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 shadow-sm">
+          <div className="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white p-4 sm:p-5 dark:border-white/5 dark:from-white/5 dark:to-white/3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+                  Course Content
+                </h2>
+                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                  {course.modules.length} modules • {totalLessons} lessons
+                </p>
+              </div>
+              <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/20">
+                <HiOutlineBookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-brand-600 dark:text-brand-400" />
+              </div>
+            </div>
+          </div>
 
-                      return (
-                        <button
-                          key={lesson.id}
-                          onClick={() => handleLessonClick(lesson)}
-                          disabled={isLocked}
-                          className={`flex w-full items-center justify-between p-3 sm:p-4 text-left transition-all group ${
-                            isLocked
-                              ? "cursor-not-allowed opacity-60 bg-gray-50/50 dark:bg-gray-800/30"
-                              : "hover:bg-gradient-to-r hover:from-brand-50/50 hover:to-transparent dark:hover:from-brand-900/10 dark:hover:to-transparent cursor-pointer"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 sm:gap-3 flex-1">
-                            <div className={`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg transition-all ${
-                              isLocked
-                                ? "bg-gray-100 dark:bg-gray-800"
-                                : isCompleted
-                                ? "bg-success-100 dark:bg-success-500/15"
-                                : "bg-brand-100 dark:bg-brand-500/15 group-hover:bg-brand-200 dark:group-hover:bg-brand-500/25"
-                            }`}>
-                              <div className={`${
-                                isLocked
-                                  ? "text-gray-400 dark:text-gray-600"
+          <div className="p-3 sm:p-4 space-y-3">
+            {course.modules.map((module: any, moduleIndex: number) => {
+              const isExpanded = expandedModules.has(module.id);
+              const moduleLessons = module.lessons.length;
+              const moduleCompleted = module.lessons.filter(
+                (l: any) => l.progress.length > 0
+              ).length;
+
+              return (
+                <div
+                  key={module.id}
+                  className="overflow-hidden rounded-lg border border-gray-200 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  {/* Module Header */}
+                  <button
+                    onClick={() => toggleModule(module.id)}
+                    className={`flex w-full items-center justify-between p-3 sm:p-4 text-left transition-all ${isExpanded
+                        ? "bg-gradient-to-r from-brand-50 via-brand-50/30 to-purple-50/30 dark:from-brand-900/20 dark:via-brand-900/10 dark:to-purple-900/10"
+                        : "bg-gradient-to-r from-gray-50 via-gray-50/50 to-white dark:from-white/5 dark:via-white/3 dark:to-white/5"
+                      } hover:from-brand-100 hover:via-brand-50 hover:to-purple-50 dark:hover:from-brand-900/30 dark:hover:via-brand-900/15 dark:hover:to-purple-900/15`}
+                  >
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <span className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-600 text-xs sm:text-sm font-bold text-white shadow-sm dark:from-brand-600 dark:to-brand-700">
+                        {moduleIndex + 1}
+                      </span>
+                      <div>
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+                          {module.title}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
+                            {moduleLessons} lessons
+                          </p>
+                          <span className="text-gray-300 dark:text-gray-600">•</span>
+                          <p className="text-[10px] sm:text-xs text-success-600 dark:text-success-400 font-medium">
+                            {moduleCompleted} completed
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="hidden sm:block text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                        {Math.round((moduleCompleted / moduleLessons) * 100)}%
+                      </div>
+                      {isExpanded ? (
+                        <HiOutlineChevronUp className="h-5 w-5 text-brand-500 dark:text-brand-400" />
+                      ) : (
+                        <HiOutlineChevronDown className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                      )}
+                    </div>
+                  </button>
+
+                  {/* Module Lessons */}
+                  {isExpanded && (
+                    <div className="divide-y divide-gray-200 bg-gradient-to-b from-white to-gray-50/30 dark:divide-white/5 dark:from-white/3 dark:to-white/5 border-l-4 border-brand-500 dark:border-brand-400">
+                      {module.lessons.map((lesson: any, lessonIndex: number) => {
+                        const isCompleted = lesson.progress.length > 0;
+                        const isLocked = lesson.isLocked || false;
+
+                        return (
+                          <button
+                            key={lesson.id}
+                            onClick={() => handleLessonClick(lesson)}
+                            disabled={isLocked}
+                            className={`flex w-full items-center justify-between p-3 sm:p-4 pl-6 sm:pl-8 text-left transition-all group ${isLocked
+                                ? "cursor-not-allowed opacity-60 bg-gray-50/50 dark:bg-gray-800/30"
+                                : "hover:bg-gradient-to-r hover:from-brand-50/50 hover:to-transparent dark:hover:from-brand-900/10 dark:hover:to-transparent cursor-pointer"
+                              }`}
+                          >
+                            <div className="flex items-center gap-2 sm:gap-3 flex-1">
+                              <div className={`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg transition-all ${isLocked
+                                  ? "bg-gray-100 dark:bg-gray-800"
                                   : isCompleted
-                                  ? "text-success-600 dark:text-success-400"
-                                  : "text-brand-600 dark:text-brand-400 group-hover:text-brand-700 dark:group-hover:text-brand-300"
-                              }`}>
-                                {getLessonIcon(lesson.type)}
-                              </div>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <h4
-                                  className={`text-xs sm:text-sm font-medium ${
-                                    isLocked
-                                      ? "text-gray-400 dark:text-gray-600"
-                                      : isCompleted
-                                      ? "text-gray-500 line-through dark:text-gray-500"
-                                      : "text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400"
-                                  }`}
-                                >
-                                  {lessonIndex + 1}. {lesson.title}
-                                </h4>
-                                {isLocked && (
-                                  <span className="inline-flex items-center gap-1 rounded-full bg-gray-200 px-2 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-400">
-                                    <HiOutlineLockClosed className="h-3 w-3" />
-                                    Locked
-                                  </span>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                                <p className={`text-[10px] sm:text-xs ${
-                                  isLocked ? "text-gray-400 dark:text-gray-600" : "text-gray-500 dark:text-gray-400"
+                                    ? "bg-success-100 dark:bg-success-500/15"
+                                    : "bg-brand-100 dark:bg-brand-500/15 group-hover:bg-brand-200 dark:group-hover:bg-brand-500/25"
                                 }`}>
-                                  {lesson.type} • {lesson.duration} min
-                                </p>
-                                {isLocked && (
-                                  <>
-                                    <span className="text-gray-300 dark:text-gray-600">•</span>
-                                    <p className="text-[10px] text-gray-400 dark:text-gray-600">
-                                      Complete previous lesson to unlock
-                                    </p>
-                                  </>
-                                )}
+                                <div className={`${isLocked
+                                    ? "text-gray-400 dark:text-gray-600"
+                                    : isCompleted
+                                      ? "text-success-600 dark:text-success-400"
+                                      : "text-brand-600 dark:text-brand-400 group-hover:text-brand-700 dark:group-hover:text-brand-300"
+                                  }`}>
+                                  {getLessonIcon(lesson.type)}
+                                </div>
                               </div>
-                              {/* Content Statistics */}
-                              {!isLocked && (
-                                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1.5">
-                                  {lesson.quizzes && lesson.quizzes.length > 0 && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-medium text-purple-700 dark:bg-purple-500/15 dark:text-purple-400">
-                                      <HiOutlineQuestionMarkCircle className="h-3 w-3" />
-                                      {lesson.quizzes.length} Quiz{lesson.quizzes.length !== 1 ? 'zes' : ''}
-                                    </span>
-                                  )}
-                                  {lesson.assignments && lesson.assignments.length > 0 && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-medium text-orange-700 dark:bg-orange-500/15 dark:text-orange-400">
-                                      <HiOutlineClipboardCheck className="h-3 w-3" />
-                                      {lesson.assignments.length} Assignment{lesson.assignments.length !== 1 ? 's' : ''}
-                                    </span>
-                                  )}
-                                  {lesson.resources && lesson.resources.length > 0 && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700 dark:bg-green-500/15 dark:text-green-400">
-                                      <HiOutlinePaperClip className="h-3 w-3" />
-                                      {lesson.resources.length} Resource{lesson.resources.length !== 1 ? 's' : ''}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <h4
+                                    className={`text-xs sm:text-sm font-medium ${isLocked
+                                        ? "text-gray-400 dark:text-gray-600"
+                                        : isCompleted
+                                          ? "text-gray-500 line-through dark:text-gray-500"
+                                          : "text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400"
+                                      }`}
+                                  >
+                                    {lessonIndex + 1}. {lesson.title}
+                                  </h4>
+                                  {isLocked && (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-gray-200 px-2 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                                      <HiOutlineLockClosed className="h-3 w-3" />
+                                      Locked
                                     </span>
                                   )}
                                 </div>
-                              )}
+                                <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                                  <p className={`text-[10px] sm:text-xs ${isLocked ? "text-gray-400 dark:text-gray-600" : "text-gray-500 dark:text-gray-400"
+                                    }`}>
+                                    {lesson.type} • {lesson.duration} min
+                                  </p>
+                                  {isLocked && (
+                                    <>
+                                      <span className="text-gray-300 dark:text-gray-600">•</span>
+                                      <p className="text-[10px] text-gray-400 dark:text-gray-600">
+                                        Complete previous lesson to unlock
+                                      </p>
+                                    </>
+                                  )}
+                                </div>
+                                {/* Content Statistics */}
+                                {!isLocked && (
+                                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1.5">
+                                    {lesson.quizzes && lesson.quizzes.length > 0 && (
+                                      <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-medium text-purple-700 dark:bg-purple-500/15 dark:text-purple-400">
+                                        <HiOutlineQuestionMarkCircle className="h-3 w-3" />
+                                        {lesson.quizzes.length} Quiz{lesson.quizzes.length !== 1 ? 'zes' : ''}
+                                      </span>
+                                    )}
+                                    {lesson.assignments && lesson.assignments.length > 0 && (
+                                      <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-medium text-orange-700 dark:bg-orange-500/15 dark:text-orange-400">
+                                        <HiOutlineClipboardCheck className="h-3 w-3" />
+                                        {lesson.assignments.length} Assignment{lesson.assignments.length !== 1 ? 's' : ''}
+                                      </span>
+                                    )}
+                                    {lesson.resources && lesson.resources.length > 0 && (
+                                      <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700 dark:bg-green-500/15 dark:text-green-400">
+                                        <HiOutlinePaperClip className="h-3 w-3" />
+                                        {lesson.resources.length} Resource{lesson.resources.length !== 1 ? 's' : ''}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                          {isLocked ? (
-                            <HiOutlineLockClosed className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 dark:text-gray-600" />
-                          ) : isCompleted ? (
-                            <div className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-success-100 dark:bg-success-500/15">
-                              <HiOutlineCheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-success-600 dark:text-success-500" />
-                            </div>
-                          ) : (
-                            <div className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-500/15 group-hover:bg-brand-200 dark:group-hover:bg-brand-500/25 transition-colors">
-                              <HiOutlinePlay className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-brand-600 dark:text-brand-400 group-hover:text-brand-700 dark:group-hover:text-brand-300" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                            {isLocked ? (
+                              <HiOutlineLockClosed className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 dark:text-gray-600" />
+                            ) : isCompleted ? (
+                              <div className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-success-100 dark:bg-success-500/15">
+                                <HiOutlineCheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-success-600 dark:text-success-500" />
+                              </div>
+                            ) : (
+                              <div className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-500/15 group-hover:bg-brand-200 dark:group-hover:bg-brand-500/25 transition-colors">
+                                <HiOutlinePlay className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-brand-600 dark:text-brand-400 group-hover:text-brand-700 dark:group-hover:text-brand-300" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
