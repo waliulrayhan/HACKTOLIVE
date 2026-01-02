@@ -377,9 +377,30 @@ export default function CourseDetailPage() {
                 <HiOutlineAcademicCap className="h-3 w-3" />
                 {course.category.replace(/_/g, " ")}
               </span>
-              <span className="inline-flex items-center gap-1 rounded-md bg-info-100 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium text-info-700 dark:bg-info-500/15 dark:text-info-400">
+              <span className="inline-flex items-center gap-1 rounded-md bg-info-100 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium text-info-700 dark:bg-info-500/15 dark:text-white">
                 <HiOutlineTrendingUp className="h-3 w-3" />
                 {course.level}
+              </span>
+              {/* Delivery Mode Badge */}
+              <span className={`inline-flex items-center gap-1 rounded-md px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium ${
+                course.deliveryMode === "LIVE"
+                  ? "bg-error-100 text-error-700 dark:bg-error-500/15 dark:text-error-400"
+                  : "bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-400"
+              }`}>
+                {course.deliveryMode === "LIVE" ? (
+                  <>
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-error-400 opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-error-500" />
+                    </span>
+                    Live Course
+                  </>
+                ) : (
+                  <>
+                    <HiOutlinePlay className="h-3 w-3" />
+                    Recorded
+                  </>
+                )}
               </span>
             </div>
 
@@ -436,7 +457,7 @@ export default function CourseDetailPage() {
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-info-100 dark:bg-info-500/15">
-                  <HiOutlineUsers className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-info-600 dark:text-info-500" />
+                  <HiOutlineUsers className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-info-600 dark:text-gray-400" />
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900 dark:text-white">
@@ -512,7 +533,7 @@ export default function CourseDetailPage() {
                     Completed
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-info-100 px-2.5 py-0.5 text-[10px] sm:text-xs font-medium text-info-700 dark:bg-info-500/15 dark:text-info-400">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-info-100 px-2.5 py-0.5 text-[10px] sm:text-xs font-medium text-info-700 dark:bg-info-500/15 dark:text-gray-400">
                     <HiOutlineClock className="h-3.5 w-3.5" />
                     In Progress
                   </span>
