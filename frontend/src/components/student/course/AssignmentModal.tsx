@@ -112,12 +112,12 @@ export default function AssignmentModal({
               {assignment.instructions && (
                 <div className="mb-4 p-4 rounded-xl bg-info-50 dark:bg-info-900/20 border border-info-200 dark:border-info-800/50">
                   <div className="flex items-start gap-3">
-                    <HiOutlineInformationCircle className="h-5 w-5 text-info-600 dark:text-info-400 shrink-0 mt-0.5" />
+                    <HiOutlineInformationCircle className="h-5 w-5 text-info-600 dark:text-gray-400 shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-semibold text-info-900 dark:text-info-300 mb-1">
+                      <p className="text-sm font-semibold text-info-900 dark:text-gray-300 mb-1">
                         Instructions
                       </p>
-                      <p className="text-sm text-info-800 dark:text-info-400 whitespace-pre-line">
+                      <p className="text-sm text-info-800 dark:text-gray-400 whitespace-pre-line">
                         {assignment.instructions}
                       </p>
                     </div>

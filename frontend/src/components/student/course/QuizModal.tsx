@@ -190,34 +190,46 @@ export default function QuizModal({
 
               {/* Quiz Stats */}
               <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
-                  <div className="flex h-10 w-10 mx-auto items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30 mb-2">
-                    <HiOutlineQuestionMarkCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                      <HiOutlineQuestionMarkCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">
+                        {quiz.questions.length}
+                      </p>
+                      <p className="text-xs text-blue-600 dark:text-blue-500">Questions</p>
+                    </div>
                   </div>
-                  <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">
-                    {quiz.questions.length}
-                  </p>
-                  <p className="text-xs text-blue-600 dark:text-blue-500">Questions</p>
                 </div>
-                <div className="text-center p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800">
-                  <div className="flex h-10 w-10 mx-auto items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30 mb-2">
-                    <HiOutlineClock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30">
+                      <HiOutlineClock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-amber-700 dark:text-amber-400">
+                        {quiz.timeLimit || "∞"}
+                      </p>
+                      <p className="text-xs text-amber-600 dark:text-amber-500">
+                        {quiz.timeLimit ? "Minutes" : "No Limit"}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-2xl font-bold text-amber-700 dark:text-amber-400">
-                    {quiz.timeLimit || "∞"}
-                  </p>
-                  <p className="text-xs text-amber-600 dark:text-amber-500">
-                    {quiz.timeLimit ? "Minutes" : "No Limit"}
-                  </p>
                 </div>
-                <div className="text-center p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800">
-                  <div className="flex h-10 w-10 mx-auto items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30 mb-2">
-                    <HiOutlineStar className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <div className="p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30">
+                      <HiOutlineStar className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-green-700 dark:text-green-400">
+                        {quiz.passingScore}%
+                      </p>
+                      <p className="text-xs text-green-600 dark:text-green-500">Pass Score</p>
+                    </div>
                   </div>
-                  <p className="text-2xl font-bold text-green-700 dark:text-green-400">
-                    {quiz.passingScore}%
-                  </p>
-                  <p className="text-xs text-green-600 dark:text-green-500">Pass Score</p>
                 </div>
               </div>
 
