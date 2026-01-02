@@ -77,42 +77,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const bgColor = useColorModeValue("gray.50", "gray.900");
-  const cardBg = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.700");
-  const accentBg = useColorModeValue("green.50", "green.900");
-  const accentColor = useColorModeValue("green.600", "green.300");
-
-  useEffect(() => {
-    const fetchCourse = async () => {
-      setLoading(true);
-      try {
-        const courseData = await academyService.getCourseBySlug(slug);
-        setCourse(courseData);
-      } catch (error) {
-        console.error("Error fetching course:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCourse();
-  }, [slug]);
-
-  useEffect(() => {
-    // Pre-fill user data if logged in
-    if (user) {
-      setFormData((prev) => ({
-        ...prev,
-        name: user.name || "",
-        email: user.email || "",
-      }));
-    }
-  }, [user]);
-  
-  const isFree = course?.price === 0;
-  const isLoggedIn = !authLoading && !!user;
-  
+  // Initialize form data with empty values
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -138,6 +103,55 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
     password: "",
     confirmPassword: "",
   });
+
+  const bgColor = useColorModeValue("gray.50", "gray.900");
+  const cardBg = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
+  const accentBg = useColorModeValue("green.50", "green.900");
+  const accentColor = useColorModeValue("green.600", "green.300");
+
+  useEffect(() => {
+    const fetchCourse = async () => {
+      setLoading(true);
+      try {
+        const courseData = await academyService.getCourseBySlug(slug);
+        setCourse(courseData);
+      } catch (error) {
+        console.error("Error fetching course:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourse();
+  }, [slug]);
+
+  // Handle user authentication state changes
+  useEffect(() => {
+    // Clear all form data when not logged in
+    if (!user) {
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        password: "",
+        confirmPassword: "",
+        message: "",
+        agreeToTerms: false,
+      });
+    }
+    // Pre-fill user data if logged in as a student
+    else if (user.role === "STUDENT") {
+      setFormData((prev) => ({
+        ...prev,
+        name: user.name || "",
+        email: user.email || "",
+      }));
+    }
+  }, [user]);
+
+  const isFree = course?.price === 0;
+  const isLoggedIn = !authLoading && !!user;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -304,6 +318,26 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
     );
   }
 
+  // Prevent instructors and admins from enrolling (but allow logged-out users and students)
+  if (!authLoading && user && user.role !== "STUDENT") {
+    return (
+      <Container maxW="container.xl" py="20">
+        <Center>
+          <VStack spacing="6" align="center">
+            <Icon as={FiShield} boxSize="16" color="orange.500" />
+            <Heading size="lg">Access Restricted</Heading>
+            <Text color="muted" maxW="md" textAlign="center">
+              Only students can enroll in courses. Instructors and administrators have different access permissions.
+            </Text>
+            <ButtonLink href="/academy/courses" colorScheme="primary">
+              Browse Courses
+            </ButtonLink>
+          </VStack>
+        </Center>
+      </Container>
+    );
+  }
+
   return (
     <Box>
       {/* Header */}
@@ -409,6 +443,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                                 }}
                                 borderRadius="lg"
                                 isDisabled={isLoggedIn}
+                                autoComplete="off"
                               />
                               <FormErrorMessage>{errors.name}</FormErrorMessage>
                             </FormControl>
@@ -439,6 +474,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                               }}
                               borderRadius="lg"
                               isDisabled={isLoggedIn}
+                              autoComplete="off"
                             />
                             <Text fontSize="xs" color="muted" mt="1">
                               We'll send course access and updates to this email

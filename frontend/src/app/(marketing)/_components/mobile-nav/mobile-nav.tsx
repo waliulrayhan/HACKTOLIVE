@@ -28,6 +28,7 @@ import { getFullImageUrl } from '@/lib/image-utils'
 import { Logo } from '../layout/logo'
 import siteConfig from '@/lib/config/data/config'
 import { authService, User } from '@/lib/auth-service'
+import { useAuth } from '@/context/AuthContext'
 
 interface NavLinkProps extends LinkProps {
   label: string
@@ -102,6 +103,7 @@ export function MobileNavContent(props: MobileNavContentProps) {
   const closeBtnRef = React.useRef<HTMLButtonElement>(null)
   const pathname = usePathname()
   const router = useRouter()
+  const { logout } = useAuth()
   const bgColor = useColorModeValue('white', 'gray.900')
   const [user, setUser] = React.useState<User | null>(null)
 
@@ -120,17 +122,12 @@ export function MobileNavContent(props: MobileNavContentProps) {
   }
 
   const handleSignOut = () => {
-    // Clear only auth-related localStorage data (preserve theme)
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    logout()
     toast.success('Signed out successfully!', {
       description: 'You have been logged out of your account.',
       duration: 3000,
     })
     onClose()
-    setTimeout(() => {
-      router.push('/login')
-    }, 500)
   }
 
   useRouteChanged(onClose)

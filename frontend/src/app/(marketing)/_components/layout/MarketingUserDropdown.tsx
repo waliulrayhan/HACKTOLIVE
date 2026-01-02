@@ -7,12 +7,14 @@ import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
 import { toast } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
 import { authService, User } from "@/lib/auth-service";
+import { useAuth } from "@/context/AuthContext";
 import { getFullImageUrl } from "@/lib/image-utils";
 
 export default function MarketingUserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
+  const { logout } = useAuth();
 
   useEffect(() => {
     const currentUser = authService.getUser();
@@ -71,21 +73,13 @@ export default function MarketingUserDropdown() {
   function handleSignOut(e: React.MouseEvent<HTMLAnchorElement>) {
     e.preventDefault();
     closeDropdown();
-    
-    // Clear only auth-related localStorage data (preserve theme)
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    logout();
     
     // Show success toast
     toast.success('Signed out successfully!', {
       description: 'You have been logged out of your account.',
       duration: 3000,
     });
-    
-    // Redirect to login page after a short delay
-    setTimeout(() => {
-      router.push('/login');
-    }, 500);
   }
 
   return (
