@@ -711,14 +711,10 @@ export default function StudentLessonPage() {
                   <Badge color={lesson.type === "VIDEO" ? "info" : "primary"} size="sm">
                     {lesson.type}
                   </Badge>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {lesson.duration} min
-                  </span>
-                  {isCompleted && (
-                    <Badge color="success" size="sm">
-                      <HiOutlineCheckCircle className="h-3 w-3" />
-                      Done
-                    </Badge>
+                  {!isCompleted && (
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {lesson.duration} min
+                    </span>
                   )}
                   {/* Quiz/Resource/Assignment counts */}
                   {quizCount > 0 && (
@@ -745,7 +741,7 @@ export default function StudentLessonPage() {
 
             <div className="flex items-center gap-2">
               {/* Navigation Buttons */}
-              {prevLesson && (
+              {/* {prevLesson && (
                 <button
                   onClick={() => handleLessonSelect(prevLesson)}
                   className="p-2 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
@@ -762,9 +758,14 @@ export default function StudentLessonPage() {
                 >
                   <HiOutlineChevronRight className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                 </button>
-              )}
+              )} */}
               
-              {!isCompleted && (
+              {isCompleted ? (
+                <Badge color="success" size="md">
+                  <HiOutlineCheckCircle className="h-4 w-4" />
+                  Complete
+                </Badge>
+              ) : (
                 <Button
                   onClick={markAsComplete}
                   disabled={completing}
@@ -772,7 +773,7 @@ export default function StudentLessonPage() {
                   size="sm"
                   startIcon={<HiOutlineCheckCircle className="h-4 w-4" />}
                 >
-                  {completing ? "Marking..." : "Mark Complete"}
+                  {completing ? "Marking..." : "Mark As Complete"}
                 </Button>
               )}
             </div>

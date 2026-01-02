@@ -545,10 +545,17 @@ export default function CourseDetailPage() {
                 <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
                   Your Progress
                 </h3>
-                <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/20">
-                  
-                  <HiOutlineTrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-brand-600 dark:text-brand-400" />
-                </div>
+                {enrollment.status === "COMPLETED" ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-success-100 px-2.5 py-0.5 text-[10px] sm:text-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-400">
+                      <HiOutlineCheckCircle className="h-3.5 w-3.5" />
+                      Completed
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-info-100 px-2.5 py-0.5 text-[10px] sm:text-xs font-medium text-info-700 dark:bg-info-500/15 dark:text-gray-400">
+                      <HiOutlineClock className="h-3.5 w-3.5" />
+                      In Progress
+                    </span>
+                  )}
               </div>
 
               <div className="mb-4 sm:mb-5">
@@ -578,7 +585,7 @@ export default function CourseDetailPage() {
                     {completedLessons} / {totalLessons}
                   </span>
                 </div>
-                <div className="flex justify-between items-center p-2 rounded-lg bg-white/50 dark:bg-white/5">
+                {/* <div className="flex justify-between items-center p-2 rounded-lg bg-white/50 dark:bg-white/5">
                   <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
                     <HiOutlineCheckCircle className="h-3.5 w-3.5" />
                     Status
@@ -594,7 +601,7 @@ export default function CourseDetailPage() {
                       In Progress
                     </span>
                   )}
-                </div>
+                </div> */}
               </div>
 
               {/* Live Course Information */}
@@ -684,9 +691,9 @@ export default function CourseDetailPage() {
                           <HiOutlineVideoCamera className="h-4 w-4 group-hover:scale-110 transition-transform" />
                           Join Live Session
                         </a>
-                        <p className="mt-2 text-[10px] text-center text-gray-600 dark:text-gray-400 truncate">
+                        {/* <p className="mt-2 text-[10px] text-center text-gray-600 dark:text-gray-400 truncate">
                           {course.meetingLink.replace(/^https?:\/\//, '')}
-                        </p>
+                        </p> */}
                       </div>
                     )}
 
