@@ -418,7 +418,7 @@ export default function LessonResourcesPage() {
                   onChange={(e) =>
                     setResourceForm({ ...resourceForm, name: e.target.value })
                   }
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   placeholder="e.g., Security Best Practices Guide"
                 />
               </div>
@@ -435,12 +435,12 @@ export default function LessonResourcesPage() {
                       type: e.target.value as any,
                     })
                   }
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-brand-400"
                 >
-                  <option value="PDF">PDF Document</option>
-                  <option value="ZIP">ZIP Archive</option>
-                  <option value="DOC">Document (Word, etc.)</option>
-                  <option value="LINK">External Link</option>
+                  <option value="PDF" className="dark:bg-gray-700 dark:text-white">PDF Document</option>
+                  <option value="ZIP" className="dark:bg-gray-700 dark:text-white">ZIP Archive</option>
+                  <option value="DOC" className="dark:bg-gray-700 dark:text-white">Document (Word, etc.)</option>
+                  <option value="LINK" className="dark:bg-gray-700 dark:text-white">External Link</option>
                 </select>
               </div>
 
@@ -454,7 +454,7 @@ export default function LessonResourcesPage() {
                   onChange={(e) =>
                     setResourceForm({ ...resourceForm, url: e.target.value })
                   }
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   placeholder="https://example.com/resource.pdf"
                 />
                 <p className="mt-1 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
@@ -472,7 +472,7 @@ export default function LessonResourcesPage() {
                   onChange={(e) =>
                     setResourceForm({ ...resourceForm, size: e.target.value })
                   }
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   placeholder="e.g., 2.5 MB"
                 />
               </div>

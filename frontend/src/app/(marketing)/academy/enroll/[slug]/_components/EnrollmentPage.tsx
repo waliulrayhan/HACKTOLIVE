@@ -401,7 +401,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                               <FormLabel fontWeight="semibold">Full Name</FormLabel>
                               <Input
                                 size="lg"
-                                placeholder="John Doe"
+                                placeholder="Your full name"
                                 value={formData.name}
                                 onChange={(e) => {
                                   setFormData({ ...formData, name: e.target.value });
