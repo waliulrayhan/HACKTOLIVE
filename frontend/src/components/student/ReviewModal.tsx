@@ -31,7 +31,7 @@ export default function ReviewModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60">
-      <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-md">
+      <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 dark:border-white/10 px-5 py-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">

@@ -375,12 +375,12 @@ export default function CourseDetailPage() {
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                <button
+                {/* <button
                   onClick={() => setShowCompletionModal(true)}
                   className="flex items-center gap-1.5 rounded-lg border border-purple-600 bg-transparent px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-purple-700 hover:bg-purple-50 dark:border-purple-500 dark:text-purple-400 dark:hover:bg-purple-900/20 transition-all hover:shadow-md"
                 >
                   🎊 <span className="hidden sm:inline">Show</span> Celebration
-                </button>
+                </button> */}
                 <button
                   onClick={handleViewCertificates}
                   className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-success-600 to-success-700 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-white hover:from-success-700 hover:to-success-800 transition-all shadow-md hover:shadow-lg"
