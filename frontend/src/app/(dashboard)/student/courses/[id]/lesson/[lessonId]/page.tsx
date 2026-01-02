@@ -8,7 +8,8 @@ import Button from "@/components/ui/button/Button";
 import CourseSidebar from "@/components/student/course/CourseSidebar";
 import LessonContent from "@/components/student/course/LessonContent";
 import QuizModal from "@/components/student/course/QuizModal";
-import AssignmentPanel from "@/components/student/course/AssignmentPanel";
+import AssignmentModal from "@/components/student/course/AssignmentModal";
+import ResourcesModal from "@/components/student/course/ResourcesModal";
 import { useSidebar } from "@/context/SidebarContext";
 import { Skeleton } from "@/components/ui/skeleton/Skeleton";
 import {
@@ -105,7 +106,7 @@ interface QuizAttempt {
   score: number;
   passed: boolean;
   attemptedAt: string;
-  answers: Record<string, string>;
+  answers: string;
 }
 
 interface Submission {
@@ -134,9 +135,10 @@ export default function StudentLessonPage() {
   const [enrollment, setEnrollment] = useState<any>(null);
   const [nextLesson, setNextLesson] = useState<any>(null);
   const [prevLesson, setPrevLesson] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<TabType>("content");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showQuizModal, setShowQuizModal] = useState(false);
+  const [showAssignmentModal, setShowAssignmentModal] = useState(false);
+  const [showResourcesModal, setShowResourcesModal] = useState(false);
   const [previousSidebarState, setPreviousSidebarState] = useState<boolean | null>(null);
 
   // Quiz state
@@ -349,12 +351,11 @@ export default function StudentLessonPage() {
       
       toast.success("Lesson marked as complete!");
       
-      // Check if this completion triggered course completion
-      // Refresh the lesson data first
+      // Refresh the lesson data and course structure
       await fetchLesson();
+      await fetchCourseStructure();
       
       // Then check course progress
-      console.log('🔍 Checking course progress after lesson completion...');
       const progressResponse = await fetch(
         `${apiUrl}/student/courses/${courseId}/progress`,
         {
@@ -366,28 +367,18 @@ export default function StudentLessonPage() {
       
       if (progressResponse.ok) {
         const progressData = await progressResponse.json();
-        console.log('📊 Course progress:', progressData);
-        
-        // Check the status from enrollment object
         const courseStatus = progressData.enrollment?.status || progressData.status;
-        console.log('📌 Course status:', courseStatus);
         
         // If course just reached 100%, redirect to course page with completion parameter
         if (courseStatus === 'COMPLETED') {
-          console.log('🎉 Course completed! Redirecting with completion parameter...');
           toast.success("🎉 Course Completed!", {
             description: "Congratulations! You've completed all lessons!",
           });
           
-          // Small delay before redirect to let user see the success message
           setTimeout(() => {
-            const redirectUrl = `/student/courses/${courseId}?completed=true`;
-            console.log('🚀 Redirecting to:', redirectUrl);
-            router.push(redirectUrl);
+            router.push(`/student/courses/${courseId}?completed=true`);
           }, 1500);
-          return; // Exit early to prevent further execution
-        } else {
-          console.log('ℹ️ Course not yet completed. Status:', courseStatus);
+          return;
         }
       }
     } catch (error) {
@@ -788,113 +779,91 @@ export default function StudentLessonPage() {
               type={lesson.type as "VIDEO" | "ARTICLE"}
               videoUrl={lesson.videoUrl}
               articleContent={lesson.articleContent}
-              resources={lesson.resources}
             />
 
-            {/* Quiz Section */}
-            {hasQuiz && (
-              <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
-                <div className="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100 dark:bg-purple-900/30">
-                        <HiOutlineQuestionMarkCircle className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-bold text-gray-900 dark:text-white">
-                          {lesson.quizzes![0].title}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {lesson.quizzes![0].questions?.length || 0} questions • 
-                          {lesson.quizzes![0].passingScore}% to pass
-                          {lesson.quizzes![0].timeLimit && ` • ${lesson.quizzes![0].timeLimit} min limit`}
-                        </p>
-                      </div>
+            {/* Action Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {/* Quiz Card */}
+              {hasQuiz && (
+                <button
+                  onClick={() => setShowQuizModal(true)}
+                  className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-md transition-all group text-left"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30 group-hover:bg-purple-200 dark:group-hover:bg-purple-900/50 transition-colors">
+                      <HiOutlineQuestionMarkCircle className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                     </div>
-                    <Button
-                      onClick={() => setShowQuizModal(true)}
-                      variant="primary"
-                      size="sm"
-                      startIcon={<HiOutlinePlay className="h-4 w-4" />}
-                    >
-                      {quizAttempts.length > 0 ? "Retake Quiz" : "Start Quiz"}
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Previous Attempts */}
-                {quizAttempts.length > 0 && (
-                  <div className="p-4">
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                      Your Attempts
-                    </h4>
-                    <div className="space-y-2">
-                      {quizAttempts.slice(0, 3).map((attempt, index) => (
-                        <div
-                          key={attempt.id}
-                          className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                              Attempt #{quizAttempts.length - index}
-                            </span>
-                            <span className="text-xs text-gray-500 dark:text-gray-500">
-                              {new Date(attempt.attemptedAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-bold text-gray-900 dark:text-white">
-                              {attempt.score}%
-                            </span>
-                            <Badge color={attempt.passed ? "success" : "error"} size="sm">
-                              {attempt.passed ? "Passed" : "Failed"}
-                            </Badge>
-                          </div>
-                        </div>
-                      ))}
+                    <div className="flex-1">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                        Quiz
+                      </h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {lesson.quizzes![0].questions?.length || 0} questions • {lesson.quizzes![0].passingScore}% to pass
+                      </p>
                     </div>
                   </div>
-                )}
-              </div>
-            )}
+                  {quizAttempts.length > 0 && (
+                    <div className="text-xs text-purple-600 dark:text-purple-400 font-medium">
+                      Best score: {Math.max(...quizAttempts.map(a => a.score))}%
+                    </div>
+                  )}
+                </button>
+              )}
 
-            {/* Assignment Section */}
-            {hasAssignment && (
-              <AssignmentPanel
-                assignment={lesson.assignments![0]}
-                submission={submission}
-                onSubmit={async (text, url) => {
-                  try {
-                    setAssignmentSubmitting(true);
-                    const token = localStorage.getItem("token");
-                    const response = await fetch(
-                      `${apiUrl}/student/assignments/${lesson.assignments![0].id}/submit`,
-                      {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                          Authorization: `Bearer ${token}`,
-                        },
-                        body: JSON.stringify({
-                          submissionText: text || null,
-                          submissionUrl: url || null,
-                        }),
-                      }
-                    );
+              {/* Assignment Card */}
+              {hasAssignment && (
+                <button
+                  onClick={() => setShowAssignmentModal(true)}
+                  className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-md transition-all group text-left"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/30 group-hover:bg-orange-200 dark:group-hover:bg-orange-900/50 transition-colors">
+                      <HiOutlineClipboardCheck className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                        Assignment
+                      </h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {submission 
+                          ? (submission.gradedAt ? "Graded" : "Pending") 
+                          : "Not submitted"}
+                      </p>
+                    </div>
+                  </div>
+                  {submission?.gradedAt && (
+                    <div className="text-xs text-orange-600 dark:text-orange-400 font-medium">
+                      Score: {submission.score}/{lesson.assignments![0].maxScore}
+                    </div>
+                  )}
+                </button>
+              )}
 
-                    if (!response.ok) throw new Error("Failed to submit");
-
-                    toast.success("Assignment submitted!");
-                    fetchSubmission();
-                  } catch (error) {
-                    toast.error("Failed to submit assignment");
-                  } finally {
-                    setAssignmentSubmitting(false);
-                  }
-                }}
-                isSubmitting={assignmentSubmitting}
-              />
-            )}
+              {/* Resources Card */}
+              {hasResources && (
+                <button
+                  onClick={() => setShowResourcesModal(true)}
+                  className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all group text-left"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30 group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50 transition-colors">
+                      <HiOutlinePaperClip className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        Resources
+                      </h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {resourceCount} file{resourceCount !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                      Download supplementary materials
+                  </div>
+                </button>
+              )}
+            </div>
 
             {/* Navigation Footer */}
             <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -990,6 +959,58 @@ export default function StudentLessonPage() {
               throw error;
             }
           }}
+          attempts={quizAttempts}
+          onRefreshAttempts={fetchQuizAttempts}
+        />
+      )}
+
+      {/* Assignment Modal */}
+      {hasAssignment && (
+        <AssignmentModal
+          assignment={lesson.assignments![0]}
+          submission={submission}
+          isOpen={showAssignmentModal}
+          onClose={() => setShowAssignmentModal(false)}
+          onSubmit={async (text, url) => {
+            try {
+              setAssignmentSubmitting(true);
+              const token = localStorage.getItem("token");
+              const response = await fetch(
+                `${apiUrl}/student/assignments/${lesson.assignments![0].id}/submit`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({
+                    submissionText: text || null,
+                    submissionUrl: url || null,
+                  }),
+                }
+              );
+
+              if (!response.ok) throw new Error("Failed to submit");
+
+              toast.success("Assignment submitted!");
+              await fetchSubmission();
+            } catch (error) {
+              toast.error("Failed to submit assignment");
+            } finally {
+              setAssignmentSubmitting(false);
+            }
+          }}
+          isSubmitting={assignmentSubmitting}
+        />
+      )}
+
+      {/* Resources Modal */}
+      {hasResources && (
+        <ResourcesModal
+          resources={lesson.resources!}
+          isOpen={showResourcesModal}
+          onClose={() => setShowResourcesModal(false)}
+          lessonTitle={lesson.title}
         />
       )}
     </div>

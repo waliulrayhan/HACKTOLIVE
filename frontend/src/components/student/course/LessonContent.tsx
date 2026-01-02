@@ -2,32 +2,16 @@
 
 import React from "react";
 import {
-  HiOutlinePlay,
-  HiOutlineClock,
   HiOutlineBookOpen,
-  HiOutlineDocumentText,
-  HiOutlineLink,
-  HiOutlineDownload,
-  HiOutlinePaperClip,
 } from "react-icons/hi";
-import Badge from "@/components/ui/badge/Badge";
-
-interface Resource {
-  id: string;
-  name: string;
-  type: string;
-  url: string;
-  size?: string;
-}
 
 interface LessonContentProps {
   type: "VIDEO" | "ARTICLE";
   videoUrl?: string;
   articleContent?: string;
-  resources?: Resource[];
 }
 
-export default function LessonContent({ type, videoUrl, articleContent, resources }: LessonContentProps) {
+export default function LessonContent({ type, videoUrl, articleContent }: LessonContentProps) {
   const isYouTubeUrl = (url: string) => {
     return /(?:youtube\.com|youtu\.be)/.test(url);
   };
@@ -48,7 +32,7 @@ export default function LessonContent({ type, videoUrl, articleContent, resource
 
   const hasVideoContent = type === "VIDEO" && videoUrl;
   const hasArticleContent = type === "ARTICLE" && articleContent;
-  const hasResources = resources && resources.length > 0;
+
 
   return (
     <div className="space-y-6">
@@ -130,60 +114,6 @@ export default function LessonContent({ type, videoUrl, articleContent, resource
           <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm">
             The instructor is preparing this lesson content. Please check back later or proceed to other lessons.
           </p>
-        </div>
-      )}
-
-      {/* Resources Section */}
-      {hasResources && (
-        <div className="rounded-md border border-gray-200 dark:border-white/5 bg-white dark:bg-white/[0.03] overflow-hidden">
-          <div className="flex items-center gap-2 border-b border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-white/5 px-4 py-3">
-            <HiOutlinePaperClip className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-              Downloadable Resources
-            </h3>
-            <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">
-              {resources!.length} file{resources!.length !== 1 ? "s" : ""}
-            </span>
-          </div>
-          <div className="divide-y divide-gray-100 dark:divide-white/5">
-            {resources!.map((resource) => (
-              <a
-                key={resource.id}
-                href={resource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group"
-              >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-white/5 group-hover:bg-brand-50 dark:group-hover:bg-brand-900/30 transition-colors">
-                  {resource.type === "PDF" && (
-                    <HiOutlineDocumentText className="h-5 w-5 text-error-500" />
-                  )}
-                  {resource.type === "LINK" && (
-                    <HiOutlineLink className="h-5 w-5 text-info-500" />
-                  )}
-                  {(resource.type === "ZIP" || resource.type === "DOC") && (
-                    <HiOutlineDownload className="h-5 w-5 text-success-500" />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
-                    {resource.name}
-                  </p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <Badge color="light" size="sm">
-                      {resource.type}
-                    </Badge>
-                    {resource.size && (
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {resource.size}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <HiOutlineDownload className="h-5 w-5 text-gray-400 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors shrink-0" />
-              </a>
-            ))}
-          </div>
         </div>
       )}
     </div>

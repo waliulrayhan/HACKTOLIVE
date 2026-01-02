@@ -125,7 +125,7 @@ export default function CourseSidebar({
   }
 
   return (
-    <div className="w-72 shrink-0 flex h-full flex-col bg-white dark:bg-white/[0.03] border-r border-gray-200 dark:border-white/5">
+    <div className="w-80 shrink-0 flex h-full flex-col bg-white dark:bg-white/[0.03] border-r border-gray-200 dark:border-white/5">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white dark:bg-white/[0.03] border-b border-gray-200 dark:border-white/5 p-4">
         <div className="flex items-center justify-between mb-3">
