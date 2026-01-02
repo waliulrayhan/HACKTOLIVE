@@ -93,7 +93,7 @@ export default function MyCoursesPage() {
       if (!response.ok) throw new Error("Failed to fetch courses");
 
       const data = await response.json();
-      
+
       const transformedEnrollments = data.map((enrollment: Enrollment) => ({
         ...enrollment,
         course: {
@@ -105,7 +105,7 @@ export default function MyCoursesPage() {
           },
         },
       }));
-      
+
       setEnrollments(transformedEnrollments);
     } catch (error) {
       console.error("Error fetching courses:", error);
@@ -174,55 +174,58 @@ export default function MyCoursesPage() {
       <PageBreadcrumb pageTitle="My Courses" />
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
-              <HiOutlineAcademicCap className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-500/15">
+              <HiOutlineAcademicCap className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Total Courses</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Total Courses</p>
+              <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
             </div>
           </div>
         </div>
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/30">
-              <HiOutlinePlay className="h-6 w-6 text-green-600 dark:text-green-400" />
+
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-500/15">
+              <HiOutlinePlay className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.inProgress}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">In Progress</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">In Progress</p>
+              <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">{stats.inProgress}</p>
             </div>
           </div>
         </div>
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-100 dark:bg-purple-900/30">
-              <HiOutlineCheckCircle className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-500/15">
+              <HiOutlineCheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Completed</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Completed</p>
+              <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
             </div>
           </div>
         </div>
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-100 dark:bg-orange-900/30">
-              <HiOutlineClock className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-500/15">
+              <HiOutlineClock className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 dark:text-orange-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalHours}h</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Learning Hours</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Learning Hours</p>
+              <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">{stats.totalHours}h</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters & Search */}
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+      <div className="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
         <div className="flex flex-col lg:flex-row lg:items-center gap-4">
           {/* Search */}
           <div className="relative flex-1">
@@ -232,7 +235,7 @@ export default function MyCoursesPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search courses..."
-              className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 pl-12 pr-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all"
+              className="w-full rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 pl-12 pr-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all"
             />
           </div>
 
@@ -246,18 +249,16 @@ export default function MyCoursesPage() {
               <button
                 key={tab.value}
                 onClick={() => setFilter(tab.value)}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap transition-all ${
-                  filter === tab.value
+                className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-all ${filter === tab.value
                     ? "bg-brand-500 text-white shadow-sm"
                     : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                }`}
+                  }`}
               >
                 {tab.label}
-                <span className={`rounded-full px-2 py-0.5 text-xs ${
-                  filter === tab.value
+                <span className={`rounded-full px-2 py-0.5 text-xs ${filter === tab.value
                     ? "bg-white/20"
                     : "bg-gray-200 dark:bg-gray-600"
-                }`}>
+                  }`}>
                   {tab.count}
                 </span>
               </button>
@@ -268,21 +269,19 @@ export default function MyCoursesPage() {
           <div className="flex items-center gap-1 rounded-lg border border-gray-200 dark:border-gray-700 p-1">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-md transition-colors ${
-                viewMode === "grid"
+              className={`p-2 rounded-md transition-colors ${viewMode === "grid"
                   ? "bg-brand-500 text-white"
                   : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-              }`}
+                }`}
             >
               <HiOutlineViewGrid className="h-5 w-5" />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`p-2 rounded-md transition-colors ${
-                viewMode === "list"
+              className={`p-2 rounded-md transition-colors ${viewMode === "list"
                   ? "bg-brand-500 text-white"
                   : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-              }`}
+                }`}
             >
               <HiOutlineViewList className="h-5 w-5" />
             </button>
@@ -291,7 +290,7 @@ export default function MyCoursesPage() {
           {/* Browse More */}
           <button
             onClick={() => router.push("/academy/courses")}
-            className="flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-3 text-sm font-medium text-white hover:bg-brand-600 transition-colors shadow-sm hover:shadow-md whitespace-nowrap"
+            className="flex items-center gap-2 rounded-md bg-brand-500 px-5 py-3 text-sm font-medium text-white hover:bg-brand-600 transition-colors shadow-sm hover:shadow-md whitespace-nowrap"
           >
             <HiOutlineAcademicCap className="h-5 w-5" />
             Browse Courses
@@ -310,8 +309,8 @@ export default function MyCoursesPage() {
               {searchQuery
                 ? "No courses found"
                 : filter === "ALL"
-                ? "Start Your Learning Journey"
-                : `No ${filter.toLowerCase()} courses`}
+                  ? "Start Your Learning Journey"
+                  : `No ${filter.toLowerCase()} courses`}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
               {searchQuery
@@ -379,10 +378,10 @@ function CourseCard({
   return (
     <div
       onClick={onNavigate}
-      className="group cursor-pointer rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+      className="group cursor-pointer rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
     >
       {/* Thumbnail */}
-      <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-700">
+      <div className="relative aspect-[2/1] overflow-hidden bg-gray-100 dark:bg-gray-700">
         {course.thumbnail ? (
           <Image
             src={course.thumbnail}
@@ -395,10 +394,10 @@ function CourseCard({
             <HiOutlineAcademicCap className="h-16 w-16 text-gray-300 dark:text-gray-600" />
           </div>
         )}
-        
+
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        
+
         {/* Top Badges */}
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -428,9 +427,8 @@ function CourseCard({
           </div>
           <div className="h-1.5 w-full rounded-full bg-white/30 backdrop-blur-sm overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all ${
-                isCompleted ? "bg-green-400" : "bg-brand-400"
-              }`}
+              className={`h-full rounded-full transition-all ${isCompleted ? "bg-green-400" : "bg-brand-400"
+                }`}
               style={{ width: `${enrollment.progress}%` }}
             />
           </div>
@@ -447,7 +445,7 @@ function CourseCard({
           <Badge
             color={
               course.level === "FUNDAMENTAL" ? "success" :
-              course.level === "INTERMEDIATE" ? "warning" : "error"
+                course.level === "INTERMEDIATE" ? "warning" : "error"
             }
             size="sm"
           >
@@ -498,27 +496,26 @@ function CourseCard({
         </div>
 
         {/* Live Course Schedule */}
-        {isLive && course.startDate && (
-          <div className="mt-4 p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-            <div className="flex items-center gap-2 text-sm text-purple-700 dark:text-purple-300">
-              <HiOutlineCalendar className="h-4 w-4" />
-              <span>
-                Starts {new Date(course.startDate).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                })}
-              </span>
-            </div>
-          </div>
-        )}
+        {/* {isLive && course.startDate && (
+        <div className="mt-4 p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
+        <div className="flex items-center gap-2 text-sm text-purple-700 dark:text-purple-300">
+          <HiOutlineCalendar className="h-4 w-4" />
+          <span>
+          Starts {new Date(course.startDate).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          })}
+          </span>
+        </div>
+        </div>
+      )} */}
 
         {/* Action Button */}
         <button
-          className={`mt-4 w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white transition-all hover:shadow-md ${
-            isCompleted
+          className={`mt-4 w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white transition-all hover:shadow-md ${isCompleted
               ? "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
               : "bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700"
-          }`}
+            }`}
         >
           {isCompleted ? (
             <>
@@ -601,7 +598,7 @@ function CourseListItem({
                 <Badge
                   color={
                     course.level === "FUNDAMENTAL" ? "success" :
-                    course.level === "INTERMEDIATE" ? "warning" : "error"
+                      course.level === "INTERMEDIATE" ? "warning" : "error"
                   }
                   size="sm"
                 >
@@ -668,9 +665,8 @@ function CourseListItem({
                 </div>
                 <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all ${
-                      isCompleted ? "bg-green-500" : "bg-brand-500"
-                    }`}
+                    className={`h-full rounded-full transition-all ${isCompleted ? "bg-green-500" : "bg-brand-500"
+                      }`}
                     style={{ width: `${enrollment.progress}%` }}
                   />
                 </div>
@@ -678,11 +674,10 @@ function CourseListItem({
 
               {/* Action */}
               <button
-                className={`w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-all ${
-                  isCompleted
+                className={`w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-all ${isCompleted
                     ? "bg-purple-500 hover:bg-purple-600"
                     : "bg-brand-500 hover:bg-brand-600"
-                }`}
+                  }`}
               >
                 {isCompleted ? "Review" : "Continue"}
                 <HiOutlinePlay className="h-4 w-4" />
