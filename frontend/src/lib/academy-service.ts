@@ -10,6 +10,10 @@ export interface CourseFilters {
   level?: string;
   tier?: string;
   search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  deliveryMode?: string;
+  sortBy?: string;
 }
 
 export interface InstructorFilters {
@@ -42,6 +46,10 @@ class AcademyService {
       if (filters?.level) params.append('level', filters.level);
       if (filters?.tier) params.append('tier', filters.tier);
       if (filters?.search) params.append('search', filters.search);
+      if (filters?.minPrice !== undefined) params.append('minPrice', String(filters.minPrice));
+      if (filters?.maxPrice !== undefined) params.append('maxPrice', String(filters.maxPrice));
+      if (filters?.deliveryMode) params.append('deliveryMode', filters.deliveryMode);
+      if (filters?.sortBy) params.append('sortBy', filters.sortBy);
 
       const response = await api.get<Course[]>(`${this.basePath}/courses?${params.toString()}`);
       return this.transformCourses(response.data);

@@ -72,13 +72,22 @@ export default function AllCoursesPage() {
   
   const { user } = useAuth();
 
-  // Fetch courses from API
+  // Fetch courses from API with filters (with debouncing for search)
   useEffect(() => {
     const fetchCourses = async () => {
       setLoading(true);
       try {
-        const allCourses = await academyService.getCourses();
+        const allCourses = await academyService.getCourses({
+          search: searchQuery || undefined,
+          level: selectedLevels.length > 0 ? selectedLevels.join(',') : undefined,
+          tier: selectedTiers.length > 0 ? selectedTiers.join(',') : undefined,
+          deliveryMode: selectedDeliveryModes.length > 0 ? selectedDeliveryModes.join(',') : undefined,
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+          sortBy: sortBy,
+        });
         setCourses(allCourses);
+        setCurrentPage(1); // Reset to first page when filters change
       } catch (error) {
         console.error("Error fetching courses:", error);
       } finally {
@@ -86,8 +95,13 @@ export default function AllCoursesPage() {
       }
     };
 
-    fetchCourses();
-  }, []);
+    // Debounce search queries
+    const debounceTimer = setTimeout(() => {
+      fetchCourses();
+    }, searchQuery ? 500 : 0); // 500ms debounce for search, instant for other filters
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery, selectedLevels, selectedTiers, selectedDeliveryModes, minPrice, maxPrice, sortBy]);
 
   // Fetch enrolled course IDs if user is logged in
   useEffect(() => {
@@ -121,68 +135,17 @@ export default function AllCoursesPage() {
     { value: "live", label: "Live Classes" },
   ];
 
-  // Filter courses
-  const filteredCourses = courses.filter((course) => {
-    // Search filter
-    if (
-      searchQuery &&
-      !course.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !course.description.toLowerCase().includes(searchQuery.toLowerCase())
-    ) {
-      return false;
-    }
+  // Backend handles filtering now, so we just use the courses directly
+  const filteredCourses = courses;
 
-    // Level filter
-    if (selectedLevels.length > 0 && !selectedLevels.includes(course.level)) {
-      return false;
-    }
-
-    // Price filter
-    if (course.price < minPrice || course.price > maxPrice) {
-      return false;
-    }
-
-    // Tier filter
-    if (selectedTiers.length > 0 && !selectedTiers.includes(course.tier)) {
-      return false;
-    }
-
-    // Delivery mode filter
-    if (selectedDeliveryModes.length > 0 && !selectedDeliveryModes.includes(course.deliveryMode)) {
-      return false;
-    }
-
-    return true;
-  });
-
-  // Sort courses
-  const sortedCourses = [...filteredCourses].sort((a, b) => {
-    switch (sortBy) {
-      case "popular":
-        return b.totalStudents - a.totalStudents;
-      case "rating":
-        return b.rating - a.rating;
-      case "price-low":
-        return a.price - b.price;
-      case "price-high":
-        return b.price - a.price;
-      case "newest":
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      default:
-        return 0;
-    }
-  });
+  // Sorting is also handled by backend
+  const sortedCourses = filteredCourses;
 
   // Pagination
   const totalPages = Math.ceil(sortedCourses.length / coursesPerPage);
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
   const currentCourses = sortedCourses.slice(indexOfFirstCourse, indexOfLastCourse);
-
-  // Reset to page 1 when filters change
-  const handleFilterChange = () => {
-    setCurrentPage(1);
-  };
 
   const resetFilters = () => {
     setSelectedLevels([]);
@@ -231,7 +194,6 @@ export default function AllCoursesPage() {
                 onChange={(e) => {
                   const val = parseInt(e.target.value) || 0;
                   setMinPrice(Math.min(val, maxPrice));
-                  handleFilterChange();
                 }}
                 min={0}
                 max={maxPrice}
@@ -247,7 +209,6 @@ export default function AllCoursesPage() {
                 onChange={(e) => {
                   const val = parseInt(e.target.value) || 10000;
                   setMaxPrice(Math.max(val, minPrice));
-                  handleFilterChange();
                 }}
                 min={minPrice}
                 max={100000}
@@ -265,7 +226,6 @@ export default function AllCoursesPage() {
                 setMinPrice(val[0]);
                 setMaxPrice(val[1]);
               }}
-              onChangeEnd={handleFilterChange}
               min={0}
               max={10000}
               step={100}

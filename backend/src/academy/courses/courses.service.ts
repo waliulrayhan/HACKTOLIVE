@@ -67,10 +67,99 @@ export class CoursesService {
   async findAll(params?: {
     skip?: number;
     take?: number;
-    where?: Prisma.CourseWhereInput;
-    orderBy?: Prisma.CourseOrderByWithRelationInput;
+    search?: string;
+    category?: string;
+    level?: string;
+    tier?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    deliveryMode?: string;
+    sortBy?: string;
   }): Promise<Course[]> {
-    const { skip, take, where, orderBy } = params || {};
+    const { skip, take, search, category, level, tier, minPrice, maxPrice, deliveryMode, sortBy } = params || {};
+    
+    // Build where clause
+    const where: Prisma.CourseWhereInput = {};
+    
+    // Search filter
+    if (search) {
+      where.OR = [
+        { title: { contains: search } },
+        { description: { contains: search } },
+      ];
+    }
+    
+    // Category filter
+    if (category) {
+      where.category = category.toUpperCase() as any;
+    }
+    
+    // Level filter (support comma-separated values)
+    if (level) {
+      const levels = level.split(',').map(l => l.trim().toUpperCase());
+      if (levels.length === 1) {
+        where.level = levels[0] as any;
+      } else {
+        where.level = { in: levels as any[] };
+      }
+    }
+    
+    // Tier filter (support comma-separated values)
+    if (tier) {
+      const tiers = tier.split(',').map(t => t.trim().toUpperCase());
+      if (tiers.length === 1) {
+        where.tier = tiers[0] as any;
+      } else {
+        where.tier = { in: tiers as any[] };
+      }
+    }
+    
+    // Price range filter
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      where.price = {};
+      if (minPrice !== undefined) {
+        where.price.gte = minPrice;
+      }
+      if (maxPrice !== undefined) {
+        where.price.lte = maxPrice;
+      }
+    }
+    
+    // Delivery mode filter (support comma-separated values)
+    if (deliveryMode) {
+      const modes = deliveryMode.split(',').map(m => m.trim().toUpperCase());
+      if (modes.length === 1) {
+        where.deliveryMode = modes[0] as any;
+      } else {
+        where.deliveryMode = { in: modes as any[] };
+      }
+    }
+    
+    // Build orderBy clause
+    let orderBy: Prisma.CourseOrderByWithRelationInput = { createdAt: 'desc' };
+    
+    if (sortBy) {
+      switch (sortBy) {
+        case 'popular':
+          orderBy = { totalStudents: 'desc' };
+          break;
+        case 'rating':
+          orderBy = { rating: 'desc' };
+          break;
+        case 'price-low':
+          orderBy = { price: 'asc' };
+          break;
+        case 'price-high':
+          orderBy = { price: 'desc' };
+          break;
+        case 'newest':
+          orderBy = { createdAt: 'desc' };
+          break;
+        default:
+          orderBy = { createdAt: 'desc' };
+      }
+    }
+    
     const courses = await this.prisma.course.findMany({
       skip,
       take,

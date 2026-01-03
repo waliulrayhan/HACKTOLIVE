@@ -30,21 +30,22 @@ export class CoursesController {
     @Query('level') level?: string,
     @Query('tier') tier?: string,
     @Query('search') search?: string,
+    @Query('minPrice') minPrice?: string,
+    @Query('maxPrice') maxPrice?: string,
+    @Query('deliveryMode') deliveryMode?: string,
+    @Query('sortBy') sortBy?: string,
   ) {
-    if (search) {
-      return this.coursesService.searchCourses(search);
-    }
-
-    const where: Prisma.CourseWhereInput = {};
-    if (category) where.category = category as any;
-    if (level) where.level = level as any;
-    if (tier) where.tier = tier as any;
-
     return this.coursesService.findAll({
       skip: skip ? parseInt(skip) : undefined,
       take: take ? parseInt(take) : undefined,
-      where,
-      orderBy: { createdAt: 'desc' },
+      search,
+      category,
+      level,
+      tier,
+      minPrice: minPrice ? parseFloat(minPrice) : undefined,
+      maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+      deliveryMode,
+      sortBy,
     });
   }
 
