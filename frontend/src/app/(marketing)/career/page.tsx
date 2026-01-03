@@ -27,8 +27,10 @@ import {
   useColorModeValue,
   HStack,
   Divider,
+  useDisclosure,
 } from '@chakra-ui/react'
 import { toast } from '@/components/ui/toast'
+import { Modal } from '@/components/ui/modal'
 import { useEffect } from 'react'
 import {
   FiTarget,
@@ -165,6 +167,7 @@ export default function CareerPage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedJob, setSelectedJob] = useState<string | null>(null)
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const cardBg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
@@ -284,6 +287,7 @@ export default function CareerPage() {
         coverLetter: '',
       })
       setSelectedJob(null)
+      onClose()
     } catch (error) {
       console.error('Error submitting application:', error)
       toast.error('Failed to submit application', {
@@ -315,8 +319,7 @@ export default function CareerPage() {
   const handleApplyClick = (jobId: string, jobTitle: string) => {
     setSelectedJob(jobId)
     setFormData((prev) => ({ ...prev, careerId: jobId }))
-    const applicationForm = document.getElementById('application-form')
-    applicationForm?.scrollIntoView({ behavior: 'smooth' })
+    onOpen()
   }
 
   return (
@@ -763,29 +766,88 @@ export default function CareerPage() {
 
                       <Text color={mutedColor}>{job.description}</Text>
 
-                      <Box>
-                        <Heading size="sm" mb={3}>
-                          Requirements:
-                        </Heading>
-                        <List spacing={2}>
-                          {Array.isArray(job.requirements) ? job.requirements.map((req, idx) => (
-                            <ListItem
-                              key={idx}
-                              fontSize="sm"
-                              color={mutedColor}
-                              display="flex"
-                              gap={2}
-                            >
-                              <ListIcon
-                                as={FiCheckCircle}
-                                color={iconColor}
-                                mt={0.5}
-                              />
-                              {req}
-                            </ListItem>
-                          )) : null}
-                        </List>
-                      </Box>
+                      <Grid
+                        templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }}
+                        gap={6}
+                      >
+                        {job.requirements && job.requirements.length > 0 && (
+                          <Box>
+                            <Heading size="sm" mb={3}>
+                              Requirements:
+                            </Heading>
+                            <List spacing={2}>
+                              {job.requirements.map((req: string, idx: number) => (
+                                <ListItem
+                                  key={idx}
+                                  fontSize="sm"
+                                  color={mutedColor}
+                                  display="flex"
+                                  gap={2}
+                                >
+                                  <ListIcon
+                                    as={FiCheckCircle}
+                                    color={iconColor}
+                                    mt={0.5}
+                                  />
+                                  {req}
+                                </ListItem>
+                              ))}
+                            </List>
+                          </Box>
+                        )}
+
+                        {job.responsibilities && job.responsibilities.length > 0 && (
+                          <Box>
+                            <Heading size="sm" mb={3}>
+                              Responsibilities:
+                            </Heading>
+                            <List spacing={2}>
+                              {job.responsibilities.map((resp: string, idx: number) => (
+                                <ListItem
+                                  key={idx}
+                                  fontSize="sm"
+                                  color={mutedColor}
+                                  display="flex"
+                                  gap={2}
+                                >
+                                  <ListIcon
+                                    as={FiCheckCircle}
+                                    color={iconColor}
+                                    mt={0.5}
+                                  />
+                                  {resp}
+                                </ListItem>
+                              ))}
+                            </List>
+                          </Box>
+                        )}
+
+                        {job.benefits && job.benefits.length > 0 && (
+                          <Box>
+                            <Heading size="sm" mb={3}>
+                              Benefits:
+                            </Heading>
+                            <List spacing={2}>
+                              {job.benefits.map((benefit: string, idx: number) => (
+                                <ListItem
+                                  key={idx}
+                                  fontSize="sm"
+                                  color={mutedColor}
+                                  display="flex"
+                                  gap={2}
+                                >
+                                  <ListIcon
+                                    as={FiCheckCircle}
+                                    color={iconColor}
+                                    mt={0.5}
+                                  />
+                                  {benefit}
+                                </ListItem>
+                              ))}
+                            </List>
+                          </Box>
+                        )}
+                      </Grid>
                     </VStack>
 
                     <Button
@@ -805,122 +867,33 @@ export default function CareerPage() {
           </Stack>
         </VStack>
 
-        {/* Application Form */}
-        <Box id="application-form">
-          <FallInPlace delay={0.5}>
-            <Card
-              bg={cardBg}
-              borderWidth="1px"
-              borderColor={borderColor}
-              p={{ base: 6, md: 8 }}
-              borderRadius="lg"
-            >
-              <VStack spacing={6} align="stretch">
-                <Box>
-                  <Heading size="lg" mb={2}>
-                    Submit Your Application
-                  </Heading>
-                  <Text color={mutedColor}>
-                    Fill out the form below and we'll review your application. You
-                    can also send your resume directly to careers@hacktolive.net
-                  </Text>
-                </Box>
+        {/* Application Modal */}
+        <Modal isOpen={isOpen} onClose={onClose} className="max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+          <Box p={{ base: 6, md: 8 }}>
+            <VStack spacing={6} align="stretch">
+              <Box>
+                <Heading size="lg" mb={2}>
+                  Submit Your Application
+                </Heading>
+                <Text color={mutedColor}>
+                  Fill out the form below and we'll review your application. You
+                  can also send your resume directly to careers@hacktolive.net
+                </Text>
+              </Box>
 
-                <form onSubmit={handleSubmit}>
-                  <Stack spacing={4}>
-                    <Grid
-                      templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }}
-                      gap={4}
-                    >
-                      <FormControl isInvalid={!!errors.name}>
-                        <FormLabel>Full Name</FormLabel>
-                        <Input
-                          name="name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          placeholder="Your full name"
-                          bg={inputBg}
-                          borderColor={inputBorder}
-                          _hover={{ borderColor: iconColor }}
-                          _focus={{
-                            borderColor: iconColor,
-                            boxShadow: `0 0 0 1px ${iconColor}`,
-                          }}
-                        />
-                        <FormErrorMessage>{errors.name}</FormErrorMessage>
-                      </FormControl>
-
-                      <FormControl isInvalid={!!errors.email}>
-                        <FormLabel>Email</FormLabel>
-                        <Input
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          placeholder="your.email@example.com"
-                          bg={inputBg}
-                          borderColor={inputBorder}
-                          _hover={{ borderColor: iconColor }}
-                          _focus={{
-                            borderColor: iconColor,
-                            boxShadow: `0 0 0 1px ${iconColor}`,
-                          }}
-                          suppressHydrationWarning
-                        />
-                        <FormErrorMessage>{errors.email}</FormErrorMessage>
-                      </FormControl>
-                    </Grid>
-
-                    <Grid
-                      templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }}
-                      gap={4}
-                    >
-                      <FormControl isInvalid={!!errors.phone}>
-                        <FormLabel>Phone Number</FormLabel>
-                        <Input
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          placeholder="+880 1XXX-XXXXXX"
-                          bg={inputBg}
-                          borderColor={inputBorder}
-                          _hover={{ borderColor: iconColor }}
-                          _focus={{
-                            borderColor: iconColor,
-                            boxShadow: `0 0 0 1px ${iconColor}`,
-                          }}
-                          suppressHydrationWarning
-                        />
-                        <FormErrorMessage>{errors.phone}</FormErrorMessage>
-                      </FormControl>
-
-                      <FormControl isInvalid={!!errors.careerId}>
-                        <FormLabel>Position Applied For</FormLabel>
-                        <Input
-                          name="careerId"
-                          value={
-                            formData.careerId
-                              ? careers.find(j => j.id === formData.careerId)?.title || ''
-                              : ''
-                          }
-                          readOnly
-                          placeholder="Select a position above"
-                          bg={inputBg}
-                          borderColor={inputBorder}
-                          cursor="not-allowed"
-                          _hover={{ borderColor: inputBorder }}
-                        />
-                        <FormErrorMessage>{errors.careerId}</FormErrorMessage>
-                      </FormControl>
-                    </Grid>
-
-                    <FormControl>
-                      <FormLabel>Years of Experience</FormLabel>
+              <form onSubmit={handleSubmit}>
+                <Stack spacing={4}>
+                  <Grid
+                    templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }}
+                    gap={4}
+                  >
+                    <FormControl isInvalid={!!errors.name}>
+                      <FormLabel>Full Name</FormLabel>
                       <Input
-                        name="experience"
-                        value={formData.experience}
+                        name="name"
+                        value={formData.name}
                         onChange={handleChange}
-                        placeholder="e.g., 3 years"
+                        placeholder="Your full name"
                         bg={inputBg}
                         borderColor={inputBorder}
                         _hover={{ borderColor: iconColor }}
@@ -929,16 +902,17 @@ export default function CareerPage() {
                           boxShadow: `0 0 0 1px ${iconColor}`,
                         }}
                       />
+                      <FormErrorMessage>{errors.name}</FormErrorMessage>
                     </FormControl>
 
-                    <FormControl isInvalid={!!errors.coverLetter}>
-                      <FormLabel>Cover Letter</FormLabel>
-                      <Textarea
-                        name="coverLetter"
-                        value={formData.coverLetter}
+                    <FormControl isInvalid={!!errors.email}>
+                      <FormLabel>Email</FormLabel>
+                      <Input
+                        name="email"
+                        type="email"
+                        value={formData.email}
                         onChange={handleChange}
-                        placeholder="Tell us why you'd be a great fit for this position..."
-                        rows={6}
+                        placeholder="your.email@example.com"
                         bg={inputBg}
                         borderColor={inputBorder}
                         _hover={{ borderColor: iconColor }}
@@ -946,79 +920,159 @@ export default function CareerPage() {
                           borderColor: iconColor,
                           boxShadow: `0 0 0 1px ${iconColor}`,
                         }}
+                        suppressHydrationWarning
                       />
-                      <FormErrorMessage>{errors.coverLetter}</FormErrorMessage>
+                      <FormErrorMessage>{errors.email}</FormErrorMessage>
                     </FormControl>
+                  </Grid>
 
-                    <FormControl isInvalid={!!errors.resume}>
-                      <FormLabel>Resume / CV (PDF only)</FormLabel>
-                      <Box
-                        position="relative"
-                        borderWidth="2px"
-                        borderStyle="dashed"
-                        borderColor={errors.resume ? 'error.500' : inputBorder}
-                        borderRadius="md"
-                        p={6}
-                        textAlign="center"
+                  <Grid
+                    templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }}
+                    gap={4}
+                  >
+                    <FormControl isInvalid={!!errors.phone}>
+                      <FormLabel>Phone Number</FormLabel>
+                      <Input
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        placeholder="+880 1XXX-XXXXXX"
                         bg={inputBg}
+                        borderColor={inputBorder}
                         _hover={{ borderColor: iconColor }}
-                        transition="all 0.2s"
-                      >
-                        <Input
-                          type="file"
-                          accept=".pdf,application/pdf"
-                          onChange={handleFileChange}
-                          position="absolute"
-                          top="0"
-                          left="0"
-                          width="100%"
-                          height="100%"
-                          opacity="0"
-                          cursor="pointer"
-                        />
-                        <VStack spacing={2}>
-                          <Icon as={FiUpload} boxSize={8} color={iconColor} />
-                          {formData.resume ? (
-                            <>
-                              <Text fontSize="sm" fontWeight="medium">
-                                {formData.resume.name}
-                              </Text>
-                              <Text fontSize="xs" color={mutedColor}>
-                                {(formData.resume.size / 1024).toFixed(2)} KB
-                              </Text>
-                            </>
-                          ) : (
-                            <>
-                              <Text fontSize="sm" fontWeight="medium">
-                                Click to upload or drag and drop
-                              </Text>
-                              <Text fontSize="xs" color={mutedColor}>
-                                PDF only (Max 10MB)
-                              </Text>
-                            </>
-                          )}
-                        </VStack>
-                      </Box>
-                      <FormErrorMessage>{errors.resume}</FormErrorMessage>
+                        _focus={{
+                          borderColor: iconColor,
+                          boxShadow: `0 0 0 1px ${iconColor}`,
+                        }}
+                        suppressHydrationWarning
+                      />
+                      <FormErrorMessage>{errors.phone}</FormErrorMessage>
                     </FormControl>
 
-                    <Button
-                      type="submit"
-                      colorScheme="primary"
-                      size="lg"
-                      rightIcon={<Icon as={FiSend} />}
-                      isLoading={isSubmitting}
-                      loadingText="Submitting..."
-                      width="full"
+                    <FormControl isInvalid={!!errors.careerId}>
+                      <FormLabel>Position Applied For</FormLabel>
+                      <Input
+                        name="careerId"
+                        value={
+                          formData.careerId
+                            ? careers.find(j => j.id === formData.careerId)?.title || ''
+                            : ''
+                        }
+                        readOnly
+                        placeholder="Select a position above"
+                        bg={inputBg}
+                        borderColor={inputBorder}
+                        cursor="not-allowed"
+                        _hover={{ borderColor: inputBorder }}
+                      />
+                      <FormErrorMessage>{errors.careerId}</FormErrorMessage>
+                    </FormControl>
+                  </Grid>
+
+                  <FormControl>
+                    <FormLabel>Years of Experience</FormLabel>
+                    <Input
+                      name="experience"
+                      value={formData.experience}
+                      onChange={handleChange}
+                      placeholder="e.g., 3 years"
+                      bg={inputBg}
+                      borderColor={inputBorder}
+                      _hover={{ borderColor: iconColor }}
+                      _focus={{
+                        borderColor: iconColor,
+                        boxShadow: `0 0 0 1px ${iconColor}`,
+                      }}
+                    />
+                  </FormControl>
+
+                  <FormControl isInvalid={!!errors.coverLetter}>
+                    <FormLabel>Cover Letter</FormLabel>
+                    <Textarea
+                      name="coverLetter"
+                      value={formData.coverLetter}
+                      onChange={handleChange}
+                      placeholder="Tell us why you'd be a great fit for this position..."
+                      rows={6}
+                      bg={inputBg}
+                      borderColor={inputBorder}
+                      _hover={{ borderColor: iconColor }}
+                      _focus={{
+                        borderColor: iconColor,
+                        boxShadow: `0 0 0 1px ${iconColor}`,
+                      }}
+                    />
+                    <FormErrorMessage>{errors.coverLetter}</FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl isInvalid={!!errors.resume}>
+                    <FormLabel>Resume / CV (PDF only)</FormLabel>
+                    <Box
+                      position="relative"
+                      borderWidth="2px"
+                      borderStyle="dashed"
+                      borderColor={errors.resume ? 'error.500' : inputBorder}
+                      borderRadius="md"
+                      p={6}
+                      textAlign="center"
+                      bg={inputBg}
+                      _hover={{ borderColor: iconColor }}
+                      transition="all 0.2s"
                     >
-                      Submit Application
-                    </Button>
-                  </Stack>
-                </form>
-              </VStack>
-            </Card>
-          </FallInPlace>
-        </Box>
+                      <Input
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        onChange={handleFileChange}
+                        position="absolute"
+                        top="0"
+                        left="0"
+                        width="100%"
+                        height="100%"
+                        opacity="0"
+                        cursor="pointer"
+                      />
+                      <VStack spacing={2}>
+                        <Icon as={FiUpload} boxSize={8} color={iconColor} />
+                        {formData.resume ? (
+                          <>
+                            <Text fontSize="sm" fontWeight="medium">
+                              {formData.resume.name}
+                            </Text>
+                            <Text fontSize="xs" color={mutedColor}>
+                              {(formData.resume.size / 1024).toFixed(2)} KB
+                            </Text>
+                          </>
+                        ) : (
+                          <>
+                            <Text fontSize="sm" fontWeight="medium">
+                              Click to upload or drag and drop
+                            </Text>
+                            <Text fontSize="xs" color={mutedColor}>
+                              PDF only (Max 10MB)
+                            </Text>
+                          </>
+                        )}
+                      </VStack>
+                    </Box>
+                    <FormErrorMessage>{errors.resume}</FormErrorMessage>
+                  </FormControl>
+
+                  <Button
+                    type="submit"
+                    colorScheme="primary"
+                    size="lg"
+                    rightIcon={<Icon as={FiSend} />}
+                    isLoading={isSubmitting}
+                    loadingText="Submitting..."
+                    width="full"
+                  >
+                    Submit Application
+                  </Button>
+                </Stack>
+              </form>
+            </VStack>
+          </Box>
+        </Modal>
 
         {/* Contact Info */}
         <Box mt={12}>
