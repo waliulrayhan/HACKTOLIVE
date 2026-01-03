@@ -23,6 +23,9 @@ import {
   HiOutlineCheckCircle,
   HiOutlineXCircle,
   HiOutlineClipboardCheck,
+  HiOutlineChevronDoubleLeft,
+  HiOutlineChevronDoubleRight,
+  HiOutlineDownload,
 } from "react-icons/hi";
 import {
   Table,
@@ -32,7 +35,6 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import Button from "@/components/ui/button/Button";
-import { Modal } from "@/components/ui/modal";
 import Badge from "@/components/ui/badge/Badge";
 
 interface Application {
@@ -96,7 +98,7 @@ export default function ApplicationsManagementPage() {
   });
   const [stats, setStats] = useState<ApplicationStats | null>(null);
   const [careers, setCareers] = useState<any[]>([]);
-  const [showModal, setShowModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [applicationToDelete, setApplicationToDelete] = useState<{ id: string; name: string } | null>(null);
@@ -264,7 +266,7 @@ export default function ApplicationsManagementPage() {
 
   const openViewModal = (application: Application) => {
     setSelectedApplication(application);
-    setShowModal(true);
+    setShowViewModal(true);
   };
 
   const openStatusModal = (application: Application) => {
@@ -433,41 +435,56 @@ export default function ApplicationsManagementPage() {
         </div>
       )}
 
-      {/* Filters */}
-      <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
-        <div className="flex flex-col gap-3 sm:gap-4">
-          {/* Search */}
-          <div className="relative flex-1 sm:max-w-xs">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <HiOutlineSearch className="h-4 w-4 text-gray-400" />
+      {/* Main Content */}
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+        {/* Header */}
+        <div className="border-b border-gray-200 p-3 sm:p-4 dark:border-white/5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+                Job Applications
+              </h2>
+              <p className="mt-0.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                Manage and review job applications
+              </p>
             </div>
-            <input
-              type="text"
-              placeholder="Search applicants..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="block w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-3 text-sm placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder-gray-500"
-            />
-            {searchInput && (
-              <button
-                onClick={clearSearch}
-                className="absolute inset-y-0 right-0 flex items-center pr-3"
-              >
-                <HiOutlineX className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
-              </button>
-            )}
           </div>
+        </div>
 
-          {/* Filters */}
-          <div className="flex flex-wrap gap-2">
+        {/* Search and Filter */}
+        <div className="border-b border-gray-200 p-3 sm:p-4 dark:border-white/5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+            <div className="relative flex-1">
+              <HiOutlineSearch className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search applicants... (Press Enter to search)"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setSearchTerm(searchInput);
+                  }
+                }}
+                className="h-9 sm:h-10 w-full rounded-lg border border-gray-300 bg-white pl-9 pr-10 text-xs text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+              />
+              {searchInput && (
+                <button
+                  onClick={() => {
+                    setSearchInput('');
+                    setSearchTerm('');
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  title="Clear search"
+                >
+                  <HiOutlineX className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
             <select
               value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="h-9 sm:h-10 rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             >
               <option value="ALL">All Status</option>
               <option value="PENDING">Pending</option>
@@ -477,63 +494,88 @@ export default function ApplicationsManagementPage() {
               <option value="ACCEPTED">Accepted</option>
               <option value="REJECTED">Rejected</option>
             </select>
-
             <select
               value={careerFilter}
-              onChange={(e) => {
-                setCareerFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
+              onChange={(e) => setCareerFilter(e.target.value)}
+              className="h-9 sm:h-10 rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             >
               <option value="ALL">All Positions</option>
               {careers.map((career) => (
                 <option key={career.id} value={career.id}>{career.title}</option>
               ))}
             </select>
-
-            <select
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-              className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
-            >
-              <option value="10">10 per page</option>
-              <option value="25">25 per page</option>
-              <option value="50">50 per page</option>
-              <option value="100">100 per page</option>
-            </select>
           </div>
         </div>
-      </div>
 
-      {/* Table */}
-      <div className="overflow-hidden rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+        {/* Table */}
         <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
+          <div className="min-w-[640px]">
+            <Table>
+            <TableHeader className="border-b border-gray-100 dark:border-white/5">
               <TableRow>
-                <TableCell className="font-semibold">Applicant</TableCell>
-                <TableCell className="font-semibold">Position</TableCell>
-                <TableCell className="font-semibold">Contact</TableCell>
-                <TableCell className="font-semibold">Experience</TableCell>
-                <TableCell className="font-semibold">Status</TableCell>
-                <TableCell className="font-semibold">Applied</TableCell>
-                <TableCell className="font-semibold text-right">Actions</TableCell>
+                <TableCell
+                  isHeader
+                  className="px-3 sm:px-4 py-2 text-left text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Applicant
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-3 sm:px-4 py-2 text-left text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Position
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-3 sm:px-4 py-2 text-left text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Contact
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-3 sm:px-4 py-2 text-left text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Experience
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-3 sm:px-4 py-2 text-left text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Status
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-3 sm:px-4 py-2 text-left text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Applied
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-3 sm:px-4 py-2 text-center text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                  Actions
+                </TableCell>
               </TableRow>
             </TableHeader>
             <TableBody>
               {applications.length === 0 ? (
                 <TableRow>
-                  <TableCell className="text-center py-8 text-gray-500 dark:text-gray-400">
-                    No applications found
+                  <TableCell colSpan={7} className="px-3 sm:px-4 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <HiOutlineDocumentText className="h-10 w-10 text-gray-400" />
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">No applications found</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Applications will appear here once candidates apply
+                      </p>
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : (
                 applications.map((application) => (
-                  <TableRow key={application.id}>
+                  <TableRow
+                    key={application.id}
+                    className="border-b border-gray-100 transition-colors hover:bg-gray-50 dark:border-white/5 dark:hover:bg-white/2"
+                  >
                     <TableCell>
                       <div className="flex flex-col">
                         <span className="font-medium text-gray-900 dark:text-white">
@@ -541,65 +583,66 @@ export default function ApplicationsManagementPage() {
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    <TableCell className="px-3 sm:px-4 py-3">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
                           {application.career.title}
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
                           {application.career.department}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400">
+                    <TableCell className="px-3 sm:px-4 py-3">
+                      <div className="flex flex-col gap-1 text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
                         <div className="flex items-center gap-1">
-                          <HiOutlineMail className="h-3 w-3" />
-                          {application.email}
+                          <HiOutlineMail className="h-3 w-3 shrink-0" />
+                          <span className="truncate max-w-[150px]">{application.email}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <HiOutlinePhone className="h-3 w-3" />
+                          <HiOutlinePhone className="h-3 w-3 shrink-0" />
                           {application.phone}
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                    <TableCell className="px-3 sm:px-4 py-3">
+                      <span className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
                         {application.experience || 'N/A'}
                       </span>
                     </TableCell>
-                    <TableCell>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium ${getStatusBadgeClass(application.status)}`}>
+                    <TableCell className="px-3 sm:px-4 py-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium ${getStatusBadgeClass(application.status)}`}>
                         {application.status}
                       </span>
                     </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                    <TableCell className="px-3 sm:px-4 py-3">
+                      <div className="flex items-center gap-1 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                        <HiOutlineCalendar className="h-3 w-3 shrink-0" />
                         {formatDate(application.createdAt)}
-                      </span>
+                      </div>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center justify-end gap-2">
+                    <TableCell className="px-3 sm:px-4 py-3">
+                      <div className="flex items-center justify-center gap-1">
                         <button
                           onClick={() => openViewModal(application)}
-                          className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-white/5 dark:hover:text-gray-300"
+                          className="rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-white/5 dark:hover:text-gray-300"
                           title="View Details"
                         >
-                          <HiOutlineEye className="h-4 w-4" />
+                          <HiOutlineEye className="h-3.5 w-3.5" />
                         </button>
                         <button
                           onClick={() => openStatusModal(application)}
-                          className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-brand-600 dark:hover:bg-white/5 dark:hover:text-brand-400"
+                          className="rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-brand-600 dark:hover:bg-white/5 dark:hover:text-brand-400"
                           title="Update Status"
                         >
-                          <HiOutlineClipboardCheck className="h-4 w-4" />
+                          <HiOutlineClipboardCheck className="h-3.5 w-3.5" />
                         </button>
                         <button
                           onClick={() => openDeleteModal(application.id, application.name)}
-                          className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-error-600 dark:hover:bg-white/5 dark:hover:text-error-400"
+                          className="rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-error-600 dark:hover:bg-white/5 dark:hover:text-error-400"
                           title="Delete"
                         >
-                          <HiOutlineTrash className="h-4 w-4" />
+                          <HiOutlineTrash className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </TableCell>
@@ -608,244 +651,423 @@ export default function ApplicationsManagementPage() {
               )}
             </TableBody>
           </Table>
+          </div>
         </div>
 
         {/* Pagination */}
-        {pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-white/5">
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              Showing {((currentPage - 1) * itemsPerPage) + 1} to{' '}
-              {Math.min(currentPage * itemsPerPage, pagination.total)} of{' '}
-              {pagination.total} results
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                variant="outline"
-                size="sm"
+        {pagination.totalPages > 0 && (
+          <div className="flex flex-col gap-3 border-t border-gray-200 p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4 dark:border-white/5">
+            <div className="flex items-center gap-2 text-xs">
+              <select
+                value={itemsPerPage}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                className="h-7 rounded-md border border-gray-300 bg-white px-2 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
               >
-                <HiOutlineChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                Page {currentPage} of {pagination.totalPages}
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+              <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                of {pagination.total} results
               </span>
-              <Button
-                onClick={() => setCurrentPage(prev => Math.min(pagination.totalPages, prev + 1))}
-                disabled={currentPage === pagination.totalPages}
-                variant="outline"
-                size="sm"
+            </div>
+            
+            <div className="flex items-center gap-1">
+              {/* First Page */}
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={pagination.page === 1}
+                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3"
+                title="First page"
               >
-                <HiOutlineChevronRight className="h-4 w-4" />
-              </Button>
+                <HiOutlineChevronDoubleLeft className="h-3 w-3" />
+              </button>
+              
+              {/* Previous Page */}
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={pagination.page === 1}
+                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3"
+                title="Previous page"
+              >
+                <HiOutlineChevronLeft className="h-3 w-3" />
+              </button>
+              
+              {/* Page Numbers */}
+              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                .filter(page => {
+                  if (pagination.totalPages <= 7) return true;
+                  if (page === 1 || page === pagination.totalPages) return true;
+                  if (Math.abs(page - pagination.page) <= 1) return true;
+                  return false;
+                })
+                .map((page, index, array) => (
+                  <React.Fragment key={page}>
+                    {index > 0 && array[index - 1] !== page - 1 && (
+                      <span className="px-1 sm:px-2 text-gray-400 text-xs">...</span>
+                    )}
+                    <button
+                      onClick={() => setCurrentPage(page)}
+                      className={`flex h-7 w-7 items-center justify-center rounded-md border text-xs font-medium transition-colors ${
+                        pagination.page === page
+                          ? 'border-brand-500 bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-400'
+                          : 'border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  </React.Fragment>
+                ))}
+              
+              {/* Next Page */}
+              <button
+                onClick={() => setCurrentPage(p => Math.min(pagination.totalPages, p + 1))}
+                disabled={pagination.page === pagination.totalPages}
+                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3"
+                title="Next page"
+              >
+                <HiOutlineChevronRight className="h-3 w-3" />
+              </button>
+              
+              {/* Last Page */}
+              <button
+                onClick={() => setCurrentPage(pagination.totalPages)}
+                disabled={pagination.page === pagination.totalPages}
+                className="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/3"
+                title="Last page"
+              >
+                <HiOutlineChevronDoubleRight className="h-3 w-3" />
+              </button>
             </div>
           </div>
         )}
       </div>
 
       {/* View Modal */}
-      {showModal && selectedApplication && (
-        <Modal
-          isOpen={showModal}
-          onClose={() => {
-            setShowModal(false);
-            setSelectedApplication(null);
-          }}
-        >
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Application from {selectedApplication.name}
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Position</p>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white">{selectedApplication.career.title}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Department</p>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white">{selectedApplication.career.department}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</p>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white">{selectedApplication.email}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</p>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white">{selectedApplication.phone}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Experience</p>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white">{selectedApplication.experience || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</p>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium mt-1 ${getStatusBadgeClass(selectedApplication.status)}`}>
-                  {selectedApplication.status}
-                </span>
-              </div>
+      {showViewModal && selectedApplication && (
+        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 bg-white dark:bg-gray-900 px-6 py-5 flex items-center justify-between border-b border-gray-200 dark:border-gray-800">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Application Details
+              </h3>
+              <button
+                onClick={() => {
+                  setShowViewModal(false);
+                  setSelectedApplication(null);
+                }}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              >
+                <HiOutlineX className="h-5 w-5" />
+              </button>
             </div>
 
-            <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Cover Letter</p>
-              <p className="mt-1 text-sm text-gray-900 dark:text-white whitespace-pre-wrap">
-                {selectedApplication.coverLetter}
-              </p>
-            </div>
-
-            {selectedApplication.resumeUrl && (
-              <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Resume / CV</p>
-                <div className="flex gap-2">
-                  <a
-                    href={`${process.env.NEXT_PUBLIC_API_URL}${selectedApplication.resumeUrl}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300"
-                  >
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    View PDF
-                  </a>
-                  <a
-                    href={`${process.env.NEXT_PUBLIC_API_URL}${selectedApplication.resumeUrl}`}
-                    download
-                    className="inline-flex items-center gap-2 text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300"
-                  >
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Download
-                  </a>
+            {/* Body */}
+            <div className="px-6 pb-6">
+              {/* Applicant Info */}
+              <div className="flex items-start justify-between gap-4 pb-5 border-b border-gray-200 dark:border-gray-800 pt-5">
+                <div className="flex-1">
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    {selectedApplication.name}
+                  </h4>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(selectedApplication.status)}`}>
+                      {selectedApplication.status}
+                    </span>
+                  </div>
                 </div>
               </div>
-            )}
 
-            {selectedApplication.notes && (
-              <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Internal Notes</p>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white whitespace-pre-wrap">
-                  {selectedApplication.notes}
-                </p>
+              {/* Details Grid */}
+              <div className="grid grid-cols-2 gap-4 pt-5 pb-5 border-b border-gray-200 dark:border-gray-800">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 shrink-0">
+                    <HiOutlineBriefcase className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Position</p>
+                    <p className="text-sm text-gray-900 dark:text-white">{selectedApplication.career.title}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 shrink-0">
+                    <HiOutlineBriefcase className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Department</p>
+                    <p className="text-sm text-gray-900 dark:text-white">{selectedApplication.career.department}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 shrink-0">
+                    <HiOutlineMail className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Email</p>
+                    <p className="text-sm text-gray-900 dark:text-white break-all">{selectedApplication.email}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 shrink-0">
+                    <HiOutlinePhone className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Phone</p>
+                    <p className="text-sm text-gray-900 dark:text-white">{selectedApplication.phone}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 shrink-0">
+                    <HiOutlineClock className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Experience</p>
+                    <p className="text-sm text-gray-900 dark:text-white">{selectedApplication.experience || 'Not specified'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 shrink-0">
+                    <HiOutlineCalendar className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Applied On</p>
+                    <p className="text-sm text-gray-900 dark:text-white">
+                      {new Date(selectedApplication.createdAt).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </p>
+                  </div>
+                </div>
               </div>
-            )}
+
+              {/* Cover Letter */}
+              <div className="pt-5 space-y-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">Cover Letter</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+                    {selectedApplication.coverLetter}
+                  </p>
+                </div>
+
+                {selectedApplication.resumeUrl && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">Resume / CV</p>
+                    <div className="flex gap-2">
+                      <a
+                        href={`${process.env.NEXT_PUBLIC_API_URL}${selectedApplication.resumeUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      >
+                        <HiOutlineEye className="h-4 w-4" />
+                        View PDF
+                      </a>
+                      <a
+                        href={`${process.env.NEXT_PUBLIC_API_URL}${selectedApplication.resumeUrl}`}
+                        download
+                        className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      >
+                        <HiOutlineDownload className="h-4 w-4" />
+                        Download
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {selectedApplication.notes && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">Internal Notes</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+                      {selectedApplication.notes}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800/50 px-6 py-4 flex items-center justify-end gap-3 border-t border-gray-200 dark:border-gray-800 rounded-b-xl">
+              <button
+                onClick={() => {
+                  setShowViewModal(false);
+                  setSelectedApplication(null);
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  setShowViewModal(false);
+                  setShowStatusModal(true);
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 dark:bg-brand-600 dark:hover:bg-brand-700 rounded-lg transition-colors"
+              >
+                Update Status
+              </button>
+            </div>
           </div>
-        </Modal>
+        </div>
       )}
 
       {/* Status Update Modal */}
       {showStatusModal && selectedApplication && (
-        <Modal
-          isOpen={showStatusModal}
-          onClose={() => {
-            setShowStatusModal(false);
-            setSelectedApplication(null);
-          }}
-        >
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Update Application Status
-            </h3>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Status
-              </label>
-              <select
-                value={statusUpdateData.status}
-                onChange={(e) => setStatusUpdateData(prev => ({ 
-                  ...prev, 
-                  status: e.target.value as Application['status'] 
-                }))}
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
-              >
-                <option value="PENDING">Pending</option>
-                <option value="REVIEWING">Reviewing</option>
-                <option value="SHORTLISTED">Shortlisted</option>
-                <option value="INTERVIEWED">Interviewed</option>
-                <option value="ACCEPTED">Accepted</option>
-                <option value="REJECTED">Rejected</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Internal Notes
-              </label>
-              <textarea
-                value={statusUpdateData.notes}
-                onChange={(e) => setStatusUpdateData(prev => ({ ...prev, notes: e.target.value }))}
-                rows={4}
-                placeholder="Add notes about this application..."
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
-              />
-            </div>
-
-            <div className="flex justify-end gap-3">
-              <Button
+        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-md">
+            {/* Header */}
+            <div className="px-6 py-5 flex items-center justify-between border-b border-gray-200 dark:border-gray-800">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Update Application Status
+              </h3>
+              <button
                 onClick={() => {
                   setShowStatusModal(false);
                   setSelectedApplication(null);
                 }}
-                variant="outline"
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              >
+                <HiOutlineX className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="px-6 py-5 space-y-4">
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Status
+                </label>
+                <select
+                  value={statusUpdateData.status}
+                  onChange={(e) => setStatusUpdateData(prev => ({ 
+                    ...prev, 
+                    status: e.target.value as Application['status'] 
+                  }))}
+                  className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                >
+                  <option value="PENDING">Pending</option>
+                  <option value="REVIEWING">Reviewing</option>
+                  <option value="SHORTLISTED">Shortlisted</option>
+                  <option value="INTERVIEWED">Interviewed</option>
+                  <option value="ACCEPTED">Accepted</option>
+                  <option value="REJECTED">Rejected</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Internal Notes
+                </label>
+                <textarea
+                  value={statusUpdateData.notes}
+                  onChange={(e) => setStatusUpdateData(prev => ({ ...prev, notes: e.target.value }))}
+                  rows={4}
+                  placeholder="Add notes about this application..."
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white resize-none"
+                />
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="bg-gray-50 dark:bg-gray-800/50 px-6 py-4 flex items-center justify-end gap-3 border-t border-gray-200 dark:border-gray-800 rounded-b-xl">
+              <button
+                onClick={() => {
+                  setShowStatusModal(false);
+                  setSelectedApplication(null);
+                }}
                 disabled={updatingStatus}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
-              </Button>
-              <Button
+              </button>
+              <button
                 onClick={handleUpdateStatus}
                 disabled={updatingStatus}
+                className="px-4 py-2 text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 dark:bg-brand-600 dark:hover:bg-brand-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
               >
+                {updatingStatus && (
+                  <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                )}
                 {updatingStatus ? 'Updating...' : 'Update Status'}
-              </Button>
+              </button>
             </div>
           </div>
-        </Modal>
+        </div>
       )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && applicationToDelete && (
-        <Modal
-          isOpen={showDeleteModal}
-          onClose={() => {
-            setShowDeleteModal(false);
-            setApplicationToDelete(null);
-          }}
-        >
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Delete Application</h3>
-            <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-error-100 dark:bg-error-500/15">
-                <HiOutlineExclamationCircle className="h-6 w-6 text-error-600 dark:text-error-400" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  Are you sure you want to delete the application from <strong>{applicationToDelete.name}</strong>? 
-                  This action cannot be undone.
-                </p>
-              </div>
-            </div>
-            <div className="flex justify-end gap-3">
-              <Button
+        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-md">
+            {/* Header */}
+            <div className="px-6 py-5 flex items-center justify-between border-b border-gray-200 dark:border-gray-800">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Delete Application</h3>
+              <button
                 onClick={() => {
                   setShowDeleteModal(false);
                   setApplicationToDelete(null);
                 }}
-                variant="outline"
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              >
+                <HiOutlineX className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="px-6 py-5">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-error-100 dark:bg-error-500/15">
+                  <HiOutlineExclamationCircle className="h-6 w-6 text-error-600 dark:text-error-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    Are you sure you want to delete the application from <strong>{applicationToDelete.name}</strong>? 
+                    This action cannot be undone.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="bg-gray-50 dark:bg-gray-800/50 px-6 py-4 flex items-center justify-end gap-3 border-t border-gray-200 dark:border-gray-800 rounded-b-xl">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setApplicationToDelete(null);
+                }}
                 disabled={isSubmitting}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
-              </Button>
+              </button>
               <button
                 onClick={handleDeleteApplication}
                 disabled={isSubmitting}
-                className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-3 text-sm bg-error-500 text-white hover:bg-error-600 disabled:bg-error-300 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-error-500 hover:bg-error-600 dark:bg-error-600 dark:hover:bg-error-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
+                {isSubmitting && (
+                  <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                )}
                 {isSubmitting ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>
-        </Modal>
+        </div>
       )}
     </div>
   );
