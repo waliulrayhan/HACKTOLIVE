@@ -81,19 +81,14 @@ export class CertificatesController {
     @Param('id') id: string,
     @Res() res: Response,
   ) {
-    const certificatePath = await this.certificatesService.getCertificatePdf(id);
+    const pdfStream = await this.certificatesService.generateCertificatePdfStream(id);
     
-    if (!fs.existsSync(certificatePath)) {
-      throw new NotFoundException('Certificate file not found');
-    }
-
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(
       'Content-Disposition',
       `inline; filename="certificate-${id}.pdf"`,
     );
     
-    const fileStream = fs.createReadStream(certificatePath);
-    fileStream.pipe(res);
+    pdfStream.pipe(res);
   }
 }

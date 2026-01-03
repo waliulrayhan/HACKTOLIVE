@@ -14,11 +14,6 @@ interface CertificateData {
 
 @Injectable()
 export class CertificateGeneratorService {
-  private readonly certificatesDir = path.join(
-    process.cwd(),
-    'uploads',
-    'certificates',
-  );
   private readonly templatePath = path.join(
     process.cwd(),
     'uploads',
@@ -26,128 +21,102 @@ export class CertificateGeneratorService {
     'template.png',
   );
 
-  constructor() {
-    // Ensure certificates directory exists
-    if (!fs.existsSync(this.certificatesDir)) {
-      fs.mkdirSync(this.certificatesDir, { recursive: true });
-    }
-  }
+  constructor() {}
 
-  async generateCertificate(
-    data: CertificateData,
-    certificateId: string,
-  ): Promise<string> {
-    const fileName = `${certificateId}.pdf`;
-    const filePath = path.join(this.certificatesDir, fileName);
-
-    return new Promise((resolve, reject) => {
-      try {
-        const doc = new PDFDocument({
-          size: 'A4',
-          layout: 'landscape',
-          margin: 0,
-        });
-
-        const writeStream = fs.createWriteStream(filePath);
-        doc.pipe(writeStream);
-
-        // Add template background image - fill entire page
-        if (fs.existsSync(this.templatePath)) {
-          doc.image(this.templatePath, 0, 0, {
-            width: doc.page.width,
-            height: doc.page.height,
-            fit: [doc.page.width, doc.page.height],
-          });
-        } else {
-          // Fallback to simple background if template not found
-          this.drawBackground(doc);
-          this.drawBorder(doc);
-          this.drawHeader(doc);
-        }
-
-        // Student name - elegant script font (positioned for "Full Name" area)
-        doc
-          .fontSize(50)
-          .font('Times-Italic')
-          .fillColor('#1d6f65')
-          .text(data.studentName, 100, 250, {
-            align: 'center',
-            width: 642,
-          });
-
-        // Course completion text with course name integrated
-        const courseText = `Has successfully completed the comprehensive ${data.duration}-hour course on`;
-        doc
-          .fontSize(13)
-          .font('Helvetica')
-          .fillColor('#1d6f65')
-          .text(courseText, 100, 350, {
-            align: 'center',
-            width: 642,
-          });
-
-        // Course name in quotes (next line)
-        doc
-          .fontSize(16)
-          .font('Helvetica-Bold')
-          .fillColor('#1d6f65')
-          .text(`"${data.courseName}"`, 100, 365, {
-            align: 'center',
-            width: 642,
-          });
-
-        // Format date
-        const dateStr = data.completionDate.toLocaleDateString('en-US', {
-          weekday: 'long',
-          month: 'long',
-          day: 'numeric',
-            year: 'numeric',
-          });
-
-        // Date positioned at bottom center
-        doc
-          .fontSize(13)
-          .font('Helvetica')
-          .fillColor('#1d6f65')
-          .text(dateStr, 100, 370, {
-            align: 'center',
-            width: 642,
-          });
-
-        // Certification Number - bottom left (under "Certification Number" label)
-        doc
-          .fontSize(10)
-          .font('Helvetica')
-          .fillColor('#1d6f65')
-          .text(data.verificationCode, 200, 450, {
-            align: 'center',
-            width: 165,
-          });
-
-        // Instructor name - bottom right (under "Instructor" label)
-        doc
-          .fontSize(10)
-          .font('Helvetica')
-          .fillColor('#1d6f65')
-          .text(data.instructorName, 200, 450, {
-            align: 'center',
-            width: 165,
-          });
-
-        // Finalize PDF
-        doc.end();
-
-        writeStream.on('finish', () => {
-          resolve(`/certificates/${fileName}`);
-        });
-
-        writeStream.on('error', (error) => {
-          reject(error);
-        });
-      } catch (error) {
-        reject(error);
-      }
+  generateCertificatePDF(data: CertificateData): PDFKit.PDFDocument {
+    const doc = new PDFDocument({
+      size: 'A4',
+      layout: 'landscape',
+      margin: 0,
     });
+
+    // Add template background image - fill entire page
+    if (fs.existsSync(this.templatePath)) {
+      doc.image(this.templatePath, 0, 0, {
+        width: doc.page.width,
+        height: doc.page.height,
+        fit: [doc.page.width, doc.page.height],
+      });
+    } else {
+      // Fallback to simple background if template not found
+      this.drawBackground(doc);
+      this.drawBorder(doc);
+      this.drawHeader(doc);
+    }
+
+    // Student name - elegant script font (positioned for "Full Name" area)
+    doc
+      .fontSize(50)
+      .font('Times-Italic')
+      .fillColor('#1d6f65')
+      .text(data.studentName, 100, 250, {
+        align: 'center',
+        width: 642,
+      });
+
+    // Course completion text with course name integrated
+    const courseText = `Has successfully completed the comprehensive ${data.duration}-hour course on`;
+    doc
+      .fontSize(13)
+      .font('Helvetica')
+      .fillColor('#1d6f65')
+      .text(courseText, 100, 350, {
+        align: 'center',
+        width: 642,
+      });
+
+    // Course name in quotes (next line)
+    doc
+      .fontSize(16)
+      .font('Helvetica-Bold')
+      .fillColor('#1d6f65')
+      .text(`"${data.courseName}"`, 100, 365, {
+        align: 'center',
+        width: 642,
+      });
+
+    // Format date
+    const dateStr = data.completionDate.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+        year: 'numeric',
+      });
+
+    // Date positioned at bottom center
+    doc
+      .fontSize(13)
+      .font('Helvetica')
+      .fillColor('#1d6f65')
+      .text(dateStr, 100, 370, {
+        align: 'center',
+        width: 642,
+      });
+
+    // Certification Number - bottom left (under "Certification Number" label)
+    doc
+      .fontSize(10)
+      .font('Helvetica')
+      .fillColor('#1d6f65')
+      .text(data.verificationCode, 200, 450, {
+        align: 'center',
+        width: 165,
+      });
+
+    // Instructor name - bottom right (under "Instructor" label)
+    doc
+      .fontSize(10)
+      .font('Helvetica')
+      .fillColor('#1d6f65')
+      .text(data.instructorName, 200, 450, {
+        align: 'center',
+        width: 165,
+      });
+
+    // Finalize PDF
+    doc.end();
+
+    return doc;
   }
 
   private drawBackground(doc: PDFKit.PDFDocument) {
@@ -361,19 +330,5 @@ export class CertificateGeneratorService {
 
     doc.restore();
     doc.fillOpacity(1);
-  }
-
-  async deleteCertificate(certificateId: string): Promise<void> {
-    const fileName = `${certificateId}.pdf`;
-    const filePath = path.join(this.certificatesDir, fileName);
-
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-  }
-
-  getCertificatePath(certificateId: string): string {
-    const fileName = `${certificateId}.pdf`;
-    return path.join(this.certificatesDir, fileName);
   }
 }

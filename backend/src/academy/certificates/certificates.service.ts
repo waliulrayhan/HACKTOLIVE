@@ -66,7 +66,7 @@ export class CertificatesService {
     });
   }
 
-  async findOne(id: string): Promise<Certificate | null> {
+  async findOne(id: string) {
     const certificate = await this.prisma.certificate.findUnique({
       where: { id },
       include: {
@@ -170,11 +170,6 @@ export class CertificatesService {
         },
       },
     });
-
-    // If status changed to ISSUED, generate PDF
-    if (data.status === 'ISSUED' && certificate.status === 'ISSUED') {
-      await this.generateCertificatePdf(certificate);
-    }
 
     return certificate;
   }
@@ -285,7 +280,13 @@ export class CertificatesService {
     return `HACK-${timestamp}-${randomPart}`;
   }
 
-  async generateCertificatePdf(certificate: any): Promise<string> {
+  async generateCertificatePdfStream(certificateId: string): Promise<PDFKit.PDFDocument> {
+    const certificate = await this.findOne(certificateId);
+    
+    if (certificate.status !== 'ISSUED') {
+      throw new NotFoundException('Certificate not yet issued');
+    }
+
     const certificateData = {
       studentName: certificate.student?.user?.name || 'Student',
       courseName: certificate.course?.title || 'Course',
@@ -295,41 +296,6 @@ export class CertificatesService {
       duration: certificate.course?.duration || 0,
     };
 
-    const pdfUrl = await this.certificateGenerator.generateCertificate(
-      certificateData,
-      certificate.id,
-    );
-
-    // Update certificate with PDF URL
-    await this.prisma.certificate.update({
-      where: { id: certificate.id },
-      data: {
-        certificateUrl: pdfUrl,
-      },
-    });
-
-    return pdfUrl;
-  }
-
-  async getCertificatePdf(certificateId: string): Promise<string> {
-    const certificate = await this.findOne(certificateId);
-    
-    if (!certificate) {
-      throw new NotFoundException('Certificate not found');
-    }
-
-    if (certificate.status !== 'ISSUED') {
-      throw new NotFoundException('Certificate not yet issued');
-    }
-
-    const pdfPath = this.certificateGenerator.getCertificatePath(certificateId);
-    
-    // If PDF doesn't exist, generate it
-    const fs = require('fs');
-    if (!fs.existsSync(pdfPath)) {
-      await this.generateCertificatePdf(certificate);
-    }
-
-    return pdfPath;
+    return this.certificateGenerator.generateCertificatePDF(certificateData);
   }
 }

@@ -1000,21 +1000,6 @@ export class InstructorService {
       },
     });
 
-    // Generate PDF certificate
-    const certificateData = {
-      studentName: updatedCertificate.student.user.name || 'Student',
-      courseName: updatedCertificate.course.title,
-      instructorName: updatedCertificate.course.instructor.user.name || 'Instructor',
-      completionDate: updatedCertificate.issuedAt || new Date(),
-      verificationCode: updatedCertificate.verificationCode || '',
-      duration: updatedCertificate.course.duration,
-    };
-
-    await this.certificateGenerator.generateCertificate(
-      certificateData,
-      updatedCertificate.id,
-    );
-
     // Update student certificates count
     await this.prisma.student.update({
       where: { id: certificate.studentId },
