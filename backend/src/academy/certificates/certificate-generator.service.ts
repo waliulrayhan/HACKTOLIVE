@@ -19,6 +19,12 @@ export class CertificateGeneratorService {
     'uploads',
     'certificates',
   );
+  private readonly templatePath = path.join(
+    process.cwd(),
+    'uploads',
+    'certificate-templates',
+    'template.png',
+  );
 
   constructor() {
     // Ensure certificates directory exists
@@ -45,101 +51,88 @@ export class CertificateGeneratorService {
         const writeStream = fs.createWriteStream(filePath);
         doc.pipe(writeStream);
 
-        // Background - elegant gradient effect
-        this.drawBackground(doc);
-
-        // Border decoration
-        this.drawBorder(doc);
-
-        // Header section
-        this.drawHeader(doc);
-
-        // Certificate of Achievement text
-        doc
-          .fontSize(24)
-          .font('Helvetica-Bold')
-          .fillColor('#1a1a1a')
-          .text('CERTIFICATE OF COMPLETION', 0, 150, {
-            align: 'center',
+        // Add template background image - fill entire page
+        if (fs.existsSync(this.templatePath)) {
+          doc.image(this.templatePath, 0, 0, {
             width: doc.page.width,
+            height: doc.page.height,
+            fit: [doc.page.width, doc.page.height],
+          });
+        } else {
+          // Fallback to simple background if template not found
+          this.drawBackground(doc);
+          this.drawBorder(doc);
+          this.drawHeader(doc);
+        }
+
+        // Student name - elegant script font (positioned for "Full Name" area)
+        doc
+          .fontSize(50)
+          .font('Times-Italic')
+          .fillColor('#1d6f65')
+          .text(data.studentName, 100, 250, {
+            align: 'center',
+            width: 642,
           });
 
-        // Decorative line under title
+        // Course completion text with course name integrated
+        const courseText = `Has successfully completed the comprehensive ${data.duration}-hour course on`;
         doc
-          .moveTo(250, 185)
-          .lineTo(doc.page.width - 250, 185)
-          .lineWidth(2)
-          .strokeColor('#6366f1')
-          .stroke();
-
-        // "This is to certify that" text
-        doc
-          .fontSize(14)
+          .fontSize(13)
           .font('Helvetica')
-          .fillColor('#666')
-          .text('This is to certify that', 0, 220, {
+          .fillColor('#1d6f65')
+          .text(courseText, 100, 350, {
             align: 'center',
-            width: doc.page.width,
+            width: 642,
           });
 
-        // Student name - highlighted
+        // Course name in quotes (next line)
         doc
-          .fontSize(36)
+          .fontSize(16)
           .font('Helvetica-Bold')
-          .fillColor('#1a1a1a')
-          .text(data.studentName, 0, 250, {
+          .fillColor('#1d6f65')
+          .text(`"${data.courseName}"`, 100, 365, {
             align: 'center',
-            width: doc.page.width,
+            width: 642,
           });
 
-        // Decorative underline for name
-        const nameWidth = doc.widthOfString(data.studentName);
-        const nameX = (doc.page.width - nameWidth) / 2;
-        doc
-          .moveTo(nameX, 295)
-          .lineTo(nameX + nameWidth, 295)
-          .lineWidth(1.5)
-          .strokeColor('#6366f1')
-          .stroke();
+        // Format date
+        const dateStr = data.completionDate.toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+            year: 'numeric',
+          });
 
-        // "has successfully completed" text
+        // Date positioned at bottom center
         doc
-          .fontSize(14)
+          .fontSize(13)
           .font('Helvetica')
-          .fillColor('#666')
-          .text('has successfully completed the course', 0, 320, {
+          .fillColor('#1d6f65')
+          .text(dateStr, 100, 370, {
             align: 'center',
-            width: doc.page.width,
+            width: 642,
           });
 
-        // Course name - highlighted
+        // Certification Number - bottom left (under "Certification Number" label)
         doc
-          .fontSize(24)
-          .font('Helvetica-Bold')
-          .fillColor('#6366f1')
-          .text(data.courseName, 0, 350, {
-            align: 'center',
-            width: doc.page.width,
-          });
-
-        // Duration info
-        doc
-          .fontSize(12)
+          .fontSize(10)
           .font('Helvetica')
-          .fillColor('#888')
-          .text(`Course Duration: ${data.duration} hours`, 0, 390, {
+          .fillColor('#1d6f65')
+          .text(data.verificationCode, 200, 450, {
             align: 'center',
-            width: doc.page.width,
+            width: 165,
           });
 
-        // Footer section with signatures
-        this.drawFooter(doc, data);
-
-        // Verification code section
-        this.drawVerificationCode(doc, data.verificationCode);
-
-        // Decorative elements
-        this.drawDecorativeElements(doc);
+        // Instructor name - bottom right (under "Instructor" label)
+        doc
+          .fontSize(10)
+          .font('Helvetica')
+          .fillColor('#1d6f65')
+          .text(data.instructorName, 200, 450, {
+            align: 'center',
+            width: 165,
+          });
 
         // Finalize PDF
         doc.end();
