@@ -106,17 +106,17 @@ export default function StudentPerformanceModal({
               <div className="grid gap-2 sm:gap-3 grid-cols-3">
                 {/* Lessons */}
                 <div className="rounded-md border border-gray-200 bg-white p-2.5 sm:p-3 dark:border-white/5 dark:bg-white/3">
-                  <div className="flex flex-col items-center text-center gap-1.5 sm:gap-2">
-                    <div className={`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg ${
-                      performance.performance.lessons.percentage >= 80 
-                        ? "bg-success-100 dark:bg-success-500/15" 
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className={`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg shrink-0 ${
+                      performance.performance.lessons.percentage >= 80
+                        ? "bg-success-100 dark:bg-success-500/15"
                         : performance.performance.lessons.percentage >= 60
                         ? "bg-warning-100 dark:bg-warning-500/15"
                         : "bg-error-100 dark:bg-error-500/15"
                     }`}>
                       <HiOutlineAcademicCap className={`h-4 w-4 sm:h-5 sm:w-5 ${getScoreColor(performance.performance.lessons.percentage)}`} />
                     </div>
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Lessons</p>
                       <p className={`text-sm sm:text-base font-bold ${getScoreColor(performance.performance.lessons.percentage)}`}>
                         {performance.performance.lessons.completed}/{performance.performance.lessons.total}
@@ -130,17 +130,17 @@ export default function StudentPerformanceModal({
 
                 {/* Quizzes */}
                 <div className="rounded-md border border-gray-200 bg-white p-2.5 sm:p-3 dark:border-white/5 dark:bg-white/3">
-                  <div className="flex flex-col items-center text-center gap-1.5 sm:gap-2">
-                    <div className={`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg ${
-                      performance.performance.quizzes.averageScore >= 80 
-                        ? "bg-success-100 dark:bg-success-500/15" 
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className={`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg shrink-0 ${
+                      performance.performance.quizzes.averageScore >= 80
+                        ? "bg-success-100 dark:bg-success-500/15"
                         : performance.performance.quizzes.averageScore >= 60
                         ? "bg-warning-100 dark:bg-warning-500/15"
                         : "bg-error-100 dark:bg-error-500/15"
                     }`}>
                       <HiOutlineQuestionMarkCircle className={`h-4 w-4 sm:h-5 sm:w-5 ${getScoreColor(performance.performance.quizzes.averageScore)}`} />
                     </div>
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Quizzes</p>
                       <p className={`text-sm sm:text-base font-bold ${getScoreColor(performance.performance.quizzes.averageScore)}`}>
                         {performance.performance.quizzes.averageScore}%
@@ -154,17 +154,17 @@ export default function StudentPerformanceModal({
 
                 {/* Assignments */}
                 <div className="rounded-md border border-gray-200 bg-white p-2.5 sm:p-3 dark:border-white/5 dark:bg-white/3">
-                  <div className="flex flex-col items-center text-center gap-1.5 sm:gap-2">
-                    <div className={`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg ${
-                      performance.performance.assignments.averageScore >= 80 
-                        ? "bg-success-100 dark:bg-success-500/15" 
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className={`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg shrink-0 ${
+                      performance.performance.assignments.averageScore >= 80
+                        ? "bg-success-100 dark:bg-success-500/15"
                         : performance.performance.assignments.averageScore >= 60
                         ? "bg-warning-100 dark:bg-warning-500/15"
                         : "bg-error-100 dark:bg-error-500/15"
                     }`}>
                       <HiOutlineClipboardCheck className={`h-4 w-4 sm:h-5 sm:w-5 ${getScoreColor(performance.performance.assignments.averageScore)}`} />
                     </div>
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Assignments</p>
                       <p className={`text-sm sm:text-base font-bold ${getScoreColor(performance.performance.assignments.averageScore)}`}>
                         {performance.performance.assignments.averageScore}%
@@ -315,33 +315,35 @@ export default function StudentPerformanceModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="sticky bottom-0 flex items-center justify-end gap-2 sm:gap-2.5 border-t border-gray-200 bg-white px-4 sm:px-5 py-3 sm:py-3.5 dark:border-white/5 dark:bg-gray-900">
+        <div className="sticky bottom-0 flex items-center justify-between gap-2 sm:gap-2.5 border-t border-gray-200 bg-white px-4 sm:px-5 py-3 sm:py-3.5 dark:border-white/5 dark:bg-gray-900">
           <button
             onClick={onClose}
             className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors dark:text-gray-300 dark:hover:bg-gray-800"
           >
             Cancel
           </button>
-          <button
-            onClick={() => {
-              onReject(certificateId);
-              onClose();
-            }}
-            className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-red-600 border border-red-500 hover:bg-red-50 rounded-md transition-colors dark:text-red-500 dark:hover:bg-red-500/10"
-          >
-            <HiOutlineXCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            Reject
-          </button>
-          <button
-            onClick={() => {
-              onIssue(certificateId);
-              onClose();
-            }}
-            className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 rounded-md transition-colors"
-          >
-            <HiOutlineCheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            Issue Certificate
-          </button>
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            <button
+              onClick={() => {
+                onReject(certificateId);
+                onClose();
+              }}
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-red-600 border border-red-500 hover:bg-red-50 rounded-md transition-colors dark:text-red-500 dark:hover:bg-red-500/10"
+            >
+              <HiOutlineXCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              Reject
+            </button>
+            <button
+              onClick={() => {
+                onIssue(certificateId);
+                onClose();
+              }}
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 rounded-md transition-colors"
+            >
+              <HiOutlineCheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              Issue Certificate
+            </button>
+          </div>
         </div>
       </div>
     </div>
