@@ -106,6 +106,16 @@ export default function DashboardLayout({
             name: "Blogs",
             path: "/admin/blogs",
           },
+          {
+            icon: <BoxIcon />,
+            name: "Careers",
+            path: "/admin/careers",
+          },
+          {
+            icon: <FileIcon />,
+            name: "Applications",
+            path: "/admin/applications",
+          },
           // {
           //   icon: <PieChartIcon />,
           //   name: "System Analytics",

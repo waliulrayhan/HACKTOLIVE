@@ -29,6 +29,7 @@ import {
   Divider,
 } from '@chakra-ui/react'
 import { toast } from '@/components/ui/toast'
+import { useEffect } from 'react'
 import {
   FiTarget,
   FiHeart,
@@ -150,11 +151,13 @@ const jobOpenings: JobPosition[] = [
 ]
 
 export default function CareerPage() {
+  const [careers, setCareers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    position: '',
+    careerId: '',
     experience: '',
     resume: null as File | null,
     coverLetter: '',
@@ -175,6 +178,27 @@ export default function CareerPage() {
   const badgeBg = useColorModeValue('primary.100', 'primary.900')
   const badgeColor = useColorModeValue('primary.800', 'primary.200')
 
+  // Fetch careers from API
+  useEffect(() => {
+    const fetchCareers = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/career?status=ACTIVE`
+        );
+        if (!response.ok) throw new Error('Failed to fetch careers');
+        const data = await response.json();
+        setCareers(data.data || []);
+      } catch (error) {
+        console.error('Error fetching careers:', error);
+        toast.error('Failed to load career opportunities');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCareers();
+  }, []);
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
@@ -192,14 +216,22 @@ export default function CareerPage() {
       newErrors.phone = 'Phone number is required'
     }
 
-    if (!formData.position.trim()) {
-      newErrors.position = 'Position is required'
+    if (!formData.careerId.trim()) {
+      newErrors.careerId = 'Position is required'
     }
 
     if (!formData.coverLetter.trim()) {
       newErrors.coverLetter = 'Cover letter is required'
     } else if (formData.coverLetter.trim().length < 50) {
       newErrors.coverLetter = 'Cover letter must be at least 50 characters'
+    }
+
+    if (!formData.resume) {
+      newErrors.resume = 'Resume/CV is required'
+    } else if (formData.resume.type !== 'application/pdf') {
+      newErrors.resume = 'Resume must be a PDF file'
+    } else if (formData.resume.size > 10 * 1024 * 1024) {
+      newErrors.resume = 'Resume file size must not exceed 10MB'
     }
 
     setErrors(newErrors)
@@ -215,25 +247,51 @@ export default function CareerPage() {
 
     setIsSubmitting(true)
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('phone', formData.phone);
+      formDataToSend.append('careerId', formData.careerId);
+      formDataToSend.append('experience', formData.experience);
+      formDataToSend.append('coverLetter', formData.coverLetter);
+      if (formData.resume) {
+        formDataToSend.append('resume', formData.resume);
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/career/applications`,
+        {
+          method: 'POST',
+          body: formDataToSend,
+        }
+      )
+
+      if (!response.ok) throw new Error('Failed to submit application')
+
       toast.success('Application submitted successfully!', {
         description: "We'll review your application and get back to you soon.",
         duration: 5000,
       })
 
       setFormData({
+        careerId: '',
         name: '',
         email: '',
         phone: '',
-        position: '',
         experience: '',
         resume: null,
         coverLetter: '',
       })
       setSelectedJob(null)
+    } catch (error) {
+      console.error('Error submitting application:', error)
+      toast.error('Failed to submit application', {
+        description: 'Please try again',
+      })
+    } finally {
       setIsSubmitting(false)
-    }, 1500)
+    }
   }
 
   const handleChange = (
@@ -247,14 +305,16 @@ export default function CareerPage() {
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData((prev) => ({ ...prev, resume: e.target.files![0] }))
+    const file = e.target.files?.[0] || null;
+    setFormData((prev) => ({ ...prev, resume: file }));
+    if (errors.resume) {
+      setErrors((prev) => ({ ...prev, resume: '' }));
     }
-  }
+  };
 
   const handleApplyClick = (jobId: string, jobTitle: string) => {
     setSelectedJob(jobId)
-    setFormData((prev) => ({ ...prev, position: jobTitle }))
+    setFormData((prev) => ({ ...prev, careerId: jobId }))
     const applicationForm = document.getElementById('application-form')
     applicationForm?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -598,7 +658,12 @@ export default function CareerPage() {
           </FallInPlace>
 
           <Stack spacing={6} w="full">
-            {jobOpenings.map((job, index) => (
+            {loading ? (
+              <Text textAlign="center">Loading career opportunities...</Text>
+            ) : careers.length === 0 ? (
+              <Text textAlign="center" color={mutedColor}>No career opportunities available at the moment.</Text>
+            ) : (
+              careers.map((job, index) => (
               <FallInPlace key={job.id} delay={0.1 * (index + 1)}>
                 <Card
                   bg={cardBg}
@@ -627,7 +692,7 @@ export default function CareerPage() {
                           borderRadius="lg"
                           bg={iconBg}
                         >
-                          <Icon as={job.icon} boxSize={6} color={iconColor} />
+                          <Icon as={FiBriefcase} boxSize={6} color={iconColor} />
                         </Flex>
                         <Box flex="1" minW="200px">
                           <Heading size="md" mb={1}>
@@ -677,21 +742,23 @@ export default function CareerPage() {
                           gap={1}
                         >
                           <Icon as={FiCalendar} boxSize={3} />
-                          {job.experience}
+                          {job.experience || 'Not specified'}
                         </Badge>
-                        <Badge
-                          bg={badgeBg}
-                          color={badgeColor}
-                          px={3}
-                          py={1}
-                          borderRadius="full"
-                          display="flex"
-                          alignItems="center"
-                          gap={1}
-                        >
-                          <Icon as={FiDollarSign} boxSize={3} />
-                          {job.salary}
-                        </Badge>
+                        {job.salary && (
+                          <Badge
+                            bg={badgeBg}
+                            color={badgeColor}
+                            px={3}
+                            py={1}
+                            borderRadius="full"
+                            display="flex"
+                            alignItems="center"
+                            gap={1}
+                          >
+                            <Icon as={FiDollarSign} boxSize={3} />
+                            {job.salary}
+                          </Badge>
+                        )}
                       </Flex>
 
                       <Text color={mutedColor}>{job.description}</Text>
@@ -701,7 +768,7 @@ export default function CareerPage() {
                           Requirements:
                         </Heading>
                         <List spacing={2}>
-                          {job.requirements.map((req, idx) => (
+                          {Array.isArray(job.requirements) ? job.requirements.map((req, idx) => (
                             <ListItem
                               key={idx}
                               fontSize="sm"
@@ -716,7 +783,7 @@ export default function CareerPage() {
                               />
                               {req}
                             </ListItem>
-                          ))}
+                          )) : null}
                         </List>
                       </Box>
                     </VStack>
@@ -733,7 +800,8 @@ export default function CareerPage() {
                   </Grid>
                 </Card>
               </FallInPlace>
-            ))}
+            ))
+            )}
           </Stack>
         </VStack>
 
@@ -797,6 +865,7 @@ export default function CareerPage() {
                             borderColor: iconColor,
                             boxShadow: `0 0 0 1px ${iconColor}`,
                           }}
+                          suppressHydrationWarning
                         />
                         <FormErrorMessage>{errors.email}</FormErrorMessage>
                       </FormControl>
@@ -820,26 +889,28 @@ export default function CareerPage() {
                             borderColor: iconColor,
                             boxShadow: `0 0 0 1px ${iconColor}`,
                           }}
+                          suppressHydrationWarning
                         />
                         <FormErrorMessage>{errors.phone}</FormErrorMessage>
                       </FormControl>
 
-                      <FormControl isInvalid={!!errors.position}>
+                      <FormControl isInvalid={!!errors.careerId}>
                         <FormLabel>Position Applied For</FormLabel>
                         <Input
-                          name="position"
-                          value={formData.position}
-                          onChange={handleChange}
-                          placeholder="Select a position above or enter custom"
+                          name="careerId"
+                          value={
+                            formData.careerId
+                              ? careers.find(j => j.id === formData.careerId)?.title || ''
+                              : ''
+                          }
+                          readOnly
+                          placeholder="Select a position above"
                           bg={inputBg}
                           borderColor={inputBorder}
-                          _hover={{ borderColor: iconColor }}
-                          _focus={{
-                            borderColor: iconColor,
-                            boxShadow: `0 0 0 1px ${iconColor}`,
-                          }}
+                          cursor="not-allowed"
+                          _hover={{ borderColor: inputBorder }}
                         />
-                        <FormErrorMessage>{errors.position}</FormErrorMessage>
+                        <FormErrorMessage>{errors.careerId}</FormErrorMessage>
                       </FormControl>
                     </Grid>
 
@@ -860,26 +931,6 @@ export default function CareerPage() {
                       />
                     </FormControl>
 
-                    <FormControl>
-                      <FormLabel>Resume / CV</FormLabel>
-                      <Input
-                        type="file"
-                        accept=".pdf,.doc,.docx"
-                        onChange={handleFileChange}
-                        bg={inputBg}
-                        borderColor={inputBorder}
-                        pt={1}
-                        _hover={{ borderColor: iconColor }}
-                        _focus={{
-                          borderColor: iconColor,
-                          boxShadow: `0 0 0 1px ${iconColor}`,
-                        }}
-                      />
-                      <Text fontSize="xs" color={mutedColor} mt={1}>
-                        Upload your resume in PDF or DOC format (Max 5MB)
-                      </Text>
-                    </FormControl>
-
                     <FormControl isInvalid={!!errors.coverLetter}>
                       <FormLabel>Cover Letter</FormLabel>
                       <Textarea
@@ -897,6 +948,58 @@ export default function CareerPage() {
                         }}
                       />
                       <FormErrorMessage>{errors.coverLetter}</FormErrorMessage>
+                    </FormControl>
+
+                    <FormControl isInvalid={!!errors.resume}>
+                      <FormLabel>Resume / CV (PDF only)</FormLabel>
+                      <Box
+                        position="relative"
+                        borderWidth="2px"
+                        borderStyle="dashed"
+                        borderColor={errors.resume ? 'error.500' : inputBorder}
+                        borderRadius="md"
+                        p={6}
+                        textAlign="center"
+                        bg={inputBg}
+                        _hover={{ borderColor: iconColor }}
+                        transition="all 0.2s"
+                      >
+                        <Input
+                          type="file"
+                          accept=".pdf,application/pdf"
+                          onChange={handleFileChange}
+                          position="absolute"
+                          top="0"
+                          left="0"
+                          width="100%"
+                          height="100%"
+                          opacity="0"
+                          cursor="pointer"
+                        />
+                        <VStack spacing={2}>
+                          <Icon as={FiUpload} boxSize={8} color={iconColor} />
+                          {formData.resume ? (
+                            <>
+                              <Text fontSize="sm" fontWeight="medium">
+                                {formData.resume.name}
+                              </Text>
+                              <Text fontSize="xs" color={mutedColor}>
+                                {(formData.resume.size / 1024).toFixed(2)} KB
+                              </Text>
+                            </>
+                          ) : (
+                            <>
+                              <Text fontSize="sm" fontWeight="medium">
+                                Click to upload or drag and drop
+                              </Text>
+                              <Text fontSize="xs" color={mutedColor}>
+                                PDF only (Max 10MB)
+                              </Text>
+                            </>
+                          )}
+                        </VStack>
+                      </Box>
+                      <FormErrorMessage>{errors.resume}</FormErrorMessage>
                     </FormControl>
 
                     <Button

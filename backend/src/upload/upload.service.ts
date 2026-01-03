@@ -19,6 +19,7 @@ export class UploadService {
       path.join(this.uploadPath, 'avatars'),
       path.join(this.uploadPath, 'images'),
       path.join(this.uploadPath, 'documents'),
+      path.join(this.uploadPath, 'resumes'),
     ];
 
     dirs.forEach((dir) => {
@@ -43,6 +44,24 @@ export class UploadService {
     const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedMimeTypes.includes(file.mimetype)) {
       throw new BadRequestException('Only image files (JPEG, PNG, GIF, WebP) are allowed');
+    }
+  }
+
+  validateDocumentFile(file: any): void {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    // Check file size (max 10MB for documents)
+    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+    if (file.size > maxSize) {
+      throw new BadRequestException('File size must not exceed 10MB');
+    }
+
+    // Check file type - only PDF for resumes
+    const allowedMimeTypes = ['application/pdf'];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new BadRequestException('Only PDF files are allowed for resumes');
     }
   }
 
@@ -92,5 +111,16 @@ export class UploadService {
     fs.writeFileSync(filepath, file.buffer);
     
     return this.getFileUrl(filename, 'images');
+  }
+
+  async uploadResume(file: any): Promise<string> {
+    this.validateDocumentFile(file);
+    const filename = this.generateFileName(file, 'resume-');
+    const filepath = path.join(this.uploadPath, 'resumes', filename);
+    
+    // Save file
+    fs.writeFileSync(filepath, file.buffer);
+    
+    return this.getFileUrl(filename, 'resumes');
   }
 }

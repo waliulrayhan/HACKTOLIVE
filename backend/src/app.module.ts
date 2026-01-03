@@ -9,6 +9,7 @@ import { InstructorModule } from './instructor/instructor.module';
 import { AdminModule } from './admin/admin.module';
 import { UploadModule } from './upload/upload.module';
 import { BlogModule } from './blog/blog.module';
+import { CareerModule } from './career/career.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { BlogModule } from './blog/blog.module';
     AdminModule,
     UploadModule,
     BlogModule,
+    CareerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
