@@ -97,11 +97,10 @@ export default function CertificatesPage() {
       return;
     }
 
-    if (certificate.certificateUrl) {
-      window.open(certificate.certificateUrl, "_blank");
-    } else {
-      toast.info("Certificate download coming soon!");
-    }
+    // Open certificate PDF in new tab
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    const certificateUrl = `${apiUrl}/academy/certificates/download/${certificate.id}`;
+    window.open(certificateUrl, "_blank");
   };
 
   const handleVerify = (verificationCode: string) => {

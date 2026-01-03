@@ -10,6 +10,7 @@ import { ReviewsController } from './reviews/reviews.controller';
 import { ReviewsService } from './reviews/reviews.service';
 import { CertificatesController } from './certificates/certificates.controller';
 import { CertificatesService } from './certificates/certificates.service';
+import { CertificateGeneratorService } from './certificates/certificate-generator.service';
 import { QuizzesController } from './quizzes/quizzes.controller';
 import { QuizzesService } from './quizzes/quizzes.service';
 
@@ -29,6 +30,7 @@ import { QuizzesService } from './quizzes/quizzes.service';
     EnrollmentsService,
     ReviewsService,
     CertificatesService,
+    CertificateGeneratorService,
     QuizzesService,
   ],
   exports: [

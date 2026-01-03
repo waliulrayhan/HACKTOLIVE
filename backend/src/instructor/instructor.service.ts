@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Prisma } from '@prisma/client';
+import { CertificateGeneratorService } from '../academy/certificates/certificate-generator.service';
 
 @Injectable()
 export class InstructorService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private certificateGenerator: CertificateGeneratorService,
+  ) {}
 
   // Verify course ownership
   async verifyCourseOwnership(userId: string, courseId: string) {
@@ -986,11 +990,30 @@ export class InstructorService {
         },
         course: {
           include: {
-            instructor: true,
+            instructor: {
+              include: {
+                user: true,
+              },
+            },
           },
         },
       },
     });
+
+    // Generate PDF certificate
+    const certificateData = {
+      studentName: updatedCertificate.student.user.name || 'Student',
+      courseName: updatedCertificate.course.title,
+      instructorName: updatedCertificate.course.instructor.user.name || 'Instructor',
+      completionDate: updatedCertificate.issuedAt || new Date(),
+      verificationCode: updatedCertificate.verificationCode || '',
+      duration: updatedCertificate.course.duration,
+    };
+
+    await this.certificateGenerator.generateCertificate(
+      certificateData,
+      updatedCertificate.id,
+    );
 
     // Update student certificates count
     await this.prisma.student.update({

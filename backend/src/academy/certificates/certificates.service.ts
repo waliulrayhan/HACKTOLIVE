@@ -2,10 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
 import { Certificate, Prisma } from '@prisma/client';
 import * as crypto from 'crypto';
+import { CertificateGeneratorService } from './certificate-generator.service';
 
 @Injectable()
 export class CertificatesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private certificateGenerator: CertificateGeneratorService,
+  ) {}
 
   async create(data: Prisma.CertificateCreateInput): Promise<Certificate> {
     // Generate verification code
@@ -66,10 +70,18 @@ export class CertificatesService {
     const certificate = await this.prisma.certificate.findUnique({
       where: { id },
       include: {
-        student: true,
+        student: {
+          include: {
+            user: true,
+          },
+        },
         course: {
           include: {
-            instructor: true,
+            instructor: {
+              include: {
+                user: true,
+              },
+            },
           },
         },
       },
@@ -138,18 +150,33 @@ export class CertificatesService {
     id: string,
     data: Prisma.CertificateUpdateInput,
   ): Promise<Certificate> {
-    return this.prisma.certificate.update({
+    const certificate = await this.prisma.certificate.update({
       where: { id },
       data,
       include: {
-        student: true,
+        student: {
+          include: {
+            user: true,
+          },
+        },
         course: {
           include: {
-            instructor: true,
+            instructor: {
+              include: {
+                user: true,
+              },
+            },
           },
         },
       },
     });
+
+    // If status changed to ISSUED, generate PDF
+    if (data.status === 'ISSUED' && certificate.status === 'ISSUED') {
+      await this.generateCertificatePdf(certificate);
+    }
+
+    return certificate;
   }
 
   async remove(id: string): Promise<Certificate> {
@@ -256,5 +283,53 @@ export class CertificatesService {
     const timestamp = Date.now().toString(36).toUpperCase();
     const randomPart = crypto.randomBytes(4).toString('hex').toUpperCase();
     return `HACK-${timestamp}-${randomPart}`;
+  }
+
+  async generateCertificatePdf(certificate: any): Promise<string> {
+    const certificateData = {
+      studentName: certificate.student?.user?.name || 'Student',
+      courseName: certificate.course?.title || 'Course',
+      instructorName: certificate.course?.instructor?.user?.name || 'Instructor',
+      completionDate: certificate.issuedAt || new Date(),
+      verificationCode: certificate.verificationCode || '',
+      duration: certificate.course?.duration || 0,
+    };
+
+    const pdfUrl = await this.certificateGenerator.generateCertificate(
+      certificateData,
+      certificate.id,
+    );
+
+    // Update certificate with PDF URL
+    await this.prisma.certificate.update({
+      where: { id: certificate.id },
+      data: {
+        certificateUrl: pdfUrl,
+      },
+    });
+
+    return pdfUrl;
+  }
+
+  async getCertificatePdf(certificateId: string): Promise<string> {
+    const certificate = await this.findOne(certificateId);
+    
+    if (!certificate) {
+      throw new NotFoundException('Certificate not found');
+    }
+
+    if (certificate.status !== 'ISSUED') {
+      throw new NotFoundException('Certificate not yet issued');
+    }
+
+    const pdfPath = this.certificateGenerator.getCertificatePath(certificateId);
+    
+    // If PDF doesn't exist, generate it
+    const fs = require('fs');
+    if (!fs.existsSync(pdfPath)) {
+      await this.generateCertificatePdf(certificate);
+    }
+
+    return pdfPath;
   }
 }

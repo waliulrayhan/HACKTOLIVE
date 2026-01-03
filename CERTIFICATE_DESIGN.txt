@@ -1,0 +1,169 @@
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                         Certificate Preview (A4 Landscape)                     │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ ╔══════════════════════════════════════════════════════════════════════════╗ ┃
+┃ ║                                                                          ║ ┃
+┃ ║                        [Light gradient background]                      ║ ┃
+┃ ║                                                                          ║ ┃
+┃ ║                           ✦  HACKTOLIVE  ✦                             ║ ┃
+┃ ║                              Academy                                     ║ ┃
+┃ ║                                                                          ║ ┃
+┃ ║                  ─────────────────────────────────                       ║ ┃
+┃ ║              CERTIFICATE OF COMPLETION                                   ║ ┃
+┃ ║                  ═════════════════════════════════                       ║ ┃
+┃ ║                                                                          ║ ┃
+┃ ║                   This is to certify that                                ║ ┃
+┃ ║                                                                          ║ ┃
+┃ ║                       JOHN DOE SMITH                                     ║ ┃
+┃ ║                    ───────────────────                                   ║ ┃
+┃ ║                                                                          ║ ┃
+┃ ║              has successfully completed the course                       ║ ┃
+┃ ║                                                                          ║ ┃
+┃ ║              ✦ Full Stack Web Development ✦                             ║ ┃
+┃ ║                                                                          ║ ┃
+┃ ║                    Course Duration: 40 hours                             ║ ┃
+┃ ║                                                                          ║ ┃
+┃ ║                                                                          ║ ┃
+┃ ║                                                                          ║ ┃
+┃ ║   Date of Completion            Instructor                               ║ ┃
+┃ ║   ─────────────────             ──────────────                           ║ ┃
+┃ ║   January 3, 2026               Sarah Johnson                            ║ ┃
+┃ ║                                                                          ║ ┃
+┃ ║                                                                          ║ ┃
+┃ ║              Verification Code: HACK-ABC123-XYZ789                       ║ ┃
+┃ ║                                                                          ║ ┃
+┃ ╚══════════════════════════════════════════════════════════════════════════╝ ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                              Design Features                                   │
+├────────────────────────────────────────────────────────────────────────────────┤
+│ • Dual Border System: Outer (Indigo #6366f1) + Inner (Gray)                  │
+│ • Gradient Accents: Top & bottom subtle background                            │
+│ • Corner Decorations: Four decorative circle patterns                         │
+│ • Typography Hierarchy:                                                        │
+│   - Title: 24pt Bold                                                          │
+│   - Student Name: 36pt Bold (highlighted)                                     │
+│   - Course Name: 24pt Bold (brand color)                                      │
+│   - Other text: 10-14pt varying weights                                       │
+│ • Professional Layout: Centered, balanced, print-ready                        │
+│ • Verification Security: Unique code for authenticity                         │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        Color Scheme (Udemy/Coursera Style)                     │
+├────────────────────────────────────────────────────────────────────────────────┤
+│ Primary Brand:    #6366f1 (Indigo)    - Borders, accents, course name         │
+│ Text Primary:     #1a1a1a (Dark Gray) - Main text, student name               │
+│ Text Secondary:   #666666 (Gray)      - Subtitles, descriptions               │
+│ Text Tertiary:    #888888 (Light Gray) - Labels, small text                   │
+│ Background:       #ffffff (White)      - Clean professional base               │
+│ Accents:          Subtle gradients     - Sophisticated depth                  │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                           User Experience Flow                                 │
+├────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                │
+│  Student View (Before Issue)     Student View (After Issue)                   │
+│  ┌─────────────────────┐         ┌─────────────────────┐                     │
+│  │ ⏱️  PENDING          │         │ ✅ ISSUED           │                     │
+│  │                     │         │                     │                     │
+│  │ Your instructor is  │         │ ┌─────────────────┐ │                     │
+│  │ reviewing your      │         │ │  ⬇️ Download    │ │                     │
+│  │ certificate request │         │ └─────────────────┘ │                     │
+│  │                     │         │                     │                     │
+│  │ [View Course]       │         │ [View Course] [👁️]  │                     │
+│  └─────────────────────┘         └─────────────────────┘                     │
+│                                                                                │
+│  Click Download ──────────────────────> Opens in New Tab                      │
+│                                                                                │
+│  URL: http://192.168.0.166:3001/academy/certificates/download/{id}            │
+│                                                                                │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                          Technical Architecture                                │
+├────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                │
+│  Frontend (Next.js)                    Backend (NestJS)                        │
+│  ┌──────────────┐                      ┌─────────────────────┐                │
+│  │ Click        │────API Request───────>│ GET /academy/       │                │
+│  │ Download     │                      │ certificates/       │                │
+│  │ Button       │                      │ download/:id        │                │
+│  └──────────────┘                      └──────────┬──────────┘                │
+│         │                                         │                            │
+│         │                              ┌──────────▼──────────┐                 │
+│         │                              │ CertificatesService │                 │
+│         │                              │ - Validate status   │                 │
+│         │                              │ - Get file path     │                 │
+│         │                              └──────────┬──────────┘                 │
+│         │                                         │                            │
+│         │                              ┌──────────▼──────────┐                 │
+│         │                              │ File System         │                 │
+│         │<────PDF Stream──────────────-│ Read PDF file       │                 │
+│         │                              └─────────────────────┘                 │
+│         │                                                                       │
+│  ┌──────▼──────┐                                                               │
+│  │ Browser     │                                                               │
+│  │ PDF Viewer  │ (View, Download, Print)                                      │
+│  └─────────────┘                                                               │
+│                                                                                │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                           PDF Generation Process                               │
+├────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                │
+│  Instructor Issues Certificate                                                 │
+│           │                                                                    │
+│           ▼                                                                    │
+│  ┌─────────────────────┐                                                      │
+│  │ InstructorService   │                                                      │
+│  │ issueCertificate()  │                                                      │
+│  └──────────┬──────────┘                                                      │
+│             │                                                                  │
+│             ▼                                                                  │
+│  ┌─────────────────────────────────┐                                          │
+│  │ 1. Update Status to ISSUED      │                                          │
+│  │ 2. Set issuedAt timestamp        │                                          │
+│  │ 3. Generate verification code    │                                          │
+│  └──────────┬──────────────────────┘                                          │
+│             │                                                                  │
+│             ▼                                                                  │
+│  ┌─────────────────────────────────┐                                          │
+│  │ CertificateGeneratorService     │                                          │
+│  │ generateCertificate()           │                                          │
+│  └──────────┬──────────────────────┘                                          │
+│             │                                                                  │
+│             ▼                                                                  │
+│  ┌─────────────────────────────────┐                                          │
+│  │ PDFKit creates document         │                                          │
+│  │ - Draw background & borders     │                                          │
+│  │ - Add header (HACKTOLIVE)       │                                          │
+│  │ - Add title & student name      │                                          │
+│  │ - Add course information        │                                          │
+│  │ - Add footer (date, instructor) │                                          │
+│  │ - Add verification code         │                                          │
+│  │ - Add decorative elements       │                                          │
+│  └──────────┬──────────────────────┘                                          │
+│             │                                                                  │
+│             ▼                                                                  │
+│  ┌─────────────────────────────────┐                                          │
+│  │ Save to file system:            │                                          │
+│  │ uploads/certificates/{id}.pdf   │                                          │
+│  └─────────────────────────────────┘                                          │
+│                                                                                │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+✅ IMPLEMENTATION COMPLETE!
+
+Your certificate system is now fully functional with:
+  ✓ Professional PDF generation (Udemy/Coursera style)
+  ✓ Automatic generation when instructor issues certificate
+  ✓ Download in new browser tab
+  ✓ Clean, elegant design
+  ✓ Verification code system
+  ✓ Print-ready format

@@ -7,10 +7,14 @@ import {
   Param,
   Delete,
   Query,
+  Res,
+  NotFoundException,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CertificatesService } from './certificates.service';
 import { Prisma } from '@prisma/client';
+import type { Response } from 'express';
+import * as fs from 'fs';
 
 @ApiTags('academy')
 @Controller('academy/certificates')
@@ -70,5 +74,26 @@ export class CertificatesController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.certificatesService.remove(id);
+  }
+
+  @Get('download/:id')
+  async downloadCertificate(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    const certificatePath = await this.certificatesService.getCertificatePdf(id);
+    
+    if (!fs.existsSync(certificatePath)) {
+      throw new NotFoundException('Certificate file not found');
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      `inline; filename="certificate-${id}.pdf"`,
+    );
+    
+    const fileStream = fs.createReadStream(certificatePath);
+    fileStream.pipe(res);
   }
 }
