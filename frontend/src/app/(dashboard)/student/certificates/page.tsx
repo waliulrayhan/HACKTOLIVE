@@ -38,8 +38,13 @@ interface Certificate {
     thumbnail?: string;
     instructor: {
       id: string;
-      name: string;
-      avatar?: string;
+      user: {
+        id: string;
+        name: string;
+        email: string;
+        avatar?: string;
+        bio?: string;
+      };
     };
   };
 }
@@ -271,21 +276,21 @@ export default function CertificatesPage() {
 
                 {/* Instructor */}
                 <div className="mb-3 sm:mb-4 flex items-center gap-2">
-                  {certificate.course.instructor.avatar ? (
+                  {certificate.course?.instructor?.user?.avatar ? (
                     <img
-                      src={certificate.course.instructor.avatar.startsWith('http') 
-                        ? certificate.course.instructor.avatar 
-                        : `${process.env.NEXT_PUBLIC_API_URL}${certificate.course.instructor.avatar}`}
-                      alt={certificate.course.instructor.name}
+                      src={certificate.course.instructor.user.avatar.startsWith('http') 
+                        ? certificate.course.instructor.user.avatar 
+                        : `${process.env.NEXT_PUBLIC_API_URL}${certificate.course.instructor.user.avatar}`}
+                      alt={certificate.course?.instructor?.user?.name || 'Instructor'}
                       className="h-5 w-5 rounded-full object-cover"
                     />
                   ) : (
                     <div className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-500 text-white text-[10px] font-semibold">
-                      {certificate.course.instructor.name.charAt(0).toUpperCase()}
+                      {certificate.course?.instructor?.user?.name?.charAt(0).toUpperCase() || 'I'}
                     </div>
                   )}
                   <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
-                    {certificate.course.instructor.name}
+                    {certificate.course?.instructor?.user?.name || 'Instructor'}
                   </span>
                 </div>
 

@@ -607,7 +607,7 @@ export class StudentService {
         },
       },
       orderBy: {
-        issuedAt: 'desc',
+        requestedAt: 'desc',
       },
     });
   }
