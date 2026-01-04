@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "@/components/ui/toast";
 import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
+import DateTimePicker from "@/components/ui/DateTimePicker";
 import {
   HiOutlineArrowLeft,
   HiOutlineClipboardList,
@@ -399,11 +400,17 @@ export default function AssignmentManagementPage() {
                 <label className="mb-1.5 block text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
                   Due Date (Optional)
                 </label>
-                <input
-                  type="datetime-local"
-                  value={formData.dueDate}
-                  onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs sm:text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                <DateTimePicker
+                  selected={formData.dueDate ? new Date(formData.dueDate) : null}
+                  onChange={(date) => {
+                    setFormData({ ...formData, dueDate: date ? date.toISOString() : '' });
+                  }}
+                  placeholderText="Select due date and time"
+                  minDate={new Date()}
+                  dateFormat="yyyy-MM-dd HH:mm"
+                  showTimeSelect
+                  timeIntervals={15}
+                  className="text-xs sm:text-sm"
                 />
               </div>
             </div>

@@ -504,7 +504,7 @@ export default function CreateCoursePage() {
 
             {/* Thumbnail Section */}
             <div className="rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-5 dark:border-white/5 dark:from-gray-800/50 dark:to-gray-900/50">
-              <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+              <label className="flex text-sm font-semibold text-gray-900 dark:text-white mb-3 items-center gap-2">
                 <HiOutlineCamera className="h-4 w-4 text-brand-500" />
                 Course Thumbnail
                 <span className="text-xs font-normal text-gray-500 dark:text-gray-400">(2:1 ratio recommended)</span>

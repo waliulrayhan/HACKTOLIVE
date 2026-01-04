@@ -4,11 +4,13 @@ import ComponentCard from '@/components/shared/ComponentCard';
 import Label from '../Label';
 import Input from '../input/InputField';
 import Select from '../Select';
-import { ChevronDownIcon, EyeCloseIcon, EyeIcon, TimeIcon } from '@/icons';
+import { ChevronDownIcon, EyeCloseIcon, EyeIcon } from '@/icons';
 import DatePicker from '../date-picker';
+import TimePicker from '@/components/ui/TimePicker';
 
 export default function DefaultInputs() {
   const [showPassword, setShowPassword] = useState(false);
+  const [selectedTime, setSelectedTime] = useState<Date | null>(null);
   const options = [
     { value: "marketing", label: "Marketing" },
     { value: "template", label: "Template" },
@@ -75,18 +77,16 @@ export default function DefaultInputs() {
         </div>
 
         <div>
-          <Label htmlFor="tm">Time Picker Input</Label>
-          <div className="relative">
-            <Input
-              type="time"
-              id="tm"
-              name="tm"
-              onChange={(e) => console.log(e.target.value)}
-            />
-            <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
-              <TimeIcon />
-            </span>
-          </div>
+          <Label htmlFor="time-picker">Time Picker Input</Label>
+          <TimePicker
+            selected={selectedTime}
+            onChange={(time) => {
+              setSelectedTime(time);
+              console.log('Selected time:', time);
+            }}
+            placeholderText="Select time"
+            name="time-picker"
+          />
         </div>
         <div>
           <Label htmlFor="tm">Input with Payment</Label>

@@ -3,9 +3,9 @@
 import React from 'react';
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { HiOutlineCalendar } from 'react-icons/hi2';
+import { HiOutlineClock } from 'react-icons/hi2';
 
-interface DatePickerProps {
+interface DateTimePickerProps {
   selected: Date | null;
   onChange: (date: Date | null) => void;
   placeholderText?: string;
@@ -15,18 +15,26 @@ interface DatePickerProps {
   disabled?: boolean;
   className?: string;
   name?: string;
+  showTimeSelect?: boolean;
+  timeFormat?: string;
+  timeIntervals?: number;
+  dateFormat?: string;
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({
+const DateTimePicker: React.FC<DateTimePickerProps> = ({
   selected,
   onChange,
-  placeholderText = "Select date",
+  placeholderText = "Select date and time",
   minDate,
   maxDate,
   error = false,
   disabled = false,
   className = "",
   name,
+  showTimeSelect = true,
+  timeFormat = "HH:mm",
+  timeIntervals = 15,
+  dateFormat = "yyyy-MM-dd HH:mm",
 }) => {
   return (
     <div className="relative datepicker-wrapper">
@@ -38,7 +46,10 @@ const DatePicker: React.FC<DatePickerProps> = ({
         maxDate={maxDate}
         disabled={disabled}
         name={name}
-        dateFormat="yyyy-MM-dd"
+        showTimeSelect={showTimeSelect}
+        timeFormat={timeFormat}
+        timeIntervals={timeIntervals}
+        dateFormat={dateFormat}
         className={`w-full h-10 rounded-lg border px-3 py-2 pr-10 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
           error
             ? 'border-red-500 focus:border-red-500'
@@ -48,7 +59,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
         wrapperClassName="w-full"
         popperClassName="custom-datepicker-popper"
       />
-      <HiOutlineCalendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+      <HiOutlineClock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
       
       <style jsx global>{`
         /* Datepicker wrapper */
@@ -93,8 +104,14 @@ const DatePicker: React.FC<DatePickerProps> = ({
           border-bottom-color: rgb(55 65 81);
         }
 
+        /* Time header */
+        .react-datepicker__header--time {
+          padding: 0.5rem;
+        }
+
         /* Current month - Light theme */
-        .react-datepicker__current-month {
+        .react-datepicker__current-month,
+        .react-datepicker-time__header {
           font-size: 0.875rem;
           font-weight: 600;
           color: rgb(17 24 39);
@@ -102,7 +119,8 @@ const DatePicker: React.FC<DatePickerProps> = ({
         }
 
         /* Current month - Dark theme */
-        .dark .react-datepicker__current-month {
+        .dark .react-datepicker__current-month,
+        .dark .react-datepicker-time__header {
           color: rgb(243 244 246);
         }
 
@@ -248,6 +266,70 @@ const DatePicker: React.FC<DatePickerProps> = ({
           background-color: transparent !important;
         }
 
+        /* Time container */
+        .react-datepicker__time-container {
+          border-left: 1px solid rgb(229 231 235);
+        }
+
+        .dark .react-datepicker__time-container {
+          border-left-color: rgb(55 65 81);
+        }
+
+        .react-datepicker__time {
+          background-color: white;
+        }
+
+        .dark .react-datepicker__time {
+          background-color: rgb(17 24 39);
+        }
+
+        .react-datepicker__time-box {
+          width: 100%;
+        }
+
+        /* Time list */
+        .react-datepicker__time-list {
+          padding: 0 !important;
+        }
+
+        .react-datepicker__time-list-item {
+          height: 2rem !important;
+          padding: 0.25rem 0.5rem !important;
+          font-size: 0.875rem;
+          color: rgb(17 24 39);
+          transition: all 0.2s;
+        }
+
+        .dark .react-datepicker__time-list-item {
+          color: rgb(243 244 246);
+        }
+
+        .react-datepicker__time-list-item:hover {
+          background-color: rgb(243 244 246) !important;
+        }
+
+        .dark .react-datepicker__time-list-item:hover {
+          background-color: rgb(55 65 81) !important;
+        }
+
+        .react-datepicker__time-list-item--selected {
+          background-color: rgb(59 130 246) !important;
+          color: white !important;
+          font-weight: 600;
+        }
+
+        .react-datepicker__time-list-item--selected:hover {
+          background-color: rgb(37 99 235) !important;
+        }
+
+        .react-datepicker__time-list-item--disabled {
+          color: rgb(209 213 219) !important;
+        }
+
+        .dark .react-datepicker__time-list-item--disabled {
+          color: rgb(75 85 99) !important;
+        }
+
         /* Triangle */
         .react-datepicker__triangle {
           display: none;
@@ -257,4 +339,4 @@ const DatePicker: React.FC<DatePickerProps> = ({
   );
 };
 
-export default DatePicker;
+export default DateTimePicker;
