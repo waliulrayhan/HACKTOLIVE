@@ -52,7 +52,7 @@ docker-compose logs -f
 ssh root@72.62.71.250
 
 # 2. Navigate to project directory
-cd /root/HACKTOLIVE
+cd /var/www/HACKTOLIVE
 
 # 3. Stop all containers
 docker-compose down
