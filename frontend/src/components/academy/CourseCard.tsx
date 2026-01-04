@@ -132,7 +132,7 @@ export default function CourseCard({ course, variant = "default", isEnrolled = f
 
         {/* Description */}
         {variant !== "compact" && (
-          <Text fontSize="sm" color="gray.600" _dark={{ color: "gray.400" }} noOfLines={2}>
+          <Text fontSize="sm" color="gray.600" _dark={{ color: "gray.400" }} noOfLines={2} whiteSpace="pre-wrap">
             {course.shortDescription}
           </Text>
         )}

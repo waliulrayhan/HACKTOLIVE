@@ -248,6 +248,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   fontSize={{ base: "sm", md: "md", lg: "lg" }} 
                   color="muted"
                   lineHeight="tall"
+                  whiteSpace="pre-wrap"
                 >
                   {course.shortDescription}
                 </Text>
@@ -445,7 +446,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                           <Heading size="lg" mb="4">
                             About This Course
                           </Heading>
-                          <Text color="muted" lineHeight="tall">
+                          <Text color="muted" lineHeight="tall" whiteSpace="pre-wrap">
                             {course.description}
                           </Text>
                         </Box>

@@ -110,7 +110,7 @@ export default function CurriculumAccordion({ modules, isEnrolled = false }: Cur
                         {module.title}
                       </Text>
                     </HStack>
-                    <Text fontSize="sm" color="gray.600" _dark={{ color: "gray.400" }}>
+                    <Text fontSize="sm" color="gray.600" _dark={{ color: "gray.400" }} whiteSpace="pre-wrap">
                       {module.description}
                     </Text>
                   </VStack>
@@ -180,6 +180,7 @@ export default function CurriculumAccordion({ modules, isEnrolled = false }: Cur
                               color="gray.600"
                               _dark={{ color: "gray.400" }}
                               noOfLines={1}
+                              whiteSpace="pre-wrap"
                             >
                               {lesson.description}
                             </Text>

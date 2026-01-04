@@ -183,7 +183,7 @@ export default function QuizModal({
           {mode === "overview" && (
             <div className="p-6 space-y-6">
               {quiz.description && (
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
                   {quiz.description}
                 </p>
               )}

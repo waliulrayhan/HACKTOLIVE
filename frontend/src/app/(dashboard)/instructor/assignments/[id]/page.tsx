@@ -253,7 +253,7 @@ export default function AssignmentSubmissionsPage() {
           </div>
 
           {assignment.description && (
-            <p className="mt-3 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+            <p className="mt-3 text-xs sm:text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
               {assignment.description}
             </p>
           )}

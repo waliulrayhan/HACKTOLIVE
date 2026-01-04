@@ -430,7 +430,7 @@ export default function InstructorCoursesPage() {
                             <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white line-clamp-1">
                               {course.title}<span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${getTierBadgeClass(course.tier)}`}>{course.tier}</span>
                             </p>
-                            <p className="mt-0.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
+                            <p className="mt-0.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 line-clamp-1 whitespace-pre-wrap">
                               {course.shortDescription}
                             </p>
                             {course.contentStats && (
@@ -696,7 +696,7 @@ export default function InstructorCoursesPage() {
                         {selectedCourse.tier}
                       </Badge> */}
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
                       {selectedCourse.shortDescription}
                     </p>
                   </div>

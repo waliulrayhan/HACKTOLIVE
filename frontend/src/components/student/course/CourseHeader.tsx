@@ -112,7 +112,7 @@ export default function CourseHeader({
               </h1>
 
               {/* Description */}
-              <p className="text-white/80 text-sm lg:text-base mb-6 max-w-2xl line-clamp-2">
+              <p className="text-white/80 text-sm lg:text-base mb-6 max-w-2xl line-clamp-2 whitespace-pre-wrap">
                 {course.shortDescription}
               </p>
 

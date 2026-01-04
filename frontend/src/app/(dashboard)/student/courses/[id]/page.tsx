@@ -455,7 +455,7 @@ export default function CourseDetailPage() {
               {course.title}
             </h1>
 
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
               {course.shortDescription}
             </p>
 

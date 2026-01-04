@@ -104,7 +104,7 @@ export default function AssignmentModal({
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Assignment Info */}
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 whitespace-pre-wrap">
                 {assignment.description}
               </p>
 
