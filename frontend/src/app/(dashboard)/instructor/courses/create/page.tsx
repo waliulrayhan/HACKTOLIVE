@@ -7,6 +7,7 @@ import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import Button from "@/components/ui/button/Button";
 import Image from "next/image";
 import ImageCropper from "@/components/ImageCropper";
+import DatePicker from "@/components/ui/DatePicker";
 import {
   HiOutlineInformationCircle,
   HiOutlineCurrencyDollar,
@@ -810,16 +811,19 @@ export default function CreateCoursePage() {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Start Date <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="date"
+                    <DatePicker
+                      selected={formData.startDate ? new Date(formData.startDate) : null}
+                      onChange={(date) => {
+                        const value = date ? date.toISOString().split('T')[0] : '';
+                        handleInputChange({
+                          target: { name: 'startDate', value }
+                        } as React.ChangeEvent<HTMLInputElement>);
+                      }}
+                      placeholderText="Select start date"
+                      minDate={new Date()}
+                      maxDate={formData.endDate ? new Date(formData.endDate) : undefined}
+                      error={!!errors.startDate}
                       name="startDate"
-                      value={formData.startDate}
-                      onChange={handleInputChange}
-                      className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
-                        errors.startDate
-                          ? 'border-red-500 focus:border-red-500'
-                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
-                      }`}
                     />
                     {errors.startDate && <p className="mt-1.5 text-xs text-red-500">{errors.startDate}</p>}
                   </div>
@@ -828,16 +832,18 @@ export default function CreateCoursePage() {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       End Date <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="date"
+                    <DatePicker
+                      selected={formData.endDate ? new Date(formData.endDate) : null}
+                      onChange={(date) => {
+                        const value = date ? date.toISOString().split('T')[0] : '';
+                        handleInputChange({
+                          target: { name: 'endDate', value }
+                        } as React.ChangeEvent<HTMLInputElement>);
+                      }}
+                      placeholderText="Select end date"
+                      minDate={formData.startDate ? new Date(formData.startDate) : new Date()}
+                      error={!!errors.endDate}
                       name="endDate"
-                      value={formData.endDate}
-                      onChange={handleInputChange}
-                      className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
-                        errors.endDate
-                          ? 'border-red-500 focus:border-red-500'
-                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
-                      }`}
                     />
                     {errors.endDate && <p className="mt-1.5 text-xs text-red-500">{errors.endDate}</p>}
                   </div>
