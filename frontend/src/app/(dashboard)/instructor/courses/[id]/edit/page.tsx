@@ -1652,7 +1652,7 @@ export default function EditCoursePage() {
                                     <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1">Add quiz/assignment separately</p>
                                   </div>
                                   <div>
-                                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Duration</label>
+                                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Duration (minutes)</label>
                                     <input
                                       type="number"
                                       value={lesson.duration}
