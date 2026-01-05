@@ -1,9 +1,10 @@
 'use client'
 
-import { HStack } from '@chakra-ui/react'
+import { HStack, IconButton, Badge } from '@chakra-ui/react'
 import { useDisclosure, useUpdateEffect } from '@chakra-ui/react'
 import { useScrollSpy } from '@/lib/hooks/use-scrollspy'
 import { usePathname, useRouter } from 'next/navigation'
+import { FiShoppingCart } from 'react-icons/fi'
 
 import * as React from 'react'
 
@@ -17,6 +18,7 @@ import MarketingUserDropdown from './MarketingUserDropdown'
 import { authService } from '@/lib/auth-service'
 import { MegaMenuItem } from '../mega-menu'
 import { megaMenuData } from '../mega-menu'
+import { cartService } from '@/lib/shop-service'
 
 interface NavigationProps {
   showOnlyLinks?: boolean
@@ -35,12 +37,37 @@ const Navigation: React.FC<NavigationProps> = ({
   const router = useRouter()
   const path = usePathname()
   const [isLoggedIn, setIsLoggedIn] = React.useState(false)
+  const [cartItemCount, setCartItemCount] = React.useState(0)
   
   // Check if user is logged in
   React.useEffect(() => {
     const user = authService.getUser()
     setIsLoggedIn(!!user)
   }, [])
+  
+  // Fetch cart item count
+  React.useEffect(() => {
+    const fetchCartCount = async () => {
+      try {
+        const cart = await cartService.getCart()
+        const totalItems = cart?.items?.reduce((sum: number, item: any) => sum + item.quantity, 0) || 0
+        setCartItemCount(totalItems)
+      } catch (error) {
+        console.error('Error fetching cart count:', error)
+      }
+    }
+    
+    fetchCartCount()
+    
+    // Refresh cart count every 10 seconds when on shopping pages
+    const interval = setInterval(() => {
+      if (path?.startsWith('/shopping')) {
+        fetchCartCount()
+      }
+    }, 10000)
+    
+    return () => clearInterval(interval)
+  }, [path])
   
   // Only use scrollspy if there are links with ids
   const scrollSpySelectors = siteConfig.header.links
@@ -133,6 +160,36 @@ const Navigation: React.FC<NavigationProps> = ({
           )
         })}
 
+        {/* Cart Icon with Badge */}
+        <IconButton
+          aria-label="Shopping Cart"
+          icon={
+            <div style={{ position: 'relative' }}>
+              <FiShoppingCart size={20} />
+              {cartItemCount > 0 && (
+                <Badge
+                  position="absolute"
+                  top="-8px"
+                  right="-8px"
+                  colorScheme="red"
+                  borderRadius="full"
+                  fontSize="xs"
+                  minW="20px"
+                  h="20px"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  {cartItemCount > 99 ? '99+' : cartItemCount}
+                </Badge>
+              )}
+            </div>
+          }
+          variant="ghost"
+          onClick={() => router.push('/shopping/cart')}
+          display={['none', null, 'flex']}
+        />
+
         <ThemeToggle />
         
         {isLoggedIn && <MarketingUserDropdown />}
@@ -178,6 +235,36 @@ const Navigation: React.FC<NavigationProps> = ({
           </NavLink>
         )
       })}
+
+      {/* Cart Icon with Badge */}
+      <IconButton
+        aria-label="Shopping Cart"
+        icon={
+          <div style={{ position: 'relative' }}>
+            <FiShoppingCart size={20} />
+            {cartItemCount > 0 && (
+              <Badge
+                position="absolute"
+                top="-8px"
+                right="-8px"
+                colorScheme="red"
+                borderRadius="full"
+                fontSize="xs"
+                minW="20px"
+                h="20px"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                {cartItemCount > 99 ? '99+' : cartItemCount}
+              </Badge>
+            )}
+          </div>
+        }
+        variant="ghost"
+        onClick={() => router.push('/shopping/cart')}
+        display={['none', null, 'flex']}
+      />
 
       <ThemeToggle />
       

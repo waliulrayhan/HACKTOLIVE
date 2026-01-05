@@ -8,30 +8,33 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  name         String?
-  password     String
-  role         UserRole      @default(STUDENT)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  avatar       String?       @db.VarChar(500)
-  bio          String?
-  city         String?
-  country      String?
-  facebookUrl  String?       @db.VarChar(500)
-  instagramUrl String?       @db.VarChar(500)
-  linkedinUrl  String?       @db.VarChar(500)
-  phone        String?
-  state        String?
-  twitterUrl   String?       @db.VarChar(500)
-  githubUrl    String?       @db.VarChar(500)
-  websiteUrl   String?       @db.VarChar(500)
-  blogs        Blog[]
-  comments     BlogComment[]
-  instructor   Instructor?
-  reviews      Review[]
-  student      Student?
+  id              String           @id @default(uuid())
+  email           String           @unique
+  name            String?
+  password        String
+  role            UserRole         @default(STUDENT)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  avatar          String?          @db.VarChar(500)
+  bio             String?
+  city            String?
+  country         String?
+  facebookUrl     String?          @db.VarChar(500)
+  instagramUrl    String?          @db.VarChar(500)
+  linkedinUrl     String?          @db.VarChar(500)
+  phone           String?
+  state           String?
+  twitterUrl      String?          @db.VarChar(500)
+  githubUrl       String?          @db.VarChar(500)
+  websiteUrl      String?          @db.VarChar(500)
+  blogs           Blog[]
+  comments        BlogComment[]
+  instructor      Instructor?
+  reviews         Review[]
+  student         Student?
+  cart            Cart?
+  orders          Order[]
+  productReviews  ProductReview[]
 }
 
 model Instructor {
@@ -104,6 +107,7 @@ model Course {
   modules          CourseModule[]
   enrollments      Enrollment[]
   reviews          Review[]
+  products         Product[]
 
   @@index([slug])
   @@index([category])
@@ -561,4 +565,311 @@ enum ApplicationStatus {
   INTERVIEWED
   ACCEPTED
   REJECTED
+}
+
+// ============================================
+// E-COMMERCE MODELS
+// ============================================
+
+model ProductCategory {
+  id          String    @id @default(uuid())
+  name        String    @db.VarChar(255)
+  slug        String    @unique @db.VarChar(255)
+  description String?   @db.Text
+  icon        String?   @db.VarChar(50)
+  image       String?   @db.VarChar(500)
+  featured    Boolean   @default(false)
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+
+  @@index([slug])
+  @@index([featured])
+}
+
+model Product {
+  id               String          @id @default(uuid())
+  name             String          @db.VarChar(255)
+  slug             String          @unique @db.VarChar(255)
+  description      String          @db.Text
+  shortDescription String?         @db.VarChar(500)
+  categoryId       String
+  type             ProductType
+  price            Float
+  compareAtPrice   Float?
+  cost             Float?
+  sku              String?         @unique @db.VarChar(100)
+  images           String          @db.Text // JSON array of image URLs
+  thumbnail        String?         @db.VarChar(500)
+  stockQuantity    Int             @default(0)
+  lowStockThreshold Int?           @default(10)
+  trackInventory   Boolean         @default(true)
+  allowBackorder   Boolean         @default(false)
+  weight           Float?
+  dimensions       String?         @db.VarChar(255) // JSON: {length, width, height}
+  
+  // For course vouchers
+  courseId         String?
+  voucherDuration  Int? // in days
+  
+  // For merchandise
+  sizes            String?         @db.Text // JSON array
+  colors           String?         @db.Text // JSON array
+  material         String?         @db.VarChar(255)
+  
+  // For bundles
+  bundleProducts   String?         @db.Text // JSON array of product IDs
+  
+  featured         Boolean         @default(false)
+  status           ProductStatus   @default(DRAFT)
+  seoTitle         String?         @db.VarChar(255)
+  seoDescription   String?         @db.VarChar(500)
+  tags             String?         @db.Text
+  
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  
+  category         ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  course           Course?         @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
+  reviews          ProductReview[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([courseId])
+  @@index([type])
+  @@index([status])
+  @@index([featured])
+  @@index([sku])
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String?    @unique
+  sessionId String?    @unique @db.VarChar(255)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  items     CartItem[]
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionId])
+}
+
+model CartItem {
+  id          String   @id @default(uuid())
+  cartId      String
+  productId   String
+  quantity    Int      @default(1)
+  price       Float
+  selectedOptions String? @db.VarChar(255) // JSON for size, color, etc.
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  cart        Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([cartId])
+  @@index([productId])
+}
+
+model Order {
+  id                String        @id @default(uuid())
+  orderNumber       String        @unique @db.VarChar(50)
+  userId            String?
+  
+  // Customer Info
+  customerEmail     String        @db.VarChar(255)
+  customerName      String        @db.VarChar(255)
+  customerPhone     String        @db.VarChar(50)
+  
+  // Shipping Address
+  shippingAddress   String        @db.VarChar(500)
+  shippingCity      String        @db.VarChar(100)
+  shippingState     String?       @db.VarChar(100)
+  shippingZip       String        @db.VarChar(20)
+  shippingCountry   String        @db.VarChar(100)
+  
+  // Billing Address (optional, can be same as shipping)
+  billingAddress    String?       @db.VarChar(500)
+  billingCity       String?       @db.VarChar(100)
+  billingState      String?       @db.VarChar(100)
+  billingZip        String?       @db.VarChar(20)
+  billingCountry    String?       @db.VarChar(100)
+  
+  // Pricing
+  subtotal          Float
+  tax               Float         @default(0)
+  shippingCost      Float         @default(0)
+  discount          Float         @default(0)
+  total             Float
+  
+  // Order Details
+  status            OrderStatus   @default(PENDING)
+  paymentStatus     PaymentStatus @default(PENDING)
+  paymentMethod     PaymentMethod?
+  
+  notes             String?       @db.Text
+  trackingNumber    String?       @db.VarChar(255)
+  
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  completedAt       DateTime?
+  
+  user              User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items             OrderItem[]
+  payments          Payment[]
+  invoice           Invoice?
+
+  @@index([userId])
+  @@index([orderNumber])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String
+  productId   String
+  productName String   @db.VarChar(255)
+  productImage String? @db.VarChar(500)
+  quantity    Int
+  price       Float
+  total       Float
+  selectedOptions String? @db.VarChar(500) // JSON for size, color, etc.
+  
+  // For course vouchers
+  voucherCode String?  @unique @db.VarChar(100)
+  voucherUsed Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([voucherCode])
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  orderId           String
+  amount            Float
+  currency          String        @default("BDT") @db.VarChar(10)
+  paymentMethod     PaymentMethod
+  status            PaymentStatus @default(PENDING)
+  
+  // Payment Gateway Details
+  transactionId     String?       @unique @db.VarChar(255)
+  gatewayResponse   String?       @db.Text // JSON
+  
+  // Mobile Banking
+  mobileNumber      String?       @db.VarChar(50)
+  mobileProvider    String?       @db.VarChar(50) // bKash, Nagad, Rocket, etc.
+  
+  // Card Payment
+  cardLast4         String?       @db.VarChar(4)
+  cardBrand         String?       @db.VarChar(50)
+  
+  // Bank Transfer
+  bankName          String?       @db.VarChar(255)
+  accountNumber     String?       @db.VarChar(100)
+  transferReference String?       @db.VarChar(255)
+  
+  paidAt            DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([transactionId])
+  @@index([status])
+}
+
+model Invoice {
+  id            String   @id @default(uuid())
+  orderId       String   @unique
+  invoiceNumber String   @unique @db.VarChar(50)
+  invoiceUrl    String?  @db.VarChar(500)
+  issuedAt      DateTime @default(now())
+  dueAt         DateTime?
+  paidAt        DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([invoiceNumber])
+}
+
+model ProductReview {
+  id        String   @id @default(uuid())
+  productId String
+  userId    String
+  orderId   String?
+  rating    Int
+  title     String?  @db.VarChar(255)
+  comment   String?  @db.Text
+  verified  Boolean  @default(false)
+  helpful   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, userId, orderId])
+  @@index([productId])
+  @@index([userId])
+  @@index([rating])
+  @@index([verified])
+}
+
+// ============================================
+// E-COMMERCE ENUMS
+// ============================================
+
+enum ProductType {
+  COURSE_VOUCHER
+  TSHIRT
+  MERCHANDISE
+  TRAINING_BUNDLE
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+  OUT_OF_STOCK
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  MOBILE_BANKING
+  CARD
+  BANK_TRANSFER
+  CASH_ON_DELIVERY
 }

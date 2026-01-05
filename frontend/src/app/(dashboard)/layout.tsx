@@ -21,6 +21,7 @@ import {
   VideoIcon,
   UserIcon,
 } from "@/icons/index";
+import { FiShoppingCart } from "react-icons/fi";
 
 export default function DashboardLayout({
   children,
@@ -71,6 +72,11 @@ export default function DashboardLayout({
             path: "/student/blogs",
           },
           {
+            icon: <BoxIcon />,
+            name: "Order History",
+            path: "/student/orders",
+          },
+          {
             icon: <UserCircleIcon />,
             name: "Profile",
             path: "/student/profile",
@@ -110,6 +116,15 @@ export default function DashboardLayout({
             icon: <BoxIcon />,
             name: "Careers",
             path: "/admin/careers",
+          },
+          {
+            icon: <FiShoppingCart className="w-5 h-5" />,
+            name: "Shop",
+            subItems: [
+              { name: "Products", path: "/admin/shop/products" },
+              { name: "Categories", path: "/admin/shop/categories" },
+              { name: "Orders", path: "/admin/shop/orders" },
+            ],
           },
           {
             icon: <FileIcon />,
