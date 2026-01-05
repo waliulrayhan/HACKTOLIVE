@@ -22,7 +22,7 @@ type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  subItems?: { icon?: React.ReactNode; name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
 const defaultNavItems: NavItem[] = [
@@ -195,6 +195,11 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
                           : "menu-dropdown-item-inactive"
                       }`}
                     >
+                      {subItem.icon && (
+                        <span className="mr-2 w-5 h-5 flex-shrink-0">
+                          {subItem.icon}
+                        </span>
+                      )}
                       {subItem.name}
                       <span className="flex items-center gap-1 ml-auto">
                         {subItem.new && (

@@ -44,22 +44,16 @@ export default function DashboardLayout({
           {
             icon: <FileIcon />,
             name: "My Courses",
-            path: "/student/courses",
+            subItems: [
+              { icon: <VideoIcon />, name: "All Courses", path: "/student/courses" },
+              { icon: <TaskIcon />, name: "Assignments", path: "/student/assignments" },
+              { icon: <CheckCircleIcon />, name: "Certificates", path: "/student/certificates" },
+            ],
           },
           {
             icon: <PieChartIcon />,
             name: "Progress",
             path: "/student/progress",
-          },
-          {
-            icon: <TaskIcon />,
-            name: "Assignments",
-            path: "/student/assignments",
-          },
-          {
-            icon: <CheckCircleIcon />,
-            name: "Certificates",
-            path: "/student/certificates",
           },
           {
             icon: <BoxIconLine />,
@@ -95,7 +89,10 @@ export default function DashboardLayout({
           {
             icon: <GroupIcon />,
             name: "User Management",
-            path: "/admin/users",
+            subItems: [
+              { icon: <GroupIcon />, name: "All Users", path: "/admin/users" },
+              { icon: <UserIcon />, name: "Instructors", path: "/admin/instructors" },
+            ],
           },
           {
             icon: <CheckCircleIcon />,
@@ -103,33 +100,26 @@ export default function DashboardLayout({
             path: "/admin/courses",
           },
           {
-            icon: <UserIcon />,
-            name: "Instructors",
-            path: "/admin/instructors",
-          },
-          {
             icon: <DocsIcon />,
             name: "Blogs",
             path: "/admin/blogs",
           },
           {
-            icon: <BoxIcon />,
-            name: "Careers",
-            path: "/admin/careers",
-          },
-          {
             icon: <FiShoppingCart className="w-5 h-5" />,
             name: "Shop",
             subItems: [
-              { name: "Products", path: "/admin/shop/products" },
-              { name: "Categories", path: "/admin/shop/categories" },
-              { name: "Orders", path: "/admin/shop/orders" },
+              { icon: <BoxIcon />, name: "Products", path: "/admin/shop/products" },
+              { icon: <GridIcon />, name: "Categories", path: "/admin/shop/categories" },
+              { icon: <BoxIconLine />, name: "Orders", path: "/admin/shop/orders" },
             ],
           },
           {
-            icon: <FileIcon />,
-            name: "Applications",
-            path: "/admin/applications",
+            icon: <BoxIcon />,
+            name: "Career Center",
+            subItems: [
+              { icon: <FileIcon />, name: "Job Postings", path: "/admin/careers" },
+              { icon: <DocsIcon />, name: "Applications", path: "/admin/applications" },
+            ],
           },
           // {
           //   icon: <PieChartIcon />,
@@ -156,24 +146,16 @@ export default function DashboardLayout({
             icon: <FileIcon />,
             name: "My Courses",
             subItems: [
-              { name: "All Courses", path: "/instructor/courses" },
-              { name: "Create Course", path: "/instructor/courses/create" },
+              { icon: <VideoIcon />, name: "All Courses", path: "/instructor/courses" },
+              { icon: <BoxIconLine />, name: "Create Course", path: "/instructor/courses/create" },
+              { icon: <TaskIcon />, name: "Assignments", path: "/instructor/assignments" },
+              { icon: <CheckCircleIcon />, name: "Certificates", path: "/instructor/certificates" },
             ],
           },
           {
             icon: <UserIcon />,
             name: "Students",
             path: "/instructor/students",
-          },
-          {
-            icon: <TaskIcon />,
-            name: "Assignments",
-            path: "/instructor/assignments",
-          },
-          {
-            icon: <CheckCircleIcon />,
-            name: "Certificates",
-            path: "/instructor/certificates",
           },
           // {
           //   icon: <PieChartIcon />,
