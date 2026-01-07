@@ -1,10 +1,9 @@
 'use client'
 
-import { HStack, IconButton, Badge } from '@chakra-ui/react'
+import { HStack } from '@chakra-ui/react'
 import { useDisclosure, useUpdateEffect } from '@chakra-ui/react'
 import { useScrollSpy } from '@/lib/hooks/use-scrollspy'
 import { usePathname, useRouter } from 'next/navigation'
-import { FiShoppingCart } from 'react-icons/fi'
 
 import * as React from 'react'
 
@@ -18,7 +17,6 @@ import MarketingUserDropdown from './MarketingUserDropdown'
 import { authService } from '@/lib/auth-service'
 import { MegaMenuItem } from '../mega-menu'
 import { megaMenuData } from '../mega-menu'
-import { useCart } from '@/context/CartContext'
 
 interface NavigationProps {
   showOnlyLinks?: boolean
@@ -37,7 +35,6 @@ const Navigation: React.FC<NavigationProps> = ({
   const router = useRouter()
   const path = usePathname()
   const [isLoggedIn, setIsLoggedIn] = React.useState(false)
-  const { cartItemCount } = useCart()
   
   // Check if user is logged in
   React.useEffect(() => {
@@ -136,36 +133,6 @@ const Navigation: React.FC<NavigationProps> = ({
           )
         })}
 
-        {/* Cart Icon with Badge */}
-        <IconButton
-          aria-label="Shopping Cart"
-          icon={
-            <div style={{ position: 'relative' }}>
-              <FiShoppingCart size={20} />
-              {cartItemCount > 0 && (
-                <Badge
-                  position="absolute"
-                  top="-8px"
-                  right="-8px"
-                  colorScheme="red"
-                  borderRadius="full"
-                  fontSize="xs"
-                  minW="20px"
-                  h="20px"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  {cartItemCount > 99 ? '99+' : cartItemCount}
-                </Badge>
-              )}
-            </div>
-          }
-          variant="ghost"
-          onClick={() => router.push('/shopping/cart')}
-          display={['none', null, 'flex']}
-        />
-
         <ThemeToggle />
         
         {isLoggedIn && <MarketingUserDropdown />}
@@ -211,36 +178,6 @@ const Navigation: React.FC<NavigationProps> = ({
           </NavLink>
         )
       })}
-
-      {/* Cart Icon with Badge */}
-      <IconButton
-        aria-label="Shopping Cart"
-        icon={
-          <div style={{ position: 'relative' }}>
-            <FiShoppingCart size={20} />
-            {cartItemCount > 0 && (
-              <Badge
-                position="absolute"
-                top="-8px"
-                right="-8px"
-                colorScheme="red"
-                borderRadius="full"
-                fontSize="xs"
-                minW="20px"
-                h="20px"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-              >
-                {cartItemCount > 99 ? '99+' : cartItemCount}
-              </Badge>
-            )}
-          </div>
-        }
-        variant="ghost"
-        onClick={() => router.push('/shopping/cart')}
-        display={['none', null, 'flex']}
-      />
 
       <ThemeToggle />
       
