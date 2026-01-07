@@ -29,8 +29,9 @@ import { Link } from '@saas-ui/react'
 import { BackgroundGradient } from '@/components/shared/gradients/background-gradient'
 import { PageTransition } from '@/components/shared/motion/page-transition'
 import { Header } from '../../(marketing)/_components/layout/header'
+import OTPInput from '@/app/(auth)/verify-otp/_components/OTPInput'
 import { NextPage } from 'next'
-import { FaArrowLeft, FaEnvelope, FaEye, FaEyeSlash } from 'react-icons/fa'
+import { FaArrowLeft, FaEye, FaEyeSlash, FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
 import { useState, useMemo } from 'react'
 import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -51,6 +52,7 @@ const ResetPassword: NextPage = () => {
   const leftBgColor = useColorModeValue('#4d7c0f', '#365314')
   const rightBgColor = useColorModeValue('white', 'gray.800')
   const { colorMode } = useColorMode()
+  const passwordBoxBg = useColorModeValue('gray.50', 'gray.700')
 
   // Password complexity requirements
   const passwordRequirements = useMemo(() => {
@@ -496,22 +498,20 @@ const ResetPassword: NextPage = () => {
 
                       <form onSubmit={handleVerifyOtp}>
                         <VStack spacing={4}>
-                          <FormControl isInvalid={!!errors.otp}>
-                            <FormLabel htmlFor="otp">Verification Code</FormLabel>
-                            <Input
-                              id="otp"
-                              type="text"
-                              placeholder="Enter 6-digit code"
-                              value={otp}
-                              onChange={(e) => {
-                                setOtp(e.target.value)
-                                if (errors.otp) setErrors(prev => ({ ...prev, otp: '' }))
-                              }}
-                              size="lg"
-                              maxLength={6}
-                            />
-                            <FormErrorMessage>{errors.otp}</FormErrorMessage>
-                          </FormControl>
+                          <OTPInput
+                            value={otp}
+                            onChange={(value) => {
+                              setOtp(value)
+                              if (errors.otp) setErrors(prev => ({ ...prev, otp: '' }))
+                            }}
+                            onComplete={(value) => {
+                              // Auto-verify on complete (optional)
+                            }}
+                            isInvalid={!!errors.otp}
+                            error={errors.otp}
+                            label="Enter Verification Code"
+                            helperText="Enter the 6-digit code sent to your email"
+                          />
 
                           <Button
                             type="submit"
@@ -554,33 +554,114 @@ const ResetPassword: NextPage = () => {
                         <VStack spacing={4}>
                           <FormControl isInvalid={!!errors.password}>
                             <FormLabel htmlFor="password">New Password</FormLabel>
-                            <Input
-                              id="password"
-                              type="password"
-                              placeholder="Enter new password"
-                              value={password}
-                              onChange={(e) => {
-                                setPassword(e.target.value)
-                                if (errors.password) setErrors(prev => ({ ...prev, password: '' }))
-                              }}
-                              size="lg"
-                            />
+                            <InputGroup size="lg">
+                              <Input
+                                id="password"
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="Create a password"
+                                value={password}
+                                onChange={(e) => {
+                                  setPassword(e.target.value)
+                                  if (errors.password) setErrors(prev => ({ ...prev, password: '' }))
+                                }}
+                              />
+                              <InputRightElement>
+                                <IconButton
+                                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                  icon={showPassword ? <FaEyeSlash /> : <FaEye />}
+                                  onClick={() => setShowPassword(!showPassword)}
+                                  variant="ghost"
+                                  size="sm"
+                                  _hover={{ bg: 'transparent' }}
+                                />
+                              </InputRightElement>
+                            </InputGroup>
+                            {password && (
+                              <Box mt={2} p={3} bg={passwordBoxBg} borderRadius="md">
+                                <Text fontSize="xs" fontWeight="semibold" mb={2}>
+                                  Password requirements:
+                                </Text>
+                                <Grid templateColumns="repeat(2, 1fr)" gap={2}>
+                                  <GridItem>
+                                    <HStack spacing={1}>
+                                      <Icon
+                                        as={passwordRequirements.minLength ? FaCheckCircle : FaTimesCircle}
+                                        color={passwordRequirements.minLength ? 'green.500' : 'gray.400'}
+                                        boxSize={3}
+                                      />
+                                      <Text fontSize="xs">At least 8 characters</Text>
+                                    </HStack>
+                                  </GridItem>
+                                  <GridItem>
+                                    <HStack spacing={1}>
+                                      <Icon
+                                        as={passwordRequirements.hasUpperCase ? FaCheckCircle : FaTimesCircle}
+                                        color={passwordRequirements.hasUpperCase ? 'green.500' : 'gray.400'}
+                                        boxSize={3}
+                                      />
+                                      <Text fontSize="xs">One uppercase letter</Text>
+                                    </HStack>
+                                  </GridItem>
+                                  <GridItem>
+                                    <HStack spacing={1}>
+                                      <Icon
+                                        as={passwordRequirements.hasLowerCase ? FaCheckCircle : FaTimesCircle}
+                                        color={passwordRequirements.hasLowerCase ? 'green.500' : 'gray.400'}
+                                        boxSize={3}
+                                      />
+                                      <Text fontSize="xs">One lowercase letter</Text>
+                                    </HStack>
+                                  </GridItem>
+                                  <GridItem>
+                                    <HStack spacing={1}>
+                                      <Icon
+                                        as={passwordRequirements.hasNumber ? FaCheckCircle : FaTimesCircle}
+                                        color={passwordRequirements.hasNumber ? 'green.500' : 'gray.400'}
+                                        boxSize={3}
+                                      />
+                                      <Text fontSize="xs">One number</Text>
+                                    </HStack>
+                                  </GridItem>
+                                  <GridItem colSpan={2}>
+                                    <HStack spacing={1}>
+                                      <Icon
+                                        as={passwordRequirements.hasSpecialChar ? FaCheckCircle : FaTimesCircle}
+                                        color={passwordRequirements.hasSpecialChar ? 'green.500' : 'gray.400'}
+                                        boxSize={3}
+                                      />
+                                      <Text fontSize="xs">One special character (!@#$%^&*)</Text>
+                                    </HStack>
+                                  </GridItem>
+                                </Grid>
+                              </Box>
+                            )}
                             <FormErrorMessage>{errors.password}</FormErrorMessage>
                           </FormControl>
 
                           <FormControl isInvalid={!!errors.confirmPassword}>
                             <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
-                            <Input
-                              id="confirmPassword"
-                              type="password"
-                              placeholder="Confirm new password"
-                              value={confirmPassword}
-                              onChange={(e) => {
-                                setConfirmPassword(e.target.value)
-                                if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: '' }))
-                              }}
-                              size="lg"
-                            />
+                            <InputGroup size="lg">
+                              <Input
+                                id="confirmPassword"
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                placeholder="Confirm your password"
+                                value={confirmPassword}
+                                onChange={(e) => {
+                                  setConfirmPassword(e.target.value)
+                                  if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: '' }))
+                                }}
+                              />
+                              <InputRightElement>
+                                <IconButton
+                                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                                  icon={showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                  variant="ghost"
+                                  size="sm"
+                                  _hover={{ bg: 'transparent' }}
+                                />
+                              </InputRightElement>
+                            </InputGroup>
                             <FormErrorMessage>{errors.confirmPassword}</FormErrorMessage>
                           </FormControl>
 
