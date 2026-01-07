@@ -13,6 +13,48 @@ export class ProductService {
   async createProduct(createProductDto: CreateProductDto) {
     const { images, sizes, colors, bundleProducts, tags, dimensions, ...data } = createProductDto;
 
+    // Check if slug already exists
+    const existingProduct = await this.prisma.product.findUnique({
+      where: { slug: data.slug },
+    });
+
+    if (existingProduct) {
+      throw new BadRequestException('A product with this slug already exists. Please use a different name.');
+    }
+
+    // Auto-generate SKU if not provided
+    if (!data.sku) {
+      // Find the highest SKU number to avoid collisions
+      const lastProduct = await this.prisma.product.findFirst({
+        where: {
+          sku: {
+            startsWith: 'PROD-',
+          },
+        },
+        orderBy: {
+          sku: 'desc',
+        },
+        select: {
+          sku: true,
+        },
+      });
+
+      let nextNumber = 1;
+      if (lastProduct?.sku) {
+        const match = lastProduct.sku.match(/PROD-(\d+)/);
+        if (match) {
+          nextNumber = parseInt(match[1]) + 1;
+        }
+      }
+
+      data.sku = `PROD-${String(nextNumber).padStart(5, '0')}`;
+    }
+
+    // Clean up empty or invalid values for optional foreign keys
+    if (!data.courseId || data.courseId === '' || data.courseId === 'undefined') {
+      delete data.courseId;
+    }
+
     return this.prisma.product.create({
       data: {
         ...data,
@@ -36,7 +78,7 @@ export class ProductService {
       limit = 12,
       category,
       type,
-      status = 'ACTIVE',
+      status,
       minPrice,
       maxPrice,
       search,
@@ -58,7 +100,8 @@ export class ProductService {
       where.type = type;
     }
 
-    if (status) {
+    // Only filter by status if explicitly provided (allow empty string to show all)
+    if (status && status !== '') {
       where.status = status;
     }
 
@@ -169,6 +212,11 @@ export class ProductService {
     if (bundleProducts) updateData.bundleProducts = JSON.stringify(bundleProducts);
     if (tags) updateData.tags = JSON.stringify(tags);
     if (dimensions) updateData.dimensions = JSON.stringify(dimensions);
+
+    // Clean up empty or invalid values for optional foreign keys
+    if (!updateData.courseId || updateData.courseId === '' || updateData.courseId === 'undefined') {
+      updateData.courseId = null;
+    }
 
     const product = await this.prisma.product.update({
       where: { id },

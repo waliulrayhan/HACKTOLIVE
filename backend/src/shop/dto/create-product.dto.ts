@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsOptional, IsEnum, IsBoolean, IsArray, Min } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsEnum, IsBoolean, IsArray, Min, MaxLength } from 'class-validator';
 
 export enum ProductType {
   COURSE_VOUCHER = 'COURSE_VOUCHER',
@@ -26,6 +26,7 @@ export class CreateProductDto {
 
   @IsString()
   @IsOptional()
+  @MaxLength(500, { message: 'Short description must not exceed 500 characters' })
   shortDescription?: string;
 
   @IsString()
@@ -51,7 +52,8 @@ export class CreateProductDto {
   sku?: string;
 
   @IsArray()
-  images: string[];
+  @IsOptional()
+  images?: string[];
 
   @IsString()
   @IsOptional()

@@ -57,11 +57,8 @@ export default function AdminProductsPage() {
     limit: 10,
     totalPages: 0,
   });
-  const [showModal, setShowModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState<{ id: string; name: string } | null>(null);
-  const [formData, setFormData] = useState<any>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchControllerRef = useRef<AbortController | null>(null);
@@ -79,7 +76,8 @@ export default function AdminProductsPage() {
 
     try {
       setLoading(true);
-      const response = await productService.getProducts({ limit: 1000 });
+      // Admin panel should see all products regardless of status
+      const response = await productService.getProducts({ limit: 1000, status: '' });
       const data = response.data || [];
       setAllProducts(data);
 
@@ -143,54 +141,11 @@ export default function AdminProductsPage() {
   }, [searchTerm, statusFilter, typeFilter, itemsPerPage]);
 
   const handleCreate = () => {
-    setSelectedProduct(null);
-    setFormData({
-      name: '',
-      slug: '',
-      description: '',
-      shortDescription: '',
-      categoryId: '',
-      type: 'MERCHANDISE',
-      price: 0,
-      stockQuantity: 0,
-      images: [],
-      status: 'ACTIVE',
-      featured: false,
-      trackInventory: true,
-      allowBackorder: false,
-    });
-    setShowModal(true);
+    router.push('/admin/shop/products/create');
   };
 
   const handleEdit = (product: Product) => {
-    setSelectedProduct(product);
-    setFormData({
-      ...product,
-      images: product.images || [],
-    });
-    setShowModal(true);
-  };
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setIsSubmitting(true);
-      if (selectedProduct) {
-        await productService.updateProduct(selectedProduct.id, formData);
-        toast.success('Product updated successfully!');
-      } else {
-        await productService.createProduct(formData);
-        toast.success('Product created successfully!');
-      }
-      setShowModal(false);
-      fetchProducts();
-    } catch (error: any) {
-      toast.error('Failed to save product', {
-        description: error.response?.data?.message || 'Please try again',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    router.push(`/admin/shop/products/${product.id}/edit`);
   };
 
   const handleDelete = async () => {
@@ -538,199 +493,6 @@ export default function AdminProductsPage() {
           )}
         </div>
       </div>
-
-      {/* Create/Edit Modal */}
-      <Modal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-      >
-        <div className="p-6">
-          <h3 className="mb-4 text-xl font-semibold text-dark dark:text-white">
-            {selectedProduct ? 'Edit Product' : 'Create Product'}
-          </h3>
-          <form onSubmit={handleSave} className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                Name *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.name || ''}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                Slug *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.slug || ''}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                Category *
-              </label>
-              <select
-                required
-                value={formData.categoryId || ''}
-                onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-              >
-                <option value="">Select category</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                Type *
-              </label>
-              <select
-                required
-                value={formData.type || ''}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-              >
-                <option value="COURSE_VOUCHER">Course Voucher</option>
-                <option value="TSHIRT">T-Shirt</option>
-                <option value="MERCHANDISE">Merchandise</option>
-                <option value="TRAINING_BUNDLE">Training Bundle</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                Price (৳) *
-              </label>
-              <input
-                type="number"
-                required
-                min="0"
-                value={formData.price || 0}
-                onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                Stock Quantity *
-              </label>
-              <input
-                type="number"
-                required
-                min="0"
-                value={formData.stockQuantity || 0}
-                onChange={(e) => setFormData({ ...formData, stockQuantity: Number(e.target.value) })}
-                className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                Status
-              </label>
-              <select
-                value={formData.status || ''}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-              >
-                <option value="DRAFT">Draft</option>
-                <option value="ACTIVE">Active</option>
-                <option value="ARCHIVED">Archived</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-                Image URL
-              </label>
-              <input
-                type="url"
-                value={formData.thumbnail || ''}
-                onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
-                className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-              Short Description
-            </label>
-            <textarea
-              value={formData.shortDescription || ''}
-              onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
-              rows={2}
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">
-              Description *
-            </label>
-            <textarea
-              required
-              value={formData.description || ''}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={4}
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-            />
-          </div>
-
-          <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.featured || false}
-                onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                className="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500/20"
-              />
-              <span className="text-xs text-gray-700 dark:text-gray-300">Featured Product</span>
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.trackInventory !== false}
-                onChange={(e) => setFormData({ ...formData, trackInventory: e.target.checked })}
-                className="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500/20"
-              />
-              <span className="text-xs text-gray-700 dark:text-gray-300">Track Inventory</span>
-            </label>
-          </div>
-
-          <div className="flex justify-end gap-2 border-t border-gray-200 pt-4 dark:border-gray-700">
-            <Button
-              onClick={() => setShowModal(false)}
-              variant="outline"
-              disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-            <Button
-              disabled={isSubmitting}
-              className="bg-brand-500 text-white hover:bg-brand-600"
-            >
-              {isSubmitting ? 'Saving...' : selectedProduct ? 'Update Product' : 'Create Product'}
-            </Button>
-          </div>
-        </form>
-        </div>
-      </Modal>
 
       {/* Delete Confirmation Modal */}
       <Modal
