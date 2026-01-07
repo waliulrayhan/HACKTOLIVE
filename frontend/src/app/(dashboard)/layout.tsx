@@ -122,10 +122,15 @@ export default function DashboardLayout({
             ],
           },
           {
-            icon: <FileIcon />,
-            name: "Email Templates",
-            path: "/admin/email-templates",
+            icon: <DocsIcon />,
+            name: "Contact Messages",
+            path: "/admin/contacts",
           },
+          // {
+          //   icon: <FileIcon />,
+          //   name: "Email Templates",
+          //   path: "/admin/email-templates",
+          // },
           // {
           //   icon: <PieChartIcon />,
           //   name: "System Analytics",

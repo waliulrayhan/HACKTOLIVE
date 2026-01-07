@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsOptional, IsNumber } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class FilterContactDto {
   @ApiPropertyOptional()
@@ -15,11 +16,13 @@ export class FilterContactDto {
   @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
+  @Type(() => Number)
   page?: number;
 
   @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
+  @Type(() => Number)
   limit?: number;
 
   @ApiPropertyOptional()

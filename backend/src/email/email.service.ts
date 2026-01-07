@@ -276,11 +276,9 @@ export class EmailService {
       email,
       {
         name,
-        subject,
-        date: new Date().toLocaleDateString(),
       },
       name,
-      { type: 'contact_form' },
+      { type: 'contact_form', subject },
     );
   }
 

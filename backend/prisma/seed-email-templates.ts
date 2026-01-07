@@ -172,7 +172,7 @@ async function seedEmailTemplates() {
       slug: 'career-application-confirmation',
       subject: 'Application Received - HACKTOLIVE',
       type: 'GENERAL' as EmailTemplateType,
-      fromEmail: 'SUPPORT' as EmailSender,
+      fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name', 'position']),
       description: 'Confirmation email when someone applies for a job',
       body: `<!DOCTYPE html>
@@ -209,7 +209,7 @@ async function seedEmailTemplates() {
       slug: 'contact-form-confirmation',
       subject: 'We Received Your Message - HACKTOLIVE',
       type: 'GENERAL' as EmailTemplateType,
-      fromEmail: 'SUPPORT' as EmailSender,
+      fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name']),
       description: 'Confirmation email when someone submits contact form',
       body: `<!DOCTYPE html>
@@ -246,7 +246,7 @@ async function seedEmailTemplates() {
       slug: 'career-application-status',
       subject: 'Update on Your Application - HACKTOLIVE',
       type: 'GENERAL' as EmailTemplateType,
-      fromEmail: 'SUPPORT' as EmailSender,
+      fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name', 'position', 'status', 'message']),
       description: 'Status update email for job applications',
       body: `<!DOCTYPE html>
