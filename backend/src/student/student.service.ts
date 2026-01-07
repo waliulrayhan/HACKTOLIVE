@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { instructorInclude, transformCourse, transformEnrollment } from '../utils/transform.util';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class StudentService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private emailService: EmailService,
+  ) {}
 
   async getDashboard(userId: string) {
     const student = await this.prisma.student.findUnique({
@@ -246,6 +250,44 @@ export class StudentService {
           totalStudents: { increment: 1 },
         },
       });
+    }
+
+    // Get user details for email
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    // Get instructor name
+    let instructorName = 'HACKTOLIVE Instructor';
+    if (enrollment.course.instructor) {
+      const instructorUser = await this.prisma.user.findUnique({
+        where: { id: enrollment.course.instructor.userId },
+      });
+      instructorName = instructorUser?.name || instructorName;
+    }
+
+    // Send enrollment confirmation email (non-blocking)
+    if (user?.email) {
+      console.log(`📧 Sending enrollment confirmation email to ${user.email} for course: ${course.title}`);
+      this.emailService.sendCourseEnrollmentConfirmation(
+        user.email,
+        user.name || 'Student',
+        course.title,
+        course.slug,
+        instructorName,
+        course.price === 0,
+      ).then((sent) => {
+        if (sent) {
+          console.log(`✅ Enrollment confirmation email sent successfully to ${user.email}`);
+        } else {
+          console.error(`❌ Failed to send enrollment confirmation email to ${user.email}`);
+        }
+      }).catch(error => {
+        console.error('❌ Error sending enrollment confirmation email:', error);
+        // Don't throw error - enrollment is already complete
+      });
+    } else {
+      console.log(`⚠️ No email address found for user ${userId}, skipping enrollment confirmation email`);
     }
 
     return transformEnrollment(enrollment);

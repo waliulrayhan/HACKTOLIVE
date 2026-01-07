@@ -17,6 +17,7 @@ async function seedEmailTemplates() {
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name', 'code', 'expiryMinutes']),
       description: 'OTP email sent during user registration',
+      isActive: true,
       body: `<!DOCTYPE html>
 <html>
 <head>
@@ -58,6 +59,7 @@ async function seedEmailTemplates() {
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name', 'code', 'expiryMinutes']),
       description: 'OTP email sent during login',
+      isActive: true,
       body: `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
@@ -96,6 +98,7 @@ async function seedEmailTemplates() {
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name', 'code', 'expiryMinutes']),
       description: 'OTP email for password reset',
+      isActive: true,
       body: `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
@@ -134,6 +137,7 @@ async function seedEmailTemplates() {
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name', 'email']),
       description: 'Welcome email after verification',
+      isActive: true,
       body: `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
@@ -175,6 +179,7 @@ async function seedEmailTemplates() {
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name', 'position']),
       description: 'Confirmation email when someone applies for a job',
+      isActive: true,
       body: `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
@@ -212,6 +217,7 @@ async function seedEmailTemplates() {
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name']),
       description: 'Confirmation email when someone submits contact form',
+      isActive: true,
       body: `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
@@ -249,6 +255,7 @@ async function seedEmailTemplates() {
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name', 'position', 'status', 'message']),
       description: 'Status update email for job applications',
+      isActive: true,
       body: `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
@@ -273,6 +280,84 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <p style="margin:0 0 5px;color:#666;font-size:13px;font-weight:600">HACKTOLIVE</p>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 All rights reserved</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+    },
+    {
+      name: 'Course Enrollment Confirmation',
+      slug: 'course-enrollment-confirmation',
+      subject: 'Welcome to {{courseName}} - HACKTOLIVE Academy',
+      type: 'COURSE_ENROLLMENT' as EmailTemplateType,
+      fromEmail: 'NOREPLY' as EmailSender,
+      variables: JSON.stringify(['studentName', 'courseName', 'courseSlug', 'enrollmentDate', 'courseUrl', 'instructorName', 'isFree']),
+      description: 'Confirmation email sent when a student enrolls in a course',
+      isActive: true,
+      body: `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:20px 0">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#fff;border-radius:8px;overflow:hidden">
+        <tr><td style="background:linear-gradient(135deg,#84cc16 0%,#65a30d 100%);padding:40px 30px;text-align:center">
+          <h1 style="margin:0 0 10px;color:#fff;font-size:28px">🎉 Enrollment Successful!</h1>
+          <p style="margin:0;color:#fff;font-size:14px;opacity:0.95">You're now enrolled in the course</p>
+        </td></tr>
+        <tr><td style="padding:40px 30px">
+          <p style="margin:0 0 20px;color:#333;font-size:16px">Hello <strong>{{studentName}}</strong>,</p>
+          <p style="margin:0 0 25px;color:#666;font-size:14px;line-height:1.6">Congratulations! You have successfully enrolled in <strong>{{courseName}}</strong>.</p>
+          
+          <div style="background-color:#f0fdf4;border:2px solid #84cc16;border-radius:8px;padding:25px;margin:0 0 30px">
+            <h2 style="margin:0 0 15px;color:#15803d;font-size:18px">📚 Course Details</h2>
+            <table width="100%" cellpadding="8" cellspacing="0" style="font-size:14px">
+              <tr>
+                <td style="color:#666;padding:8px 0"><strong>Course:</strong></td>
+                <td style="color:#333;padding:8px 0">{{courseName}}</td>
+              </tr>
+              <tr>
+                <td style="color:#666;padding:8px 0"><strong>Instructor:</strong></td>
+                <td style="color:#333;padding:8px 0">{{instructorName}}</td>
+              </tr>
+              <tr>
+                <td style="color:#666;padding:8px 0"><strong>Enrolled on:</strong></td>
+                <td style="color:#333;padding:8px 0">{{enrollmentDate}}</td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="background-color:#fef9c3;border-left:4px solid #eab308;padding:20px;border-radius:4px;margin:0 0 30px">
+            <p style="margin:0 0 10px;color:#713f12;font-size:14px;font-weight:600">📌 What's Next?</p>
+            <ul style="margin:0;padding-left:20px;color:#854d0e;font-size:13px;line-height:1.8">
+              <li>Access your course dashboard to start learning</li>
+              <li>Check out the course curriculum and materials</li>
+              <li>Join the course community and connect with other students</li>
+              <li>Track your progress and earn certificates upon completion</li>
+            </ul>
+          </div>
+
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 30px">
+            <tr><td align="center">
+              <a href="{{courseUrl}}" style="display:inline-block;background-color:#84cc16;color:#fff;text-decoration:none;padding:14px 40px;border-radius:8px;font-size:15px;font-weight:600;box-shadow:0 4px 6px rgba(132,204,22,0.3)">Start Learning Now →</a>
+            </td></tr>
+          </table>
+
+          <div style="border-top:1px solid #e5e7eb;padding-top:20px;margin-top:20px">
+            <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.5">
+              <strong>Need help?</strong> Our support team is here for you. You can also access course help from your student dashboard.
+            </p>
+            <p style="margin:0;color:#999;font-size:12px">
+              Contact us at <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a>
+            </p>
+          </div>
+        </td></tr>
+        <tr><td style="background-color:#f9fafb;padding:25px;text-align:center;border-top:1px solid #e5e7eb">
+          <p style="margin:0 0 8px;color:#666;font-size:13px;font-weight:600">HACKTOLIVE Academy</p>
+          <p style="margin:0 0 5px;color:#999;font-size:11px">Empowering cybersecurity professionals worldwide</p>
           <p style="margin:0;color:#999;font-size:11px">© 2026 All rights reserved</p>
         </td></tr>
       </table>

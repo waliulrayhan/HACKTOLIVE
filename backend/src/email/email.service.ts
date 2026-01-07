@@ -93,6 +93,8 @@ export class EmailService {
     metadata?: Record<string, any>,
   ): Promise<boolean> {
     try {
+      this.logger.log(`Attempting to send email using template: ${templateSlug} to ${recipientEmail}`);
+      
       // Fetch template from database
       const template = await this.prisma.emailTemplate.findUnique({
         where: { slug: templateSlug },
@@ -107,6 +109,8 @@ export class EmailService {
         this.logger.warn(`Email template is inactive: ${templateSlug}`);
         return false;
       }
+
+      this.logger.log(`Found active template: ${template.name}, preparing to send...`);
 
       // Replace variables in subject and body
       const subject = this.replaceVariables(template.subject, variables);
@@ -279,6 +283,46 @@ export class EmailService {
       },
       name,
       { type: 'contact_form', subject },
+    );
+  }
+
+  /**
+   * Send course enrollment confirmation
+   */
+  async sendCourseEnrollmentConfirmation(
+    studentEmail: string,
+    studentName: string,
+    courseName: string,
+    courseSlug: string,
+    instructorName: string,
+    isFree: boolean = false,
+  ): Promise<boolean> {
+    const enrollmentDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+    
+    const courseUrl = `${process.env.FRONTEND_URL || 'https://hacktolive.io'}/student/courses/${courseSlug}`;
+
+    return this.sendTemplateEmail(
+      'course-enrollment-confirmation',
+      studentEmail,
+      {
+        studentName,
+        courseName,
+        courseSlug,
+        enrollmentDate,
+        courseUrl,
+        instructorName,
+        isFree: isFree ? 'Yes' : 'No',
+      },
+      studentName,
+      { 
+        type: 'course_enrollment', 
+        courseSlug,
+        isFree,
+      },
     );
   }
 
