@@ -12,27 +12,25 @@ import {
   VStack,
   HStack,
   useColorModeValue,
-  Image,
   IconButton,
-  useToast,
   Spinner,
   Divider,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
   Badge,
   Stack,
+  SimpleGrid,
+  Flex,
 } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
-import { FiTrash2, FiShoppingBag, FiArrowRight, FiMinus, FiPlus } from 'react-icons/fi'
+import { FiTrash2, FiShoppingBag, FiArrowRight, FiMinus, FiPlus, FiPackage } from 'react-icons/fi'
 import { FallInPlace } from '@/components/shared/motion/fall-in-place'
+import { BackgroundGradient } from '@/components/shared/gradients/background-gradient'
 import { cartService, Cart } from '@/lib/shop-service'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from '@/components/ui/toast'
 import { useCart } from '@/context/CartContext'
+import NextImage from 'next/image'
+import { getFullImageUrl } from '@/lib/image-utils'
 
 export default function CartPage() {
   const [cart, setCart] = useState<Cart | null>(null)
@@ -41,10 +39,12 @@ export default function CartPage() {
   const router = useRouter()
   const { refreshCart } = useCart()
 
+  const bgColor = useColorModeValue('gray.50', 'gray.900')
   const cardBg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
   const mutedColor = useColorModeValue('gray.600', 'gray.400')
-  const totalBg = useColorModeValue('gray.50', 'gray.700')
+  const accentColor = useColorModeValue('primary.500', 'primary.400')
+  const iconBg = useColorModeValue('primary.50', 'primary.900')
 
   useEffect(() => {
     fetchCart()
@@ -118,209 +118,319 @@ export default function CartPage() {
 
   if (loading) {
     return (
-      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
-        <Spinner size="xl" color="primary.500" />
+      <Box position="relative" minH="100vh">
+        <BackgroundGradient height="100%" zIndex={-1} />
+        <Container maxW="container.xl" pt={{ base: 32, md: 40 }}>
+          <VStack spacing={8}>
+            <Spinner size="xl" color={accentColor} thickness="4px" />
+            <Text color={mutedColor}>Loading your cart...</Text>
+          </VStack>
+        </Container>
       </Box>
     )
   }
 
   if (!cart || cart.items.length === 0) {
     return (
-      <Box pt={{ base: 28, md: 32 }} pb={12}>
-        <Container maxW="container.md">
+      <Box position="relative" minH="100vh">
+        <BackgroundGradient height="100%" zIndex={-1} />
+        <Container maxW="container.lg" pt={{ base: 32, md: 40 }} pb={20}>
           <FallInPlace>
-            <VStack spacing={6} py={12} textAlign="center">
-              <Icon as={FiShoppingBag} boxSize={16} color={mutedColor} />
-              <Heading size="lg">Your cart is empty</Heading>
-              <Text color={mutedColor}>Add some products to get started</Text>
-              <Button as={Link} href="/shopping" colorScheme="primary" rightIcon={<FiArrowRight />}>
-                Continue Shopping
-              </Button>
-            </VStack>
-          </FallInPlace>
-        </Container>
+            <Card bg={cardBg} borderColor={borderColor} borderWidth="1px" shadow="xl">
+              <CardBody>
+                <VStack spacing={8} py={12} textAlign="center">
+                  <Flex
+                    align="center"
+                    justify="center"
+                    w={20}
+                    h={20}
+                    borderRadius="full"
+                    bg={iconBg}
+                  >
+                    <Icon as={FiShoppingBag} boxSize={10} color={accentColor} />
+                  </Flex>
+                  <VStack spacing={3}>
+                    <Heading size="lg">Your Cart is Empty</Heading>
+                    <Text color={mutedColor} maxW="md">
+                      Looks like you haven't added anything to your cart yet. Explore our products and find something you'll love!
+                    </Text>
+                  </VStack>
+                  <Button
+                    as={Link}
+                    href="/shopping"
+                    colorScheme="primary"
+                    size="lg"
+                    rightIcon={<FiArrowRight />}
+                  >
+                    Continue Shopping
+                  </Button>
+                </VStack>
+              </CardBody>
+             </Card>
+           </FallInPlace>
+         </Container>
       </Box>
     )
   }
 
-  const tax: number = cart.subtotal * 0.0 // No tax for now
-  const shipping: number = 0 // Free shipping
+  const tax: number = cart.subtotal * 0.0
+  const shipping: number = 0
   const total: number = cart.subtotal + tax + shipping
 
   return (
-    <Box pt={{ base: 28, md: 32 }} pb={12}>
-      <Container maxW="container.xl">
+    <Box position="relative" minH="100vh">
+      <BackgroundGradient height="100%" zIndex={-1} />
+      <Container maxW="container.xl" pt={{ base: 32, md: 40 }} pb={20}>
         <FallInPlace>
-          <VStack spacing={8} align="start">
-            <HStack justify="space-between" width="100%">
-              <Heading size="xl">Shopping Cart ({cart.itemCount} items)</Heading>
+          <VStack spacing={8} align="stretch">
+            {/* Header */}
+            <HStack justify="space-between" flexWrap="wrap" gap={4}>
+              <VStack align="start" spacing={1}>
+                <Heading size="xl">Shopping Cart</Heading>
+                <Text color={mutedColor}>{cart.itemCount} {cart.itemCount === 1 ? 'item' : 'items'} in your cart</Text>
+              </VStack>
               <Button
                 variant="ghost"
                 colorScheme="red"
                 size="sm"
                 onClick={clearCart}
+                leftIcon={<FiTrash2 />}
               >
                 Clear Cart
               </Button>
             </HStack>
 
-            <Stack direction={{ base: 'column', lg: 'row' }} spacing={8} width="100%" align="start">
+            <SimpleGrid columns={{ base: 1, lg: 3 }} spacing={8}>
               {/* Cart Items */}
-              <VStack spacing={4} flex={1} width="100%">
-                {cart.items.map((item) => (
+              <Box gridColumn={{ base: 'span 1', lg: 'span 2' }}>
+                <VStack spacing={4} align="stretch">
+                  {cart.items.map((item, index) => (
+                    <FallInPlace key={item.id} delay={index * 0.1}>
+                      <Card
+                        bg={cardBg}
+                        borderColor={borderColor}
+                        borderWidth="1px"
+                        shadow="sm"
+                        _hover={{ shadow: 'md' }}
+                        transition="all 0.2s"
+                      >
+                        <CardBody p={4}>
+                          <Flex gap={4} direction={{ base: 'column', sm: 'row' }}>
+                            {/* Product Image */}
+                            <Box
+                              flexShrink={0}
+                              w={{ base: '100%', sm: '120px' }}
+                              h={{ base: '200px', sm: '120px' }}
+                              position="relative"
+                              borderRadius="md"
+                              overflow="hidden"
+                              bg={borderColor}
+                            >
+                              {(item.product.thumbnail || item.product.images[0]) ? (
+                                <NextImage
+                                  src={getFullImageUrl(item.product.thumbnail || item.product.images[0], 'general')}
+                                  alt={item.product.name}
+                                  fill
+                                  style={{ objectFit: 'cover' }}
+                                  sizes="(max-width: 640px) 100vw, 120px"
+                                />
+                              ) : (
+                                <Flex align="center" justify="center" height="100%" bg={borderColor}>
+                                  <Icon as={FiShoppingBag} boxSize={10} color={mutedColor} />
+                                </Flex>
+                              )}
+                            </Box>
+
+                            {/* Product Info */}
+                            <VStack flex={1} align="start" spacing={2}>
+                              <Link href={`/shopping/${item.product.slug}`}>
+                                <Heading
+                                  size="sm"
+                                  noOfLines={2}
+                                  _hover={{ color: accentColor }}
+                                  cursor="pointer"
+                                  transition="color 0.2s"
+                                >
+                                  {item.product.name}
+                                </Heading>
+                              </Link>
+
+                              {item.selectedOptions && (
+                                <HStack spacing={2} flexWrap="wrap">
+                                  {item.selectedOptions.size && (
+                                    <Badge colorScheme="blue" fontSize="xs">
+                                      Size: {item.selectedOptions.size}
+                                    </Badge>
+                                  )}
+                                  {item.selectedOptions.color && (
+                                    <Badge colorScheme="purple" fontSize="xs">
+                                      Color: {item.selectedOptions.color}
+                                    </Badge>
+                                  )}
+                                </HStack>
+                              )}
+
+                              <Text fontSize="xl" fontWeight="bold" color={accentColor}>
+                                ৳{item.price.toLocaleString()}
+                              </Text>
+
+                              {/* Quantity Controls */}
+                              <HStack spacing={3} mt={2}>
+                                <HStack
+                                  bg={iconBg}
+                                  borderRadius="md"
+                                  p={1}
+                                  spacing={0}
+                                >
+                                  <IconButton
+                                    aria-label="Decrease quantity"
+                                    icon={<FiMinus />}
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                    isLoading={updating === item.id}
+                                    isDisabled={item.quantity <= 1}
+                                    _hover={{ bg: 'whiteAlpha.300' }}
+                                  />
+                                  <Text
+                                    fontWeight="semibold"
+                                    minW="40px"
+                                    textAlign="center"
+                                    px={2}
+                                  >
+                                    {item.quantity}
+                                  </Text>
+                                  <IconButton
+                                    aria-label="Increase quantity"
+                                    icon={<FiPlus />}
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                    isLoading={updating === item.id}
+                                    isDisabled={item.quantity >= item.product.stockQuantity}
+                                    _hover={{ bg: 'whiteAlpha.300' }}
+                                  />
+                                </HStack>
+
+                                <IconButton
+                                  aria-label="Remove item"
+                                  icon={<FiTrash2 />}
+                                  size="sm"
+                                  colorScheme="red"
+                                  variant="ghost"
+                                  onClick={() => removeItem(item.id)}
+                                  isLoading={updating === item.id}
+                                />
+                              </HStack>
+
+                              {item.product.stockQuantity < 10 && (
+                                <Text fontSize="xs" color="orange.500">
+                                  Only {item.product.stockQuantity} left in stock
+                                </Text>
+                              )}
+                            </VStack>
+
+                            {/* Item Total */}
+                            <VStack align="end" justify="space-between" minW="100px">
+                              <Text fontSize="lg" fontWeight="bold">
+                                ৳{(item.price * item.quantity).toLocaleString()}
+                              </Text>
+                            </VStack>
+                          </Flex>
+                        </CardBody>
+                      </Card>
+                    </FallInPlace>
+                  ))}
+                </VStack>
+              </Box>
+
+              {/* Order Summary */}
+              <Box gridColumn="span 1">
+                <FallInPlace delay={0.2}>
                   <Card
-                    key={item.id}
                     bg={cardBg}
                     borderColor={borderColor}
                     borderWidth="1px"
-                    borderRadius="lg"
-                    width="100%"
+                    shadow="xl"
+                    position="sticky"
+                    top="100px"
                   >
-                    <CardBody>
-                      <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
-                        <Image
-                          src={item.product.thumbnail || item.product.images[0] || '/images/placeholder.png'}
-                          alt={item.product.name}
-                          boxSize={{ base: '100%', md: '120px' }}
-                          objectFit="cover"
-                          borderRadius="md"
-                        />
+                    <CardBody p={6}>
+                      <VStack spacing={5} align="stretch">
+                        <Heading size="md">Order Summary</Heading>
 
-                        <VStack flex={1} align="start" spacing={2}>
-                          <Link href={`/shopping/${item.product.slug}`}>
-                            <Heading size="md" _hover={{ color: 'primary.500' }}>
-                              {item.product.name}
-                            </Heading>
-                          </Link>
+                        <Divider />
 
-                          {item.selectedOptions && (
-                            <HStack spacing={2} flexWrap="wrap">
-                              {item.selectedOptions.size && (
-                                <Badge>Size: {item.selectedOptions.size}</Badge>
-                              )}
-                              {item.selectedOptions.color && (
-                                <Badge>Color: {item.selectedOptions.color}</Badge>
-                              )}
-                            </HStack>
-                          )}
+                        <VStack spacing={3} align="stretch">
+                          <HStack justify="space-between">
+                            <Text color={mutedColor}>Subtotal</Text>
+                            <Text fontWeight="semibold">
+                              ৳{cart.subtotal.toLocaleString()}
+                            </Text>
+                          </HStack>
 
-                          <Text fontSize="lg" fontWeight="bold" color="primary.500">
-                            ৳{item.price.toLocaleString()}
-                          </Text>
+                          <HStack justify="space-between">
+                            <Text color={mutedColor}>Shipping</Text>
+                            <Text fontWeight="semibold" color="green.500">
+                              {shipping === 0 ? 'FREE' : `৳${shipping.toLocaleString()}`}
+                            </Text>
+                          </HStack>
 
-                          <HStack spacing={4} mt={2}>
-                            <HStack>
-                              <IconButton
-                                aria-label="Decrease quantity"
-                                icon={<FiMinus />}
-                                size="sm"
-                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                isLoading={updating === item.id}
-                                isDisabled={item.quantity <= 1}
-                              />
-                              <Text fontWeight="semibold" minW="40px" textAlign="center">
-                                {item.quantity}
-                              </Text>
-                              <IconButton
-                                aria-label="Increase quantity"
-                                icon={<FiPlus />}
-                                size="sm"
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                isLoading={updating === item.id}
-                                isDisabled={item.quantity >= item.product.stockQuantity}
-                              />
-                            </HStack>
-
-                            <IconButton
-                              aria-label="Remove item"
-                              icon={<FiTrash2 />}
-                              size="sm"
-                              colorScheme="red"
-                              variant="ghost"
-                              onClick={() => removeItem(item.id)}
-                              isLoading={updating === item.id}
-                            />
+                          <HStack justify="space-between">
+                            <Text color={mutedColor}>Tax</Text>
+                            <Text fontWeight="semibold">
+                              ৳{tax.toLocaleString()}
+                            </Text>
                           </HStack>
                         </VStack>
 
-                        <VStack align="end" justify="space-between" minW="100px">
-                          <Text fontSize="xl" fontWeight="bold">
-                            ৳{(item.price * item.quantity).toLocaleString()}
+                        <Divider />
+
+                        <HStack justify="space-between">
+                          <Text fontSize="lg" fontWeight="bold">
+                            Total
                           </Text>
+                          <Text fontSize="2xl" fontWeight="bold" color={accentColor}>
+                            ৳{total.toLocaleString()}
+                          </Text>
+                        </HStack>
+
+                        <VStack spacing={3} pt={2}>
+                          <Button
+                            colorScheme="primary"
+                            size="lg"
+                            width="100%"
+                            rightIcon={<FiArrowRight />}
+                            onClick={() => router.push('/shopping/checkout')}
+                          >
+                            Proceed to Checkout
+                          </Button>
+
+                          <Button
+                            as={Link}
+                            href="/shopping"
+                            variant="outline"
+                            size="md"
+                            width="100%"
+                          >
+                            Continue Shopping
+                          </Button>
                         </VStack>
-                      </Stack>
+
+                        {/* Trust Badges */}
+                        <Divider />
+                        <VStack spacing={2} pt={2}>
+                          <HStack color={mutedColor} fontSize="sm">
+                            <Icon as={FiPackage} />
+                            <Text>Free shipping on all orders</Text>
+                          </HStack>
+                        </VStack>
+                      </VStack>
                     </CardBody>
                   </Card>
-                ))}
-              </VStack>
-
-              {/* Order Summary */}
-              <Card
-                bg={cardBg}
-                borderColor={borderColor}
-                borderWidth="1px"
-                borderRadius="lg"
-                width={{ base: '100%', lg: '400px' }}
-                position={{ base: 'relative', lg: 'sticky' }}
-                top={{ base: 0, lg: '100px' }}
-              >
-                <CardBody>
-                  <VStack spacing={4} align="start">
-                    <Heading size="md">Order Summary</Heading>
-
-                    <Divider />
-
-                    <HStack justify="space-between" width="100%">
-                      <Text>Subtotal</Text>
-                      <Text fontWeight="semibold">৳{cart.subtotal.toLocaleString()}</Text>
-                    </HStack>
-
-                    <HStack justify="space-between" width="100%">
-                      <Text>Shipping</Text>
-                      <Text fontWeight="semibold" color="green.500">
-                        {shipping === 0 ? 'FREE' : `৳${shipping.toLocaleString()}`}
-                      </Text>
-                    </HStack>
-
-                    <HStack justify="space-between" width="100%">
-                      <Text>Tax</Text>
-                      <Text fontWeight="semibold">৳{tax.toLocaleString()}</Text>
-                    </HStack>
-
-                    <Divider />
-
-                    <HStack justify="space-between" width="100%">
-                      <Text fontSize="xl" fontWeight="bold">
-                        Total
-                      </Text>
-                      <Text fontSize="2xl" fontWeight="bold" color="primary.500">
-                        ৳{total.toLocaleString()}
-                      </Text>
-                    </HStack>
-
-                    <Button
-                      colorScheme="primary"
-                      size="lg"
-                      width="100%"
-                      rightIcon={<FiArrowRight />}
-                      onClick={() => router.push('/shopping/checkout')}
-                    >
-                      Proceed to Checkout
-                    </Button>
-
-                    <Button
-                      as={Link}
-                      href="/shopping"
-                      variant="outline"
-                      size="lg"
-                      width="100%"
-                    >
-                      Continue Shopping
-                    </Button>
-                  </VStack>
-                </CardBody>
-              </Card>
-            </Stack>
+                </FallInPlace>
+              </Box>
+            </SimpleGrid>
           </VStack>
         </FallInPlace>
       </Container>
