@@ -245,7 +245,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                   )}
                 </Text>
 
-                <Text color={mutedColor}>{product.shortDescription}</Text>
+                <Text color={mutedColor} whiteSpace="pre-wrap">{product.shortDescription}</Text>
               </VStack>
 
               <Divider />

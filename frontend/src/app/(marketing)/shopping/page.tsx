@@ -354,7 +354,7 @@ export default function ShoppingPage() {
                         {product.name}
                       </Heading>
 
-                      <Text color={mutedColor} fontSize="sm" noOfLines={2}>
+                      <Text color={mutedColor} fontSize="sm" noOfLines={2} whiteSpace="pre-wrap">
                         {product.shortDescription || product.description}
                       </Text>
 

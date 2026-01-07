@@ -820,7 +820,7 @@ export default function EditProductPage() {
                                     )}
                                     <div className="flex-1">
                                         <h5 className="text-base font-semibold text-gray-900 dark:text-white">{formData.name || 'Untitled Product'}</h5>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{formData.shortDescription}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 whitespace-pre-wrap">{formData.shortDescription}</p>
                                         <div className="flex gap-2 mt-2">
                                             <span className="px-2 py-1 text-xs rounded bg-brand-100 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400">
                                                 {formData.type.replace('_', ' ')}
