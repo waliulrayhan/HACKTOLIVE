@@ -14,13 +14,11 @@ import {
   HStack,
   Badge,
   useColorModeValue,
-  Image,
   Tabs,
   TabList,
   Tab,
   TabPanels,
   TabPanel,
-  useToast,
   Spinner,
   Breadcrumb,
   BreadcrumbItem,
@@ -35,23 +33,28 @@ import {
   Avatar,
   Stack,
   SimpleGrid,
+  Flex,
+  AspectRatio,
+  Center,
 } from '@chakra-ui/react'
 import { useState, useEffect, use } from 'react'
 import {
   FiShoppingCart,
-  FiHeart,
-  FiShare2,
-  FiCheck,
   FiTruck,
   FiShield,
   FiRefreshCw,
   FiChevronRight,
   FiStar,
+  FiCheck,
 } from 'react-icons/fi'
 import { FallInPlace } from '@/components/shared/motion/fall-in-place'
 import { productService, cartService, Product } from '@/lib/shop-service'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { toast } from '@/components/ui/toast'
+import { useCart } from '@/context/CartContext'
+import NextImage from 'next/image'
+import { getFullImageUrl } from '@/lib/image-utils'
 
 export default function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params)
@@ -61,8 +64,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   const [quantity, setQuantity] = useState(1)
   const [selectedOptions, setSelectedOptions] = useState<any>({})
   const [addingToCart, setAddingToCart] = useState(false)
-  const toast = useToast()
+  const [addedToCart, setAddedToCart] = useState(false)
   const router = useRouter()
+  const { incrementCartCount } = useCart()
 
   const cardBg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
@@ -74,17 +78,32 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
   useEffect(() => {
     fetchProduct()
+    checkIfInCart()
   }, [resolvedParams.slug])
+
+  const checkIfInCart = async () => {
+    try {
+      const cart = await cartService.getCart()
+      const isInCart = cart?.items?.some((item: any) => item.productId === product?.id || item.product?.id === product?.id)
+      setAddedToCart(isInCart)
+    } catch (error) {
+      console.error('Failed to check cart:', error)
+    }
+  }
 
   const fetchProduct = async () => {
     try {
       const data = await productService.getProductBySlug(resolvedParams.slug)
       setProduct(data)
+      
+      // Check if product is in cart after loading
+      const cart = await cartService.getCart()
+      const isInCart = cart?.items?.some((item: any) => item.productId === data.id || item.product?.id === data.id)
+      setAddedToCart(isInCart)
     } catch (error) {
       console.error('Failed to fetch product:', error)
-      toast({
-        title: 'Product not found',
-        status: 'error',
+      toast.error('Product not found', {
+        description: 'Redirecting to shop...',
         duration: 3000,
       })
       router.push('/shopping')
@@ -94,7 +113,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   }
 
   const handleAddToCart = async () => {
-    if (!product) return
+    if (!product || addedToCart) return
 
     setAddingToCart(true)
     try {
@@ -103,17 +122,15 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
         quantity,
         selectedOptions,
       })
-      toast({
-        title: 'Added to cart',
-        description: `${product.name} has been added to your cart`,
-        status: 'success',
+      setAddedToCart(true)
+      incrementCartCount(quantity)
+      toast.success('Added to cart', {
+        description: `${product.name} (${quantity}) added to your cart`,
         duration: 3000,
       })
     } catch (error: any) {
-      toast({
-        title: 'Failed to add to cart',
+      toast.error('Failed to add to cart', {
         description: error.response?.data?.message || 'Please try again',
-        status: 'error',
         duration: 3000,
       })
     } finally {
@@ -172,13 +189,24 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             {/* Image Gallery */}
             <Box>
               <Card bg={cardBg} borderColor={borderColor} borderWidth="1px" borderRadius="xl" overflow="hidden">
-                <Image
-                  src={images[selectedImage]}
-                  alt={product.name}
-                  width="100%"
-                  height={{ base: '300px', md: '500px' }}
-                  objectFit="cover"
-                />
+                <AspectRatio ratio={1}>
+                  <Box position="relative" width="100%" height="100%">
+                    {images[selectedImage] ? (
+                      <NextImage
+                        src={getFullImageUrl(images[selectedImage], 'general')}
+                        alt={product.name}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        priority
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                      />
+                    ) : (
+                      <Center height="100%" bg={borderColor}>
+                        <Icon as={FiShoppingCart} boxSize={16} color={mutedColor} />
+                      </Center>
+                    )}
+                  </Box>
+                </AspectRatio>
               </Card>
 
               {images.length > 1 && (
@@ -196,7 +224,23 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                       transition="all 0.2s"
                       _hover={{ borderColor: 'primary.400' }}
                     >
-                      <Image src={img} alt={`${product.name} ${idx + 1}`} height="80px" objectFit="cover" />
+                      <AspectRatio ratio={1}>
+                        <Box position="relative">
+                          {img ? (
+                            <NextImage
+                              src={getFullImageUrl(img, 'general')}
+                              alt={`${product.name} ${idx + 1}`}
+                              fill
+                              style={{ objectFit: 'cover' }}
+                              sizes="150px"
+                            />
+                          ) : (
+                            <Center height="100%" bg={borderColor}>
+                              <Icon as={FiShoppingCart} boxSize={6} color={mutedColor} />
+                            </Center>
+                          )}
+                        </Box>
+                      </AspectRatio>
                     </Card>
                   ))}
                 </SimpleGrid>
@@ -230,20 +274,25 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                   </HStack>
                 )}
 
-                <Text fontSize="3xl" fontWeight="bold" color={priceColor}>
-                  ৳{product.price.toLocaleString()}
+                <HStack spacing={3} align="baseline">
+                  <Text fontSize="3xl" fontWeight="bold" color="primary.500">
+                    ৳{product.price.toLocaleString()}
+                  </Text>
                   {product.compareAtPrice && product.compareAtPrice > product.price && (
-                    <Text
-                      as="span"
-                      fontSize="xl"
-                      color={mutedColor}
-                      textDecoration="line-through"
-                      ml={3}
-                    >
-                      ৳{product.compareAtPrice.toLocaleString()}
-                    </Text>
+                    <VStack spacing={0} align="start">
+                      <Text
+                        fontSize="lg"
+                        color={mutedColor}
+                        textDecoration="line-through"
+                      >
+                        ৳{product.compareAtPrice.toLocaleString()}
+                      </Text>
+                      <Badge colorScheme="green" fontSize="xs">
+                        {Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}% OFF
+                      </Badge>
+                    </VStack>
                   )}
-                </Text>
+                </HStack>
 
                 <Text color={mutedColor} whiteSpace="pre-wrap">{product.shortDescription}</Text>
               </VStack>
@@ -305,23 +354,33 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                     <NumberDecrementStepper />
                   </NumberInputStepper>
                 </NumberInput>
-                <Text fontSize="sm" color={mutedColor}>
-                  {product.stockQuantity} available
-                </Text>
+                {product.stockQuantity > 0 ? (
+                  <HStack>
+                    <Badge colorScheme={product.stockQuantity <= (product.lowStockThreshold || 10) ? 'orange' : 'green'}>
+                      {product.stockQuantity} in stock
+                    </Badge>
+                    {product.stockQuantity <= (product.lowStockThreshold || 10) && (
+                      <Text fontSize="sm" color="orange.500">Low stock!</Text>
+                    )}
+                  </HStack>
+                ) : (
+                  <Badge colorScheme="red">Out of stock</Badge>
+                )}
               </VStack>
 
               {/* Actions */}
               <Stack direction={{ base: 'column', md: 'row' }} spacing={4} width="100%">
                 <Button
-                  colorScheme="primary"
+                  colorScheme={addedToCart ? "green" : "primary"}
                   size="lg"
-                  leftIcon={<FiShoppingCart />}
+                  leftIcon={addedToCart ? <FiCheck /> : <FiShoppingCart />}
                   isLoading={addingToCart}
-                  isDisabled={product.stockQuantity === 0 && !product.allowBackorder}
+                  loadingText="Adding..."
+                  isDisabled={(product.stockQuantity === 0 && !product.allowBackorder) || addedToCart}
                   onClick={handleAddToCart}
                   flex={1}
                 >
-                  Add to Cart
+                  {addedToCart ? 'Added to Cart' : 'Add to Cart'}
                 </Button>
                 <Button
                   variant="outline"
@@ -366,7 +425,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
               <TabPanels>
                 <TabPanel>
                   <Card bg={cardBg} borderColor={borderColor} borderWidth="1px" p={6}>
-                    <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                    <Text whiteSpace="pre-wrap" color={mutedColor}>
+                      {product.description}
+                    </Text>
                   </Card>
                 </TabPanel>
 

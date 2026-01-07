@@ -662,12 +662,17 @@ export default function ShoppingPage() {
                               colorScheme={addedToCart.has(product.id) ? "green" : "primary"}
                               size="sm"
                               leftIcon={addedToCart.has(product.id) ? <FiCheck /> : <FiShoppingCart />}
-                              isDisabled={product.stockQuantity === 0 && !product.allowBackorder}
+                              isDisabled={
+                                (product.stockQuantity === 0 && !product.allowBackorder) || 
+                                addedToCart.has(product.id)
+                              }
                               isLoading={addingToCart === product.id}
                               loadingText="Adding"
                               onClick={(e) => {
                                 e.stopPropagation()
-                                handleAddToCart(product.id)
+                                if (!addedToCart.has(product.id)) {
+                                  handleAddToCart(product.id)
+                                }
                               }}
                             >
                               {addedToCart.has(product.id) ? 'Added' : 'Add'}
