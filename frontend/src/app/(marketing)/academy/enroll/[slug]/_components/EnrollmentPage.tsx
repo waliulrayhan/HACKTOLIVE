@@ -30,6 +30,7 @@ import {
   RadioGroup,
   Spinner,
   Center,
+  Divider,
 } from "@chakra-ui/react";
 import { toast } from '@/components/ui/toast'
 import Image from "next/image";
@@ -427,7 +428,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                               value={paymentData.paymentMethod}
                               onChange={(value) => setPaymentData({ ...paymentData, paymentMethod: value })}
                             >
-                              <Stack spacing="3">
+                              <VStack spacing="3">
                                 <Radio value="card" size="lg">
                                   <HStack>
                                     <Icon as={FiCreditCard} />
@@ -440,7 +441,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                                     <Text>UPI / Net Banking</Text>
                                   </HStack>
                                 </Radio>
-                              </Stack>
+                              </VStack>
                             </RadioGroup>
                           </FormControl>
 
