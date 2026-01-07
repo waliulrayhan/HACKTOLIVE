@@ -11,26 +11,40 @@ import {
   VStack,
   HStack,
   useColorModeValue,
-  useToast,
   Spinner,
   FormControl,
   FormLabel,
   Input,
-  Select,
   Textarea,
   Radio,
   RadioGroup,
   Stack,
   Divider,
   Image,
-  Badge,
+  Icon,
+  Flex,
+  SimpleGrid,
 } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
-import { FiCheckCircle } from 'react-icons/fi'
+import {
+  FiCheckCircle,
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiMapPin,
+  FiCreditCard,
+  FiShoppingBag,
+  FiPackage,
+  FiTruck,
+} from 'react-icons/fi'
 import { FallInPlace } from '@/components/shared/motion/fall-in-place'
+import { BackgroundGradient } from '@/components/shared/gradients/background-gradient'
 import { cartService, orderService, Cart } from '@/lib/shop-service'
 import { useRouter } from 'next/navigation'
 import { authService } from '@/lib/auth-service'
+import { toast } from '@/components/ui/toast'
+import NextImage from 'next/image'
+import { getFullImageUrl } from '@/lib/image-utils'
 
 export default function CheckoutPage() {
   const [cart, setCart] = useState<Cart | null>(null)
@@ -48,19 +62,23 @@ export default function CheckoutPage() {
     notes: '',
   })
 
-  const toast = useToast()
   const router = useRouter()
 
+  const bgColor = useColorModeValue('gray.50', 'gray.900')
   const cardBg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
   const mutedColor = useColorModeValue('gray.600', 'gray.400')
+  const iconBg = useColorModeValue('primary.50', 'primary.900')
+  const iconColor = useColorModeValue('primary.500', 'primary.400')
+  const accentColor = useColorModeValue('primary.500', 'primary.400')
+  const inputBg = useColorModeValue('white', 'gray.700')
+  const inputBorder = useColorModeValue('gray.300', 'gray.600')
 
   useEffect(() => {
-    
     // Auto-fill form with user data if logged in
     const user = authService.getUser()
     if (user) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         customerName: user.name || '',
         customerEmail: user.email || '',
@@ -99,19 +117,15 @@ export default function CheckoutPage() {
       // Clear session ID since cart is now empty
       cartService.clearSessionId()
 
-      toast({
-        title: 'Order placed successfully!',
+      toast.success('Order placed successfully!', {
         description: `Order number: ${order.orderNumber}`,
-        status: 'success',
         duration: 5000,
       })
 
       router.push(`/shopping/orders/${order.orderNumber}`)
     } catch (error: any) {
-      toast({
-        title: 'Failed to create order',
+      toast.error('Failed to create order', {
         description: error.response?.data?.message || 'Please try again',
-        status: 'error',
         duration: 5000,
       })
     } finally {
@@ -121,8 +135,8 @@ export default function CheckoutPage() {
 
   if (loading) {
     return (
-      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
-        <Spinner size="xl" color="primary.500" />
+      <Box minH="100vh" bg={bgColor} display="flex" alignItems="center" justifyContent="center">
+        <Spinner size="xl" color={accentColor} thickness="4px" />
       </Box>
     )
   }
@@ -136,209 +150,528 @@ export default function CheckoutPage() {
   const total = cart.subtotal + tax + shipping
 
   return (
-    <Box pt={{ base: 28, md: 32 }} pb={12}>
-      <Container maxW="container.xl">
-        <FallInPlace>
-          <Heading size="xl" mb={8}>
-            Checkout
-          </Heading>
+    <Box position="relative" overflow="hidden">
+      <BackgroundGradient height="100%" zIndex={-1} />
+      
+      <Box pt={{ base: 28, md: 32 }} pb={16} bg={bgColor}>
+        <Container maxW="container.xl">
+          <FallInPlace>
+            {/* Header */}
+            <VStack spacing={3} mb={10} textAlign="center">
+              <Flex
+                w={14}
+                h={14}
+                align="center"
+                justify="center"
+                borderRadius="xl"
+                bg={iconBg}
+                color={iconColor}
+              >
+                <Icon as={FiShoppingBag} boxSize={7} />
+              </Flex>
+              <Heading size="2xl" fontWeight="bold">
+                Checkout
+              </Heading>
+              <Text fontSize="lg" color={mutedColor} maxW="2xl">
+                Complete your order securely
+              </Text>
+            </VStack>
 
-          <form onSubmit={handleSubmit}>
-            <Stack direction={{ base: 'column', lg: 'row' }} spacing={8} align="start">
-              {/* Checkout Form */}
-              <VStack spacing={6} flex={1} width="100%">
-                <Card bg={cardBg} borderColor={borderColor} borderWidth="1px" borderRadius="lg" width="100%">
-                  <CardBody>
-                    <VStack spacing={4}>
-                      <Heading size="md" alignSelf="start">
-                        Contact Information
-                      </Heading>
+            <form onSubmit={handleSubmit}>
+              <SimpleGrid columns={{ base: 1, lg: 3 }} spacing={8}>
+                {/* Left Column - Forms */}
+                <VStack spacing={6} gridColumn={{ base: 1, lg: 'span 2' }}>
+                  {/* Contact Information */}
+                  <Card
+                    bg={cardBg}
+                    borderColor={borderColor}
+                    borderWidth="1px"
+                    borderRadius="xl"
+                    width="100%"
+                    shadow="sm"
+                    _hover={{ shadow: 'md' }}
+                    transition="all 0.2s"
+                  >
+                    <CardBody p={6}>
+                      <HStack spacing={3} mb={5}>
+                        <Flex
+                          w={10}
+                          h={10}
+                          align="center"
+                          justify="center"
+                          borderRadius="lg"
+                          bg={iconBg}
+                          color={iconColor}
+                        >
+                          <Icon as={FiUser} boxSize={5} />
+                        </Flex>
+                        <Heading size="md" fontWeight="semibold">
+                          Contact Information
+                        </Heading>
+                      </HStack>
 
-                      <FormControl isRequired>
-                        <FormLabel>Full Name</FormLabel>
-                        <Input
-                          value={formData.customerName}
-                          onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-                        />
-                      </FormControl>
+                      <VStack spacing={4}>
+                        <FormControl isRequired>
+                          <FormLabel fontSize="sm" fontWeight="medium">
+                            Full Name
+                          </FormLabel>
+                          <Input
+                            value={formData.customerName}
+                            onChange={(e) =>
+                              setFormData({ ...formData, customerName: e.target.value })
+                            }
+                            placeholder="Enter your full name"
+                            size="lg"
+                            bg={inputBg}
+                            borderColor={inputBorder}
+                            _hover={{ borderColor: accentColor }}
+                            _focus={{
+                              borderColor: accentColor,
+                              boxShadow: `0 0 0 1px ${accentColor}`,
+                            }}
+                          />
+                        </FormControl>
 
-                      <FormControl isRequired>
-                        <FormLabel>Email</FormLabel>
-                        <Input
-                          type="email"
-                          value={formData.customerEmail}
-                          onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
-                        />
-                      </FormControl>
+                        <FormControl isRequired>
+                          <FormLabel fontSize="sm" fontWeight="medium">
+                            Email Address
+                          </FormLabel>
+                          <Input
+                            type="email"
+                            value={formData.customerEmail}
+                            onChange={(e) =>
+                              setFormData({ ...formData, customerEmail: e.target.value })
+                            }
+                            placeholder="your@email.com"
+                            size="lg"
+                            bg={inputBg}
+                            borderColor={inputBorder}
+                            _hover={{ borderColor: accentColor }}
+                            _focus={{
+                              borderColor: accentColor,
+                              boxShadow: `0 0 0 1px ${accentColor}`,
+                            }}
+                          />
+                        </FormControl>
 
-                      <FormControl isRequired>
-                        <FormLabel>Phone</FormLabel>
-                        <Input
-                          type="tel"
-                          value={formData.customerPhone}
-                          onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
-                        />
-                      </FormControl>
-                    </VStack>
-                  </CardBody>
-                </Card>
+                        <FormControl isRequired>
+                          <FormLabel fontSize="sm" fontWeight="medium">
+                            Phone Number
+                          </FormLabel>
+                          <Input
+                            type="tel"
+                            value={formData.customerPhone}
+                            onChange={(e) =>
+                              setFormData({ ...formData, customerPhone: e.target.value })
+                            }
+                            placeholder="+880 1XXX XXXXXX"
+                            size="lg"
+                            bg={inputBg}
+                            borderColor={inputBorder}
+                            _hover={{ borderColor: accentColor }}
+                            _focus={{
+                              borderColor: accentColor,
+                              boxShadow: `0 0 0 1px ${accentColor}`,
+                            }}
+                          />
+                        </FormControl>
+                      </VStack>
+                    </CardBody>
+                  </Card>
 
-                <Card bg={cardBg} borderColor={borderColor} borderWidth="1px" borderRadius="lg" width="100%">
-                  <CardBody>
-                    <VStack spacing={4}>
-                      <Heading size="md" alignSelf="start">
-                        Shipping Address
-                      </Heading>
+                  {/* Shipping Address */}
+                  <Card
+                    bg={cardBg}
+                    borderColor={borderColor}
+                    borderWidth="1px"
+                    borderRadius="xl"
+                    width="100%"
+                    shadow="sm"
+                    _hover={{ shadow: 'md' }}
+                    transition="all 0.2s"
+                  >
+                    <CardBody p={6}>
+                      <HStack spacing={3} mb={5}>
+                        <Flex
+                          w={10}
+                          h={10}
+                          align="center"
+                          justify="center"
+                          borderRadius="lg"
+                          bg={iconBg}
+                          color={iconColor}
+                        >
+                          <Icon as={FiMapPin} boxSize={5} />
+                        </Flex>
+                        <Heading size="md" fontWeight="semibold">
+                          Shipping Address
+                        </Heading>
+                      </HStack>
 
-                      <FormControl isRequired>
-                        <FormLabel>Address</FormLabel>
-                        <Textarea
-                          value={formData.shippingAddress}
-                          onChange={(e) => setFormData({ ...formData, shippingAddress: e.target.value })}
-                        />
-                      </FormControl>
+                      <VStack spacing={4}>
+                        <FormControl isRequired>
+                          <FormLabel fontSize="sm" fontWeight="medium">
+                            Address
+                          </FormLabel>
+                          <Textarea
+                            value={formData.shippingAddress}
+                            onChange={(e) =>
+                              setFormData({ ...formData, shippingAddress: e.target.value })
+                            }
+                            placeholder="House/Flat, Street, Area"
+                            rows={3}
+                            size="lg"
+                            bg={inputBg}
+                            borderColor={inputBorder}
+                            _hover={{ borderColor: accentColor }}
+                            _focus={{
+                              borderColor: accentColor,
+                              boxShadow: `0 0 0 1px ${accentColor}`,
+                            }}
+                          />
+                        </FormControl>
 
-                      <FormControl isRequired>
-                        <FormLabel>City</FormLabel>
-                        <Input
-                          value={formData.shippingCity}
-                          onChange={(e) => setFormData({ ...formData, shippingCity: e.target.value })}
-                        />
-                      </FormControl>
+                        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} width="100%">
+                          <FormControl isRequired>
+                            <FormLabel fontSize="sm" fontWeight="medium">
+                              City
+                            </FormLabel>
+                            <Input
+                              value={formData.shippingCity}
+                              onChange={(e) =>
+                                setFormData({ ...formData, shippingCity: e.target.value })
+                              }
+                              placeholder="e.g. Dhaka"
+                              size="lg"
+                              bg={inputBg}
+                              borderColor={inputBorder}
+                              _hover={{ borderColor: accentColor }}
+                              _focus={{
+                                borderColor: accentColor,
+                                boxShadow: `0 0 0 1px ${accentColor}`,
+                              }}
+                            />
+                          </FormControl>
 
-                      <FormControl isRequired>
-                        <FormLabel>ZIP Code</FormLabel>
-                        <Input
-                          value={formData.shippingZip}
-                          onChange={(e) => setFormData({ ...formData, shippingZip: e.target.value })}
-                        />
-                      </FormControl>
+                          <FormControl isRequired>
+                            <FormLabel fontSize="sm" fontWeight="medium">
+                              ZIP Code
+                            </FormLabel>
+                            <Input
+                              value={formData.shippingZip}
+                              onChange={(e) =>
+                                setFormData({ ...formData, shippingZip: e.target.value })
+                              }
+                              placeholder="e.g. 1200"
+                              size="lg"
+                              bg={inputBg}
+                              borderColor={inputBorder}
+                              _hover={{ borderColor: accentColor }}
+                              _focus={{
+                                borderColor: accentColor,
+                                boxShadow: `0 0 0 1px ${accentColor}`,
+                              }}
+                            />
+                          </FormControl>
+                        </SimpleGrid>
 
-                      <FormControl isRequired>
-                        <FormLabel>Country</FormLabel>
-                        <Input value={formData.shippingCountry} isReadOnly />
-                      </FormControl>
-                    </VStack>
-                  </CardBody>
-                </Card>
+                        <FormControl isRequired>
+                          <FormLabel fontSize="sm" fontWeight="medium">
+                            Country
+                          </FormLabel>
+                          <Input
+                            value={formData.shippingCountry}
+                            isReadOnly
+                            size="lg"
+                            bg={inputBg}
+                            borderColor={inputBorder}
+                          />
+                        </FormControl>
+                      </VStack>
+                    </CardBody>
+                  </Card>
 
-                <Card bg={cardBg} borderColor={borderColor} borderWidth="1px" borderRadius="lg" width="100%">
-                  <CardBody>
-                    <VStack spacing={4} align="start">
-                      <Heading size="md">Payment Method</Heading>
+                  {/* Payment Method */}
+                  <Card
+                    bg={cardBg}
+                    borderColor={borderColor}
+                    borderWidth="1px"
+                    borderRadius="xl"
+                    width="100%"
+                    shadow="sm"
+                    _hover={{ shadow: 'md' }}
+                    transition="all 0.2s"
+                  >
+                    <CardBody p={6}>
+                      <HStack spacing={3} mb={5}>
+                        <Flex
+                          w={10}
+                          h={10}
+                          align="center"
+                          justify="center"
+                          borderRadius="lg"
+                          bg={iconBg}
+                          color={iconColor}
+                        >
+                          <Icon as={FiCreditCard} boxSize={5} />
+                        </Flex>
+                        <Heading size="md" fontWeight="semibold">
+                          Payment Method
+                        </Heading>
+                      </HStack>
 
                       <RadioGroup value={paymentMethod} onChange={setPaymentMethod}>
                         <Stack spacing={3}>
-                          <Radio value="MOBILE_BANKING">Mobile Banking (bKash, Nagad, Rocket)</Radio>
-                          <Radio value="CARD">Credit/Debit Card</Radio>
-                          <Radio value="BANK_TRANSFER">Bank Transfer</Radio>
-                          <Radio value="CASH_ON_DELIVERY">Cash on Delivery</Radio>
+                          <Box
+                            p={4}
+                            borderWidth="2px"
+                            borderRadius="lg"
+                            borderColor={
+                              paymentMethod === 'MOBILE_BANKING' ? accentColor : borderColor
+                            }
+                            bg={paymentMethod === 'MOBILE_BANKING' ? iconBg : 'transparent'}
+                            cursor="pointer"
+                            transition="all 0.2s"
+                            _hover={{ borderColor: accentColor }}
+                          >
+                            <Radio value="MOBILE_BANKING" size="lg" colorScheme="primary">
+                              <Text fontWeight="medium">Mobile Banking</Text>
+                              <Text fontSize="sm" color={mutedColor} mt={1}>
+                                bKash, Nagad, Rocket
+                              </Text>
+                            </Radio>
+                          </Box>
+
+                          <Box
+                            p={4}
+                            borderWidth="2px"
+                            borderRadius="lg"
+                            borderColor={paymentMethod === 'CARD' ? accentColor : borderColor}
+                            bg={paymentMethod === 'CARD' ? iconBg : 'transparent'}
+                            cursor="pointer"
+                            transition="all 0.2s"
+                            _hover={{ borderColor: accentColor }}
+                          >
+                            <Radio value="CARD" size="lg" colorScheme="primary">
+                              <Text fontWeight="medium">Credit/Debit Card</Text>
+                              <Text fontSize="sm" color={mutedColor} mt={1}>
+                                Visa, Mastercard, Amex
+                              </Text>
+                            </Radio>
+                          </Box>
+
+                          <Box
+                            p={4}
+                            borderWidth="2px"
+                            borderRadius="lg"
+                            borderColor={
+                              paymentMethod === 'BANK_TRANSFER' ? accentColor : borderColor
+                            }
+                            bg={paymentMethod === 'BANK_TRANSFER' ? iconBg : 'transparent'}
+                            cursor="pointer"
+                            transition="all 0.2s"
+                            _hover={{ borderColor: accentColor }}
+                          >
+                            <Radio value="BANK_TRANSFER" size="lg" colorScheme="primary">
+                              <Text fontWeight="medium">Bank Transfer</Text>
+                              <Text fontSize="sm" color={mutedColor} mt={1}>
+                                Direct bank deposit
+                              </Text>
+                            </Radio>
+                          </Box>
+
+                          <Box
+                            p={4}
+                            borderWidth="2px"
+                            borderRadius="lg"
+                            borderColor={
+                              paymentMethod === 'CASH_ON_DELIVERY' ? accentColor : borderColor
+                            }
+                            bg={paymentMethod === 'CASH_ON_DELIVERY' ? iconBg : 'transparent'}
+                            cursor="pointer"
+                            transition="all 0.2s"
+                            _hover={{ borderColor: accentColor }}
+                          >
+                            <Radio value="CASH_ON_DELIVERY" size="lg" colorScheme="primary">
+                              <Text fontWeight="medium">Cash on Delivery</Text>
+                              <Text fontSize="sm" color={mutedColor} mt={1}>
+                                Pay when you receive
+                              </Text>
+                            </Radio>
+                          </Box>
                         </Stack>
                       </RadioGroup>
-                    </VStack>
-                  </CardBody>
-                </Card>
+                    </CardBody>
+                  </Card>
 
-                <FormControl>
-                  <FormLabel>Order Notes (Optional)</FormLabel>
-                  <Textarea
-                    placeholder="Any special instructions..."
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  />
-                </FormControl>
-              </VStack>
+                  {/* Additional Notes */}
+                  <FormControl>
+                    <FormLabel fontSize="sm" fontWeight="medium">
+                      Order Notes (Optional)
+                    </FormLabel>
+                    <Textarea
+                      placeholder="Any special instructions for your order..."
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      rows={4}
+                      size="lg"
+                      bg={inputBg}
+                      borderColor={inputBorder}
+                      _hover={{ borderColor: accentColor }}
+                      _focus={{
+                        borderColor: accentColor,
+                        boxShadow: `0 0 0 1px ${accentColor}`,
+                      }}
+                    />
+                  </FormControl>
+                </VStack>
 
-              {/* Order Summary */}
-              <Card
-                bg={cardBg}
-                borderColor={borderColor}
-                borderWidth="1px"
-                borderRadius="lg"
-                width={{ base: '100%', lg: '400px' }}
-                position={{ base: 'relative', lg: 'sticky' }}
-                top={{ base: 0, lg: '100px' }}
-              >
-                <CardBody>
-                  <VStack spacing={4}>
-                    <Heading size="md" alignSelf="start">
-                      Order Summary
-                    </Heading>
+                {/* Right Column - Order Summary */}
+                <Box>
+                  <Card
+                    bg={cardBg}
+                    borderColor={borderColor}
+                    borderWidth="1px"
+                    borderRadius="xl"
+                    shadow="sm"
+                    position="sticky"
+                    top="100px"
+                  >
+                    <CardBody p={6}>
+                      <VStack spacing={5}>
+                        <HStack spacing={3} width="100%">
+                          <Flex
+                            w={10}
+                            h={10}
+                            align="center"
+                            justify="center"
+                            borderRadius="lg"
+                            bg={iconBg}
+                            color={iconColor}
+                          >
+                            <Icon as={FiPackage} boxSize={5} />
+                          </Flex>
+                          <Heading size="md" fontWeight="semibold">
+                            Order Summary
+                          </Heading>
+                        </HStack>
 
-                    <Divider />
+                        <Divider />
 
-                    <VStack spacing={3} width="100%">
-                      {cart.items.map((item) => (
-                        <HStack key={item.id} spacing={3} width="100%" align="start">
-                          <Image
-                            src={item.product.thumbnail || item.product.images[0]}
-                            alt={item.product.name}
-                            boxSize="60px"
-                            objectFit="cover"
-                            borderRadius="md"
-                          />
-                          <VStack flex={1} align="start" spacing={0}>
-                            <Text fontSize="sm" fontWeight="semibold" noOfLines={2}>
-                              {item.product.name}
+                        <VStack spacing={3} width="100%" maxH="300px" overflowY="auto">
+                          {cart.items.map((item) => (
+                            <HStack
+                              key={item.id}
+                              spacing={3}
+                              width="100%"
+                              align="start"
+                              p={2}
+                              borderRadius="md"
+                              _hover={{ bg: iconBg }}
+                              transition="all 0.2s"
+                            >
+                              <Box
+                                position="relative"
+                                boxSize="50px"
+                                borderRadius="md"
+                                overflow="hidden"
+                                flexShrink={0}
+                              >
+                                <NextImage
+                                  src={getFullImageUrl(
+                                    item.product.thumbnail || item.product.images[0]
+                                  )}
+                                  alt={item.product.name}
+                                  fill
+                                  style={{ objectFit: 'cover' }}
+                                />
+                              </Box>
+                              <VStack flex={1} align="start" spacing={0}>
+                                <Text fontSize="sm" fontWeight="medium" noOfLines={2}>
+                                  {item.product.name}
+                                </Text>
+                                <Text fontSize="xs" color={mutedColor}>
+                                  Qty: {item.quantity}
+                                </Text>
+                              </VStack>
+                              <Text fontSize="sm" fontWeight="bold" color={accentColor}>
+                                ৳{(item.price * item.quantity).toLocaleString()}
+                              </Text>
+                            </HStack>
+                          ))}
+                        </VStack>
+
+                        <Divider />
+
+                        <VStack spacing={3} width="100%">
+                          <HStack justify="space-between" width="100%">
+                            <Text fontSize="sm" color={mutedColor}>
+                              Subtotal
                             </Text>
-                            <Text fontSize="xs" color={mutedColor}>
-                              Qty: {item.quantity}
+                            <Text fontSize="sm" fontWeight="semibold">
+                              ৳{cart.subtotal.toLocaleString()}
                             </Text>
-                          </VStack>
-                          <Text fontSize="sm" fontWeight="semibold">
-                            ৳{(item.price * item.quantity).toLocaleString()}
+                          </HStack>
+
+                          <HStack justify="space-between" width="100%">
+                            <HStack spacing={2}>
+                              <Icon as={FiTruck} color={mutedColor} boxSize={4} />
+                              <Text fontSize="sm" color={mutedColor}>
+                                Shipping
+                              </Text>
+                            </HStack>
+                            <Text fontSize="sm" fontWeight="semibold" color="green.500">
+                              FREE
+                            </Text>
+                          </HStack>
+
+                          <HStack justify="space-between" width="100%">
+                            <Text fontSize="sm" color={mutedColor}>
+                              Tax
+                            </Text>
+                            <Text fontSize="sm" fontWeight="semibold">
+                              ৳{tax.toLocaleString()}
+                            </Text>
+                          </HStack>
+                        </VStack>
+
+                        <Divider />
+
+                        <HStack justify="space-between" width="100%">
+                          <Text fontSize="lg" fontWeight="bold">
+                            Total
+                          </Text>
+                          <Text fontSize="2xl" fontWeight="bold" color={accentColor}>
+                            ৳{total.toLocaleString()}
                           </Text>
                         </HStack>
-                      ))}
-                    </VStack>
 
-                    <Divider />
+                        <Button
+                          type="submit"
+                          colorScheme="primary"
+                          size="lg"
+                          width="100%"
+                          isLoading={submitting}
+                          loadingText="Processing..."
+                          leftIcon={<Icon as={FiCheckCircle} />}
+                          _hover={{ transform: 'translateY(-2px)', shadow: 'lg' }}
+                          transition="all 0.2s"
+                        >
+                          Place Order
+                        </Button>
 
-                    <HStack justify="space-between" width="100%">
-                      <Text>Subtotal</Text>
-                      <Text fontWeight="semibold">৳{cart.subtotal.toLocaleString()}</Text>
-                    </HStack>
-
-                    <HStack justify="space-between" width="100%">
-                      <Text>Shipping</Text>
-                      <Text fontWeight="semibold" color="green.500">
-                        FREE
-                      </Text>
-                    </HStack>
-
-                    <HStack justify="space-between" width="100%">
-                      <Text>Tax</Text>
-                      <Text fontWeight="semibold">৳{tax.toLocaleString()}</Text>
-                    </HStack>
-
-                    <Divider />
-
-                    <HStack justify="space-between" width="100%">
-                      <Text fontSize="xl" fontWeight="bold">
-                        Total
-                      </Text>
-                      <Text fontSize="2xl" fontWeight="bold" color="primary.500">
-                        ৳{total.toLocaleString()}
-                      </Text>
-                    </HStack>
-
-                    <Button
-                      type="submit"
-                      colorScheme="primary"
-                      size="lg"
-                      width="100%"
-                      isLoading={submitting}
-                      leftIcon={<FiCheckCircle />}
-                    >
-                      Place Order
-                    </Button>
-                  </VStack>
-                </CardBody>
-              </Card>
-            </Stack>
-          </form>
-        </FallInPlace>
-      </Container>
+                        <Text fontSize="xs" color={mutedColor} textAlign="center">
+                          By placing your order, you agree to our terms and conditions
+                        </Text>
+                      </VStack>
+                    </CardBody>
+                  </Card>
+                </Box>
+              </SimpleGrid>
+            </form>
+          </FallInPlace>
+        </Container>
+      </Box>
     </Box>
   )
 }
