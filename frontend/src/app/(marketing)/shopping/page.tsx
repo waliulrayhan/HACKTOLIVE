@@ -48,6 +48,8 @@ import { useRouter } from 'next/navigation'
 import { chakra } from '@chakra-ui/react'
 import { toast } from '@/components/ui/toast'
 import NextImage from 'next/image'
+import { getFullImageUrl } from '@/lib/image-utils'
+import { useCart } from '@/context/CartContext'
 
 export default function ShoppingPage() {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -65,6 +67,7 @@ export default function ShoppingPage() {
   const [addingToCart, setAddingToCart] = useState<string | null>(null)
   const [addedToCart, setAddedToCart] = useState<Set<string>>(new Set())
   const router = useRouter()
+  const { incrementCartCount } = useCart()
 
   const bgColor = useColorModeValue('gray.50', 'gray.900')
   const cardBg = useColorModeValue('white', 'gray.800')
@@ -141,6 +144,9 @@ export default function ShoppingPage() {
       
       // Mark as added - will persist until page reload or manual clear
       setAddedToCart(prev => new Set(prev).add(productId))
+      
+      // Increment cart count in context
+      incrementCartCount(1)
       
       toast.success('Added to cart', {
         description: 'Product successfully added to your cart',
@@ -565,7 +571,7 @@ export default function ShoppingPage() {
                       <Box position="relative" height="240px" overflow="hidden" bg={borderColor}>
                         {(product.thumbnail || product.images[0]) ? (
                           <NextImage
-                            src={product.thumbnail || product.images[0]}
+                            src={getFullImageUrl(product.thumbnail || product.images[0], 'general')}
                             alt={product.name}
                             fill
                             style={{ objectFit: 'cover' }}

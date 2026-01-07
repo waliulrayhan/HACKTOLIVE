@@ -31,13 +31,15 @@ import { FallInPlace } from '@/components/shared/motion/fall-in-place'
 import { cartService, Cart } from '@/lib/shop-service'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { toast } from '@/components/ui/toast'
+import { useCart } from '@/context/CartContext'
 
 export default function CartPage() {
   const [cart, setCart] = useState<Cart | null>(null)
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState<string | null>(null)
-  const toast = useToast()
   const router = useRouter()
+  const { refreshCart } = useCart()
 
   const cardBg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
@@ -65,16 +67,13 @@ export default function CartPage() {
     try {
       const data = await cartService.updateCartItem(itemId, quantity)
       setCart(data)
-      toast({
-        title: 'Cart updated',
-        status: 'success',
+      await refreshCart()
+      toast.success('Cart updated', {
         duration: 2000,
       })
     } catch (error: any) {
-      toast({
-        title: 'Failed to update cart',
-        description: error.response?.data?.message,
-        status: 'error',
+      toast.error('Failed to update cart', {
+        description: error.response?.data?.message || 'Please try again',
         duration: 3000,
       })
     } finally {
@@ -87,16 +86,13 @@ export default function CartPage() {
     try {
       const data = await cartService.removeFromCart(itemId)
       setCart(data)
-      toast({
-        title: 'Item removed from cart',
-        status: 'success',
+      await refreshCart()
+      toast.success('Item removed from cart', {
         duration: 2000,
       })
     } catch (error: any) {
-      toast({
-        title: 'Failed to remove item',
-        description: error.response?.data?.message,
-        status: 'error',
+      toast.error('Failed to remove item', {
+        description: error.response?.data?.message || 'Please try again',
         duration: 3000,
       })
     } finally {
@@ -108,15 +104,13 @@ export default function CartPage() {
     try {
       const data = await cartService.clearCart()
       setCart(data)
-      toast({
-        title: 'Cart cleared',
-        status: 'success',
+      await refreshCart()
+      toast.success('Cart cleared', {
         duration: 2000,
       })
     } catch (error: any) {
-      toast({
-        title: 'Failed to clear cart',
-        status: 'error',
+      toast.error('Failed to clear cart', {
+        description: 'Please try again',
         duration: 3000,
       })
     }
