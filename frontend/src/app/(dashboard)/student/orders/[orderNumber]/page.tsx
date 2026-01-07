@@ -4,7 +4,10 @@ import React, { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
+import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
 import Badge from "@/components/ui/badge/Badge";
+import Button from "@/components/ui/button/Button";
+import { getFullImageUrl } from '@/lib/image-utils';
 import {
   HiOutlineCheckCircle,
   HiOutlineClock,
@@ -15,6 +18,10 @@ import {
   HiOutlinePhone,
   HiOutlineUser,
   HiOutlineCreditCard,
+  HiOutlineShoppingBag,
+  HiOutlineArrowLeft,
+  HiOutlineCalendar,
+  HiOutlineCurrencyDollar,
 } from "react-icons/hi";
 
 interface OrderItem {
@@ -120,35 +127,36 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="space-y-4">
         <PageBreadcrumb pageTitle="Order Details" />
-        <div className="p-6">
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-          </div>
-        </div>
+        <TablePageLoadingSkeleton />
       </div>
     );
   }
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="space-y-4">
         <PageBreadcrumb pageTitle="Order Details" />
-        <div className="p-6">
-          <div className="bg-card rounded-lg border border-border p-12 text-center">
-            <h3 className="text-lg font-semibold text-foreground mb-2">
+        <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 p-12">
+          <div className="flex flex-col items-center gap-3">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-500/15">
+              <HiOutlineXCircle className="h-8 w-8 text-red-600 dark:text-red-500" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
               Order not found
             </h3>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center max-w-md">
               The order you're looking for doesn't exist or you don't have permission to view it.
             </p>
-            <button
+            <Button
               onClick={() => router.push("/student/orders")}
-              className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+              variant="primary"
+              className="mt-4"
             >
+              <HiOutlineArrowLeft className="mr-2 h-4 w-4" />
               Back to Orders
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -158,239 +166,313 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
   const StatusIcon = getStatusIcon(order.status);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="space-y-4">
       <PageBreadcrumb pageTitle={`Order ${order.orderNumber}`} />
 
-      <div className="p-6 max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">
-                Order Details
-              </h1>
-              <p className="text-muted-foreground">
-                Order placed on {new Date(order.createdAt).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </p>
+      {/* Header Card */}
+      <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+        <div className="p-4 sm:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/15 shrink-0">
+                <HiOutlineShoppingBag className="h-6 w-6 text-brand-600 dark:text-brand-400" />
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                  Order Details
+                </h1>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                  <HiOutlineCalendar className="h-4 w-4" />
+                  <span>
+                    {new Date(order.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="text-right">
-              <div className="text-sm text-muted-foreground mb-2">Order Number</div>
-              <div className="font-mono text-lg font-semibold text-foreground">
+            <div className="flex flex-col sm:items-end gap-2">
+              <div className="text-xs text-gray-500 dark:text-gray-400">Order Number</div>
+              <div className="font-mono text-base sm:text-lg font-bold text-brand-600 dark:text-brand-500">
                 {order.orderNumber}
               </div>
             </div>
           </div>
 
-          <div className="flex gap-3">
+          {/* <div className="mt-4 flex flex-wrap gap-2">
             <Badge color={getStatusColor(order.status)}>
-              <StatusIcon className="w-4 h-4 mr-1" />
+              <StatusIcon className="w-3 h-3 mr-1" />
               {order.status}
             </Badge>
-            <Badge color={order.paymentStatus === 'PAID' ? 'success' : 'warning'}>
+            <Badge color={order.paymentStatus === 'PAID' || order.paymentStatus === 'COMPLETED' ? 'success' : 'warning'}>
+              <HiOutlineCreditCard className="w-3 h-3 mr-1" />
               {order.paymentStatus}
             </Badge>
-          </div>
-        </div>
+          </div> */}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Order Items */}
-            <div className="bg-card rounded-lg border border-border overflow-hidden">
-              <div className="px-6 py-4 border-b border-border">
-                <h2 className="text-xl font-semibold text-foreground">Order Items</h2>
-              </div>
-              <div className="divide-y divide-border">
-                {order.items.map((item) => (
-                  <div key={item.id} className="p-6 flex gap-4">
-                    <div className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center overflow-hidden shrink-0">
+          {/* <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/5">
+            <Button
+              onClick={() => router.push("/student/orders")}
+              variant="outline"
+              size="sm"
+            >
+              <HiOutlineArrowLeft className="mr-2 h-4 w-4" />
+              Back to Orders
+            </Button>
+          </div> */}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-4">
+          {/* Order Items */}
+          <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+            <div className="border-b border-gray-200 p-3 sm:p-4 dark:border-white/5">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                Order Items ({order.items.length})
+              </h2>
+            </div>
+            <div className="divide-y divide-gray-200 dark:divide-white/5">
+              {order.items.map((item, index) => (
+                <div key={item.id} className="p-3 sm:p-4">
+                  <div className="flex gap-3 sm:gap-4">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
                       {item.productImage ? (
                         <Image
-                          src={item.productImage}
+                          src={getFullImageUrl(item.productImage, 'general')}
                           alt={item.productName}
                           width={80}
                           height={80}
-                          className="object-cover"
+                          className="object-cover w-full h-full"
                         />
                       ) : (
-                        <div className="text-muted-foreground text-xs text-center">
-                          No Image
-                        </div>
+                        <HiOutlineShoppingBag className="h-8 w-8 text-gray-400" />
                       )}
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-foreground mb-1">
-                        {item.productName}
-                      </h3>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+                          {item.productName}
+                        </h3>
+                        <div className="text-sm sm:text-base font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                          ৳{item.total.toLocaleString()}
+                        </div>
+                      </div>
+                      <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                         <span>Qty: {item.quantity}</span>
+                        <span>•</span>
                         <span>৳{item.price.toLocaleString()} each</span>
                       </div>
                       {item.voucherCode && (
                         <div className="mt-2">
-                          <Badge color="info">
+                          <Badge color="info" variant="light">
                             Voucher: {item.voucherCode}
                           </Badge>
                         </div>
                       )}
                     </div>
-                    <div className="text-right">
-                      <div className="font-semibold text-foreground">
-                        ৳{item.total.toLocaleString()}
-                      </div>
-                    </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
+          </div>
 
-            {/* Shipping Address */}
-            <div className="bg-card rounded-lg border border-border overflow-hidden">
-              <div className="px-6 py-4 border-b border-border">
-                <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
-                  <HiOutlineLocationMarker className="w-5 h-5" />
-                  Shipping Address
-                </h2>
-              </div>
-              <div className="p-6">
-                <div className="space-y-2 text-foreground">
-                  <div className="flex items-center gap-2">
-                    <HiOutlineUser className="w-4 h-4 text-muted-foreground" />
-                    <span>{order.customerName}</span>
+          {/* Shipping Address */}
+          <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+            <div className="border-b border-gray-200 p-3 sm:p-4 dark:border-white/5">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <HiOutlineLocationMarker className="w-5 h-5 text-brand-600 dark:text-brand-500" />
+                Shipping Address
+              </h2>
+            </div>
+            <div className="p-3 sm:p-4">
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-500/15 shrink-0">
+                    <HiOutlineUser className="h-4 w-4 text-brand-600 dark:text-brand-400" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <HiOutlineMail className="w-4 h-4 text-muted-foreground" />
-                    <span>{order.customerEmail}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Customer Name</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{order.customerName}</p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <HiOutlinePhone className="w-4 h-4 text-muted-foreground" />
-                    <span>{order.customerPhone}</span>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-500/15 shrink-0">
+                    <HiOutlineMail className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                   </div>
-                  <div className="mt-4 pt-4 border-t border-border">
-                    <p className="text-foreground">{order.shippingAddress}</p>
-                    <p className="text-muted-foreground">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Email</p>
+                    <p className="text-sm text-gray-900 dark:text-white break-all">{order.customerEmail}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100 dark:bg-green-500/15 shrink-0">
+                    <HiOutlinePhone className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Phone</p>
+                    <p className="text-sm text-gray-900 dark:text-white">{order.customerPhone}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 pt-3 border-t border-gray-200 dark:border-white/5">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-500/15 shrink-0">
+                    <HiOutlineLocationMarker className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Delivery Address</p>
+                    <p className="text-sm text-gray-900 dark:text-white">{order.shippingAddress}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       {order.shippingCity}, {order.shippingZip}
                     </p>
-                    <p className="text-muted-foreground">{order.shippingCountry}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{order.shippingCountry}</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Order Summary */}
-            <div className="bg-card rounded-lg border border-border overflow-hidden">
-              <div className="px-6 py-4 border-b border-border">
-                <h2 className="text-xl font-semibold text-foreground">Order Summary</h2>
+        {/* Sidebar */}
+        <div className="space-y-4">
+          {/* Order Summary */}
+          <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+            <div className="border-b border-gray-200 p-3 sm:p-4 dark:border-white/5">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <HiOutlineCurrencyDollar className="w-5 h-5 text-brand-600 dark:text-brand-500" />
+                Order Summary
+              </h2>
+            </div>
+            <div className="p-3 sm:p-4 space-y-3">
+              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                <span>Subtotal</span>
+                <span className="font-medium text-gray-900 dark:text-white">৳{order.subtotal.toLocaleString()}</span>
               </div>
-              <div className="p-6 space-y-3">
-                <div className="flex justify-between text-foreground">
-                  <span>Subtotal</span>
-                  <span>৳{order.subtotal.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-foreground">
-                  <span>Tax</span>
-                  <span>৳{order.tax.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-foreground">
-                  <span>Shipping</span>
-                  <span>{order.shippingCost === 0 ? 'FREE' : `৳${order.shippingCost.toLocaleString()}`}</span>
-                </div>
-                <div className="pt-3 border-t border-border">
-                  <div className="flex justify-between text-lg font-bold text-foreground">
-                    <span>Total</span>
-                    <span>৳{order.total.toLocaleString()}</span>
-                  </div>
+              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                <span>Tax</span>
+                <span className="font-medium text-gray-900 dark:text-white">৳{order.tax.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                <span>Shipping</span>
+                <span className="font-medium text-gray-900 dark:text-white">
+                  {order.shippingCost === 0 ? 'FREE' : `৳${order.shippingCost.toLocaleString()}`}
+                </span>
+              </div>
+              <div className="pt-3 border-t border-gray-200 dark:border-white/5">
+                <div className="flex justify-between">
+                  <span className="text-base font-semibold text-gray-900 dark:text-white">Total</span>
+                  <span className="text-lg font-bold text-brand-600 dark:text-brand-500">
+                    ৳{order.total.toLocaleString()}
+                  </span>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Payment Info */}
-            <div className="bg-card rounded-lg border border-border overflow-hidden">
-              <div className="px-6 py-4 border-b border-border">
-                <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
-                  <HiOutlineCreditCard className="w-5 h-5" />
-                  Payment Information
-                </h2>
+          {/* Payment Info */}
+          <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+            <div className="border-b border-gray-200 p-3 sm:p-4 dark:border-white/5">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <HiOutlineCreditCard className="w-5 h-5 text-brand-600 dark:text-brand-500" />
+                Payment
+              </h2>
+            </div>
+            <div className="p-3 sm:p-4 space-y-3">
+              <div>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Payment Method</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {order.paymentMethod.replace(/_/g, ' ')}
+                </p>
               </div>
-              <div className="p-6 space-y-3">
+              <div>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Payment Status</p>
                 <div>
-                  <div className="text-sm text-muted-foreground mb-1">Payment Method</div>
-                  <div className="text-foreground font-medium">
-                    {order.paymentMethod.replace('_', ' ')}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-muted-foreground mb-1">Payment Status</div>
-                  <Badge color={order.paymentStatus === 'PAID' ? 'success' : 'warning'}>
+                  <Badge color={order.paymentStatus === 'PAID' || order.paymentStatus === 'COMPLETED' ? 'success' : 'warning'}>
                     {order.paymentStatus}
                   </Badge>
                 </div>
-                {order.trackingNumber && (
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-1">Tracking Number</div>
-                    <div className="text-foreground font-mono text-sm">
-                      {order.trackingNumber}
+              </div>
+              {order.trackingNumber && (
+                <div className="pt-3 border-t border-gray-200 dark:border-white/5">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Tracking Number</p>
+                  <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
+                    <div className="flex items-center gap-2">
+                      <HiOutlineTruck className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                      <p className="text-sm font-mono font-semibold text-blue-700 dark:text-blue-400 break-all">
+                        {order.trackingNumber}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Order Timeline */}
+          {(order.createdAt || order.completedAt) && (
+            <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+              <div className="border-b border-gray-200 p-3 sm:p-4 dark:border-white/5">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Timeline</h2>
+              </div>
+              <div className="p-3 sm:p-4 space-y-4">
+                <div className="flex gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 dark:bg-brand-500 shrink-0">
+                    <HiOutlineCheckCircle className="h-4 w-4 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">Order Placed</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {new Date(order.createdAt).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  </div>
+                </div>
+                {order.completedAt && (
+                  <div className="flex gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-success-500 dark:bg-success-500 shrink-0">
+                      <HiOutlineCheckCircle className="h-4 w-4 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">Completed</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {new Date(order.completedAt).toLocaleString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
                     </div>
                   </div>
                 )}
               </div>
             </div>
+          )}
 
-            {/* Order Timeline */}
-            {order.completedAt && (
-              <div className="bg-card rounded-lg border border-border overflow-hidden">
-                <div className="px-6 py-4 border-b border-border">
-                  <h2 className="text-xl font-semibold text-foreground">Order Timeline</h2>
-                </div>
-                <div className="p-6 space-y-4">
-                  <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center shrink-0">
-                      <HiOutlineCheckCircle className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-foreground">Order Placed</div>
-                      <div className="text-sm text-muted-foreground">
-                        {new Date(order.createdAt).toLocaleString()}
-                      </div>
-                    </div>
-                  </div>
-                  {order.completedAt && (
-                    <div className="flex gap-3">
-                      <div className="w-8 h-8 rounded-full bg-success-500 flex items-center justify-center shrink-0">
-                        <HiOutlineCheckCircle className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-foreground">Completed</div>
-                        <div className="text-sm text-muted-foreground">
-                          {new Date(order.completedAt).toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
+          {/* Notes */}
+          {order.notes && (
+            <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+              <div className="border-b border-gray-200 p-3 sm:p-4 dark:border-white/5">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Order Notes</h2>
               </div>
-            )}
-
-            {order.notes && (
-              <div className="bg-card rounded-lg border border-border overflow-hidden">
-                <div className="px-6 py-4 border-b border-border">
-                  <h2 className="text-xl font-semibold text-foreground">Order Notes</h2>
-                </div>
-                <div className="p-6">
-                  <p className="text-foreground">{order.notes}</p>
-                </div>
+              <div className="p-3 sm:p-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400">{order.notes}</p>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

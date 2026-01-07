@@ -444,15 +444,22 @@ export default function OrderHistoryPage() {
                             </div>
                           </TableCell>
                           <TableCell className="px-3 py-2.5 sm:px-4 sm:py-3">
-                            <div className="flex justify-center">
+                            <div className="flex justify-center gap-2">
                               <Button
                                 onClick={() => handleViewOrder(order)}
+                                variant="outline"
+                                size="sm"
+                                className="h-7! px-2.5! text-[10px]! sm:h-8! sm:px-3! sm:text-xs!"
+                              >
+                                <HiOutlineEye className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                onClick={() => router.push(`/student/orders/${order.orderNumber}`)}
                                 variant="primary"
                                 size="sm"
-                                className="!h-7 !px-2.5 !text-[10px] sm:!h-8 sm:!px-3 sm:!text-xs"
+                                className="h-7! px-2.5! text-[10px]! sm:h-8! sm:px-3! sm:text-xs!"
                               >
-                                <HiOutlineEye className="mr-1 h-3 w-3" />
-                                View
+                                Details
                               </Button>
                             </div>
                           </TableCell>
@@ -557,7 +564,7 @@ export default function OrderHistoryPage() {
 
       {/* Order Details Modal */}
       {showModal && selectedOrder && (
-        <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
           <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
@@ -693,7 +700,7 @@ export default function OrderHistoryPage() {
             <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 px-6 py-4 border-t border-gray-200 dark:border-gray-800">
               <Button
                 onClick={() => setShowModal(false)}
-                variant="secondary"
+                variant="outline"
                 className="w-full"
               >
                 Close
