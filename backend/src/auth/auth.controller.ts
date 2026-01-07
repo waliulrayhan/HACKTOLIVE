@@ -16,6 +16,7 @@ import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { UpdateProfileDto, UpdateSocialLinksDto, ChangePasswordDto } from './dto/update-profile.dto';
+import { VerifyOtpDto, SendPasswordResetOtpDto, ResetPasswordDto } from './dto/otp.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { GoogleAuthGuard } from './google-auth.guard';
 
@@ -25,20 +26,65 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('signup')
-  @ApiOperation({ summary: 'Register a new user (Student only via public signup)' })
-  @ApiResponse({ status: 201, description: 'User successfully registered' })
+  @ApiOperation({ summary: 'Register a new user - sends OTP for verification' })
+  @ApiResponse({ status: 201, description: 'OTP sent to email for verification' })
   @ApiResponse({ status: 409, description: 'User already exists' })
   async signup(@Body() signupDto: SignupDto) {
     return this.authService.signup(signupDto);
   }
 
+  @Post('verify-registration')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify OTP after registration' })
+  @ApiResponse({ status: 200, description: 'Email verified, user registered successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired OTP' })
+  async verifyRegistration(@Body() verifyOtpDto: VerifyOtpDto) {
+    return this.authService.verifyRegistrationOtp(
+      verifyOtpDto.userId,
+      verifyOtpDto.code,
+    );
+  }
+
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Login with email and password (All roles)' })
-  @ApiResponse({ status: 200, description: 'Successfully logged in' })
+  @ApiOperation({ summary: 'Login with email and password - sends OTP for verification' })
+  @ApiResponse({ status: 200, description: 'OTP sent to email' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Post('verify-login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify OTP to complete login' })
+  @ApiResponse({ status: 200, description: 'Login successful' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired OTP' })
+  async verifyLogin(@Body() verifyOtpDto: VerifyOtpDto) {
+    return this.authService.verifyLoginOtp(
+      verifyOtpDto.userId,
+      verifyOtpDto.code,
+    );
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Request password reset OTP' })
+  @ApiResponse({ status: 200, description: 'Password reset OTP sent to email' })
+  async forgotPassword(@Body() sendOtpDto: SendPasswordResetOtpDto) {
+    return this.authService.sendPasswordResetOtp(sendOtpDto.email);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset password using OTP' })
+  @ApiResponse({ status: 200, description: 'Password reset successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired OTP' })
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPasswordWithOtp(
+      resetPasswordDto.email,
+      resetPasswordDto.code,
+      resetPasswordDto.newPassword,
+    );
   }
 
   @Get('profile')

@@ -8,8 +8,9 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (name: string, email: string, password: string, role?: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ userId: string; email: string; requiresOtp: boolean }>;
+  signup: (name: string, email: string, password: string, role?: string) => Promise<{ userId: string; email: string; requiresOtp: boolean }>;
+  verifyOtp: (userId: string, code: string, type: 'registration' | 'login') => Promise<void>;
   logout: () => void;
   updateUser: (user: User) => void;
   setUser: (user: User | null) => void;
@@ -48,23 +49,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       const data = await authService.login(email, password);
-      authService.setToken(data.token);
-      authService.setUser(data.user);
-      setUser(data.user);
-
-      // Redirect based on role
-      switch (data.user.role) {
-        case 'ADMIN':
-          router.push('/admin/dashboard');
-          break;
-        case 'INSTRUCTOR':
-          router.push('/instructor/dashboard');
-          break;
-        case 'STUDENT':
-        default:
-          router.push('/student/dashboard');
-          break;
-      }
+      // Return OTP response for verification
+      return {
+        userId: data.userId,
+        email: data.email,
+        requiresOtp: data.requiresOtp,
+      };
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -74,6 +64,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signup = async (name: string, email: string, password: string, role?: string) => {
     try {
       const data = await authService.signup(name, email, password, role);
+      // Return OTP response for verification
+      return {
+        userId: data.userId,
+        email: data.email,
+        requiresOtp: data.requiresOtp,
+      };
+    } catch (error) {
+      console.error('Signup failed:', error);
+      throw error;
+    }
+  };
+
+  const verifyOtp = async (userId: string, code: string, type: 'registration' | 'login') => {
+    try {
+      const data = type === 'registration'
+        ? await authService.verifyRegistration(userId, code)
+        : await authService.verifyLogin(userId, code);
+      
       authService.setToken(data.token);
       authService.setUser(data.user);
       setUser(data.user);
@@ -92,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           break;
       }
     } catch (error) {
-      console.error('Signup failed:', error);
+      console.error('OTP verification failed:', error);
       throw error;
     }
   };
@@ -127,7 +135,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loading, 
       isLoading: loading, 
       login, 
-      signup, 
+      signup,
+      verifyOtp,
       logout, 
       updateUser,
       setUser: setUserAndStore,

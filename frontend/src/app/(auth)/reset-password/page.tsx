@@ -6,6 +6,9 @@ import {
   FormControl,
   FormLabel,
   Input,
+  InputGroup,
+  InputRightElement,
+  IconButton,
   useColorModeValue,
   FormErrorMessage,
   VStack,
@@ -17,60 +20,125 @@ import {
   Flex,
   Icon,
   Image,
+  PinInput,
+  PinInputField,
+  HStack,
+  Center,
 } from '@chakra-ui/react'
 import { Link } from '@saas-ui/react'
 import { BackgroundGradient } from '@/components/shared/gradients/background-gradient'
 import { PageTransition } from '@/components/shared/motion/page-transition'
 import { Header } from '../../(marketing)/_components/layout/header'
 import { NextPage } from 'next'
-import { FaArrowLeft, FaEnvelope } from 'react-icons/fa'
-import { useState } from 'react'
+import { FaArrowLeft, FaEnvelope, FaEye, FaEyeSlash } from 'react-icons/fa'
+import { useState, useMemo } from 'react'
 import NextLink from 'next/link'
+import { useRouter } from 'next/navigation'
+import { authService } from '@/lib/auth-service'
+import { toast } from '@/components/ui/toast'
 
 const ResetPassword: NextPage = () => {
+  const router = useRouter()
+  const [step, setStep] = useState<'email' | 'otp' | 'password'>('email')
   const [email, setEmail] = useState('')
-  const [errors, setErrors] = useState({ email: '' })
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [otp, setOtp] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [errors, setErrors] = useState({ email: '', otp: '', password: '', confirmPassword: '' })
   const [isLoading, setIsLoading] = useState(false)
   const leftBgColor = useColorModeValue('#4d7c0f', '#365314')
   const rightBgColor = useColorModeValue('white', 'gray.800')
   const { colorMode } = useColorMode()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    // Reset errors
-    setErrors({ email: '' })
+  // Password complexity requirements
+  const passwordRequirements = useMemo(() => {
+    return {
+      minLength: password.length >= 8,
+      hasUpperCase: /[A-Z]/.test(password),
+      hasLowerCase: /[a-z]/.test(password),
+      hasNumber: /[0-9]/.test(password),
+      hasSpecialChar: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+    }
+  }, [password])
 
-    // Validation
-    let hasError = false
-    const newErrors = { email: '' }
+  const isPasswordValid = useMemo(() => {
+    return Object.values(passwordRequirements).every(req => req)
+  }, [passwordRequirements])
+
+  const handleRequestOtp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setErrors({ email: '', otp: '', password: '', confirmPassword: '' })
 
     if (!email) {
-      newErrors.email = 'Email is required'
-      hasError = true
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid'
-      hasError = true
+      setErrors(prev => ({ ...prev, email: 'Email is required' }))
+      return
     }
-
-    if (hasError) {
-      setErrors(newErrors)
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setErrors(prev => ({ ...prev, email: 'Email is invalid' }))
       return
     }
 
-    // Handle reset password logic here
     setIsLoading(true)
-    
     try {
-      console.log('Reset password for:', email)
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      setIsSubmitted(true)
-    } catch (error) {
-      console.error('Reset password error:', error)
+      await authService.forgotPassword(email)
+      toast.success('OTP sent!', {
+        description: 'Check your email for the verification code.',
+        duration: 3000,
+      })
+      setStep('otp')
+    } catch (error: any) {
+      toast.error('Failed to send OTP', {
+        description: error.response?.data?.message || 'Please try again.',
+        duration: 5000,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (otp.length !== 6) {
+      setErrors(prev => ({ ...prev, otp: 'Please enter the complete 6-digit code' }))
+      return
+    }
+
+    setStep('password')
+  }
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setErrors({ email: '', otp: '', password: '', confirmPassword: '' })
+
+    if (!password) {
+      setErrors(prev => ({ ...prev, password: 'Password is required' }))
+      return
+    }
+    if (!isPasswordValid) {
+      setErrors(prev => ({ ...prev, password: 'Password does not meet all requirements' }))
+      return
+    }
+    if (password !== confirmPassword) {
+      setErrors(prev => ({ ...prev, confirmPassword: 'Passwords do not match' }))
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      await authService.resetPassword(email, otp, password)
+      toast.success('Password reset successful!', {
+        description: 'You can now login with your new password.',
+        duration: 3000,
+      })
+      router.push('/login')
+    } catch (error: any) {
+      toast.error('Failed to reset password', {
+        description: error.response?.data?.message || 'Invalid or expired OTP.',
+        duration: 5000,
+      })
     } finally {
       setIsLoading(false)
     }
@@ -355,24 +423,23 @@ const ResetPassword: NextPage = () => {
             pt={{ base: 24, md: 28, lg: 20 }}
           >
             <PageTransition width="100%">
+
               <Box maxW="md" w="full" mx="auto">
                 <VStack spacing={6} align="stretch">
-                  {!isSubmitted ? (
+                  {step === 'email' && (
                     <>
-                      {/* Title */}
+                      {/* Email Step */}
                       <VStack spacing={2} align="center">
                         <Heading size="lg" textAlign="center">
                           Forgot your password?
                         </Heading>
                         <Text fontSize="sm" color="muted" textAlign="center">
-                          Enter the email address linked to your account, and we’ll send you a link to reset your password.
+                          Enter your email address to receive a password reset code.
                         </Text>
                       </VStack>
 
-                      {/* Reset Password Form */}
-                      <form onSubmit={handleSubmit}>
+                      <form onSubmit={handleRequestOtp}>
                         <VStack spacing={4}>
-                          {/* Email Field */}
                           <FormControl isInvalid={!!errors.email}>
                             <FormLabel htmlFor="email">Email</FormLabel>
                             <Input
@@ -382,28 +449,26 @@ const ResetPassword: NextPage = () => {
                               value={email}
                               onChange={(e) => {
                                 setEmail(e.target.value)
-                                if (errors.email) setErrors({ email: '' })
+                                if (errors.email) setErrors(prev => ({ ...prev, email: '' }))
                               }}
                               size="lg"
                             />
                             <FormErrorMessage>{errors.email}</FormErrorMessage>
                           </FormControl>
 
-                          {/* Submit Button */}
                           <Button
                             type="submit"
                             colorScheme="primary"
                             size="lg"
                             w="full"
                             isLoading={isLoading}
-                            loadingText="Sending..."
+                            loadingText="Sending code..."
                           >
-                            Send reset link
+                            Send reset code
                           </Button>
                         </VStack>
                       </form>
 
-                      {/* Back to Login Link */}
                       <Button
                         as={NextLink}
                         href="/login"
@@ -415,72 +480,148 @@ const ResetPassword: NextPage = () => {
                         Back to login
                       </Button>
                     </>
-                  ) : (
+                  )}
+
+                  {step === 'otp' && (
                     <>
-                      {/* Success State */}
-                      <VStack spacing={4} align="center" py={8}>
-                        <Box
-                          p={4}
-                          borderRadius="full"
-                          bg={colorMode === 'light' ? 'green.100' : 'green.900'}
-                        >
-                          <Icon 
-                            as={FaEnvelope} 
-                            w={8} 
-                            h={8} 
-                            color={colorMode === 'light' ? 'green.600' : 'green.300'}
-                          />
-                        </Box>
+                      {/* OTP Verification Step */}
+                      <VStack spacing={2} align="center">
                         <Heading size="lg" textAlign="center">
-                          Check your email
+                          Verify your email
                         </Heading>
                         <Text fontSize="sm" color="muted" textAlign="center">
-                          We've sent a password reset link to <strong>{email}</strong>
-                        </Text>
-                        <Text fontSize="sm" color="muted" textAlign="center">
-                          Click the link in the email to reset your password. If you don't see it, check your spam folder.
+                          We've sent a 6-digit code to <strong>{email}</strong>
                         </Text>
                       </VStack>
 
-                      {/* Actions */}
-                      <VStack spacing={3}>
-                        <Button
-                          onClick={() => setIsSubmitted(false)}
-                          variant="outline"
-                          size="lg"
-                          w="full"
-                        >
-                          Try another email
-                        </Button>
-                        <Button
-                          as={NextLink}
-                          href="/login"
-                          leftIcon={<FaArrowLeft />}
-                          variant="ghost"
-                          size="md"
-                          w="full"
-                        >
-                          Back to login
-                        </Button>
+                      <form onSubmit={handleVerifyOtp}>
+                        <VStack spacing={4}>
+                          <FormControl isInvalid={!!errors.otp}>
+                            <FormLabel htmlFor="otp">Verification Code</FormLabel>
+                            <Input
+                              id="otp"
+                              type="text"
+                              placeholder="Enter 6-digit code"
+                              value={otp}
+                              onChange={(e) => {
+                                setOtp(e.target.value)
+                                if (errors.otp) setErrors(prev => ({ ...prev, otp: '' }))
+                              }}
+                              size="lg"
+                              maxLength={6}
+                            />
+                            <FormErrorMessage>{errors.otp}</FormErrorMessage>
+                          </FormControl>
+
+                          <Button
+                            type="submit"
+                            colorScheme="primary"
+                            size="lg"
+                            w="full"
+                            isLoading={isLoading}
+                            loadingText="Verifying..."
+                          >
+                            Verify code
+                          </Button>
+                        </VStack>
+                      </form>
+
+                      <Button
+                        onClick={() => setStep('email')}
+                        leftIcon={<FaArrowLeft />}
+                        variant="ghost"
+                        size="md"
+                        w="full"
+                      >
+                        Back to email
+                      </Button>
+                    </>
+                  )}
+
+                  {step === 'password' && (
+                    <>
+                      {/* New Password Step */}
+                      <VStack spacing={2} align="center">
+                        <Heading size="lg" textAlign="center">
+                          Set new password
+                        </Heading>
+                        <Text fontSize="sm" color="muted" textAlign="center">
+                          Choose a strong password for your account.
+                        </Text>
                       </VStack>
+
+                      <form onSubmit={handleResetPassword}>
+                        <VStack spacing={4}>
+                          <FormControl isInvalid={!!errors.password}>
+                            <FormLabel htmlFor="password">New Password</FormLabel>
+                            <Input
+                              id="password"
+                              type="password"
+                              placeholder="Enter new password"
+                              value={password}
+                              onChange={(e) => {
+                                setPassword(e.target.value)
+                                if (errors.password) setErrors(prev => ({ ...prev, password: '' }))
+                              }}
+                              size="lg"
+                            />
+                            <FormErrorMessage>{errors.password}</FormErrorMessage>
+                          </FormControl>
+
+                          <FormControl isInvalid={!!errors.confirmPassword}>
+                            <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
+                            <Input
+                              id="confirmPassword"
+                              type="password"
+                              placeholder="Confirm new password"
+                              value={confirmPassword}
+                              onChange={(e) => {
+                                setConfirmPassword(e.target.value)
+                                if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: '' }))
+                              }}
+                              size="lg"
+                            />
+                            <FormErrorMessage>{errors.confirmPassword}</FormErrorMessage>
+                          </FormControl>
+
+                          <Button
+                            type="submit"
+                            colorScheme="primary"
+                            size="lg"
+                            w="full"
+                            isLoading={isLoading}
+                            loadingText="Resetting..."
+                          >
+                            Reset password
+                          </Button>
+                        </VStack>
+                      </form>
+
+                      <Button
+                        onClick={() => setStep('otp')}
+                        leftIcon={<FaArrowLeft />}
+                        variant="ghost"
+                        size="md"
+                        w="full"
+                      >
+                        Back to verification
+                      </Button>
                     </>
                   )}
 
                   {/* Sign Up Link */}
-                  {!isSubmitted && (
-                    <Text textAlign="center" fontSize="sm" color="muted">
-                      Don't have an account?{' '}
-                      <Link
-                        as={NextLink}
-                        href="/signup"
-                        color="blue.500"
-                        fontWeight="semibold"
-                        _hover={{ color: 'blue.600', textDecoration: 'underline' }}
-                      >
-                        Sign up
-                      </Link>
-                    </Text>
-                  )}
+                  <Text textAlign="center" fontSize="sm" color="muted">
+                    Don't have an account?{' '}
+                    <Link
+                      as={NextLink}
+                      href="/signup"
+                      color="blue.500"
+                      fontWeight="semibold"
+                      _hover={{ color: 'blue.600', textDecoration: 'underline' }}
+                    >
+                      Sign up
+                    </Link>
+                  </Text>
                 </VStack>
               </Box>
             </PageTransition>

@@ -10,6 +10,8 @@ import * as bcrypt from 'bcryptjs';
 import { User, UserRole } from '@prisma/client';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
+import { OtpService } from './otp.service';
+import { EmailService } from '../email/email.service';
 
 export interface JwtPayload {
   sub: string;
@@ -22,6 +24,8 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private otpService: OtpService,
+    private emailService: EmailService,
   ) {}
 
   async signup(signupDto: SignupDto) {
@@ -44,13 +48,14 @@ export class AuthService {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
+    // Create user (not verified yet)
     const user = await this.prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         name,
         role: role || UserRole.STUDENT,
+        isVerified: false,
       },
     });
 
@@ -70,12 +75,74 @@ export class AuthService {
       });
     }
 
+    // Send OTP for email verification
+    await this.otpService.createAndSendOtp(
+      user.id,
+      user.email,
+      user.name || 'User',
+      'REGISTRATION',
+    );
+
+    return {
+      message: 'Registration successful! Please verify your email with the OTP sent to your inbox.',
+      userId: user.id,
+      email: user.email,
+      requiresOtp: true,
+    };
+  }
+
+  async verifyRegistrationOtp(userId: string, code: string) {
+    const isValid = await this.otpService.verifyOtp(userId, code, 'REGISTRATION');
+
+    if (!isValid) {
+      throw new BadRequestException('Invalid or expired OTP');
+    }
+
+    // Mark user as verified
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: { isVerified: true },
+    });
+
+    // Send welcome email after successful verification
+    const welcomeSent = await this.emailService.sendTemplateEmail(
+      'welcome-email',
+      user.email,
+      {
+        name: user.name || 'User',
+        email: user.email,
+      },
+    );
+    
+    if (!welcomeSent) {
+      // If template doesn't exist, send basic welcome email
+      const welcomeBody = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #6366f1;">Welcome to HACKTOLIVE! 🎉</h1>
+          <p>Hello ${user.name || 'User'},</p>
+          <p>Thank you for joining HACKTOLIVE Academy! We're excited to have you as part of our community.</p>
+          <p>You've taken the first step toward mastering cybersecurity and ethical hacking.</p>
+          <p>Your email has been verified successfully. You can now explore all our courses and resources!</p>
+          <br>
+          <p>Best regards,<br>HACKTOLIVE Team</p>
+        </div>
+      `;
+      
+      await this.emailService.sendEmail({
+        from: 'noreply',
+        to: user.email,
+        subject: 'Welcome to HACKTOLIVE! 🚀',
+        body: welcomeBody,
+      });
+    }
+
     // Generate token
     const token = this.generateToken(user);
 
     return {
       user: this.sanitizeUser(user),
       token,
+      message: 'Email verified successfully!',
     };
   }
 
@@ -102,12 +169,101 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // Send OTP for login verification
+    await this.otpService.createAndSendOtp(
+      user.id,
+      user.email,
+      user.name || 'User',
+      'LOGIN',
+    );
+
+    return {
+      message: 'OTP sent to your email. Please verify to complete login.',
+      userId: user.id,
+      email: user.email,
+      requiresOtp: true,
+    };
+  }
+
+  async verifyLoginOtp(userId: string, code: string) {
+    const isValid = await this.otpService.verifyOtp(userId, code, 'LOGIN');
+
+    if (!isValid) {
+      throw new BadRequestException('Invalid or expired OTP');
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        student: true,
+        instructor: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
     // Generate token
     const token = this.generateToken(user);
 
     return {
       user: this.sanitizeUser(user),
       token,
+      message: 'Login successful!',
+    };
+  }
+
+  async sendPasswordResetOtp(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      // Don't reveal if user exists or not for security
+      return {
+        message: 'If an account with that email exists, we\'ve sent a password reset OTP.',
+      };
+    }
+
+    await this.otpService.createAndSendOtp(
+      user.id,
+      user.email,
+      user.name || 'User',
+      'PASSWORD_RESET',
+    );
+
+    return {
+      message: 'Password reset OTP sent to your email.',
+    };
+  }
+
+  async resetPasswordWithOtp(email: string, code: string, newPassword: string) {
+    const { valid, userId } = await this.otpService.verifyOtpByEmail(
+      email,
+      code,
+      'PASSWORD_RESET',
+    );
+
+    if (!valid || !userId) {
+      throw new BadRequestException('Invalid or expired OTP');
+    }
+
+    // Validate new password
+    if (newPassword.length < 6) {
+      throw new BadRequestException('Password must be at least 6 characters long');
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    return {
+      message: 'Password reset successfully! You can now login with your new password.',
     };
   }
 

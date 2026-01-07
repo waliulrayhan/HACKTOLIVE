@@ -26,9 +26,16 @@ export interface AuthResponse {
   token: string;
 }
 
+export interface OtpResponse {
+  message: string;
+  userId: string;
+  email: string;
+  requiresOtp: boolean;
+}
+
 export const authService = {
   async signup(name: string, email: string, password: string, role?: string) {
-    const response = await api.post<AuthResponse>('/auth/signup', {
+    const response = await api.post<OtpResponse>('/auth/signup', {
       email,
       password,
       name,
@@ -37,10 +44,42 @@ export const authService = {
     return response.data;
   },
 
+  async verifyRegistration(userId: string, code: string) {
+    const response = await api.post<AuthResponse>('/auth/verify-registration', {
+      userId,
+      code,
+    });
+    return response.data;
+  },
+
   async login(email: string, password: string) {
-    const response = await api.post<AuthResponse>('/auth/login', {
+    const response = await api.post<OtpResponse>('/auth/login', {
       email,
       password,
+    });
+    return response.data;
+  },
+
+  async verifyLogin(userId: string, code: string) {
+    const response = await api.post<AuthResponse>('/auth/verify-login', {
+      userId,
+      code,
+    });
+    return response.data;
+  },
+
+  async forgotPassword(email: string) {
+    const response = await api.post('/auth/forgot-password', {
+      email,
+    });
+    return response.data;
+  },
+
+  async resetPassword(email: string, code: string, newPassword: string) {
+    const response = await api.post('/auth/reset-password', {
+      email,
+      code,
+      newPassword,
     });
     return response.data;
   },

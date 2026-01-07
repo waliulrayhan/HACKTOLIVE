@@ -29,22 +29,25 @@ import { FaMoon, FaSun } from 'react-icons/fa'
 import { useState, useEffect, Suspense } from 'react'
 import NextLink from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
 import { toast } from '@/components/ui/toast'
 
 const VerifyOTPContent = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { verifyOtp } = useAuth()
   const [otp, setOtp] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [timer, setTimer] = useState(120)
+  const [timer, setTimer] = useState(300) // 5 minutes = 300 seconds
   const [canResend, setCanResend] = useState(false)
   const leftBgColor = useColorModeValue('#4d7c0f', '#365314')
   const rightBgColor = useColorModeValue('white', 'gray.800')
   const { colorMode, toggleColorMode } = useColorMode()
   
-  const contact = searchParams?.get('contact') || searchParams?.get('email') || 'your email'
-  const verificationType = searchParams?.get('type') || '2fa'
+  const userId = searchParams?.get('userId') || ''
+  const email = searchParams?.get('email') || 'your email'
+  const type = (searchParams?.get('type') || 'login') as 'registration' | 'login'
 
   useEffect(() => {
     if (timer > 0) {
@@ -75,34 +78,28 @@ const VerifyOTPContent = () => {
       setError('Please enter the complete 6-digit code')
       return
     }
+if (!userId) {
+      setError('Invalid verification session. Please try again.')
+      return
+    }
 
     setIsLoading(true)
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      await verifyOtp(userId, otp, type)
       
-      if (otp === '123456') {
-        toast.success('Verification successful! Redirecting...', {
-          duration: 3000,
-        })
-        
-        setTimeout(() => {
-          if (verificationType === 'signup') {
-            router.push('/dashboard')
-          } else if (verificationType === 'reset-password') {
-            router.push('/reset-password?verified=true')
-          } else {
-            router.push('/dashboard')
-          }
-        }, 1000)
-      } else {
-        setError('Invalid verification code. Please try again.')
-        toast.error('Invalid verification code. Please try again.', {
-          duration: 4000,
-        })
-      }
-    } catch (err) {
-      setError('An error occurred. Please try again.')
+      toast.success('Verification successful!', {
+        description: type === 'registration' ? 'Welcome to HACKTOLIVE!' : 'Welcome back!',
+        duration: 2000,
+      })
+      // Redirect is handled in AuthContext
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.message || 'Invalid or expired verification code.'
+      setError(errorMsg)
+      toast.error('Verification failed', {
+        description: errorMsg,
+        duration: 4000,
+      })
     } finally {
       setIsLoading(false)
     }
@@ -116,13 +113,17 @@ const VerifyOTPContent = () => {
     setError('')
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      toast.success(`A new verification code has been sent to ${contact}`, {
-        duration: 4000,
+      // Resend OTP by redirecting back to login/signup flow
+      toast.info('Redirecting to resend code...', {
+        description: 'Please login or signup again to receive a new code.',
+        duration: 3000,
       })
       
-      setTimer(120)
+      setTimeout(() => {
+        router.push(type === 'registration' ? '/signup' : '/login')
+      }, 1000)
+      
+      setTimer(300)
       setCanResend(false)
     } catch (err) {
       toast.error('Failed to resend code. Please try again.', {
@@ -321,11 +322,11 @@ const VerifyOTPContent = () => {
                   >
                     We've sent a 6-digit code to{' '}
                     <Text as="span" color="blue.500" fontWeight="semibold">
-                      {contact}
+                      {email}
                     </Text>
                   </Text>
                 </VStack>
-
+email
                 {/* OTP Form */}
                 <form onSubmit={handleSubmit}>
                   <VStack spacing={4}>
@@ -428,24 +429,6 @@ const VerifyOTPContent = () => {
                     </Button>
                   </VStack>
                 </form>
-
-                {/* Demo Info */}
-                <Box
-                  p={{ base: 3, md: 4 }}
-                  bg={useColorModeValue('blue.50', 'blue.900')}
-                  borderRadius="md"
-                  borderLeft="4px"
-                  borderColor="blue.500"
-                  mx={{ base: 2, md: 0 }}
-                >
-                  <Text
-                    fontSize={{ base: '2xs', md: 'xs' }}
-                    color={useColorModeValue('blue.700', 'blue.200')}
-                    fontWeight="medium"
-                  >
-                    <strong>Demo Mode:</strong> Use code "123456" to verify
-                  </Text>
-                </Box>
               </VStack>
             </Box>
           </PageTransition>

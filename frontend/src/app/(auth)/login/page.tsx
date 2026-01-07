@@ -102,13 +102,16 @@ const Login: NextPage = () => {
     setIsLoading(true)
     
     try {
-      await login(email, password)
-      // Show success toast after login completes, before redirect
-      toast.success('Login successful!', {
-        description: 'Welcome back to HACKTOLIVE',
-        duration: 2000,
-      })
-      // Router redirect is handled in AuthContext based on role
+      const result = await login(email, password)
+      
+      if (result.requiresOtp) {
+        toast.success('Credentials verified!', {
+          description: 'Please enter the OTP sent to your email.',
+          duration: 3000,
+        })
+        // Redirect to OTP verification
+        router.push(`/verify-otp?userId=${result.userId}&email=${encodeURIComponent(result.email)}&type=login`)
+      }
     } catch (error: any) {
       console.error('Login error:', error)
       // Only show error toast without page refresh

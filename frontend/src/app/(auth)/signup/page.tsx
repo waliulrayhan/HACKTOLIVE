@@ -46,6 +46,7 @@ const Signup: NextPage = () => {
   const [agreeToTerms, setAgreeToTerms] = useState(false)
   const [captchaValue, setCaptchaValue] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const passwordBoxBg = useColorModeValue('gray.50', 'gray.700')
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -163,13 +164,16 @@ const Signup: NextPage = () => {
     
     try {
       // Signup is only for students
-      await signup(formData.name, formData.email, formData.password)
-      // Show success toast after signup completes, before redirect
-      toast.success('Account created successfully!', {
-        description: 'Welcome to HACKTOLIVE! Redirecting to your dashboard...',
-        duration: 2000,
-      })
-      // Router redirect is handled in AuthContext
+      const result = await signup(formData.name, formData.email, formData.password)
+      
+      if (result.requiresOtp) {
+        toast.success('Account created! Please verify your email', {
+          description: 'We\'ve sent a 6-digit code to your email address.',
+          duration: 3000,
+        })
+        // Redirect to OTP verification
+        router.push(`/verify-otp?userId=${result.userId}&email=${encodeURIComponent(result.email)}&type=registration`)
+      }
     } catch (error: any) {
       console.error('Signup error:', error)
       // Only show error toast without page refresh
@@ -403,7 +407,7 @@ const Signup: NextPage = () => {
                           </InputRightElement>
                         </InputGroup>
                         {formData.password && (
-                          <Box mt={2} p={3} bg={useColorModeValue('gray.50', 'gray.700')} borderRadius="md">
+                          <Box mt={2} p={3} bg={passwordBoxBg} borderRadius="md">
                             <Text fontSize="xs" fontWeight="semibold" mb={2}>
                               Password requirements:
                             </Text>

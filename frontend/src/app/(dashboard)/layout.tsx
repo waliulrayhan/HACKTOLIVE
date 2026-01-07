@@ -121,6 +121,11 @@ export default function DashboardLayout({
               { icon: <DocsIcon />, name: "Applications", path: "/admin/applications" },
             ],
           },
+          {
+            icon: <FileIcon />,
+            name: "Email Templates",
+            path: "/admin/email-templates",
+          },
           // {
           //   icon: <PieChartIcon />,
           //   name: "System Analytics",

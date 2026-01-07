@@ -13,6 +13,7 @@ model User {
   name            String?
   password        String
   role            UserRole         @default(STUDENT)
+  isVerified      Boolean          @default(false)
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   avatar          String?          @db.VarChar(500)
@@ -35,6 +36,7 @@ model User {
   cart            Cart?
   orders          Order[]
   productReviews  ProductReview[]
+  otps            Otp[]
 }
 
 model Instructor {
@@ -565,6 +567,126 @@ enum ApplicationStatus {
   INTERVIEWED
   ACCEPTED
   REJECTED
+}
+
+// ============================================
+// EMAIL TEMPLATES
+// ============================================
+
+model EmailTemplate {
+  id          String              @id @default(uuid())
+  name        String              @unique @db.VarChar(255)
+  slug        String              @unique @db.VarChar(255)
+  subject     String              @db.VarChar(500)
+  body        String              @db.Text
+  type        EmailTemplateType
+  variables   String              @db.Text // JSON array of available variables
+  fromEmail   EmailSender         @default(NOREPLY)
+  isActive    Boolean             @default(true)
+  description String?             @db.Text
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  logs        EmailLog[]
+
+  @@index([slug])
+  @@index([type])
+  @@index([isActive])
+}
+
+model EmailLog {
+  id              String         @id @default(uuid())
+  templateId      String?
+  recipientEmail  String         @db.VarChar(255)
+  recipientName   String?        @db.VarChar(255)
+  subject         String         @db.VarChar(500)
+  body            String         @db.Text
+  fromEmail       String         @db.VarChar(255)
+  status          EmailStatus    @default(PENDING)
+  sentAt          DateTime?
+  failedAt        DateTime?
+  errorMessage    String?        @db.Text
+  metadata        String?        @db.Text // JSON for additional data
+  createdAt       DateTime       @default(now())
+  template        EmailTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  @@index([templateId])
+  @@index([recipientEmail])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum EmailTemplateType {
+  OTP
+  GENERAL
+  CAREER_APPLICATION_CONFIRMATION
+  CAREER_APPLICATION_STATUS_UPDATE
+  CONTACT_FORM_CONFIRMATION
+  WELCOME_EMAIL
+  PASSWORD_RESET
+  ORDER_CONFIRMATION
+  COURSE_ENROLLMENT
+  CERTIFICATE_ISSUED
+  CUSTOM
+}
+
+enum EmailSender {
+  NOREPLY
+  SUPPORT
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+// ============================================
+// CONTACT FORM
+// ============================================
+
+model Contact {
+  id        String        @id @default(uuid())
+  name      String        @db.VarChar(255)
+  email     String        @db.VarChar(255)
+  phone     String?       @db.VarChar(50)
+  subject   String        @db.VarChar(500)
+  message   String        @db.Text
+  status    ContactStatus @default(PENDING)
+  notes     String?       @db.Text
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum ContactStatus {
+  PENDING
+  REPLIED
+  RESOLVED
+  SPAM
+}
+
+model Otp {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code      String   @db.VarChar(6)
+  type      OtpType
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([code])
+  @@index([expiresAt])
+}
+
+enum OtpType {
+  REGISTRATION
+  LOGIN
+  PASSWORD_RESET
 }
 
 // ============================================

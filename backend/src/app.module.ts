@@ -11,6 +11,8 @@ import { UploadModule } from './upload/upload.module';
 import { BlogModule } from './blog/blog.module';
 import { CareerModule } from './career/career.module';
 import { ShopModule } from './shop/shop.module';
+import { EmailModule } from './email/email.module';
+import { ContactModule } from './contact/contact.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { ShopModule } from './shop/shop.module';
     BlogModule,
     CareerModule,
     ShopModule,
+    EmailModule,
+    ContactModule,
   ],
   controllers: [AppController],
   providers: [AppService],

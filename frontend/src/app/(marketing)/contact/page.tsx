@@ -42,6 +42,7 @@ export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     subject: '',
     message: '',
   })
@@ -94,16 +95,34 @@ export default function ContactPage() {
     
     setIsSubmitting(true)
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/contact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to send message')
+      }
+
       toast.success('Message sent successfully!', {
         description: "We'll get back to you within 24 hours.",
         duration: 5000,
       })
       
-      setFormData({ name: '', email: '', subject: '', message: '' })
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '' })
+    } catch (error) {
+      console.error('Error sending message:', error)
+      toast.error('Failed to send message', {
+        description: 'Please try again later.',
+        duration: 5000,
+      })
+    } finally {
       setIsSubmitting(false)
-    }, 1500)
+    }
   }
 
   const handleChange = (
@@ -432,6 +451,25 @@ export default function ContactPage() {
                           }}
                         />
                         <FormErrorMessage>{errors.email}</FormErrorMessage>
+                      </FormControl>
+
+                      <FormControl isInvalid={!!errors.phone}>
+                        <FormLabel>Phone (Optional)</FormLabel>
+                        <Input
+                          name="phone"
+                          type="tel"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          placeholder="+880 1234-567890"
+                          bg={inputBg}
+                          borderColor={inputBorder}
+                          _hover={{ borderColor: iconColor }}
+                          _focus={{
+                            borderColor: iconColor,
+                            boxShadow: `0 0 0 1px ${iconColor}`,
+                          }}
+                        />
+                        <FormErrorMessage>{errors.phone}</FormErrorMessage>
                       </FormControl>
 
                       <FormControl isInvalid={!!errors.subject}>

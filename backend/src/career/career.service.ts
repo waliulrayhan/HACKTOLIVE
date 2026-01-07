@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { UploadService } from '../upload/upload.service';
+import { EmailService } from '../email/email.service';
 import { 
   CreateCareerDto, 
   UpdateCareerDto, 
@@ -16,6 +17,7 @@ export class CareerService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly uploadService: UploadService,
+    private readonly emailService: EmailService,
   ) {}
 
   // Helper method to parse JSON fields
@@ -219,7 +221,7 @@ export class CareerService {
       resumeUrl = await this.uploadService.uploadResume(resume);
     }
 
-    return this.prisma.application.create({
+    const application = await this.prisma.application.create({
       data: {
         ...createApplicationDto,
         resumeUrl,
@@ -234,6 +236,16 @@ export class CareerService {
         },
       },
     });
+
+    // Send confirmation email to applicant
+    await this.emailService.sendCareerApplicationConfirmation(
+      application.email,
+      application.name,
+      application.career.title,
+      application.id,
+    );
+
+    return application;
   }
 
   async findAllApplications(filterDto: FilterApplicationDto) {
@@ -330,7 +342,7 @@ export class CareerService {
         updateData.reviewedAt = new Date();
       }
 
-      return await this.prisma.application.update({
+      const application = await this.prisma.application.update({
         where: { id },
         data: updateData,
         include: {
@@ -343,6 +355,19 @@ export class CareerService {
           },
         },
       });
+
+      // Send status update email if status changed
+      if (updateApplicationDto.status) {
+        await this.emailService.sendCareerApplicationStatusUpdate(
+          application.email,
+          application.name,
+          application.career.title,
+          application.status,
+          updateApplicationDto.notes,
+        );
+      }
+
+      return application;
     } catch (error) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`Application with ID ${id} not found`);
