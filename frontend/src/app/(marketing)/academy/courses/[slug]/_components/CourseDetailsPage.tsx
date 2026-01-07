@@ -48,6 +48,7 @@ import {
   FiBarChart2,
   FiVideo,
   FiCalendar,
+  FiArrowLeft,
 } from "react-icons/fi";
 import CurriculumAccordion from "@/components/academy/CurriculumAccordion";
 import ReviewCard from "@/components/academy/ReviewCard";
@@ -56,6 +57,7 @@ import RatingStars from "@/components/academy/RatingStars";
 import { Course, Review } from "@/types/academy";
 import academyService from "@/lib/academy-service";
 import { useAuth } from "@/context/AuthContext";
+import { BackgroundColor } from "@tiptap/extension-text-style";
 
 interface CourseDetailsPageProps {
   slug: string;
@@ -171,6 +173,18 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
         sx={{ scrollMarginTop: "var(--navbar-height, 80px)" }}
       >
         <Container maxW="container.xl">
+          <Box mb="6">
+            <ButtonLink 
+              href="/academy/courses" 
+              variant="ghost" 
+              colorScheme="gray"
+              leftIcon={<Icon as={FiArrowLeft} />}
+              size="sm"
+              _hover={{ bg: 'green.50', color: 'green.600', _dark: { bg: 'green.900', color: 'green.400' } }}
+            >
+              Back to Courses
+            </ButtonLink>
+          </Box>
           <Flex 
             direction={{ base: "column", lg: "row" }} 
             gap={{ base: "6", md: "12" }} 

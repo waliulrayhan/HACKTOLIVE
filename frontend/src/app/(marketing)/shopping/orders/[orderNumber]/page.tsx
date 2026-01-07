@@ -32,6 +32,7 @@ import {
   FiPhone,
   FiCalendar,
   FiCreditCard,
+  FiArrowLeft,
 } from 'react-icons/fi'
 import { FallInPlace } from '@/components/shared/motion/fall-in-place'
 import { BackgroundGradient } from '@/components/shared/gradients/background-gradient'
@@ -134,6 +135,20 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
       <Box pt={{ base: 28, md: 32 }} pb={16} bg={bgColor}>
         <Container maxW="container.xl">
           <FallInPlace>
+            {/* Back Button */}
+            <Box mb={6}>
+              <Button
+                as={Link}
+                href="/shopping"
+                variant="ghost"
+                colorScheme="gray"
+                leftIcon={<Icon as={FiArrowLeft} />}
+                size="sm"
+                _hover={{ bg: 'green.50', color: 'green.600', _dark: { bg: 'green.900', color: 'green.400' } }}
+              >
+                Back to Shop
+              </Button>
+            </Box>
             {/* Header */}
             <VStack spacing={3} mb={10} textAlign="center">
               <Flex

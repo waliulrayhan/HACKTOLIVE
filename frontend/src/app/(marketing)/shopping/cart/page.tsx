@@ -21,7 +21,7 @@ import {
   Flex,
 } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
-import { FiTrash2, FiShoppingBag, FiArrowRight, FiMinus, FiPlus, FiPackage } from 'react-icons/fi'
+import { FiTrash2, FiShoppingBag, FiArrowRight, FiMinus, FiPlus, FiPackage, FiArrowLeft } from 'react-icons/fi'
 import { FallInPlace } from '@/components/shared/motion/fall-in-place'
 import { BackgroundGradient } from '@/components/shared/gradients/background-gradient'
 import { cartService, Cart } from '@/lib/shop-service'
@@ -183,6 +183,20 @@ export default function CartPage() {
       <Container maxW="container.xl" pt={{ base: 32, md: 40 }} pb={20}>
         <FallInPlace>
           <VStack spacing={8} align="stretch">
+            {/* Back Button */}
+            <Box>
+              <Button
+                as={Link}
+                href="/shopping"
+                variant="ghost"
+                colorScheme="gray"
+                leftIcon={<Icon as={FiArrowLeft} />}
+                size="sm"
+                _hover={{ bg: 'green.50', color: 'green.600', _dark: { bg: 'green.900', color: 'green.400' } }}
+              >
+                Back to Shop
+              </Button>
+            </Box>
             {/* Header */}
             <HStack justify="space-between" flexWrap="wrap" gap={4}>
               <VStack align="start" spacing={1}>
