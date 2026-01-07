@@ -141,13 +141,13 @@ export default function ShoppingPage() {
         productId,
         quantity: 1,
       })
-      
+
       // Mark as added - will persist until page reload or manual clear
       setAddedToCart(prev => new Set(prev).add(productId))
-      
+
       // Increment cart count in context
       incrementCartCount(1)
-      
+
       toast.success('Added to cart', {
         description: 'Product successfully added to your cart',
         duration: 3000,
@@ -290,13 +290,11 @@ export default function ShoppingPage() {
               <Badge
                 colorScheme="green"
                 fontSize="sm"
-                px="4"
-                py="2"
+                px={4}
+                py={1}
                 borderRadius="full"
-                textTransform="uppercase"
-                letterSpacing="wide"
               >
-                Shop Now
+                Let's Start Shop Now
               </Badge>
 
               <Box>
@@ -663,7 +661,7 @@ export default function ShoppingPage() {
                               size="sm"
                               leftIcon={addedToCart.has(product.id) ? <FiCheck /> : <FiShoppingCart />}
                               isDisabled={
-                                (product.stockQuantity === 0 && !product.allowBackorder) || 
+                                (product.stockQuantity === 0 && !product.allowBackorder) ||
                                 addedToCart.has(product.id)
                               }
                               isLoading={addingToCart === product.id}

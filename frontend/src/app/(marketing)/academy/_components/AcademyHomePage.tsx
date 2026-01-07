@@ -63,7 +63,7 @@ export default function AcademyHomePage() {
   const [featuredReviews, setFeaturedReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [enrolledCourseIds, setEnrolledCourseIds] = useState<string[]>([]);
-  
+
   const { user } = useAuth();
 
   useEffect(() => {
@@ -75,7 +75,7 @@ export default function AcademyHomePage() {
           academyService.getCourses(),
           academyService.getReviews({ take: 100 })
         ]);
-        
+
         // Filter only PUBLISHED courses
         const publishedCourses = allCourses.filter((c) => c.status === "published");
         setCourses(publishedCourses);
@@ -83,7 +83,7 @@ export default function AcademyHomePage() {
         // Filter free and premium courses from published courses only
         const free = publishedCourses.filter((c) => c.tier === "free").slice(0, 3);
         const premium = publishedCourses.filter((c) => c.tier === "premium").slice(0, 3);
-        
+
         setFreeCourses(free);
         setPremiumCourses(premium);
 
@@ -149,11 +149,9 @@ export default function AcademyHomePage() {
               <Badge
                 colorScheme="green"
                 fontSize="sm"
-                px="4"
-                py="2"
+                px={4}
+                py={1}
                 borderRadius="full"
-                textTransform="uppercase"
-                letterSpacing="wide"
               >
                 Hack To Live Academy
               </Badge>
@@ -166,7 +164,9 @@ export default function AcademyHomePage() {
                 color="white"
                 lineHeight="1.2"
               >
-                Master Cybersecurity Skills From Industry Experts
+                <Text as="span" color="green.400">
+                  Master Cybersecurity Skills
+                </Text>{' '}From Industry Experts
               </Heading>
             </FallInPlace>
 
@@ -405,8 +405,8 @@ export default function AcademyHomePage() {
               ) : freeCourses.length > 0 ? (
                 freeCourses.map((course, index) => (
                   <FallInPlace key={course.id} delay={0.1 * index}>
-                    <CourseCard 
-                      course={course} 
+                    <CourseCard
+                      course={course}
                       isEnrolled={enrolledCourseIds.includes(course.id)}
                     />
                   </FallInPlace>
@@ -462,8 +462,8 @@ export default function AcademyHomePage() {
               ) : premiumCourses.length > 0 ? (
                 premiumCourses.map((course, index) => (
                   <FallInPlace key={course.id} delay={0.1 * index}>
-                    <CourseCard 
-                      course={course} 
+                    <CourseCard
+                      course={course}
                       isEnrolled={enrolledCourseIds.includes(course.id)}
                     />
                   </FallInPlace>
@@ -632,7 +632,7 @@ export default function AcademyHomePage() {
                 ))}
               </SimpleGrid>
             )}
-            
+
             {featuredReviews.length === 0 && !loading && (
               <Box textAlign="center" py="12">
                 <Text color={textMuted} fontSize="lg">
@@ -669,7 +669,7 @@ export default function AcademyHomePage() {
                 const uniqueInstructors = Array.from(
                   new Map(publishedCourses.map(course => [course.instructor.id, course.instructor])).values()
                 ).slice(0, 3);
-                
+
                 return uniqueInstructors.map((instructor, index) => (
                   <FallInPlace key={instructor.id} delay={0.1 * index}>
                     <ButtonLink
@@ -678,138 +678,138 @@ export default function AcademyHomePage() {
                       height="auto"
                       display="block"
                     >
-                    <Box
-                      bg={cardBg}
-                      borderRadius="3xl"
-                      overflow="hidden"
-                      borderWidth="1px"
-                      borderColor={borderColor}
-                      transition="all 0.4s ease"
-                      position="relative"
-                      _hover={{
-                        transform: "translateY(-8px)",
-                        shadow: "2xl",
-                        borderColor: "purple.500",
-                        _before: {
-                          opacity: 1
-                        }
-                      }}
-                      _before={{
-                        content: '""',
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        bg: "linear-gradient(135deg, purple.500, pink.500)",
-                        opacity: 0,
-                        transition: "opacity 0.4s ease",
-                        borderRadius: "3xl",
-                        zIndex: -1,
-                        filter: "blur(20px)",
-                      }}
-                      cursor="pointer"
-                      h="full"
-                    >
-                      <Box position="relative" overflow="hidden">
-                      {instructor.avatar ? (
-                        <Image
-                          src={getFullImageUrl(instructor.avatar, 'avatar')}
-                          alt={instructor.name}
-                          width={400}
-                          height={400}
-                          unoptimized
-                          style={{
-                            width: "100%",
-                            height: "280px",
-                            objectFit: "cover"
-                          }}
-                        />
-                      ) : (
-                        <Box
-                          display="flex"
-                          alignItems="center"
-                          justifyContent="center"
-                          bg={useColorModeValue('gray.200', 'gray.700')}
-                          style={{
-                            width: "100%",
-                            height: "280px"
-                          }}
-                        >
-                          <Icon as={FiUser} boxSize="80px" color={useColorModeValue('gray.500', 'gray.400')} />
-                        </Box>
-                      )}
-                        <Box
-                          position="absolute"
-                          bottom="0"
-                          left="0"
-                          right="0"
-                          bg="linear-gradient(to top, rgba(0,0,0,0.7), transparent)"
-                          p="4"
-                        >
-                          <Badge
-                            colorScheme="purple"
-                            fontSize="xs"
-                            px="3"
-                            py="1"
-                            borderRadius="full"
+                      <Box
+                        bg={cardBg}
+                        borderRadius="3xl"
+                        overflow="hidden"
+                        borderWidth="1px"
+                        borderColor={borderColor}
+                        transition="all 0.4s ease"
+                        position="relative"
+                        _hover={{
+                          transform: "translateY(-8px)",
+                          shadow: "2xl",
+                          borderColor: "purple.500",
+                          _before: {
+                            opacity: 1
+                          }
+                        }}
+                        _before={{
+                          content: '""',
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          bg: "linear-gradient(135deg, purple.500, pink.500)",
+                          opacity: 0,
+                          transition: "opacity 0.4s ease",
+                          borderRadius: "3xl",
+                          zIndex: -1,
+                          filter: "blur(20px)",
+                        }}
+                        cursor="pointer"
+                        h="full"
+                      >
+                        <Box position="relative" overflow="hidden">
+                          {instructor.avatar ? (
+                            <Image
+                              src={getFullImageUrl(instructor.avatar, 'avatar')}
+                              alt={instructor.name}
+                              width={400}
+                              height={400}
+                              unoptimized
+                              style={{
+                                width: "100%",
+                                height: "280px",
+                                objectFit: "cover"
+                              }}
+                            />
+                          ) : (
+                            <Box
+                              display="flex"
+                              alignItems="center"
+                              justifyContent="center"
+                              bg={useColorModeValue('gray.200', 'gray.700')}
+                              style={{
+                                width: "100%",
+                                height: "280px"
+                              }}
+                            >
+                              <Icon as={FiUser} boxSize="80px" color={useColorModeValue('gray.500', 'gray.400')} />
+                            </Box>
+                          )}
+                          <Box
+                            position="absolute"
+                            bottom="0"
+                            left="0"
+                            right="0"
+                            bg="linear-gradient(to top, rgba(0,0,0,0.7), transparent)"
+                            p="4"
                           >
-                            Expert Instructor
-                          </Badge>
+                            <Badge
+                              colorScheme="purple"
+                              fontSize="xs"
+                              px="3"
+                              py="1"
+                              borderRadius="full"
+                            >
+                              Expert Instructor
+                            </Badge>
+                          </Box>
                         </Box>
-                      </Box>
 
-                      <VStack p="6" spacing="4" align="start">
-                        <VStack align="start" spacing="2" w="full">
-                          <Heading size="md" color={headingColor}>
-                            {instructor.name}
-                          </Heading>
-                          <Text fontSize="sm" color={textMuted} noOfLines={2} lineHeight="tall">
-                            {instructor.bio || "Expert Cybersecurity Instructor"}
-                          </Text>
+                        <VStack p="6" spacing="4" align="start">
+                          <VStack align="start" spacing="2" w="full">
+                            <Heading size="md" color={headingColor}>
+                              {instructor.name}
+                            </Heading>
+                            <Text fontSize="sm" color={textMuted} noOfLines={2} lineHeight="tall">
+                              {instructor.bio || "Expert Cybersecurity Instructor"}
+                            </Text>
+                          </VStack>
+
+                          <Box
+                            w="full"
+                            pt="4"
+                            borderTopWidth="1px"
+                            borderColor={borderColor}
+                          >
+                            <SimpleGrid columns={3} spacing="4" fontSize="sm">
+                              <VStack spacing="1">
+                                <HStack spacing="1" color="yellow.500">
+                                  <Icon as={FiStar} />
+                                  <Text fontWeight="bold">{instructor.rating}</Text>
+                                </HStack>
+                                <Text fontSize="xs" color={textMuted}>Rating</Text>
+                              </VStack>
+
+                              <VStack spacing="1">
+                                <HStack spacing="1" color="purple.500">
+                                  <Icon as={FiUsers} />
+                                  <Text fontWeight="bold">
+                                    {instructor.totalStudents > 999
+                                      ? `${(instructor.totalStudents / 1000).toFixed(1)}k`
+                                      : instructor.totalStudents}
+                                  </Text>
+                                </HStack>
+                                <Text fontSize="xs" color={textMuted}>Students</Text>
+                              </VStack>
+
+                              <VStack spacing="1">
+                                <HStack spacing="1" color="blue.500">
+                                  <Icon as={FiBook} />
+                                  <Text fontWeight="bold">{instructor.totalCourses}</Text>
+                                </HStack>
+                                <Text fontSize="xs" color={textMuted}>Courses</Text>
+                              </VStack>
+                            </SimpleGrid>
+                          </Box>
                         </VStack>
-
-                        <Box
-                          w="full"
-                          pt="4"
-                          borderTopWidth="1px"
-                          borderColor={borderColor}
-                        >
-                          <SimpleGrid columns={3} spacing="4" fontSize="sm">
-                            <VStack spacing="1">
-                              <HStack spacing="1" color="yellow.500">
-                                <Icon as={FiStar} />
-                                <Text fontWeight="bold">{instructor.rating}</Text>
-                              </HStack>
-                              <Text fontSize="xs" color={textMuted}>Rating</Text>
-                            </VStack>
-
-                            <VStack spacing="1">
-                              <HStack spacing="1" color="purple.500">
-                                <Icon as={FiUsers} />
-                                <Text fontWeight="bold">
-                                  {instructor.totalStudents > 999
-                                    ? `${(instructor.totalStudents / 1000).toFixed(1)}k`
-                                    : instructor.totalStudents}
-                                </Text>
-                              </HStack>
-                              <Text fontSize="xs" color={textMuted}>Students</Text>
-                            </VStack>
-
-                            <VStack spacing="1">
-                              <HStack spacing="1" color="blue.500">
-                                <Icon as={FiBook} />
-                                <Text fontWeight="bold">{instructor.totalCourses}</Text>
-                              </HStack>
-                              <Text fontSize="xs" color={textMuted}>Courses</Text>
-                            </VStack>
-                          </SimpleGrid>
-                        </Box>
-                      </VStack>
-                    </Box>
-                  </ButtonLink>
-                </FallInPlace>
-              ));
+                      </Box>
+                    </ButtonLink>
+                  </FallInPlace>
+                ));
               })()}
             </SimpleGrid>
 

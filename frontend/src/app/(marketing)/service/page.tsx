@@ -63,7 +63,10 @@ export default function ServicesPage() {
                 color="white"
                 lineHeight="shorter"
               >
-                Comprehensive Security Solutions
+                Comprehensive Security{' '}
+                <Text as="span" color="green.400">
+                  Solutions
+                </Text>
               </Heading>
               <Text
                 fontSize={{ base: 'lg', md: 'xl' }}

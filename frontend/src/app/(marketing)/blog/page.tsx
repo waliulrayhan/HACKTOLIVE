@@ -110,11 +110,11 @@ const BlogPage = () => {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/blog?${params}`
         );
-        
+
         if (!response.ok) throw new Error("Failed to fetch blogs");
-        
+
         const data = await response.json();
-        
+
         const convertedBlogs = data.data.map((blog: any) => ({
           ...blog,
           _id: blog.id,
@@ -175,7 +175,13 @@ const BlogPage = () => {
         <Container maxW="container.xl" position="relative" zIndex={1}>
           <VStack spacing={{ base: "4", md: "6" }} textAlign="center">
             <FallInPlace>
-              <Badge colorScheme="green" fontSize="sm" px="4" py="2" borderRadius="full" textTransform="uppercase" letterSpacing="wide">
+              <Badge
+                colorScheme="green"
+                fontSize="sm"
+                px={4}
+                py={1}
+                borderRadius="full"
+              >
                 Knowledge Hub
               </Badge>
             </FallInPlace>
@@ -184,6 +190,13 @@ const BlogPage = () => {
                 Hack To Live Blog
               </Heading>
             </FallInPlace>
+            <Box
+              width="120px"
+              height="4px"
+              bg={useColorModeValue('green.400', 'green.500')}
+              mx="auto"
+              borderRadius="full"
+            />
             <FallInPlace delay={0.2}>
               <Text fontSize={{ base: "lg", md: "xl" }} color="whiteAlpha.900" maxW="2xl">
                 Stay informed with the latest security insights, tutorials, and threat intelligence
