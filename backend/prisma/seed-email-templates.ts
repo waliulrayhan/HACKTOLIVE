@@ -304,61 +304,80 @@ async function seedEmailTemplates() {
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:20px 0">
     <tr><td align="center">
       <table width="600" cellpadding="0" cellspacing="0" style="background-color:#fff;border-radius:8px;overflow:hidden">
-        <tr><td style="background:linear-gradient(135deg,#84cc16 0%,#65a30d 100%);padding:40px 30px;text-align:center">
-          <h1 style="margin:0 0 10px;color:#fff;font-size:28px">🎉 Enrollment Successful!</h1>
-          <p style="margin:0;color:#fff;font-size:14px;opacity:0.95">You're now enrolled in the course</p>
+        <tr><td style="background-color:#84cc16;padding:30px;text-align:center">
+          <h1 style="margin:0;color:#fff;font-size:24px">Course Enrollment Confirmation</h1>
         </td></tr>
         <tr><td style="padding:40px 30px">
-          <p style="margin:0 0 20px;color:#333;font-size:16px">Hello <strong>{{studentName}}</strong>,</p>
-          <p style="margin:0 0 25px;color:#666;font-size:14px;line-height:1.6">Congratulations! You have successfully enrolled in <strong>{{courseName}}</strong>.</p>
+          <p style="margin:0 0 20px;color:#333;font-size:16px">Dear <strong>{{studentName}}</strong>,</p>
+          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Thank you for enrolling in <strong>{{courseName}}</strong> at HACKTOLIVE Academy. We are pleased to confirm that your enrollment has been successfully processed.</p>
+          <p style="margin:0 0 30px;color:#666;font-size:14px;line-height:1.6">This email serves as confirmation of your registration and contains important information about your course.</p>
           
-          <div style="background-color:#f0fdf4;border:2px solid #84cc16;border-radius:8px;padding:25px;margin:0 0 30px">
-            <h2 style="margin:0 0 15px;color:#15803d;font-size:18px">📚 Course Details</h2>
-            <table width="100%" cellpadding="8" cellspacing="0" style="font-size:14px">
-              <tr>
-                <td style="color:#666;padding:8px 0"><strong>Course:</strong></td>
-                <td style="color:#333;padding:8px 0">{{courseName}}</td>
-              </tr>
-              <tr>
-                <td style="color:#666;padding:8px 0"><strong>Instructor:</strong></td>
-                <td style="color:#333;padding:8px 0">{{instructorName}}</td>
-              </tr>
-              <tr>
-                <td style="color:#666;padding:8px 0"><strong>Enrolled on:</strong></td>
-                <td style="color:#333;padding:8px 0">{{enrollmentDate}}</td>
-              </tr>
-            </table>
-          </div>
+          <table width="100%" cellpadding="12" cellspacing="0" style="background-color:#f9f9f9;border-radius:6px;margin:0 0 25px;font-size:14px">
+            <tr>
+              <td colspan="2" style="color:#333;font-weight:600;border-bottom:2px solid #84cc16;padding-bottom:10px">Course Information</td>
+            </tr>
+            <tr>
+              <td style="color:#666;width:35%;border-bottom:1px solid #eee"><strong>Course Name:</strong></td>
+              <td style="color:#333;border-bottom:1px solid #eee">{{courseName}}</td>
+            </tr>
+            <tr>
+              <td style="color:#666;border-bottom:1px solid #eee"><strong>Instructor:</strong></td>
+              <td style="color:#333;border-bottom:1px solid #eee">{{instructorName}}</td>
+            </tr>
+            <tr>
+              <td style="color:#666;border-bottom:1px solid #eee"><strong>Enrollment Date:</strong></td>
+              <td style="color:#333;border-bottom:1px solid #eee">{{enrollmentDate}}</td>
+            </tr>
+            <tr>
+              <td style="color:#666"><strong>Access:</strong></td>
+              <td style="color:#333">Immediate - Available Now</td>
+            </tr>
+          </table>
 
-          <div style="background-color:#fef9c3;border-left:4px solid #eab308;padding:20px;border-radius:4px;margin:0 0 30px">
-            <p style="margin:0 0 10px;color:#713f12;font-size:14px;font-weight:600">📌 What's Next?</p>
-            <ul style="margin:0;padding-left:20px;color:#854d0e;font-size:13px;line-height:1.8">
-              <li>Access your course dashboard to start learning</li>
-              <li>Check out the course curriculum and materials</li>
-              <li>Join the course community and connect with other students</li>
-              <li>Track your progress and earn certificates upon completion</li>
+          <div style="background-color:#f0fdf4;border-left:4px solid #84cc16;padding:20px;border-radius:4px;margin:0 0 25px">
+            <p style="margin:0 0 15px;color:#333;font-size:14px;font-weight:600">Getting Started with Your Course</p>
+            <p style="margin:0 0 10px;color:#666;font-size:13px;line-height:1.7">To begin your learning journey, please follow these steps:</p>
+            <ul style="margin:0;padding-left:20px;color:#666;font-size:13px;line-height:1.8">
+              <li>Log in to your student dashboard using your registered credentials</li>
+              <li>Navigate to "My Courses" to access your enrolled courses</li>
+              <li>Review the course curriculum and learning objectives</li>
+              <li>Download any required course materials or resources</li>
+              <li>Complete the lessons at your own pace</li>
+              <li>Track your progress through the course dashboard</li>
+              <li>Participate in course discussions and community forums</li>
+              <li>Complete assessments and quizzes to test your knowledge</li>
             </ul>
           </div>
 
-          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 30px">
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 25px">
             <tr><td align="center">
-              <a href="{{courseUrl}}" style="display:inline-block;background-color:#84cc16;color:#fff;text-decoration:none;padding:14px 40px;border-radius:8px;font-size:15px;font-weight:600;box-shadow:0 4px 6px rgba(132,204,22,0.3)">Start Learning Now →</a>
+              <a href="{{courseUrl}}" style="display:inline-block;background-color:#84cc16;color:#fff;text-decoration:none;padding:12px 30px;border-radius:6px;font-size:14px;font-weight:600">Access Your Course</a>
             </td></tr>
           </table>
 
+          <div style="background-color:#fff9e6;border-left:4px solid #fbbf24;padding:20px;border-radius:4px;margin:0 0 25px">
+            <p style="margin:0 0 10px;color:#333;font-size:14px;font-weight:600">Important Information</p>
+            <ul style="margin:0;padding-left:20px;color:#666;font-size:13px;line-height:1.8">
+              <li>All course materials are available for the duration of your enrollment</li>
+              <li>You can learn at your own pace and revisit lessons anytime</li>
+              <li>Certificate of completion will be issued upon successfully finishing the course</li>
+              <li>Technical support is available if you encounter any issues</li>
+              <li>Course updates and announcements will be sent to your registered email</li>
+            </ul>
+          </div>
+
           <div style="border-top:1px solid #e5e7eb;padding-top:20px;margin-top:20px">
-            <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.5">
-              <strong>Need help?</strong> Our support team is here for you. You can also access course help from your student dashboard.
-            </p>
-            <p style="margin:0;color:#999;font-size:12px">
-              Contact us at <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a>
-            </p>
+            <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">If you have any questions regarding your enrollment or need assistance accessing the course materials, please don't hesitate to contact our support team. We are here to help you succeed in your learning journey.</p>
+            <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Support Contact:</strong></p>
+            <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
+            <p style="margin:0 0 15px;color:#666;font-size:13px">Website: <a href="https://hacktolive.net" style="color:#84cc16;text-decoration:none">www.hacktolive.net</a></p>
+            <p style="margin:0;color:#666;font-size:13px;line-height:1.6">We wish you the best in your learning experience!</p>
           </div>
         </td></tr>
-        <tr><td style="background-color:#f9fafb;padding:25px;text-align:center;border-top:1px solid #e5e7eb">
-          <p style="margin:0 0 8px;color:#666;font-size:13px;font-weight:600">HACKTOLIVE Academy</p>
-          <p style="margin:0 0 5px;color:#999;font-size:11px">Empowering cybersecurity professionals worldwide</p>
-          <p style="margin:0;color:#999;font-size:11px">© 2026 All rights reserved</p>
+        <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
+          <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" style="width:120px;height:auto;margin:0 0 10px">
+          <p style="margin:0 0 5px;color:#999;font-size:11px">Empowering Cybersecurity Professionals Worldwide</p>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
         </td></tr>
       </table>
     </td></tr>
