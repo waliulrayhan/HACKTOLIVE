@@ -515,37 +515,37 @@ export default function ApplicationsManagementPage() {
               <TableRow>
                 <TableCell
                   isHeader
-                  className="px-3 sm:px-4 py-2 text-left text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                  className="px-3 sm:px-4 py-2 text-center text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
                 >
                   Applicant
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-3 sm:px-4 py-2 text-left text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                  className="px-3 sm:px-4 py-2 text-center text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
                 >
                   Position
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-3 sm:px-4 py-2 text-left text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                  className="px-3 sm:px-4 py-2 text-center text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
                 >
                   Contact
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-3 sm:px-4 py-2 text-left text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                  className="px-3 sm:px-4 py-2 text-center text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
                 >
                   Experience
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-3 sm:px-4 py-2 text-left text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                  className="px-3 sm:px-4 py-2 text-center text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
                 >
                   Status
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-3 sm:px-4 py-2 text-left text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+                  className="px-3 sm:px-4 py-2 text-center text-[10px] sm:text-theme-xs font-medium text-gray-500 dark:text-gray-400"
                 >
                   Applied
                 </TableCell>
@@ -576,8 +576,9 @@ export default function ApplicationsManagementPage() {
                     key={application.id}
                     className="border-b border-gray-100 transition-colors hover:bg-gray-50 dark:border-white/5 dark:hover:bg-white/2"
                   >
-                    <TableCell>
-                      <div className="flex flex-col">
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <HiOutlineUser className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                         <span className="font-medium text-gray-900 dark:text-white">
                           {application.name}
                         </span>
