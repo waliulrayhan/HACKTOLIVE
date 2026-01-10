@@ -1,3 +1,14 @@
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Shopping Cart - HACKTOLIVE',
+  description: 'Review your shopping cart items. Update quantities, remove items, or proceed to checkout.',
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
+
 'use client'
 
 import {

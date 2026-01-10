@@ -1,3 +1,21 @@
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Terms of Service - HACKTOLIVE',
+  description: 'Read HACKTOLIVE\'s terms of service to understand the rules and guidelines for using our platform, courses, and services.',
+  openGraph: {
+    title: 'Terms of Service - HACKTOLIVE',
+    description: 'Understand the terms and conditions for using HACKTOLIVE services.',
+    url: 'https://hacktolive.io/terms-of-service',
+    siteName: 'HACKTOLIVE',
+    type: 'website',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+}
+
 'use client'
 
 import {

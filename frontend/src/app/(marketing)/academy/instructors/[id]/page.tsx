@@ -11,8 +11,30 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { id } = await params;
 
   return {
-    title: `Instructor Profile | HACKTOLIVE Academy`,
-    description: "Learn from industry experts in cybersecurity",
+    title: `Instructor Profile - HACKTOLIVE Academy`,
+    description: "Learn from industry experts in cybersecurity. Experienced instructors with real-world expertise.",
+    openGraph: {
+      title: "Expert Instructor - HACKTOLIVE Academy",
+      description: "Learn from industry experts in cybersecurity with years of real-world experience.",
+      url: `https://hacktolive.io/academy/instructors/${id}`,
+      siteName: "HACKTOLIVE",
+      images: [
+        {
+          url: "/logo.svg",
+          width: 1200,
+          height: 630,
+          alt: "HACKTOLIVE Instructor",
+        },
+      ],
+      locale: "en_US",
+      type: "profile",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Expert Instructor - HACKTOLIVE Academy",
+      description: "Learn from industry experts in cybersecurity.",
+      images: ["/logo.svg"],
+    },
   };
 }
 

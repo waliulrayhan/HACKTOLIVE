@@ -1,3 +1,42 @@
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Shop - HACKTOLIVE | Tech Products & Cybersecurity Tools',
+  description: 'Browse our collection of tech products, cybersecurity tools, educational resources, and professional equipment. Secure shopping with fast delivery.',
+  keywords: [
+    'tech shop',
+    'cybersecurity tools',
+    'hacking equipment',
+    'tech products',
+    'security hardware',
+    'online shop',
+    'tech store',
+    'buy tech products'
+  ],
+  openGraph: {
+    title: 'HACKTOLIVE Shop - Tech Products & Cybersecurity Tools',
+    description: 'Browse tech products, cybersecurity tools, and educational resources. Secure shopping with fast delivery.',
+    url: 'https://hacktolive.io/shopping',
+    siteName: 'HACKTOLIVE',
+    images: [
+      {
+        url: '/logo.svg',
+        width: 1200,
+        height: 630,
+        alt: 'HACKTOLIVE Shop',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'HACKTOLIVE Shop - Tech Products & Tools',
+    description: 'Browse tech products and cybersecurity tools.',
+    images: ['/logo.svg'],
+  },
+}
+
 'use client'
 
 import {

@@ -14,22 +14,40 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const blog = await blogApi.getBlogBySlug(slug);
 
     return {
-      title: `${blog.title} - Cybersecurity Blog`,
+      title: `${blog.title} - HACKTOLIVE Blog`,
       description: blog.metadata,
       keywords: blog.tags.join(", "),
       authors: [{ name: blog.author.name }],
       openGraph: {
         title: blog.title,
         description: blog.metadata,
+        url: `https://hacktolive.io/blog/${slug}`,
+        siteName: "HACKTOLIVE",
         type: "article",
         publishedTime: blog.publishDate,
         authors: [blog.author.name],
         tags: blog.tags,
+        images: [
+          {
+            url: blog.image || "/logo.svg",
+            width: 1200,
+            height: 630,
+            alt: blog.title,
+          },
+        ],
+        locale: "en_US",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: blog.title,
+        description: blog.metadata,
+        images: [blog.image || "/logo.svg"],
       },
     };
   } catch {
     return {
-      title: "Blog Not Found",
+      title: "Blog Not Found - HACKTOLIVE",
+      description: "The blog post you're looking for could not be found.",
     };
   }
 }

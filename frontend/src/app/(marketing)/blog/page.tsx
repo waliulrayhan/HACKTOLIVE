@@ -1,3 +1,42 @@
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Cybersecurity Blog - HACKTOLIVE | Latest Tech Insights & Tutorials',
+  description: 'Read our latest articles on cybersecurity, ethical hacking, web development, and technology trends. Expert insights, tutorials, and industry news from HACKTOLIVE professionals.',
+  keywords: [
+    'cybersecurity blog',
+    'ethical hacking articles',
+    'tech tutorials',
+    'security news',
+    'web development blog',
+    'hacking guides',
+    'penetration testing tutorials',
+    'tech insights'
+  ],
+  openGraph: {
+    title: 'Cybersecurity Blog - Latest Tech Insights & Tutorials',
+    description: 'Expert articles on cybersecurity, ethical hacking, web development, and technology trends. Stay updated with HACKTOLIVE blog.',
+    url: 'https://hacktolive.io/blog',
+    siteName: 'HACKTOLIVE',
+    images: [
+      {
+        url: '/logo.svg',
+        width: 1200,
+        height: 630,
+        alt: 'HACKTOLIVE Blog',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Cybersecurity Blog - Latest Tech Insights & Tutorials',
+    description: 'Expert articles on cybersecurity, ethical hacking, and web development.',
+    images: ['/logo.svg'],
+  },
+}
+
 "use client";
 import {
   Box,

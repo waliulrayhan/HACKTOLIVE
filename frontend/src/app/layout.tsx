@@ -13,23 +13,72 @@ const outfit = Outfit({
 })
 
 export const metadata = {
-  title: 'HACKTOLIVE',
-  description: 'Platform with landing page, authentication, and admin dashboard',
+  metadataBase: new URL('https://hacktolive.io'),
+  title: {
+    default: 'HACKTOLIVE - Cybersecurity, Development & Tech Solutions',
+    template: '%s | HACKTOLIVE',
+  },
+  description: 'HACKTOLIVE offers expert cybersecurity training, web development services, software solutions, and tech consultancy. Learn from industry experts and grow your tech career.',
+  keywords: [
+    'HACKTOLIVE',
+    'cybersecurity',
+    'ethical hacking',
+    'web development',
+    'tech training',
+    'penetration testing',
+    'IT services',
+    'online courses',
+  ],
+  authors: [{ name: 'HACKTOLIVE' }],
+  creator: 'HACKTOLIVE',
+  publisher: 'HACKTOLIVE',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   icons: {
     icon: '/logo.svg',
     apple: '/logo.svg',
   },
   openGraph: {
-    title: 'HACKTOLIVE',
-    description: 'Platform with landing page, authentication, and admin dashboard',
-    images: ['/logo.svg'],
+    title: 'HACKTOLIVE - Cybersecurity, Development & Tech Solutions',
+    description: 'Expert cybersecurity training, web development services, and tech solutions. Learn from industry professionals.',
+    url: 'https://hacktolive.io',
+    siteName: 'HACKTOLIVE',
+    images: [
+      {
+        url: '/logo.svg',
+        width: 1200,
+        height: 630,
+        alt: 'HACKTOLIVE Logo',
+      },
+    ],
+    locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'HACKTOLIVE',
-    description: 'Platform with landing page, authentication, and admin dashboard',
+    title: 'HACKTOLIVE - Cybersecurity, Development & Tech Solutions',
+    description: 'Expert cybersecurity training, web development services, and tech solutions.',
     images: ['/logo.svg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    // Add your verification codes here when available
+    // google: 'your-google-verification-code',
+    // yandex: 'your-yandex-verification-code',
+    // bing: 'your-bing-verification-code',
   },
 }
 

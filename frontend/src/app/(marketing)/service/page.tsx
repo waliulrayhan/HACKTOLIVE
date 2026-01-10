@@ -1,3 +1,42 @@
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Our Services - HACKTOLIVE | Web Development & Cybersecurity Solutions',
+  description: 'Professional web development, cybersecurity consulting, penetration testing, and custom software solutions. HACKTOLIVE delivers enterprise-grade tech services tailored to your needs.',
+  keywords: [
+    'web development services',
+    'cybersecurity consulting',
+    'penetration testing',
+    'security audit',
+    'custom software development',
+    'IT services',
+    'tech consulting',
+    'security solutions'
+  ],
+  openGraph: {
+    title: 'HACKTOLIVE Services - Web Development & Cybersecurity',
+    description: 'Professional web development, cybersecurity consulting, and custom software solutions. Enterprise-grade tech services.',
+    url: 'https://hacktolive.io/service',
+    siteName: 'HACKTOLIVE',
+    images: [
+      {
+        url: '/logo.svg',
+        width: 1200,
+        height: 630,
+        alt: 'HACKTOLIVE Services',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'HACKTOLIVE Services - Web Development & Cybersecurity',
+    description: 'Professional web development, cybersecurity consulting, and custom software solutions.',
+    images: ['/logo.svg'],
+  },
+}
+
 'use client'
 
 import {

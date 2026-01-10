@@ -1,10 +1,44 @@
 import CourseDetailsPage from "./_components/CourseDetailsPage";
+import { Metadata } from "next";
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
+  
+  // You can fetch course data here if needed for dynamic metadata
+  const courseTitle = slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  
   return {
-    title: `Course Details - HACKTOLIVE Academy`,
-    description: "Learn cybersecurity with expert-led courses and hands-on labs.",
+    title: `${courseTitle} - HACKTOLIVE Academy`,
+    description: `Learn ${courseTitle} with expert-led cybersecurity training. Hands-on labs, live sessions, and industry-recognized certification.`,
+    keywords: [
+      courseTitle,
+      "cybersecurity course",
+      "online training",
+      "certification",
+      "hands-on learning",
+    ],
+    openGraph: {
+      title: `${courseTitle} - HACKTOLIVE Academy`,
+      description: `Master ${courseTitle} with expert-led training, hands-on labs, and live sessions. Earn your certification.`,
+      url: `https://hacktolive.io/academy/courses/${slug}`,
+      siteName: "HACKTOLIVE",
+      images: [
+        {
+          url: "/logo.svg",
+          width: 1200,
+          height: 630,
+          alt: `${courseTitle} Course`,
+        },
+      ],
+      locale: "en_US",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${courseTitle} - HACKTOLIVE Academy`,
+      description: `Master ${courseTitle} with expert-led training and hands-on labs.`,
+      images: ["/logo.svg"],
+    },
   };
 }
 

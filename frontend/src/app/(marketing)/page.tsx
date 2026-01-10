@@ -39,7 +39,7 @@ import {
   useBreakpointValue,
 } from '@chakra-ui/react'
 import { Br, Link } from '@saas-ui/react'
-import type { Metadata, NextPage } from 'next'
+import type { NextPage } from 'next'
 import Image from 'next/image'
 import Lottie from 'lottie-react'
 import {

@@ -1,3 +1,40 @@
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Verify Certificate - HACKTOLIVE Academy',
+  description: 'Verify the authenticity of HACKTOLIVE Academy certificates. Enter a certificate code to check if a certificate is valid and view certificate details.',
+  keywords: [
+    'verify certificate',
+    'certificate verification',
+    'authentic certificate',
+    'HACKTOLIVE certificate',
+    'course certificate',
+    'certificate validation'
+  ],
+  openGraph: {
+    title: 'Verify Certificate - HACKTOLIVE Academy',
+    description: 'Verify the authenticity of HACKTOLIVE Academy certificates. Check certificate validity and details.',
+    url: 'https://hacktolive.io/verify-certificate',
+    siteName: 'HACKTOLIVE',
+    images: [
+      {
+        url: '/logo.svg',
+        width: 1200,
+        height: 630,
+        alt: 'HACKTOLIVE Certificate Verification',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Verify Certificate - HACKTOLIVE Academy',
+    description: 'Verify the authenticity of HACKTOLIVE Academy certificates.',
+    images: ['/logo.svg'],
+  },
+}
+
 'use client'
 
 import {

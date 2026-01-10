@@ -1,3 +1,41 @@
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Contact Us - HACKTOLIVE | Get in Touch',
+  description: 'Contact HACKTOLIVE for cybersecurity training, web development services, or tech consultations. Reach out via email, phone, or our contact form. We\'re here to help!',
+  keywords: [
+    'contact HACKTOLIVE',
+    'get in touch',
+    'cybersecurity consultation',
+    'tech support',
+    'contact form',
+    'customer support',
+    'business inquiry'
+  ],
+  openGraph: {
+    title: 'Contact HACKTOLIVE - Get in Touch',
+    description: 'Reach out to HACKTOLIVE for cybersecurity training, web development services, or tech consultations. We\'re here to help!',
+    url: 'https://hacktolive.io/contact',
+    siteName: 'HACKTOLIVE',
+    images: [
+      {
+        url: '/logo.svg',
+        width: 1200,
+        height: 630,
+        alt: 'Contact HACKTOLIVE',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contact HACKTOLIVE - Get in Touch',
+    description: 'Reach out to HACKTOLIVE for cybersecurity training and tech services.',
+    images: ['/logo.svg'],
+  },
+}
+
 'use client'
 
 import {

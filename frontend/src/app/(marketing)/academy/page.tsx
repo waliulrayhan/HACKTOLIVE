@@ -12,7 +12,33 @@ export const metadata: Metadata = {
     "web security",
     "online learning",
     "cyber security training",
+    "hacking courses",
+    "security certification",
   ],
+  openGraph: {
+    title: "HACKTOLIVE Academy - Learn Cybersecurity from Experts",
+    description:
+      "Master cybersecurity with expert-led courses. Learn ethical hacking, web security, and penetration testing. Join live batches and earn certificates.",
+    url: "https://hacktolive.io/academy",
+    siteName: "HACKTOLIVE",
+    images: [
+      {
+        url: "/logo.svg",
+        width: 1200,
+        height: 630,
+        alt: "HACKTOLIVE Academy",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "HACKTOLIVE Academy - Learn Cybersecurity",
+    description:
+      "Master cybersecurity with expert-led courses. Ethical hacking, web security, and penetration testing.",
+    images: ["/logo.svg"],
+  },
 };
 
 export default function Page() {
