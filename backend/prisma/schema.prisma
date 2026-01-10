@@ -336,31 +336,36 @@ model AssignmentSubmission {
 }
 
 model Blog {
-  id          String        @id @default(uuid())
-  slug        String        @unique @db.VarChar(255)
-  title       String        @db.VarChar(500)
-  mainImage   String?       @db.VarChar(500)
-  metadata    String        @db.Text
-  content     String?       @db.LongText
-  category    BlogCategory
-  blogType    BlogType
-  authorId    String
-  publishDate DateTime      @default(now())
-  readTime    String?       @db.VarChar(50)
-  tags        String        @db.Text
-  featured    Boolean       @default(false)
-  status      BlogStatus    @default(DRAFT)
-  views       Int           @default(0)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  author      User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  comments    BlogComment[]
-  likes       BlogLike[]
+  id              String           @id @default(uuid())
+  slug            String           @unique @db.VarChar(255)
+  title           String           @db.VarChar(500)
+  mainImage       String?          @db.VarChar(500)
+  metadata        String           @db.Text
+  content         String?          @db.LongText
+  category        BlogCategory
+  blogType        BlogType
+  authorId        String
+  publishDate     DateTime         @default(now())
+  readTime        String?          @db.VarChar(50)
+  tags            String           @db.Text
+  featured        Boolean          @default(false)
+  status          BlogStatus       @default(DRAFT)
+  approvalStatus  ApprovalStatus   @default(PENDING)
+  approvedAt      DateTime?
+  approvedBy      String?
+  rejectionReason String?          @db.Text
+  views           Int              @default(0)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  author          User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments        BlogComment[]
+  likes           BlogLike[]
 
   @@index([slug])
   @@index([category])
   @@index([blogType])
   @@index([status])
+  @@index([approvalStatus])
   @@index([featured])
   @@index([publishDate])
   @@index([authorId])
@@ -505,6 +510,12 @@ enum BlogStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model Career {

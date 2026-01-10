@@ -53,6 +53,7 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [currentTag, setCurrentTag] = useState("");
+  const [originalApprovalStatus, setOriginalApprovalStatus] = useState<string | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<BlogFormData>({
@@ -138,6 +139,7 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
       if (blog.mainImage) {
         setImagePreview(blog.mainImage);
       }
+      setOriginalApprovalStatus(blog.approvalStatus || null);
     } catch (error) {
       console.error("Error fetching blog:", error);
       toast.error("Failed to load blog");
@@ -321,9 +323,15 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
         throw new Error(error.message || "Failed to save blog");
       }
 
-      toast.success(
-        `Blog ${mode === "create" ? "created" : "updated"} successfully!`
-      );
+      const data = await response.json();
+      
+      if (mode === "edit" && data.approvalStatus === 'PENDING') {
+        toast.success("Blog updated and submitted for approval!");
+      } else {
+        toast.success(
+          `Blog ${mode === "create" ? "created" : "updated"} successfully!`
+        );
+      }
       router.push("/student/blogs");
     } catch (error: any) {
       console.error("Error saving blog:", error);
@@ -427,6 +435,21 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
             )}
           </button>
         </div>
+        
+        {/* Resubmission Notice for Rejected Blogs */}
+        {mode === "edit" && originalApprovalStatus === "REJECTED" && (
+          <div className="mt-4 flex items-start gap-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 p-4">
+            <HiOutlineInformationCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-500 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-yellow-800 dark:text-yellow-300">
+                Resubmitting Rejected Blog
+              </h4>
+              <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-400">
+                When you update and save this blog, it will be resubmitted to admin for approval with status reset to "Pending".
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Main Form */}
@@ -499,7 +522,7 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
               />
               
               {imagePreview ? (
-                <div className="relative w-full h-64 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700">
+                <div className="relative w-48 h-48 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700">
                   <img
                     src={`${process.env.NEXT_PUBLIC_API_URL}${imagePreview}`}
                     alt="Blog preview"
@@ -644,36 +667,36 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
               </div>
             </div>
 
-            {/* Read Time and Status */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Read Time
-                </label>
-                <input
-                  type="text"
-                  name="readTime"
-                  value={formData.readTime}
-                  onChange={handleInputChange}
-                  placeholder="8 min read"
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                />
-              </div>
+            {/* Read Time */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Read Time
+              </label>
+              <input
+                type="text"
+                name="readTime"
+                value={formData.readTime}
+                onChange={handleInputChange}
+                placeholder="8 min read"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Optional: Estimated reading time (e.g., "5 min read")
+              </p>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Status <span className="text-error-500">*</span>
-                </label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white"
-                >
-                  <option value="DRAFT">Draft</option>
-                  <option value="PUBLISHED">Published</option>
-                  <option value="ARCHIVED">Archived</option>
-                </select>
+            {/* Approval Info */}
+            <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-900/50">
+              <div className="flex items-start gap-2">
+                <HiOutlineInformationCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                    📝 About Blog Publishing
+                  </h4>
+                  <p className="text-xs text-blue-800 dark:text-blue-200">
+                    Your blog will be submitted for admin review. Once approved by an administrator, it will be automatically published and visible to all users.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -940,7 +963,7 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
           image={imageToCrop}
           onCropComplete={handleCropComplete}
           onCancel={() => setImageToCrop(null)}
-          aspectRatio={16 / 9}
+          aspectRatio={1}
         />
       )}
     </div>

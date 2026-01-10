@@ -54,6 +54,9 @@ interface Blog {
   tags?: string[];
   featured: boolean;
   status: string;
+  approvalStatus?: string;
+  approvedAt?: string;
+  rejectionReason?: string;
   publishedAt?: string;
   createdAt: string;
   updatedAt: string;
@@ -87,6 +90,8 @@ export default function BlogsManagementPage() {
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [blogToDelete, setBlogToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [showRejectionModal, setShowRejectionModal] = useState(false);
+  const [rejectionDetails, setRejectionDetails] = useState<{ id: string; title: string; reason: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchControllerRef = useRef<AbortController | null>(null);
@@ -136,7 +141,7 @@ export default function BlogsManagementPage() {
       // Apply filters
       let filteredData = data;
       if (statusFilter !== 'ALL') {
-        filteredData = filteredData.filter((blog: Blog) => blog.status === statusFilter);
+        filteredData = filteredData.filter((blog: Blog) => (blog.approvalStatus || 'PENDING') === statusFilter);
       }
       if (categoryFilter !== 'ALL') {
         filteredData = filteredData.filter((blog: Blog) => blog.category === categoryFilter);
@@ -260,6 +265,18 @@ export default function BlogsManagementPage() {
     return status === 'PUBLISHED'
       ? 'bg-success-100 text-success-700 dark:bg-success-500/15 dark:text-success-500'
       : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-500';
+  };
+
+  const getApprovalBadgeClass = (approvalStatus: string) => {
+    switch (approvalStatus) {
+      case 'APPROVED':
+        return 'bg-success-100 text-success-700 dark:bg-success-500/15 dark:text-success-500';
+      case 'REJECTED':
+        return 'bg-error-100 text-error-700 dark:bg-error-500/15 dark:text-error-500';
+      case 'PENDING':
+      default:
+        return 'bg-warning-100 text-warning-700 dark:bg-warning-500/15 dark:text-warning-500';
+    }
   };
 
   const getCategoryBadgeClass = (category: string) => {
@@ -408,9 +425,10 @@ export default function BlogsManagementPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="h-9 sm:h-10 rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             >
-              <option value="ALL">All Status</option>
-              <option value="PUBLISHED">Published</option>
-              <option value="DRAFT">Drafts</option>
+              <option value="ALL">All Approvals</option>
+              <option value="PENDING">Pending Review</option>
+              <option value="APPROVED">Approved</option>
+              <option value="REJECTED">Rejected</option>
             </select>
             <select
               value={categoryFilter}
@@ -438,22 +456,17 @@ export default function BlogsManagementPage() {
                   </TableCell>
                   <TableCell isHeader className="px-3 py-2.5 sm:px-4 sm:py-3">
                     <span className="text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300">
-                      Author
+                      Category
                     </span>
                   </TableCell>
                   <TableCell isHeader className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
                     <span className="text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300">
-                      Featured
-                    </span>
-                  </TableCell>
-                  <TableCell isHeader className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
-                    <span className="text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300">
-                      Status
+                      Approval Status
                     </span>
                   </TableCell>
                   <TableCell isHeader className="px-3 py-2.5 sm:px-4 sm:py-3">
                     <span className="text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300">
-                      Date
+                      Submitted
                     </span>
                   </TableCell>
                   <TableCell isHeader className="w-32 px-3 py-2.5 text-center sm:px-4 sm:py-3">
@@ -469,7 +482,7 @@ export default function BlogsManagementPage() {
                     <TableCell className="px-3 py-2.5 sm:px-4 sm:py-3">
                       <div className="flex items-start gap-2">
                         {blog.mainImage && (
-                          <div className="h-12 w-16 shrink-0 overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800">
+                          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800">
                             <img
                               src={getFullImageUrl(blog.mainImage, 'general')}
                               alt={blog.title}
@@ -495,48 +508,33 @@ export default function BlogsManagementPage() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="px-3 py-2.5 sm:px-4 sm:py-3">
-                      <div className="flex items-center justify-center gap-2">
-                        {blog.author?.avatar ? (
-                          <div className="h-6 w-6 shrink-0 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
-                            <img
-                              src={getFullImageUrl(blog.author.avatar, 'avatar')}
-                              alt={blog.author.name}
-                              className="h-full w-full object-cover"
-                            />
-                          </div>
-                        ) : (
-                          <div className="h-6 w-6 shrink-0 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
-                            <HiOutlineUser className="h-3 w-3 text-gray-500 dark:text-gray-400" />
-                          </div>
+                    <TableCell className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
+                      <span className={`inline-flex px-2 py-1 text-[10px] font-medium rounded ${getCategoryBadgeClass(blog.category)}`}>
+                        {blog.category.replace(/_/g, ' ')}
+                      </span>
+                    </TableCell>
+                    <TableCell className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
+                      <div className="flex flex-col items-center gap-1">
+                        <span className={`inline-flex px-2 py-1 text-[10px] sm:text-xs font-medium rounded-full ${getApprovalBadgeClass(blog.approvalStatus || 'PENDING')}`}>
+                          {blog.approvalStatus === 'APPROVED' && '✓ Approved'}
+                          {blog.approvalStatus === 'REJECTED' && '✗ Rejected'}
+                          {(!blog.approvalStatus || blog.approvalStatus === 'PENDING') && '⏳ Pending Review'}
+                        </span>
+                        {blog.approvalStatus === 'REJECTED' && blog.rejectionReason && (
+                          <button
+                            onClick={() => {
+                              setRejectionDetails({ id: blog.id, title: blog.title, reason: blog.rejectionReason || 'No reason provided' });
+                              setShowRejectionModal(true);
+                            }}
+                            className="text-[10px] text-error-600 dark:text-error-400 hover:underline"
+                            title="Click to see rejection reason"
+                          >
+                            View Reason
+                          </button>
                         )}
-                        <div className="min-w-0">
-                          <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
-                            {blog.author?.name || 'Unknown'}
-                          </p>
-                          {blog.author?.role && (
-                            <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">
-                              {blog.author.role}
-                            </p>
-                          )}
-                        </div>
                       </div>
                     </TableCell>
                     <TableCell className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
-                      {blog.featured ? (
-                        <span className="inline-flex items-center justify-center text-yellow-600 dark:text-yellow-500" title="Featured">
-                          <HiOutlineStar className="h-5 w-5 fill-current" />
-                        </span>
-                      ) : (
-                        <span className="text-gray-400 dark:text-gray-600">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
-                      <span className={`inline-flex px-2 py-1 text-[10px] sm:text-xs font-medium rounded-full ${getStatusBadgeClass(blog.status)}`}>
-                        {blog.status === 'PUBLISHED' ? 'Published' : 'Draft'}
-                      </span>
-                    </TableCell>
-                    <TableCell className="px-3 py-2.5 sm:px-4 sm:py-3">
                       <div className="flex items-center justify-center gap-1">
                         <HiOutlineCalendar className="h-3 w-3 text-gray-400" />
                         <span className="text-xs text-gray-600 dark:text-gray-400">
@@ -560,7 +558,7 @@ export default function BlogsManagementPage() {
                         >
                           <HiOutlinePencilAlt className="h-4 w-4" />
                         </button>
-                        <button
+                        {/* <button
                           onClick={() => handleTogglePublish(blog.id, blog.status, blog.title)}
                           className={`inline-flex items-center justify-center rounded-lg p-1.5 transition-colors ${
                             blog.status === 'PUBLISHED'
@@ -574,7 +572,7 @@ export default function BlogsManagementPage() {
                           ) : (
                             <HiOutlineCheckCircle className="h-4 w-4" />
                           )}
-                        </button>
+                        </button> */}
                         <button
                           onClick={() => openDeleteModal(blog.id, blog.title)}
                           className="inline-flex items-center justify-center rounded-lg p-1.5 text-error-600 transition-colors hover:bg-error-100 dark:text-error-500 dark:hover:bg-error-500/10"
@@ -870,6 +868,72 @@ export default function BlogsManagementPage() {
                 </button>
               </div>
             </article>
+          </div>
+        </div>
+      )}
+
+      {/* Rejection Reason Modal */}
+      {showRejectionModal && rejectionDetails && (
+        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-md">
+            {/* Header */}
+            <div className="px-6 py-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-800">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-error-100 dark:bg-error-500/15">
+                  <HiOutlineXCircle className="h-6 w-6 text-error-600 dark:text-error-500" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Blog Rejected
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowRejectionModal(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              >
+                <HiOutlineX className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6">
+              <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+                {rejectionDetails.title}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                This blog post was rejected by an administrator.
+              </p>
+              <div className="rounded-lg bg-error-50 dark:bg-error-950/20 border border-error-200 dark:border-error-900/50 p-4">
+                <p className="text-xs font-medium text-error-900 dark:text-error-100 mb-1">
+                  Rejection Reason:
+                </p>
+                <p className="text-sm text-error-800 dark:text-error-200">
+                  {rejectionDetails.reason}
+                </p>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
+                You can edit your blog post and resubmit it for review.
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl flex justify-end gap-3">
+              <button
+                onClick={() => setShowRejectionModal(false)}
+                className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  setShowRejectionModal(false);
+                  handleEditBlog(rejectionDetails.id);
+                }}
+                className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-4 text-sm bg-brand-600 text-white hover:bg-brand-700 shadow-lg shadow-brand-600/30"
+              >
+                <HiOutlinePencilAlt className="h-4 w-4" />
+                Edit & Resubmit
+              </button>
+            </div>
           </div>
         </div>
       )}

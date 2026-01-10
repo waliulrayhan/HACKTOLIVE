@@ -23,11 +23,19 @@ export class BlogService {
     // If user is provided, use their ID as authorId
     const authorId = user ? user.id : createBlogDto.authorId;
 
+    // Fetch user role to determine approval workflow
+    const userRole = user ? user.role : null;
+    
+    // Only STUDENT role requires approval - INSTRUCTOR and ADMIN can publish directly
+    const requiresApproval = userRole === 'STUDENT';
+
     return this.prisma.blog.create({
       data: {
         ...createBlogDto,
         authorId,
         tags: tagsString,
+        approvalStatus: requiresApproval ? 'PENDING' : 'APPROVED',
+        status: requiresApproval ? 'DRAFT' : (createBlogDto.status || 'PUBLISHED'),
       },
       include: {
         author: {
@@ -231,6 +239,10 @@ export class BlogService {
   }
 
   async update(id: string, updateBlogDto: UpdateBlogDto) {
+    console.log('=== BLOG UPDATE START ===');
+    console.log('Blog ID:', id);
+    console.log('Update DTO:', JSON.stringify(updateBlogDto, null, 2));
+    
     // Check if blog exists
     const existingBlog = await this.prisma.blog.findUnique({
       where: { id },
@@ -239,6 +251,9 @@ export class BlogService {
     if (!existingBlog) {
       throw new NotFoundException('Blog not found');
     }
+
+    console.log('Existing blog approvalStatus:', existingBlog.approvalStatus);
+    console.log('Existing blog status:', existingBlog.status);
 
     // If slug is being updated, check for conflicts
     if (updateBlogDto.slug && updateBlogDto.slug !== existingBlog.slug) {
@@ -258,6 +273,45 @@ export class BlogService {
 
     if (updateBlogDto.tags) {
       data.tags = JSON.stringify(updateBlogDto.tags);
+    }
+
+    console.log('Data after spreading updateBlogDto:', JSON.stringify(data, null, 2));
+
+    // Fetch author to check their role
+    const author = await this.prisma.user.findUnique({
+      where: { id: existingBlog.authorId },
+      select: { role: true },
+    });
+
+    const isStudent = author?.role === 'STUDENT';
+    console.log('Author role:', author?.role, '| Is student:', isStudent);
+
+    // Only apply approval workflow for STUDENT role
+    if (isStudent) {
+      // If blog was rejected, reset to pending status for re-approval
+      if (existingBlog.approvalStatus === 'REJECTED') {
+        console.log('🔄 RESETTING REJECTED BLOG TO PENDING (Student)');
+        data.approvalStatus = 'PENDING';
+        data.status = 'DRAFT';
+        data.rejectionReason = null;
+        data.approvedAt = null;
+        data.approvedBy = null;
+        console.log('Data after reset:', JSON.stringify(data, null, 2));
+      }
+      
+      // Also reset if blog was approved and is being edited (for resubmission)
+      else if (existingBlog.approvalStatus === 'APPROVED' || existingBlog.approvalStatus === 'PENDING') {
+        console.log('🔄 KEEPING AS PENDING FOR RE-APPROVAL (Student)');
+        // Keep as PENDING for re-approval
+        data.approvalStatus = 'PENDING';
+        data.status = 'DRAFT';
+      }
+    } else {
+      console.log('✅ NO APPROVAL REQUIRED (Instructor/Admin)');
+      // For INSTRUCTOR and ADMIN, keep their existing approval status or set to APPROVED
+      if (!data.approvalStatus) {
+        data.approvalStatus = 'APPROVED';
+      }
     }
 
     return this.prisma.blog.update({
@@ -619,7 +673,7 @@ export class BlogService {
   }
 
   async getBlogStats() {
-    const [total, published, draft, archived, totalViews] = await Promise.all([
+    const [total, published, draft, archived, totalViews, pending, approved, rejected] = await Promise.all([
       this.prisma.blog.count(),
       this.prisma.blog.count({ where: { status: 'PUBLISHED' } }),
       this.prisma.blog.count({ where: { status: 'DRAFT' } }),
@@ -629,6 +683,9 @@ export class BlogService {
           views: true,
         },
       }),
+      this.prisma.blog.count({ where: { approvalStatus: 'PENDING' } }),
+      this.prisma.blog.count({ where: { approvalStatus: 'APPROVED' } }),
+      this.prisma.blog.count({ where: { approvalStatus: 'REJECTED' } }),
     ]);
 
     return {
@@ -637,6 +694,111 @@ export class BlogService {
       draft,
       archived,
       totalViews: totalViews._sum.views || 0,
+      pending,
+      approved,
+      rejected,
+    };
+  }
+
+  async approveBlog(blogId: string, adminId: string) {
+    const blog = await this.prisma.blog.findUnique({
+      where: { id: blogId },
+    });
+
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    return this.prisma.blog.update({
+      where: { id: blogId },
+      data: {
+        approvalStatus: 'APPROVED',
+        approvedAt: new Date(),
+        approvedBy: adminId,
+        status: 'PUBLISHED', // Auto-publish on approval
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
+  async rejectBlog(blogId: string, adminId: string, reason?: string) {
+    const blog = await this.prisma.blog.findUnique({
+      where: { id: blogId },
+    });
+
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    return this.prisma.blog.update({
+      where: { id: blogId },
+      data: {
+        approvalStatus: 'REJECTED',
+        approvedBy: adminId,
+        rejectionReason: reason || 'No reason provided',
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getPendingBlogs(page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+
+    const [blogs, total] = await Promise.all([
+      this.prisma.blog.findMany({
+        where: { approvalStatus: 'PENDING' },
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true,
+            },
+          },
+          _count: {
+            select: {
+              comments: true,
+              likes: true,
+            },
+          },
+        },
+      }),
+      this.prisma.blog.count({ where: { approvalStatus: 'PENDING' } }),
+    ]);
+
+    const blogsWithParsedTags = blogs.map(blog => ({
+      ...blog,
+      tags: JSON.parse(blog.tags),
+    }));
+
+    return {
+      data: blogsWithParsedTags,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
     };
   }
 }

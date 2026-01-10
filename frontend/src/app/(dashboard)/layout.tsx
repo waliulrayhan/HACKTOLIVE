@@ -102,7 +102,10 @@ export default function DashboardLayout({
           {
             icon: <DocsIcon />,
             name: "Blogs",
-            path: "/admin/blogs",
+            subItems: [
+              { icon: <DocsIcon />, name: "All Blogs", path: "/admin/blogs" },
+              { icon: <CheckCircleIcon />, name: "Pending Approvals", path: "/admin/blogs/pending" },
+            ],
           },
           {
             icon: <FiShoppingCart className="w-5 h-5" />,

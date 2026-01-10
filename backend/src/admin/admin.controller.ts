@@ -99,6 +99,49 @@ export class AdminController {
     return this.adminService.deleteCourse(courseId);
   }
 
+  // Blog Management
+  @Get('blogs/pending')
+  getPendingBlogs(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.adminService.getPendingBlogs(
+      page ? parseInt(page) : 1,
+      limit ? parseInt(limit) : 10,
+    );
+  }
+
+  @Get('blogs')
+  getAllBlogs(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('approvalStatus') approvalStatus?: string,
+  ) {
+    return this.adminService.getAllBlogs({
+      page: page ? parseInt(page) : 1,
+      limit: limit ? parseInt(limit) : 10,
+      approvalStatus,
+    });
+  }
+
+  @Post('blogs/:blogId/approve')
+  approveBlog(@Param('blogId') blogId: string, @Body() body: any) {
+    return this.adminService.approveBlog(blogId, body.adminId);
+  }
+
+  @Post('blogs/:blogId/reject')
+  rejectBlog(
+    @Param('blogId') blogId: string,
+    @Body() body: { adminId: string; reason?: string },
+  ) {
+    return this.adminService.rejectBlog(blogId, body.adminId, body.reason);
+  }
+
+  @Delete('blogs/:blogId')
+  deleteBlog(@Param('blogId') blogId: string) {
+    return this.adminService.deleteBlog(blogId);
+  }
+
   // Analytics
   @Get('analytics/enrollments')
   getEnrollmentStats() {

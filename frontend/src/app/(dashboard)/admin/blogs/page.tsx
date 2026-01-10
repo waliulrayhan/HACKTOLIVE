@@ -54,6 +54,8 @@ interface Blog {
   tags?: string[];
   featured: boolean;
   status: string;
+  approvalStatus?: string;
+  rejectionReason?: string;
   publishedAt?: string;
   createdAt: string;
   updatedAt: string;
@@ -306,9 +308,9 @@ export default function BlogsManagementPage() {
               <HiOutlineCheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-success-600 dark:text-success-500" />
             </div>
             <div>
-              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Published</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Approved</p>
               <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">
-                {allBlogs.filter(b => b.status === 'PUBLISHED').length}
+                {allBlogs.filter(b => b.approvalStatus === 'APPROVED').length}
               </p>
             </div>
           </div>
@@ -316,13 +318,13 @@ export default function BlogsManagementPage() {
 
         <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-500/15">
-              <HiOutlineDocumentText className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600 dark:text-yellow-500" />
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-warning-100 dark:bg-warning-500/15">
+              <HiOutlineClock className="h-4 w-4 sm:h-5 sm:w-5 text-warning-600 dark:text-warning-500" />
             </div>
             <div>
-              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Drafts</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Pending</p>
               <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">
-                {allBlogs.filter(b => b.status === 'DRAFT').length}
+                {allBlogs.filter(b => (b.approvalStatus || 'PENDING') === 'PENDING').length}
               </p>
             </div>
           </div>
@@ -330,13 +332,13 @@ export default function BlogsManagementPage() {
 
         <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-500/15">
-              <HiOutlineTag className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-500" />
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-error-100 dark:bg-error-500/15">
+              <HiOutlineXCircle className="h-4 w-4 sm:h-5 sm:w-5 text-error-600 dark:text-error-500" />
             </div>
             <div>
-              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Categories</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Rejected</p>
               <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">
-                {categories.length}
+                {allBlogs.filter(b => b.approvalStatus === 'REJECTED').length}
               </p>
             </div>
           </div>

@@ -468,4 +468,147 @@ export class AdminService {
       return sum + enrollment.course.price;
     }, 0);
   }
+
+  // Blog Management Methods
+  async getPendingBlogs(page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+
+    const [blogs, total] = await Promise.all([
+      this.prisma.blog.findMany({
+        where: { approvalStatus: 'PENDING' },
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true,
+            },
+          },
+          _count: {
+            select: {
+              comments: true,
+              likes: true,
+            },
+          },
+        },
+      }),
+      this.prisma.blog.count({ where: { approvalStatus: 'PENDING' } }),
+    ]);
+
+    const blogsWithParsedTags = blogs.map((blog) => ({
+      ...blog,
+      tags: JSON.parse(blog.tags),
+    }));
+
+    return {
+      data: blogsWithParsedTags,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async getAllBlogs({ page = 1, limit = 10, approvalStatus }: any) {
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (approvalStatus) {
+      where.approvalStatus = approvalStatus;
+    }
+
+    const [blogs, total] = await Promise.all([
+      this.prisma.blog.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true,
+            },
+          },
+          _count: {
+            select: {
+              comments: true,
+              likes: true,
+            },
+          },
+        },
+      }),
+      this.prisma.blog.count({ where }),
+    ]);
+
+    const blogsWithParsedTags = blogs.map((blog) => ({
+      ...blog,
+      tags: JSON.parse(blog.tags),
+    }));
+
+    return {
+      data: blogsWithParsedTags,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async approveBlog(blogId: string, adminId: string) {
+    return this.prisma.blog.update({
+      where: { id: blogId },
+      data: {
+        approvalStatus: 'APPROVED',
+        approvedAt: new Date(),
+        approvedBy: adminId,
+        status: 'PUBLISHED',
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
+  async rejectBlog(blogId: string, adminId: string, reason?: string) {
+    return this.prisma.blog.update({
+      where: { id: blogId },
+      data: {
+        approvalStatus: 'REJECTED',
+        approvedBy: adminId,
+        rejectionReason: reason || 'No reason provided',
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
+  async deleteBlog(blogId: string) {
+    return this.prisma.blog.delete({
+      where: { id: blogId },
+    });
+  }
 }
