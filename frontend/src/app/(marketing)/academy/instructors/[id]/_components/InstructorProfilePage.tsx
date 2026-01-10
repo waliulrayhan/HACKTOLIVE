@@ -47,6 +47,7 @@ import {
   FiUser
 } from "react-icons/fi";
 import academyService from "@/lib/academy-service";
+import { getFullImageUrl } from "@/lib/image-utils";
 
 interface InstructorProfilePageProps {
   id: string;
@@ -143,639 +144,191 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
 
   return (
     <Box bg={bgColor} minH="100vh">
-      {/* Hero Section with Profile Header */}
-      <Box bg={heroBg} pt={{ base: "120px", md: "140px" }} pb={0}>
+      {/* Hero Section - Clean Header */}
+      <Box
+        bg={useColorModeValue("gray.900", "gray.950")}
+        pt={{ base: "120px", md: "140px" }}
+        pb={{ base: "80px", md: "100px" }}
+      >
         <Container maxW="container.xl">
-          <SimpleGrid
-            columns={{ base: 1, lg: 2 }}
-            spacing={{ base: 8, lg: 12 }}
-            alignItems="center"
-          >
-            {/* Profile Image */}
+          <VStack spacing={8}>
+            {/* Instructor Avatar and Name */}
             <FallInPlace>
-              <Box position="relative">
-                <Box
-                  position="relative"
-                  borderRadius="2xl"
-                  overflow="hidden"
-                  boxShadow="2xl"
-                >
-                  {instructor.avatar ? (
-                    <Image
-                      src={instructor.avatar}
-                      alt={instructor.name}
-                      width={600}
-                      height={600}
-                      style={{
-                        width: "100%",
-                        height: "auto",
-                        display: "block",
-                      }}
-                    />
-                  ) : (
+              <VStack spacing={6} textAlign="center">
+                <Box position="relative">
+                  {instructor.user?.avatar ? (
                     <Box
-                      w="100%"
-                      h="600px"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      bg={useColorModeValue('gray.200', 'gray.700')}
+                      position="relative"
+                      w={{ base: "150px", md: "200px" }}
+                      h={{ base: "150px", md: "200px" }}
+                      borderRadius="full"
+                      overflow="hidden"
+                      borderWidth="4px"
+                      borderColor="green.500"
+                      boxShadow="xl"
                     >
-                      <Icon as={FiUser} boxSize="200px" color={useColorModeValue('gray.500', 'gray.400')} />
+                      <Image
+                        src={getFullImageUrl(instructor.user.avatar, 'avatar')}
+                        alt={instructor.user?.name || 'Instructor'}
+                        fill
+                        style={{ objectFit: "cover" }}
+                      />
                     </Box>
+                  ) : (
+                    <Flex
+                      w={{ base: "150px", md: "200px" }}
+                      h={{ base: "150px", md: "200px" }}
+                      borderRadius="full"
+                      bg={useColorModeValue('gray.700', 'gray.800')}
+                      borderWidth="4px"
+                      borderColor="green.500"
+                      align="center"
+                      justify="center"
+                    >
+                      <Icon as={FiUser} boxSize={{ base: "60px", md: "80px" }} color="gray.500" />
+                    </Flex>
                   )}
                 </Box>
-                {/* Floating Rating Badge */}
-                <Box
-                  position="absolute"
-                  top={6}
-                  right={6}
-                  bg="white"
-                  _dark={{ bg: "gray.900" }}
-                  px={4}
-                  py={3}
-                  borderRadius="xl"
-                  boxShadow="xl"
-                >
-                  <VStack spacing={1}>
-                    <HStack spacing={2}>
-                      <Icon as={FiStar} color="yellow.400" boxSize={5} />
-                      <Text fontSize="2xl" fontWeight="bold">
-                        {instructor.rating}
-                      </Text>
-                    </HStack>
-                    <Text fontSize="xs" color={textMuted} fontWeight="medium">
-                      Rating
-                    </Text>
-                  </VStack>
-                </Box>
-              </Box>
-            </FallInPlace>
 
-            {/* Profile Info */}
-            <FallInPlace delay={0.1}>
-              <VStack align="start" spacing={6}>
-                <Badge
-                  colorScheme="green"
-                  fontSize="sm"
-                  px={4}
-                  py={2}
-                  borderRadius="full"
-                  textTransform="uppercase"
-                  fontWeight="bold"
-                  letterSpacing="wide"
-                >
-                  Expert Instructor
-                </Badge>
-
-                <VStack align="start" spacing={3}>
+                <VStack spacing={3}>
                   <Heading
                     fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}
                     fontWeight="extrabold"
+                    color="white"
                     lineHeight="1.1"
                   >
-                    {instructor.name}
+                    {instructor.user?.name || 'Instructor'}
                   </Heading>
-                  <Text
-                    fontSize={{ base: "lg", md: "xl" }}
-                    color={accentColor}
-                    fontWeight="semibold"
-                  >
-                    {instructor.experience}
-                  </Text>
-                </VStack>
-
-                <Text fontSize="lg" color={textMuted} lineHeight="tall">
-                  {instructor.bio}
-                </Text>
-
-                {/* Contact Information */}
-                {(instructor.user?.email || instructor.user?.phone || instructor.user?.city) && (
-                  <VStack align="start" spacing={3} pt={2}>
-                    {instructor.user?.email && (
-                      <HStack spacing={3} color={textMuted}>
-                        <Icon as={FiMail} boxSize={5} />
-                        <Link href={`mailto:${instructor.user.email}`} fontSize="md">
-                          {instructor.user.email}
-                        </Link>
-                      </HStack>
-                    )}
-                    {instructor.user?.phone && (
-                      <HStack spacing={3} color={textMuted}>
-                        <Icon as={FiPhone} boxSize={5} />
-                        <Link href={`tel:${instructor.user.phone}`} fontSize="md">
-                          {instructor.user.phone}
-                        </Link>
-                      </HStack>
-                    )}
-                    {(instructor.user?.city || instructor.user?.country) && (
-                      <HStack spacing={3} color={textMuted}>
-                        <Icon as={FiMapPin} boxSize={5} />
-                        <Text fontSize="md">
-                          {[instructor.user?.city, instructor.user?.country].filter(Boolean).join(", ")}
-                        </Text>
-                      </HStack>
-                    )}
-                  </VStack>
-                )}
-
-                {/* Social Links - Enhanced with all platforms */}
-                {(instructor.linkedinUrl || 
-                  instructor.twitterUrl || 
-                  instructor.githubUrl || 
-                  instructor.websiteUrl ||
-                  instructor.user?.facebookUrl ||
-                  instructor.user?.instagramUrl) && (
-                  <VStack align="start" spacing={3} pt={2}>
-                    <Text fontSize="sm" fontWeight="semibold" color={textMuted} textTransform="uppercase">
-                      Connect with me
+                  
+                  {instructor.user?.bio && (
+                    <Text
+                      fontSize={{ base: "md", md: "lg" }}
+                      color="gray.400"
+                      maxW="2xl"
+                      lineHeight="tall"
+                    >
+                      {instructor.user.bio}
                     </Text>
-                    <Wrap spacing={3}>
-                      {instructor.linkedinUrl && (
-                        <WrapItem>
-                          <Link href={instructor.linkedinUrl} isExternal>
-                            <Button
-                              size="md"
-                              variant="outline"
-                              leftIcon={<Icon as={FiLinkedin} />}
-                              borderRadius="lg"
-                              fontWeight="semibold"
-                            >
-                              LinkedIn
-                            </Button>
-                          </Link>
-                        </WrapItem>
-                      )}
-                      {instructor.twitterUrl && (
-                        <WrapItem>
-                          <Link href={instructor.twitterUrl} isExternal>
-                            <Button
-                              size="md"
-                              variant="outline"
-                              leftIcon={<Icon as={FiTwitter} />}
-                              borderRadius="lg"
-                              fontWeight="semibold"
-                            >
-                              Twitter
-                            </Button>
-                          </Link>
-                        </WrapItem>
-                      )}
-                      {instructor.githubUrl && (
-                        <WrapItem>
-                          <Link href={instructor.githubUrl} isExternal>
-                            <Button
-                              size="md"
-                              variant="outline"
-                              leftIcon={<Icon as={FiGithub} />}
-                              borderRadius="lg"
-                              fontWeight="semibold"
-                            >
-                              GitHub
-                            </Button>
-                          </Link>
-                        </WrapItem>
-                      )}
-                      {instructor.websiteUrl && (
-                        <WrapItem>
-                          <Link href={instructor.websiteUrl} isExternal>
-                            <Button
-                              size="md"
-                              variant="outline"
-                              leftIcon={<Icon as={FiGlobe} />}
-                              borderRadius="lg"
-                              fontWeight="semibold"
-                            >
-                              Website
-                            </Button>
-                          </Link>
-                        </WrapItem>
-                      )}
-                      {instructor.user?.facebookUrl && (
-                        <WrapItem>
-                          <Link href={instructor.user.facebookUrl} isExternal>
-                            <Button
-                              size="md"
-                              variant="outline"
-                              leftIcon={<Icon as={FiFacebook} />}
-                              borderRadius="lg"
-                              fontWeight="semibold"
-                            >
-                              Facebook
-                            </Button>
-                          </Link>
-                        </WrapItem>
-                      )}
-                      {instructor.user?.instagramUrl && (
-                        <WrapItem>
-                          <Link href={instructor.user.instagramUrl} isExternal>
-                            <Button
-                              size="md"
-                              variant="outline"
-                              leftIcon={<Icon as={FiInstagram} />}
-                              borderRadius="lg"
-                              fontWeight="semibold"
-                            >
-                              Instagram
-                            </Button>
-                          </Link>
-                        </WrapItem>
-                      )}
-                    </Wrap>
-                  </VStack>
-                )}
-              </VStack>
-            </FallInPlace>
-          </SimpleGrid>
-        </Container>
-      </Box>
-
-      {/* Stats Section - Separated */}
-      <Box bg={heroBg} pt={12} pb={{ base: "60px", md: "80px" }}>
-        <Container maxW="container.xl">
-          <FallInPlace delay={0.2}>
-            <SimpleGrid
-              columns={{ base: 2, md: 4 }}
-              spacing={6}
-              p={8}
-              bg={useColorModeValue(
-                "linear-gradient(135deg, #48BB78 0%, #38A169 100%)",
-                "linear-gradient(135deg, #2F855A 0%, #276749 100%)"
-              )}
-              borderRadius="2xl"
-              boxShadow="xl"
-            >
-              <VStack spacing={2}>
-                <Flex
-                  w="56px"
-                  h="56px"
-                  borderRadius="xl"
-                  bg="whiteAlpha.300"
-                  align="center"
-                  justify="center"
-                >
-                  <Icon as={FiStar} color="white" boxSize={7} />
-                </Flex>
-                <Text fontSize="3xl" fontWeight="bold" color="white">
-                  {instructor.rating}
-                </Text>
-                <Text fontSize="sm" color="whiteAlpha.900" fontWeight="medium">
-                  Instructor Rating
-                </Text>
-              </VStack>
-
-              <VStack spacing={2}>
-                <Flex
-                  w="56px"
-                  h="56px"
-                  borderRadius="xl"
-                  bg="whiteAlpha.300"
-                  align="center"
-                  justify="center"
-                >
-                  <Icon as={FiUsers} color="white" boxSize={7} />
-                </Flex>
-                <Text fontSize="3xl" fontWeight="bold" color="white">
-                  {(instructor.totalStudents / 1000).toFixed(0)}K+
-                </Text>
-                <Text fontSize="sm" color="whiteAlpha.900" fontWeight="medium">
-                  Students Taught
-                </Text>
-              </VStack>
-
-              <VStack spacing={2}>
-                <Flex
-                  w="56px"
-                  h="56px"
-                  borderRadius="xl"
-                  bg="whiteAlpha.300"
-                  align="center"
-                  justify="center"
-                >
-                  <Icon as={FiBook} color="white" boxSize={7} />
-                </Flex>
-                <Text fontSize="3xl" fontWeight="bold" color="white">
-                  {instructor.totalCourses}
-                </Text>
-                <Text fontSize="sm" color="whiteAlpha.900" fontWeight="medium">
-                  Total Courses
-                </Text>
-              </VStack>
-
-              <VStack spacing={2}>
-                <Flex
-                  w="56px"
-                  h="56px"
-                  borderRadius="xl"
-                  bg="whiteAlpha.300"
-                  align="center"
-                  justify="center"
-                >
-                  <Icon as={FiAward} color="white" boxSize={7} />
-                </Flex>
-                <Text fontSize="3xl" fontWeight="bold" color="white">
-                  {courses.length}
-                </Text>
-                <Text fontSize="sm" color="whiteAlpha.900" fontWeight="medium">
-                  Available Now
-                </Text>
-              </VStack>
-            </SimpleGrid>
-          </FallInPlace>
-        </Container>
-      </Box>
-
-      {/* Skills & Expertise Section - Separated */}
-      <Box py={{ base: "60px", md: "80px" }} bg={bgColor}>
-        <Container maxW="container.xl">
-          <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={10}>
-            {/* Skills Section */}
-            <VStack spacing={8} align="stretch">
-              <FallInPlace>
-                <VStack spacing={3} align="start">
-                  <Badge
-                    colorScheme="green"
-                    fontSize="sm"
-                    px={4}
-                    py={2}
-                    borderRadius="full"
-                  >
-                    Skills & Expertise
-                  </Badge>
-                  <Heading fontSize={{ base: "2xl", md: "3xl" }}>
-                    Technical Expertise
-                  </Heading>
-                  <Text fontSize="md" color={textMuted}>
-                    Specialized in cutting-edge cybersecurity techniques
-                  </Text>
+                  )}
                 </VStack>
-              </FallInPlace>
 
-              <FallInPlace delay={0.1}>
-                <Box
-                  w="full"
-                  bg={cardBg}
-                  p={6}
-                  borderRadius="xl"
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                >
-                  <Wrap spacing={3}>
-                    {instructor.skills.map((skill, index) => (
-                      <WrapItem key={index}>
-                        <Badge
-                          colorScheme="green"
-                          fontSize="sm"
-                          px={4}
-                          py={2}
-                          borderRadius="lg"
-                          fontWeight="semibold"
-                        >
-                          {skill}
-                        </Badge>
-                      </WrapItem>
-                    ))}
-                  </Wrap>
-                </Box>
-              </FallInPlace>
-            </VStack>
-
-            {/* About / Profile Details Section */}
-            <VStack spacing={8} align="stretch">
-              <FallInPlace>
-                <VStack spacing={3} align="start">
-                  <Badge
-                    colorScheme="green"
-                    fontSize="sm"
-                    px={4}
-                    py={2}
-                    borderRadius="full"
-                  >
-                    About
-                  </Badge>
-                  <Heading fontSize={{ base: "2xl", md: "3xl" }}>
-                    Profile Details
-                  </Heading>
-                  <Text fontSize="md" color={textMuted}>
-                    Get to know {instructor.name.split(" ")[0]} better
-                  </Text>
-                </VStack>
-              </FallInPlace>
-
-              <FallInPlace delay={0.1}>
-                <Box
-                  w="full"
-                  bg={cardBg}
-                  p={6}
-                  borderRadius="xl"
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                >
-                  <VStack spacing={4} align="stretch">
-                    {instructor.bio && (
-                      <Box>
-                        <Text fontSize="sm" fontWeight="semibold" color={textMuted} mb={2}>
-                          Bio
-                        </Text>
-                        <Text fontSize="md" lineHeight="tall">
-                          {instructor.bio}
-                        </Text>
-                      </Box>
-                    )}
-                    
-                    <Divider />
-                    
-                    {instructor.experience && (
-                      <HStack justify="space-between">
-                        <Text fontSize="sm" fontWeight="semibold" color={textMuted}>
-                          Experience
-                        </Text>
-                        <Badge colorScheme="blue" fontSize="sm" px={3} py={1}>
-                          {instructor.experience}
-                        </Badge>
-                      </HStack>
-                    )}
-                    
-                    {instructor.user?.email && (
-                      <>
-                        <Divider />
-                        <HStack justify="space-between">
-                          <Text fontSize="sm" fontWeight="semibold" color={textMuted}>
-                            Email
-                          </Text>
-                          <Link href={`mailto:${instructor.user.email}`} color={accentColor}>
-                            {instructor.user.email}
-                          </Link>
-                        </HStack>
-                      </>
-                    )}
-                    
-                    {instructor.user?.phone && (
-                      <>
-                        <Divider />
-                        <HStack justify="space-between">
-                          <Text fontSize="sm" fontWeight="semibold" color={textMuted}>
-                            Phone
-                          </Text>
-                          <Link href={`tel:${instructor.user.phone}`} color={accentColor}>
-                            {instructor.user.phone}
-                          </Link>
-                        </HStack>
-                      </>
-                    )}
-                    
-                    {(instructor.user?.city || instructor.user?.country) && (
-                      <>
-                        <Divider />
-                        <HStack justify="space-between">
-                          <Text fontSize="sm" fontWeight="semibold" color={textMuted}>
-                            Location
-                          </Text>
-                          <Text fontSize="md">
-                            {[instructor.user?.city, instructor.user?.country]
-                              .filter(Boolean)
-                              .join(", ")}
-                          </Text>
-                        </HStack>
-                      </>
-                    )}
-                    
-                    <Divider />
-                    
-                    <HStack justify="space-between">
-                      <Text fontSize="sm" fontWeight="semibold" color={textMuted}>
-                        Member Since
-                      </Text>
-                      <Text fontSize="md">
-                        {instructor.createdAt
-                          ? new Date(instructor.createdAt).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "long",
-                            })
-                          : "N/A"}
+                {/* Contact & Location */}
+                <HStack spacing={6} flexWrap="wrap" justify="center" pt={4}>
+                  {(instructor.user?.city || instructor.user?.country) && (
+                    <HStack spacing={2} color="gray.400">
+                      <Icon as={FiMapPin} boxSize={4} />
+                      <Text fontSize="sm">
+                        {[instructor.user?.city, instructor.user?.country].filter(Boolean).join(", ")}
                       </Text>
                     </HStack>
-                  </VStack>
-                </Box>
-              </FallInPlace>
-            </VStack>
-          </SimpleGrid>
-        </Container>
-      </Box>
+                  )}
+                  {instructor.user?.email && (
+                    <HStack spacing={2} color="gray.400">
+                      <Icon as={FiMail} boxSize={4} />
+                      <Link href={`mailto:${instructor.user.email}`} fontSize="sm">
+                        {instructor.user.email}
+                      </Link>
+                    </HStack>
+                  )}
+                </HStack>
 
-      {/* Experience Highlights Section - Separated */}
-      <Box py={{ base: "60px", md: "80px" }} bg={cardBg}>
-        <Container maxW="container.xl">
-          <VStack spacing={10}>
-            <FallInPlace>
-              <VStack spacing={3} textAlign="center">
-                <Badge
-                  colorScheme="green"
-                  fontSize="sm"
-                  px={4}
-                  py={2}
-                  borderRadius="full"
-                >
-                  Professional Background
-                </Badge>
-                <Heading fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}>
-                  Experience & Achievements
-                </Heading>
+                {/* Social Links */}
+                {(instructor.user?.linkedinUrl || 
+                  instructor.user?.twitterUrl || 
+                  instructor.user?.githubUrl || 
+                  instructor.user?.websiteUrl ||
+                  instructor.user?.facebookUrl ||
+                  instructor.user?.instagramUrl) && (
+                  <Wrap spacing={3} justify="center" pt={4}>
+                    {instructor.user?.linkedinUrl && (
+                      <WrapItem>
+                        <Link href={instructor.user.linkedinUrl} isExternal>
+                          <Icon as={FiLinkedin} boxSize={5} color="gray.400" _hover={{ color: "green.400" }} />
+                        </Link>
+                      </WrapItem>
+                    )}
+                    {instructor.user?.twitterUrl && (
+                      <WrapItem>
+                        <Link href={instructor.user.twitterUrl} isExternal>
+                          <Icon as={FiTwitter} boxSize={5} color="gray.400" _hover={{ color: "green.400" }} />
+                        </Link>
+                      </WrapItem>
+                    )}
+                    {instructor.user?.githubUrl && (
+                      <WrapItem>
+                        <Link href={instructor.user.githubUrl} isExternal>
+                          <Icon as={FiGithub} boxSize={5} color="gray.400" _hover={{ color: "green.400" }} />
+                        </Link>
+                      </WrapItem>
+                    )}
+                    {instructor.user?.websiteUrl && (
+                      <WrapItem>
+                        <Link href={instructor.user.websiteUrl} isExternal>
+                          <Icon as={FiGlobe} boxSize={5} color="gray.400" _hover={{ color: "green.400" }} />
+                        </Link>
+                      </WrapItem>
+                    )}
+                    {instructor.user?.facebookUrl && (
+                      <WrapItem>
+                        <Link href={instructor.user.facebookUrl} isExternal>
+                          <Icon as={FiFacebook} boxSize={5} color="gray.400" _hover={{ color: "green.400" }} />
+                        </Link>
+                      </WrapItem>
+                    )}
+                    {instructor.user?.instagramUrl && (
+                      <WrapItem>
+                        <Link href={instructor.user.instagramUrl} isExternal>
+                          <Icon as={FiInstagram} boxSize={5} color="gray.400" _hover={{ color: "green.400" }} />
+                        </Link>
+                      </WrapItem>
+                    )}
+                  </Wrap>
+                )}
               </VStack>
             </FallInPlace>
 
-            <SimpleGrid
-              columns={{ base: 1, md: 3 }}
-              spacing={8}
-              w="full"
-            >
-              <FallInPlace delay={0.1}>
-                <Box
-                  p={8}
-                  bg={bgColor}
-                  borderRadius="xl"
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  h="full"
-                >
-                  <VStack spacing={4} align="start">
-                    <Flex
-                      w="56px"
-                      h="56px"
-                      borderRadius="xl"
-                      bg={useColorModeValue("blue.100", "blue.900")}
-                      align="center"
-                      justify="center"
-                    >
-                      <Icon as={FiBook} color="blue.500" boxSize={7} />
-                    </Flex>
-                    <Heading size="md">Teaching Excellence</Heading>
-                    <Text color={textMuted} lineHeight="tall">
-                      {instructor.totalCourses}+ years of experience teaching
-                      cybersecurity courses to students worldwide
-                    </Text>
-                  </VStack>
-                </Box>
-              </FallInPlace>
-
-              <FallInPlace delay={0.2}>
-                <Box
-                  p={8}
-                  bg={bgColor}
-                  borderRadius="xl"
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  h="full"
-                >
-                  <VStack spacing={4} align="start">
-                    <Flex
-                      w="56px"
-                      h="56px"
-                      borderRadius="xl"
-                      bg={useColorModeValue("purple.100", "purple.900")}
-                      align="center"
-                      justify="center"
-                    >
-                      <Icon as={FiUsers} color="purple.500" boxSize={7} />
-                    </Flex>
-                    <Heading size="md">Student Success</Heading>
-                    <Text color={textMuted} lineHeight="tall">
-                      Mentored {instructor.totalStudents.toLocaleString()}+ students,
-                      helping them launch successful cybersecurity careers
-                    </Text>
-                  </VStack>
-                </Box>
-              </FallInPlace>
-
-              <FallInPlace delay={0.3}>
-                <Box
-                  p={8}
-                  bg={bgColor}
-                  borderRadius="xl"
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  h="full"
-                >
-                  <VStack spacing={4} align="start">
-                    <Flex
-                      w="56px"
-                      h="56px"
-                      borderRadius="xl"
-                      bg={useColorModeValue("orange.100", "orange.900")}
-                      align="center"
-                      justify="center"
-                    >
-                      <Icon as={FiAward} color="orange.500" boxSize={7} />
-                    </Flex>
-                    <Heading size="md">Industry Recognition</Heading>
-                    <Text color={textMuted} lineHeight="tall">
-                      Industry-recognized expert with certifications from top security
-                      organizations
-                    </Text>
-                  </VStack>
-                </Box>
-              </FallInPlace>
-            </SimpleGrid>
+            {/* Stats Bar */}
+            <FallInPlace delay={0.1}>
+              <SimpleGrid
+                columns={{ base: 2, md: 4 }}
+                spacing={{ base: 6, md: 8 }}
+                w="full"
+                maxW="4xl"
+              >
+                <VStack spacing={1}>
+                  <Text fontSize="3xl" fontWeight="bold" color="white">
+                    {instructor.rating}
+                  </Text>
+                  <Text fontSize="sm" color="gray.500" textTransform="uppercase">
+                    Rating
+                  </Text>
+                </VStack>
+                <VStack spacing={1}>
+                  <Text fontSize="3xl" fontWeight="bold" color="white">
+                    {(instructor.totalStudents / 1000).toFixed(0)}K+
+                  </Text>
+                  <Text fontSize="sm" color="gray.500" textTransform="uppercase">
+                    Students
+                  </Text>
+                </VStack>
+                <VStack spacing={1}>
+                  <Text fontSize="3xl" fontWeight="bold" color="white">
+                    {instructor.totalCourses}
+                  </Text>
+                  <Text fontSize="sm" color="gray.500" textTransform="uppercase">
+                    Courses
+                  </Text>
+                </VStack>
+                <VStack spacing={1}>
+                  <Text fontSize="3xl" fontWeight="bold" color="white">
+                    {reviews.length}
+                  </Text>
+                  <Text fontSize="sm" color="gray.500" textTransform="uppercase">
+                    Reviews
+                  </Text>
+                </VStack>
+              </SimpleGrid>
+            </FallInPlace>
           </VStack>
         </Container>
       </Box>
@@ -796,7 +349,7 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
                   Available Courses
                 </Badge>
                 <Heading fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}>
-                  Courses by {instructor.name.split(" ")[0]}
+                  Courses by {instructor.user?.name?.split(" ")[0] || 'Instructor'}
                 </Heading>
                 <Text fontSize={{ base: "md", md: "lg" }} color={textMuted} maxW="2xl">
                   Explore comprehensive courses designed to take you from beginner to expert
@@ -835,7 +388,7 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
                     What Students Say
                   </Heading>
                   <Text fontSize={{ base: "md", md: "lg" }} color={textMuted} maxW="2xl">
-                    Real feedback from students who learned from {instructor.name.split(" ")[0]}
+                    Real feedback from students who learned from {instructor.user?.name?.split(" ")[0] || 'the instructor'}
                   </Text>
                 </VStack>
               </FallInPlace>
@@ -885,8 +438,8 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
         </Box>
       )}
 
-      {/* CTA Section - Final Separated */}
-      <Box py={{ base: "60px", md: "80px" }} bg={cardBg}>
+      {/* CTA Section */}
+      <Box py={{ base: "60px", md: "80px" }} bg={bgColor}>
         <Container maxW="container.xl">
           <FallInPlace>
             <Box
@@ -897,15 +450,11 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
               p={{ base: 12, md: 16 }}
               borderRadius="2xl"
               textAlign="center"
-              position="relative"
-              overflow="hidden"
             >
-              <VStack spacing={6} position="relative" zIndex={1}>
-                <Icon as={FiTrendingUp} color="white" boxSize={12} />
+              <VStack spacing={6}>
                 <Heading
                   fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}
                   color="white"
-                  maxW="3xl"
                 >
                   Ready to Start Learning?
                 </Heading>
@@ -913,10 +462,8 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
                   fontSize={{ base: "md", md: "lg" }}
                   color="whiteAlpha.900"
                   maxW="2xl"
-                  lineHeight="tall"
                 >
-                  Enroll in one of {instructor.name.split(" ")[0]}'s courses and begin
-                  your journey to becoming a cybersecurity expert
+                  Enroll in {instructor.user?.name?.split(" ")[0] || 'this instructor'}'s courses and begin your journey
                 </Text>
                 <HStack spacing={4} pt={4} flexWrap="wrap" justify="center">
                   <ButtonLink
@@ -925,20 +472,8 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
                     bg="white"
                     color="green.600"
                     _hover={{ bg: "gray.100" }}
-                    fontWeight="bold"
                   >
-                    View All Courses
-                  </ButtonLink>
-                  <ButtonLink
-                    href="/signup"
-                    size="lg"
-                    variant="outline"
-                    borderColor="white"
-                    color="white"
-                    _hover={{ bg: "whiteAlpha.200" }}
-                    fontWeight="bold"
-                  >
-                    Get Started Free
+                    Browse All Courses
                   </ButtonLink>
                 </HStack>
               </VStack>

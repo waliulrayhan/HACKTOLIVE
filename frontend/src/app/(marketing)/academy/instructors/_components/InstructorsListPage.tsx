@@ -23,6 +23,7 @@ import { ButtonLink } from "@/components/shared/button-link/button-link";
 import { FiStar, FiUsers, FiBook, FiAward, FiTrendingUp, FiMapPin, FiMail, FiUser } from "react-icons/fi";
 import { Instructor } from "@/types/academy";
 import academyService from "@/lib/academy-service";
+import { getFullImageUrl } from "@/lib/image-utils";
 
 export default function InstructorsListPage() {
   const bgColor = useColorModeValue("gray.50", "gray.900");
@@ -66,14 +67,11 @@ export default function InstructorsListPage() {
               <Badge
                 colorScheme="green"
                 fontSize="sm"
-                px={5}
-                py={2}
+                px={4}
+                py={1}
                 borderRadius="full"
-                textTransform="uppercase"
-                letterSpacing="wider"
-                fontWeight="bold"
               >
-                World-Class Instructors
+                World Class Instructors
               </Badge>
             </FallInPlace>
 
@@ -203,10 +201,10 @@ export default function InstructorsListPage() {
                     >
                       {/* Instructor Image */}
                     <Box position="relative" h="280px" w="full" overflow="hidden">
-                      {instructor.avatar ? (
+                      {instructor.user?.avatar ? (
                         <Image
-                          src={instructor.avatar}
-                          alt={instructor.name}
+                          src={getFullImageUrl(instructor.user.avatar, 'avatar')}
+                          alt={instructor.user?.name || 'Instructor'}
                           fill
                           style={{ objectFit: "cover" }}
                         />
@@ -246,24 +244,26 @@ export default function InstructorsListPage() {
                       {/* Name & Badge */}
                       <Box>
                         <Heading size="md" mb={2}>
-                          {instructor.name}
+                          {instructor.user?.name || 'Instructor'}
                         </Heading>
-                        <Badge
-                          colorScheme="green"
-                          fontSize="xs"
-                          px={3}
-                          py={1}
-                          borderRadius="full"
-                          fontWeight="semibold"
-                        >
-                          {instructor.bio}
-                        </Badge>
+                        {instructor.user?.bio && (
+                          <Badge
+                            colorScheme="green"
+                            fontSize="xs"
+                            px={3}
+                            py={1}
+                            borderRadius="full"
+                            fontWeight="semibold"
+                          >
+                            {instructor.user.bio}
+                          </Badge>
+                        )}
                       </Box>
 
                       {/* Additional Info - Location and Email if available */}
                       {(instructor.user?.city || instructor.user?.country || instructor.user?.email) && (
                         <VStack spacing={2} align="stretch">
-                          {(instructor.user?.city || instructor.user?.country) && (
+                          {/* {(instructor.user?.city || instructor.user?.country) && (
                             <HStack spacing={2}>
                               <Icon as={FiMapPin} color={textMuted} boxSize={4} />
                               <Text fontSize="xs" color={textMuted} noOfLines={1}>
@@ -272,7 +272,7 @@ export default function InstructorsListPage() {
                                   .join(", ")}
                               </Text>
                             </HStack>
-                          )}
+                          )} */}
                           {instructor.user?.email && (
                             <HStack spacing={2}>
                               <Icon as={FiMail} color={textMuted} boxSize={4} />

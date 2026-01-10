@@ -20,37 +20,30 @@ export type LessonType = "video" | "article" | "quiz" | "assignment";
 export interface Instructor {
   id: string;
   userId: string;
-  name: string;
-  avatar: string | null;
-  bio: string | null;
   experience: string | null;
-  skills: string[];
+  skills: string | string[]; // API returns string, but could be parsed to array
   rating: number;
   totalStudents: number;
   totalCourses: number;
-  linkedinUrl?: string | null;
-  twitterUrl?: string | null;
-  githubUrl?: string | null;
-  websiteUrl?: string | null;
   createdAt?: string;
   updatedAt?: string;
   user?: {
     id: string;
     email: string;
     name: string | null;
+    avatar?: string | null;
+    bio?: string | null;
     phone?: string | null;
     city?: string | null;
     country?: string | null;
+    linkedinUrl?: string | null;
+    twitterUrl?: string | null;
+    githubUrl?: string | null;
+    websiteUrl?: string | null;
     facebookUrl?: string | null;
     instagramUrl?: string | null;
   };
-  // Legacy support for old socialLinks format
-  socialLinks?: {
-    linkedin?: string;
-    twitter?: string;
-    github?: string;
-    website?: string;
-  };
+  courses?: any[]; // Course array from the API
 }
 
 export interface CourseResource {
