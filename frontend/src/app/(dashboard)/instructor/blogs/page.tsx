@@ -468,15 +468,19 @@ export default function BlogsManagementPage() {
                   <TableRow key={blog.id} className="group border-b border-gray-100 transition-colors hover:bg-gray-50/50 dark:border-white/5 dark:hover:bg-white/2">
                     <TableCell className="px-3 py-2.5 sm:px-4 sm:py-3">
                       <div className="flex items-start gap-2">
-                        {blog.mainImage && (
-                          <div className="h-12 w-16 shrink-0 overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800">
+                        <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800">
+                          {blog.mainImage ? (
                             <img
                               src={getFullImageUrl(blog.mainImage, 'general')}
                               alt={blog.title}
                               className="h-full w-full object-cover"
                             />
-                          </div>
-                        )}
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center">
+                              <HiOutlineNewspaper className="h-6 w-6 text-gray-400" />
+                            </div>
+                          )}
+                        </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white line-clamp-1 mb-1">
                             {blog.title}
@@ -495,7 +499,7 @@ export default function BlogsManagementPage() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="px-3 py-2.5 sm:px-4 sm:py-3">
+                    <TableCell className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
                       <div className="flex items-center justify-center gap-2">
                         {blog.author?.avatar ? (
                           <div className="h-6 w-6 shrink-0 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
@@ -536,7 +540,7 @@ export default function BlogsManagementPage() {
                         {blog.status === 'PUBLISHED' ? 'Published' : 'Draft'}
                       </span>
                     </TableCell>
-                    <TableCell className="px-3 py-2.5 sm:px-4 sm:py-3">
+                    <TableCell className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
                       <div className="flex items-center justify-center gap-1">
                         <HiOutlineCalendar className="h-3 w-3 text-gray-400" />
                         <span className="text-xs text-gray-600 dark:text-gray-400">
