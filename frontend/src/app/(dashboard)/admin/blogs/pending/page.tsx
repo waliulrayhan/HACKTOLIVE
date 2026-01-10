@@ -668,86 +668,139 @@ export default function PendingBlogsPage() {
 
       {/* View Modal */}
       {showViewModal && selectedBlog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl bg-white shadow-2xl dark:bg-gray-900">
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4 dark:border-white/5 dark:bg-gray-900">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                Blog Preview
-              </h3>
-              <button
-                onClick={() => setShowViewModal(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-              >
-                <HiOutlineX className="h-5 w-5" />
-              </button>
-            </div>
+        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowViewModal(false)}
+              className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 dark:bg-gray-800/90 text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 shadow-lg transition-all"
+            >
+              <HiOutlineX className="h-5 w-5" />
+            </button>
 
-            <div className="p-6">
-              {selectedBlog.mainImage && (
-                <div className="mb-6 overflow-hidden rounded-lg">
-                  <img
-                    src={getFullImageUrl(selectedBlog.mainImage, "general")}
-                    alt={selectedBlog.title}
-                    className="h-64 w-full object-cover"
-                  />
-                </div>
-              )}
+            {/* Blog Content */}
+            <article className="px-6 py-8 sm:px-10 sm:py-12">
+              {/* Image and Header Section */}
+              <div className="flex flex-col sm:flex-row gap-6 mb-6">
+                {/* Blog Hero Image - Left Side */}
+                {selectedBlog.mainImage && (
+                  <div className="flex-shrink-0 w-full sm:w-48 h-48">
+                    <img
+                      src={getFullImageUrl(selectedBlog.mainImage, "general")}
+                      alt={selectedBlog.title}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
+                )}
 
-              <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-                {selectedBlog.title}
-              </h1>
+                {/* Title and Badges - Right Side */}
+                <div className="flex-1">
+                  {/* Badges */}
+                  <div className="mb-4 flex flex-wrap items-center gap-2">
+                    <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${getCategoryBadgeClass(selectedBlog.category)}`}>
+                      {selectedBlog.category.replace(/_/g, " ")}
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full bg-warning-100 text-warning-700 dark:bg-warning-500/15 dark:text-warning-400">
+                      <HiOutlineClock className="h-3 w-3" />
+                      Pending Review
+                    </span>
+                  </div>
 
-              <div className="mb-6 flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                <div className="flex items-center gap-2">
-                  <HiOutlineUser className="h-4 w-4" />
-                  {selectedBlog.author?.name}
+                  {/* Title */}
+                  <h1 className="mb-4 text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
+                    {selectedBlog.title}
+                  </h1>
+
+                  {/* Description */}
+                  {selectedBlog.metadata && (
+                    <p className="text-base text-gray-600 dark:text-gray-400 leading-relaxed">
+                      {selectedBlog.metadata}
+                    </p>
+                  )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <HiOutlineCalendar className="h-4 w-4" />
-                  {formatDate(selectedBlog.createdAt)}
-                </div>
-                <span
-                  className={`px-2 py-1 text-xs rounded ${getCategoryBadgeClass(
-                    selectedBlog.category
-                  )}`}
-                >
-                  {selectedBlog.category.replace(/_/g, " ")}
-                </span>
               </div>
 
-              {selectedBlog.metadata && (
-                <p className="mb-6 text-gray-600 dark:text-gray-400">
-                  {selectedBlog.metadata}
-                </p>
-              )}
+              {/* Author & Meta Info */}
+              <div className="mb-8 flex flex-wrap items-center gap-4 pb-8 border-b border-gray-200 dark:border-gray-800">
+                <div className="flex items-center gap-3">
+                  {selectedBlog.author?.avatar ? (
+                    <img
+                      src={getFullImageUrl(selectedBlog.author.avatar, "avatar")}
+                      alt={selectedBlog.author.name}
+                      className="h-12 w-12 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-800"
+                    />
+                  ) : (
+                    <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center ring-2 ring-gray-100 dark:ring-gray-800">
+                      <HiOutlineUser className="h-6 w-6 text-gray-400" />
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                      {selectedBlog.author?.name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {selectedBlog.author?.email}
+                    </p>
+                  </div>
+                </div>
 
+                <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                  {selectedBlog.readTime && (
+                    <div className="flex items-center gap-1.5">
+                      <HiOutlineClock className="h-4 w-4" />
+                      <span>{selectedBlog.readTime}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-1.5">
+                    <HiOutlineCalendar className="h-4 w-4" />
+                    <span>{formatDate(selectedBlog.createdAt)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Blog Content */}
+              <div className="prose prose-lg dark:prose-invert max-w-none mb-8">
+                <div
+                  className="text-gray-700 dark:text-gray-300 leading-relaxed [&_p]:mb-4 [&_p:last-child]:mb-0"
+                  dangerouslySetInnerHTML={{ __html: selectedBlog.content }}
+                  style={{
+                    lineHeight: "1.8",
+                    whiteSpace: "pre-wrap",
+                  }}
+                />
+              </div>
+
+              {/* Tags */}
               {selectedBlog.tags && selectedBlog.tags.length > 0 && (
-                <div className="mb-6 flex flex-wrap gap-2">
-                  {selectedBlog.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center gap-1 rounded-full bg-brand-100 px-3 py-1 text-xs font-medium text-brand-700 dark:bg-brand-500/15 dark:text-brand-400"
-                    >
-                      <HiOutlineTag className="h-3 w-3" />
-                      {tag}
+                <div className="mb-8 pt-6 border-t border-gray-200 dark:border-gray-800">
+                  <div className="flex items-center gap-2 mb-3">
+                    <HiOutlineTag className="h-5 w-5 text-gray-400" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Tags
                     </span>
-                  ))}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedBlog.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
 
-              <div
-                className="prose prose-sm max-w-none dark:prose-invert"
-                dangerouslySetInnerHTML={{ __html: selectedBlog.content }}
-              />
-
-              <div className="mt-8 flex gap-3 border-t border-gray-200 pt-6 dark:border-white/5">
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200 dark:border-gray-800">
                 <button
                   onClick={() => {
                     setShowViewModal(false);
                     handleApproveBlog(selectedBlog.id);
                   }}
                   disabled={isSubmitting}
-                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-success-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-success-700 disabled:opacity-50"
+                  className="flex-1 h-12 inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition px-6 text-sm bg-success-600 text-white hover:bg-success-700 shadow-lg shadow-success-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <HiOutlineCheckCircle className="h-5 w-5" />
                   Approve & Publish
@@ -758,13 +811,19 @@ export default function PendingBlogsPage() {
                     openRejectModal(selectedBlog);
                   }}
                   disabled={isSubmitting}
-                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-error-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-error-700 disabled:opacity-50"
+                  className="flex-1 h-12 inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition px-6 text-sm bg-error-600 text-white hover:bg-error-700 shadow-lg shadow-error-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <HiOutlineXCircle className="h-5 w-5" />
-                  Reject
+                  Reject Blog
                 </button>
+                {/* <button
+                  onClick={() => setShowViewModal(false)}
+                  className="h-12 inline-flex items-center justify-center font-semibold rounded-lg transition px-6 text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                >
+                  Close
+                </button> */}
               </div>
-            </div>
+            </article>
           </div>
         </div>
       )}
