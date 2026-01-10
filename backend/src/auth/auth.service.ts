@@ -169,7 +169,20 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Send OTP for login verification
+    // Check if user is STUDENT - skip OTP for students
+    if (user.role === UserRole.STUDENT) {
+      // Generate token directly for students
+      const token = this.generateToken(user);
+
+      return {
+        user: this.sanitizeUser(user),
+        token,
+        message: 'Login successful!',
+        requiresOtp: false,
+      };
+    }
+
+    // Send OTP for login verification (INSTRUCTOR and ADMIN only)
     await this.otpService.createAndSendOtp(
       user.id,
       user.email,

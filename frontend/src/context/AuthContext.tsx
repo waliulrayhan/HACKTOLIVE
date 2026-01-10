@@ -8,7 +8,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ userId: string; email: string; requiresOtp: boolean }>;
+  login: (email: string, password: string) => Promise<{ userId?: string; email?: string; requiresOtp: boolean; user?: User; token?: string }>;
   signup: (name: string, email: string, password: string, role?: string) => Promise<{ userId: string; email: string; requiresOtp: boolean }>;
   verifyOtp: (userId: string, code: string, type: 'registration' | 'login') => Promise<void>;
   logout: () => void;
@@ -49,12 +49,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       const data = await authService.login(email, password);
-      // Return OTP response for verification
-      return {
-        userId: data.userId,
-        email: data.email,
-        requiresOtp: data.requiresOtp,
-      };
+      
+      // Check if OTP is required or if it's a direct login (for students)
+      if (data.requiresOtp) {
+        // Return OTP response for verification (INSTRUCTOR and ADMIN)
+        return {
+          userId: data.userId,
+          email: data.email,
+          requiresOtp: data.requiresOtp,
+        };
+      } else {
+        // Direct login for STUDENT - set token and user
+        if (data.token && data.user) {
+          authService.setToken(data.token);
+          authService.setUser(data.user);
+          setUser(data.user);
+          
+          // Redirect to student dashboard
+          router.push('/student/dashboard');
+        }
+        
+        return {
+          requiresOtp: false,
+          user: data.user,
+          token: data.token,
+        };
+      }
     } catch (error) {
       console.error('Login failed:', error);
       throw error;

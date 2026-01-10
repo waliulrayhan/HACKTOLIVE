@@ -105,12 +105,20 @@ const Login: NextPage = () => {
       const result = await login(email, password)
       
       if (result.requiresOtp) {
+        // For INSTRUCTOR and ADMIN - show success and redirect to OTP
         toast.success('Credentials verified!', {
           description: 'Please enter the OTP sent to your email.',
           duration: 3000,
         })
         // Redirect to OTP verification
-        router.push(`/verify-otp?userId=${result.userId}&email=${encodeURIComponent(result.email)}&type=login`)
+        router.push(`/verify-otp?userId=${result.userId}&email=${encodeURIComponent(result.email!)}&type=login`)
+      } else {
+        // For STUDENT - direct login, show success message
+        toast.success('Login successful!', {
+          description: 'Welcome back! Redirecting to your dashboard...',
+          duration: 2000,
+        })
+        // AuthContext already handles the redirect to /student/dashboard
       }
     } catch (error: any) {
       console.error('Login error:', error)
