@@ -34,6 +34,7 @@ import {
   HiOutlineQuestionMarkCircle,
   HiOutlineClipboardCheck,
   HiOutlinePaperClip,
+  HiOutlineArrowLeft,
 } from "react-icons/hi";
 import Badge from "@/components/ui/badge/Badge";
 

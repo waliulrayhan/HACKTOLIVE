@@ -13,6 +13,7 @@ import {
   HiOutlineDocumentText,
   HiOutlineUsers,
   HiOutlineChartBar,
+  HiOutlineUser,
 } from "react-icons/hi";
 import Badge from "@/components/ui/badge/Badge";
 import Avatar from "@/components/ui/avatar/Avatar";
@@ -329,11 +330,17 @@ export default function CertificateIssuancePage() {
                   className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-md border border-warning-200 bg-warning-50 p-3 sm:p-4 dark:border-warning-500/20 dark:bg-warning-500/10"
                 >
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <Avatar
-                      src={cert.student?.user?.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${cert.student.user.avatar}` : '/images/default-avatar.png'}
-                      alt={cert.student?.user?.name || 'Student'}
-                      size="medium"
-                    />
+                    {cert.student?.user?.avatar ? (
+                      <Avatar
+                        src={`${process.env.NEXT_PUBLIC_API_URL}${cert.student.user.avatar}`}
+                        alt={cert.student?.user?.name || 'Student'}
+                        size="medium"
+                      />
+                    ) : (
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
+                        <HiOutlineUser className="h-6 w-6 text-gray-500 dark:text-gray-400" />
+                      </div>
+                    )}
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {cert.student?.user?.name || 'Unknown Student'}
@@ -444,11 +451,17 @@ export default function CertificateIssuancePage() {
                     className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-md border border-gray-200 bg-gray-50 p-3 sm:p-4 dark:border-white/5 dark:bg-white/3"
                   >
                     <div className="flex items-center gap-2 sm:gap-3">
-                      <Avatar
-                        src={enrollment.student?.user?.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${enrollment.student.user.avatar}` : '/images/default-avatar.png'}
-                        alt={enrollment.student?.user?.name || 'Student'}
-                        size="medium"
-                      />
+                      {enrollment.student?.user?.avatar ? (
+                        <Avatar
+                          src={`${process.env.NEXT_PUBLIC_API_URL}${enrollment.student.user.avatar}`}
+                          alt={enrollment.student?.user?.name || 'Student'}
+                          size="medium"
+                        />
+                      ) : (
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
+                          <HiOutlineUser className="h-6 w-6 text-gray-500 dark:text-gray-400" />
+                        </div>
+                      )}
                       <div>
                         <p className="text-sm font-medium text-gray-900 dark:text-white">
                           {enrollment.student?.user?.name || 'Unknown Student'}
@@ -548,11 +561,17 @@ export default function CertificateIssuancePage() {
                   className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-md border border-gray-200 bg-gray-50 p-3 sm:p-4 dark:border-white/5 dark:bg-white/3"
                 >
                   <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                    <Avatar
-                      src={enrollment.student?.user?.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${enrollment.student.user.avatar}` : '/images/default-avatar.png'}
-                      alt={enrollment.student?.user?.name || 'Student'}
-                      size="medium"
-                    />
+                    {enrollment.student?.user?.avatar ? (
+                      <Avatar
+                        src={`${process.env.NEXT_PUBLIC_API_URL}${enrollment.student.user.avatar}`}
+                        alt={enrollment.student?.user?.name || 'Student'}
+                        size="medium"
+                      />
+                    ) : (
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
+                        <HiOutlineUser className="h-6 w-6 text-gray-500 dark:text-gray-400" />
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {enrollment.student?.user?.name || 'Unknown Student'}

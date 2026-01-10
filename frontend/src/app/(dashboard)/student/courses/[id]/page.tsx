@@ -27,6 +27,7 @@ import {
   HiOutlineTrendingUp,
   HiOutlineCalendar,
   HiOutlineVideoCamera,
+  HiOutlineArrowLeft,
 } from "react-icons/hi";
 import { HiOutlineTrophy } from "react-icons/hi2";
 
@@ -343,6 +344,15 @@ export default function CourseDetailPage() {
   return (
     <div className="space-y-4">
       <PageBreadcrumb pageTitle={course.title} />
+
+      {/* Back Button */}
+      <button
+        onClick={() => router.back()}
+        className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+      >
+        <HiOutlineArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        Back to All Course
+      </button>
 
       {/* Completion Modal */}
       <CourseCompletionModal

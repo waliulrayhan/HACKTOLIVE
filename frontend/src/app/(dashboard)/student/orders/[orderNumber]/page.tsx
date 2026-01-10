@@ -169,6 +169,15 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
     <div className="space-y-4">
       <PageBreadcrumb pageTitle={`Order ${order.orderNumber}`} />
 
+      {/* Back Button */}
+      <button
+        onClick={() => router.back()}
+        className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+      >
+        <HiOutlineArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        Back to Orders
+      </button>
+
       {/* Header Card */}
       <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
         <div className="p-4 sm:p-6">

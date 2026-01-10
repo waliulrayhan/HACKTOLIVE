@@ -953,7 +953,7 @@ export default function ApplicationsManagementPage() {
                     ...prev, 
                     status: e.target.value as Application['status'] 
                   }))}
-                  className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                  className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-gray-800 dark:text-white"
                 >
                   <option value="PENDING">Pending</option>
                   <option value="REVIEWING">Reviewing</option>

@@ -290,7 +290,7 @@ export default function InstructorCoursesPage() {
 
         <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-gray-800 dark:bg-info-500/15">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-800">
               <HiOutlineUsers className="h-4 w-4 sm:h-5 sm:w-5 text-info-600 dark:text-gray-500" />
             </div>
             <div>
