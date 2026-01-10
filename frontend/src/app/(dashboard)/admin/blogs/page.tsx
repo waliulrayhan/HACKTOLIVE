@@ -696,22 +696,25 @@ export default function BlogsManagementPage() {
               <HiOutlineX className="h-5 w-5" />
             </button>
 
-            {/* Blog Hero Image */}
-            {selectedBlog.mainImage && (
-              <div className="relative h-72 w-full overflow-hidden rounded-t-xl">
-                <img
-                  src={getFullImageUrl(selectedBlog.mainImage, 'general')}
-                  alt={selectedBlog.title}
-                  className="h-full w-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-              </div>
-            )}
-
             {/* Blog Content */}
             <article className="px-6 py-8 sm:px-10 sm:py-12">
-              {/* Category & Status Badges */}
-              <div className="mb-4 flex flex-wrap items-center gap-2">
+              {/* Image and Header Section */}
+              <div className="flex flex-col sm:flex-row gap-6 mb-6">
+                {/* Blog Hero Image - Left Side */}
+                {selectedBlog.mainImage && (
+                  <div className="flex-shrink-0 w-full sm:w-48 h-48">
+                    <img
+                      src={getFullImageUrl(selectedBlog.mainImage, 'general')}
+                      alt={selectedBlog.title}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
+                )}
+
+                {/* Title and Badges - Right Side */}
+                <div className="flex-1">
+                  {/* Category & Status Badges */}
+                  <div className="mb-4 flex flex-wrap items-center gap-2">
                 <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full ${getCategoryBadgeClass(selectedBlog.category)}`}>
                   {selectedBlog.category}
                 </span>
@@ -737,6 +740,8 @@ export default function BlogsManagementPage() {
                   {selectedBlog.metadata}
                 </p>
               )}
+                </div>
+              </div>
 
               {/* Author & Meta Info */}
               <div className="mb-8 flex flex-wrap items-center gap-4 pb-8 border-b border-gray-200 dark:border-gray-800">
@@ -781,10 +786,11 @@ export default function BlogsManagementPage() {
               {/* Blog Content */}
               <div className="prose prose-lg dark:prose-invert max-w-none mb-8">
                 <div
-                  className="text-gray-700 dark:text-gray-300 leading-relaxed"
+                  className="text-gray-700 dark:text-gray-300 leading-relaxed [&_p]:mb-4 [&_p:last-child]:mb-0"
                   dangerouslySetInnerHTML={{ __html: selectedBlog.content }}
                   style={{
                     lineHeight: '1.8',
+                    whiteSpace: 'pre-wrap',
                   }}
                 />
               </div>
@@ -807,40 +813,6 @@ export default function BlogsManagementPage() {
                         #{tag}
                       </span>
                     ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Blog Type */}
-              <div className="mb-8 pt-6 border-t border-gray-200 dark:border-gray-800">
-                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                  Blog Type
-                </p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {selectedBlog.blogType.replace(/_/g, ' ')}
-                </p>
-              </div>
-
-              {/* Publish Date Info */}
-              {selectedBlog.publishedAt && (
-                <div className="mb-8 pt-6 border-t border-gray-200 dark:border-gray-800">
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                        Published On
-                      </p>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {formatDate(selectedBlog.publishedAt)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                        Last Updated
-                      </p>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {formatDate(selectedBlog.updatedAt)}
-                      </p>
-                    </div>
                   </div>
                 </div>
               )}
