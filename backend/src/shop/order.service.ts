@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma.service';
 import { CreateOrderDto, CreatePaymentDto, UpdateOrderStatusDto } from './dto/order.dto';
 import { CartService } from './cart.service';
 import { ProductService } from './product.service';
+import { EmailService } from '../email/email.service';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class OrderService {
     private prisma: PrismaService,
     private cartService: CartService,
     private productService: ProductService,
+    private emailService: EmailService,
   ) {}
 
   async createOrder(createOrderDto: CreateOrderDto, userId?: string) {
@@ -76,6 +78,12 @@ export class OrderService {
 
     // Clear cart
     await this.cartService.clearCart(userId, sessionId);
+
+    // Send confirmation email to customer
+    this.sendOrderConfirmationEmail(order);
+
+    // Send notification email to admins
+    this.sendAdminOrderNotification(order);
 
     return this.formatOrder(order);
   }
@@ -251,6 +259,8 @@ export class OrderService {
   }
 
   async updateOrderStatus(id: string, updateOrderStatusDto: UpdateOrderStatusDto) {
+    console.log('📦 updateOrderStatus called:', { id, status: updateOrderStatusDto.status });
+    
     const order = await this.prisma.order.update({
       where: { id },
       data: {
@@ -267,6 +277,11 @@ export class OrderService {
         },
       },
     });
+
+    console.log('📦 Order updated, sending email to:', order.customerEmail);
+
+    // Send status update email to customer
+    this.sendOrderStatusUpdateEmail(order, updateOrderStatusDto.status);
 
     return this.formatOrder(order);
   }
@@ -431,5 +446,127 @@ export class OrderService {
           : undefined,
       })),
     };
+  }
+
+  /**
+   * Send order confirmation email to customer
+   */
+  private async sendOrderConfirmationEmail(order: any): Promise<void> {
+    try {
+      // Format items for email
+      const itemsHtml = order.items.map((item: any) => `
+        <div style="display:flex;justify-content:space-between;padding:15px;border-bottom:1px solid #e5e7eb">
+          <div>
+            <p style="margin:0 0 5px;color:#333;font-weight:600">${item.productName}</p>
+            <p style="margin:0;color:#666;font-size:13px">Quantity: ${item.quantity} × ${item.price.toFixed(2)} BDT</p>
+          </div>
+          <div style="text-align:right">
+            <p style="margin:0;color:#333;font-weight:600">${item.total.toFixed(2)} BDT</p>
+          </div>
+        </div>
+      `).join('');
+
+      const shippingAddress = `${order.shippingAddress}, ${order.shippingCity}${order.shippingState ? ', ' + order.shippingState : ''}, ${order.shippingZip}, ${order.shippingCountry}`;
+
+      await this.emailService.sendTemplateEmail(
+        'order-confirmation-customer',
+        order.customerEmail,
+        {
+          customerName: order.customerName,
+          orderNumber: order.orderNumber,
+          orderDate: new Date(order.createdAt).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          }),
+          items: itemsHtml,
+          subtotal: order.subtotal.toFixed(2),
+          shippingCost: order.shippingCost.toFixed(2),
+          tax: order.tax.toFixed(2),
+          total: order.total.toFixed(2),
+          shippingAddress: shippingAddress,
+          orderUrl: `${process.env.FRONTEND_URL || 'https://hacktolive.io'}/shop/orders/${order.orderNumber}`,
+        },
+        order.customerName,
+      );
+    } catch (error) {
+      console.error('Failed to send order confirmation email:', error);
+    }
+  }
+
+  /**
+   * Send order notification to all admins
+   */
+  private async sendAdminOrderNotification(order: any): Promise<void> {
+    try {
+      // Get all admin emails
+      const admins = await this.prisma.user.findMany({
+        where: { role: 'ADMIN' },
+        select: { email: true, name: true },
+      });
+
+      for (const admin of admins) {
+        await this.emailService.sendTemplateEmail(
+          'new-order-admin-notification',
+          admin.email,
+          {
+            orderNumber: order.orderNumber,
+            orderDate: new Date(order.createdAt).toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            }),
+            customerName: order.customerName,
+            customerEmail: order.customerEmail,
+            total: order.total.toFixed(2),
+            itemCount: order.items.length.toString(),
+            orderUrl: `${process.env.FRONTEND_URL || 'https://hacktolive.io'}/admin/shop/orders/${order.id}`,
+          },
+          admin.name || 'Admin',
+        );
+      }
+    } catch (error) {
+      console.error('Failed to send admin order notification:', error);
+    }
+  }
+
+  /**
+   * Send order status update email to customer
+   */
+  private async sendOrderStatusUpdateEmail(order: any, status: string): Promise<void> {
+    try {
+      console.log('=== Sending Order Status Update Email ===');
+      console.log('Order:', { id: order.id, orderNumber: order.orderNumber, customerEmail: order.customerEmail, status });
+      
+      const statusMessages: Record<string, string> = {
+        CONFIRMED: 'Your order has been confirmed and is being prepared for shipment. We will notify you once it ships.',
+        PROCESSING: 'Your order is currently being processed. Our team is working to prepare your items for shipment.',
+        SHIPPED: 'Great news! Your order has been shipped and is on its way to you. You can track your package using the tracking number provided.',
+        DELIVERED: 'Your order has been delivered successfully. We hope you enjoy your purchase! If you have any concerns, please contact us.',
+        CANCELLED: 'Your order has been cancelled as requested. If you did not request this cancellation, please contact our support team immediately.',
+        REFUNDED: 'Your order has been refunded. The refund amount will be credited to your original payment method within 5-7 business days.',
+      };
+
+      const result = await this.emailService.sendTemplateEmail(
+        'order-status-update',
+        order.customerEmail,
+        {
+          customerName: order.customerName,
+          orderNumber: order.orderNumber,
+          status: status,
+          statusMessage: statusMessages[status] || 'Your order status has been updated.',
+          trackingNumber: order.trackingNumber || 'Not available yet',
+          orderUrl: `${process.env.FRONTEND_URL || 'https://hacktolive.io'}/shop/orders/${order.orderNumber}`,
+        },
+        order.customerName,
+      );
+      
+      console.log('Order status update email sent:', result);
+    } catch (error) {
+      console.error('Failed to send order status update email:', error);
+      console.error('Error stack:', error.stack);
+    }
   }
 }

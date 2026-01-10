@@ -2,12 +2,14 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { PrismaService } from '../prisma.service';
 import { Prisma } from '@prisma/client';
 import { CertificateGeneratorService } from '../academy/certificates/certificate-generator.service';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class InstructorService {
   constructor(
     private prisma: PrismaService,
     private certificateGenerator: CertificateGeneratorService,
+    private emailService: EmailService,
   ) {}
 
   // Verify course ownership
@@ -1010,6 +1012,10 @@ export class InstructorService {
       },
     });
 
+    // Send certificate issued email
+    console.log('🎓 Certificate issued, sending email to:', updatedCertificate.student?.user?.email);
+    this.sendCertificateIssuedEmail(updatedCertificate);
+
     return updatedCertificate;
   }
 
@@ -1277,5 +1283,32 @@ export class InstructorService {
         assignmentSubmissions,
       },
     };
+  }
+
+  // Helper method to send certificate issued email
+  private sendCertificateIssuedEmail(certificate: any) {
+    console.log('=== Sending Certificate Issued Email ===');
+    console.log('Student email:', certificate.student?.user?.email);
+    console.log('Course title:', certificate.course?.title);
+    
+    if (!certificate.student?.user?.email) {
+      console.error('❌ Cannot send certificate email: Student email not found');
+      return;
+    }
+
+    this.emailService.sendTemplateEmail(
+      'certificate-issued',
+      certificate.student.user.email,
+      {
+        studentName: certificate.student.user.name || 'Student',
+        courseTitle: certificate.course?.title || 'Course',
+        certificateUrl: `https://hacktolive.net${certificate.certificateUrl}`,
+        verificationCode: certificate.verificationCode,
+        instructorName: certificate.course?.instructor?.user?.name || 'Your Instructor',
+      },
+      certificate.student.user.name,
+    );
+
+    console.log('✅ Certificate email queued for:', certificate.student.user.email);
   }
 }

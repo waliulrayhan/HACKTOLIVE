@@ -558,6 +558,324 @@ async function seedEmailTemplates() {
 </body>
 </html>`,
     },
+    {
+      name: 'Order Confirmation (Customer)',
+      slug: 'order-confirmation-customer',
+      subject: 'Order Confirmation #{{orderNumber}} - HACKTOLIVE Shop',
+      type: 'ORDER_CONFIRMATION' as EmailTemplateType,
+      fromEmail: 'NOREPLY' as EmailSender,
+      variables: JSON.stringify(['customerName', 'orderNumber', 'orderDate', 'items', 'subtotal', 'shippingCost', 'tax', 'total', 'shippingAddress', 'orderUrl']),
+      description: 'Confirmation email sent to customer when an order is placed',
+      isActive: true,
+      body: `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>.logo-light{display:block!important}.logo-dark{display:none!important}@media (prefers-color-scheme:dark){.logo-light{display:none!important}.logo-dark{display:block!important}}</style></head>
+<body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:20px 0">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#fff;border-radius:8px;overflow:hidden">
+        <tr><td style="background-color:#84cc16;padding:30px;text-align:center">
+          <h1 style="margin:0;color:#fff;font-size:24px">Order Confirmed!</h1>
+        </td></tr>
+        <tr><td style="padding:40px 30px">
+          <p style="margin:0 0 20px;color:#333;font-size:16px">Dear <strong>{{customerName}}</strong>,</p>
+          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Thank you for your order! We're pleased to confirm that we've received your order and it's being processed.</p>
+          
+          <div style="background-color:#f9f9f9;border:2px solid #84cc16;border-radius:6px;padding:20px;text-align:center;margin:0 0 25px">
+            <p style="margin:0 0 5px;color:#999;font-size:12px;text-transform:uppercase;letter-spacing:1px">Order Number</p>
+            <p style="margin:0;color:#84cc16;font-size:28px;font-weight:700;letter-spacing:2px">{{orderNumber}}</p>
+            <p style="margin:10px 0 0;color:#999;font-size:12px">{{orderDate}}</p>
+          </div>
+
+          <h2 style="margin:0 0 15px;color:#333;font-size:18px;border-bottom:2px solid #84cc16;padding-bottom:10px">Order Details</h2>
+          
+          <div style="margin:0 0 20px">{{items}}</div>
+
+          <table width="100%" cellpadding="8" cellspacing="0" style="border-top:2px solid #e5e7eb;margin:0 0 25px">
+            <tr>
+              <td style="color:#666;text-align:right;padding-top:15px">Subtotal:</td>
+              <td style="color:#333;text-align:right;padding-top:15px;font-weight:600;width:100px">{{subtotal}} BDT</td>
+            </tr>
+            <tr>
+              <td style="color:#666;text-align:right">Shipping:</td>
+              <td style="color:#333;text-align:right;font-weight:600">{{shippingCost}} BDT</td>
+            </tr>
+            <tr>
+              <td style="color:#666;text-align:right">Tax:</td>
+              <td style="color:#333;text-align:right;font-weight:600">{{tax}} BDT</td>
+            </tr>
+            <tr style="border-top:2px solid #84cc16">
+              <td style="color:#333;text-align:right;padding-top:10px;font-size:16px;font-weight:700">Total:</td>
+              <td style="color:#84cc16;text-align:right;padding-top:10px;font-size:18px;font-weight:700">{{total}} BDT</td>
+            </tr>
+          </table>
+
+          <h3 style="margin:0 0 10px;color:#333;font-size:16px">Shipping Address</h3>
+          <div style="background-color:#f9f9f9;padding:15px;border-radius:6px;margin:0 0 25px">
+            <p style="margin:0;color:#666;font-size:14px;line-height:1.6">{{shippingAddress}}</p>
+          </div>
+
+          <div style="background-color:#f0fdf4;border-left:4px solid #84cc16;padding:20px;border-radius:4px;margin:0 0 25px">
+            <p style="margin:0 0 10px;color:#333;font-size:14px;font-weight:600">What's Next?</p>
+            <ul style="margin:0;padding-left:20px;color:#666;font-size:13px;line-height:1.8">
+              <li>We'll send you an email when your order ships</li>
+              <li>Track your order status in your account dashboard</li>
+              <li>Expected delivery: 3-7 business days</li>
+            </ul>
+          </div>
+
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 25px">
+            <tr><td align="center">
+              <a href="{{orderUrl}}" style="display:inline-block;background-color:#84cc16;color:#fff;text-decoration:none;padding:12px 30px;border-radius:6px;font-size:14px;font-weight:600">View Order Details</a>
+            </td></tr>
+          </table>
+
+          <div style="border-top:1px solid #e5e7eb;padding-top:20px">
+            <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Need Help?</strong></p>
+            <p style="margin:0;color:#666;font-size:13px">Contact: <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
+          </div>
+        </td></tr>
+        <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
+          <div style="margin:0 0 10px">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+          </div>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+    },
+    {
+      name: 'New Order Notification (Admin)',
+      slug: 'new-order-admin-notification',
+      subject: 'New Order Received #{{orderNumber}} - HACKTOLIVE Shop',
+      type: 'GENERAL' as EmailTemplateType,
+      fromEmail: 'NOREPLY' as EmailSender,
+      variables: JSON.stringify(['orderNumber', 'orderDate', 'customerName', 'customerEmail', 'total', 'itemCount', 'orderUrl']),
+      description: 'Notification email sent to admins when a new order is placed',
+      isActive: true,
+      body: `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>.logo-light{display:block!important}.logo-dark{display:none!important}@media (prefers-color-scheme:dark){.logo-light{display:none!important}.logo-dark{display:block!important}}</style></head>
+<body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:20px 0">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#fff;border-radius:8px;overflow:hidden">
+        <tr><td style="background-color:#1e40af;padding:30px;text-align:center">
+          <h1 style="margin:0;color:#fff;font-size:24px">🛍️ New Order Received</h1>
+        </td></tr>
+        <tr><td style="padding:40px 30px">
+          <p style="margin:0 0 20px;color:#333;font-size:16px">A new order has been placed on HACKTOLIVE Shop!</p>
+          
+          <div style="background-color:#eff6ff;border:2px solid #1e40af;border-radius:6px;padding:20px;text-align:center;margin:0 0 25px">
+            <p style="margin:0 0 5px;color:#999;font-size:12px;text-transform:uppercase;letter-spacing:1px">Order Number</p>
+            <p style="margin:0;color:#1e40af;font-size:28px;font-weight:700;letter-spacing:2px">{{orderNumber}}</p>
+            <p style="margin:10px 0 0;color:#999;font-size:12px">{{orderDate}}</p>
+          </div>
+
+          <table width="100%" cellpadding="12" cellspacing="0" style="background-color:#f9f9f9;border-radius:6px;margin:0 0 25px;font-size:14px">
+            <tr>
+              <td colspan="2" style="color:#333;font-weight:600;border-bottom:2px solid #1e40af;padding-bottom:10px">Order Summary</td>
+            </tr>
+            <tr>
+              <td style="color:#666;width:40%;border-bottom:1px solid #eee"><strong>Customer:</strong></td>
+              <td style="color:#333;border-bottom:1px solid #eee">{{customerName}}</td>
+            </tr>
+            <tr>
+              <td style="color:#666;border-bottom:1px solid #eee"><strong>Email:</strong></td>
+              <td style="color:#333;border-bottom:1px solid #eee">{{customerEmail}}</td>
+            </tr>
+            <tr>
+              <td style="color:#666;border-bottom:1px solid #eee"><strong>Items:</strong></td>
+              <td style="color:#333;border-bottom:1px solid #eee">{{itemCount}}</td>
+            </tr>
+            <tr>
+              <td style="color:#666"><strong>Total Amount:</strong></td>
+              <td style="color:#1e40af;font-weight:700;font-size:16px">{{total}} BDT</td>
+            </tr>
+          </table>
+
+          <div style="background-color:#fef3c7;border-left:4px solid #f59e0b;padding:15px 20px;border-radius:4px;margin:0 0 25px">
+            <p style="margin:0;color:#92400e;font-size:13px;line-height:1.6"><strong>Action Required:</strong> Please review this order and update the status accordingly. The customer is waiting for confirmation.</p>
+          </div>
+
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px">
+            <tr><td align="center">
+              <a href="{{orderUrl}}" style="display:inline-block;background-color:#1e40af;color:#fff;text-decoration:none;padding:12px 30px;border-radius:6px;font-size:14px;font-weight:600">View Order in Admin Panel</a>
+            </td></tr>
+          </table>
+        </td></tr>
+        <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
+          <div style="margin:0 0 10px">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+          </div>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+    },
+    {
+      name: 'Order Status Update',
+      slug: 'order-status-update',
+      subject: 'Order #{{orderNumber}} Status Update - {{status}}',
+      type: 'GENERAL' as EmailTemplateType,
+      fromEmail: 'NOREPLY' as EmailSender,
+      variables: JSON.stringify(['customerName', 'orderNumber', 'status', 'statusMessage', 'trackingNumber', 'orderUrl']),
+      description: 'Email sent when order status is updated',
+      isActive: true,
+      body: `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>.logo-light{display:block!important}.logo-dark{display:none!important}@media (prefers-color-scheme:dark){.logo-light{display:none!important}.logo-dark{display:block!important}}</style></head>
+<body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:20px 0">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#fff;border-radius:8px;overflow:hidden">
+        <tr><td style="background-color:#84cc16;padding:30px;text-align:center">
+          <h1 style="margin:0;color:#fff;font-size:24px">Order Status Update</h1>
+        </td></tr>
+        <tr><td style="padding:40px 30px">
+          <p style="margin:0 0 20px;color:#333;font-size:16px">Dear <strong>{{customerName}}</strong>,</p>
+          <p style="margin:0 0 25px;color:#666;font-size:14px;line-height:1.6">We're writing to update you on the status of your order <strong>#{{orderNumber}}</strong>.</p>
+          
+          <div style="background-color:#f9f9f9;border:2px solid #84cc16;border-radius:6px;padding:25px;text-align:center;margin:0 0 25px">
+            <p style="margin:0 0 10px;color:#999;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:600">Current Status</p>
+            <p style="margin:0;color:#84cc16;font-size:24px;font-weight:700;text-transform:uppercase">{{status}}</p>
+          </div>
+
+          <div style="background-color:#f0fdf4;border-left:4px solid #84cc16;padding:20px;border-radius:4px;margin:0 0 25px">
+            <p style="margin:0;color:#333;font-size:14px;line-height:1.6">{{statusMessage}}</p>
+          </div>
+
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 25px">
+            <tr><td align="center">
+              <a href="{{orderUrl}}" style="display:inline-block;background-color:#84cc16;color:#fff;text-decoration:none;padding:12px 30px;border-radius:6px;font-size:14px;font-weight:600">Track Your Order</a>
+            </td></tr>
+          </table>
+
+          <div style="border-top:1px solid #e5e7eb;padding-top:20px">
+            <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">If you have any questions about your order, please feel free to contact us.</p>
+            <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Support:</strong></p>
+            <p style="margin:0;color:#666;font-size:13px">Email: <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
+          </div>
+        </td></tr>
+        <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
+          <div style="margin:0 0 10px">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+          </div>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+    },
+    {
+      name: 'Certificate Issued',
+      slug: 'certificate-issued',
+      subject: '🎓 Congratulations! Certificate Earned - {{courseName}}',
+      type: 'CERTIFICATE_ISSUED' as EmailTemplateType,
+      fromEmail: 'NOREPLY' as EmailSender,
+      variables: JSON.stringify(['studentName', 'courseName', 'instructorName', 'issuedDate', 'verificationCode', 'certificateUrl', 'verificationUrl']),
+      description: 'Email sent when a certificate is issued to a student',
+      isActive: true,
+      body: `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>.logo-light{display:block!important}.logo-dark{display:none!important}@media (prefers-color-scheme:dark){.logo-light{display:none!important}.logo-dark{display:block!important}}</style></head>
+<body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:20px 0">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#fff;border-radius:8px;overflow:hidden">
+        <tr><td style="background-color:#7c3aed;padding:40px;text-align:center">
+          <div style="font-size:48px;margin:0 0 10px">🎓</div>
+          <h1 style="margin:0;color:#fff;font-size:26px">Congratulations!</h1>
+          <p style="margin:10px 0 0;color:#fff;font-size:14px;opacity:0.9">You've Earned a Certificate</p>
+        </td></tr>
+        <tr><td style="padding:40px 30px">
+          <p style="margin:0 0 20px;color:#333;font-size:16px">Dear <strong>{{studentName}}</strong>,</p>
+          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">We are thrilled to inform you that you have successfully completed the course and earned your certificate!</p>
+          
+          <div style="background-color:#faf5ff;border:2px solid #7c3aed;border-radius:8px;padding:25px;text-align:center;margin:0 0 25px">
+            <p style="margin:0 0 5px;color:#999;font-size:12px;text-transform:uppercase;letter-spacing:1px">Certificate For</p>
+            <p style="margin:0 0 15px;color:#7c3aed;font-size:20px;font-weight:700">{{courseName}}</p>
+            <p style="margin:0;color:#666;font-size:13px">Issued by <strong>{{instructorName}}</strong></p>
+            <p style="margin:5px 0 0;color:#999;font-size:12px">{{issuedDate}}</p>
+          </div>
+
+          <table width="100%" cellpadding="12" cellspacing="0" style="background-color:#f9f9f9;border-radius:6px;margin:0 0 25px;font-size:14px">
+            <tr>
+              <td colspan="2" style="color:#333;font-weight:600;border-bottom:2px solid #7c3aed;padding-bottom:10px">Certificate Details</td>
+            </tr>
+            <tr>
+              <td style="color:#666;width:40%;border-bottom:1px solid #eee"><strong>Course:</strong></td>
+              <td style="color:#333;border-bottom:1px solid #eee">{{courseName}}</td>
+            </tr>
+            <tr>
+              <td style="color:#666;border-bottom:1px solid #eee"><strong>Instructor:</strong></td>
+              <td style="color:#333;border-bottom:1px solid #eee">{{instructorName}}</td>
+            </tr>
+            <tr>
+              <td style="color:#666;border-bottom:1px solid #eee"><strong>Issued Date:</strong></td>
+              <td style="color:#333;border-bottom:1px solid #eee">{{issuedDate}}</td>
+            </tr>
+            <tr>
+              <td style="color:#666"><strong>Verification Code:</strong></td>
+              <td style="color:#7c3aed;font-family:monospace;font-weight:700">{{verificationCode}}</td>
+            </tr>
+          </table>
+
+          <div style="background-color:#fef3c7;border-left:4px solid #f59e0b;padding:15px 20px;border-radius:4px;margin:0 0 25px">
+            <p style="margin:0;color:#92400e;font-size:13px;line-height:1.6"><strong>Share Your Achievement:</strong> You can verify the authenticity of this certificate using the verification code above at our verification portal.</p>
+          </div>
+
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px">
+            <tr>
+              <td align="center" style="padding:0 5px">
+                <a href="{{certificateUrl}}" style="display:inline-block;background-color:#7c3aed;color:#fff;text-decoration:none;padding:12px 25px;border-radius:6px;font-size:14px;font-weight:600">Download Certificate</a>
+              </td>
+              <td align="center" style="padding:0 5px">
+                <a href="{{verificationUrl}}" style="display:inline-block;background-color:#f9fafb;color:#7c3aed;border:2px solid #7c3aed;text-decoration:none;padding:10px 25px;border-radius:6px;font-size:14px;font-weight:600">Verify Certificate</a>
+              </td>
+            </tr>
+          </table>
+
+          <div style="background-color:#f0fdf4;border-left:4px solid #84cc16;padding:20px;border-radius:4px;margin:0 0 25px">
+            <p style="margin:0 0 10px;color:#333;font-size:14px;font-weight:600">Next Steps</p>
+            <ul style="margin:0;padding-left:20px;color:#666;font-size:13px;line-height:1.8">
+              <li>Add this certificate to your LinkedIn profile</li>
+              <li>Share your achievement on social media</li>
+              <li>Include it in your professional resume</li>
+              <li>Continue learning with our advanced courses</li>
+            </ul>
+          </div>
+
+          <div style="border-top:1px solid #e5e7eb;padding-top:20px">
+            <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">We're proud of your dedication and accomplishment. Keep up the excellent work in your learning journey!</p>
+            <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Questions?</strong></p>
+            <p style="margin:0;color:#666;font-size:13px">Contact: <a href="mailto:support@hacktolive.net" style="color:#7c3aed;text-decoration:none">support@hacktolive.net</a></p>
+          </div>
+        </td></tr>
+        <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
+          <div style="margin:0 0 10px">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+          </div>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE Academy. All rights reserved.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+    },
   ];
 
   for (const template of templates) {

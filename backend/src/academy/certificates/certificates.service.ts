@@ -3,12 +3,14 @@ import { PrismaService } from '../../prisma.service';
 import { Certificate, Prisma } from '@prisma/client';
 import * as crypto from 'crypto';
 import { CertificateGeneratorService } from './certificate-generator.service';
+import { EmailService } from '../../email/email.service';
 
 @Injectable()
 export class CertificatesService {
   constructor(
     private prisma: PrismaService,
     private certificateGenerator: CertificateGeneratorService,
+    private emailService: EmailService,
   ) {}
 
   async create(data: Prisma.CertificateCreateInput): Promise<Certificate> {
@@ -210,6 +212,8 @@ export class CertificatesService {
     studentId: string,
     courseId: string,
   ): Promise<Certificate> {
+    console.log('🎓 issueCertificate called:', { studentId, courseId });
+    
     // Check if enrollment is completed
     const enrollment = await this.prisma.enrollment.findFirst({
       where: {
@@ -234,6 +238,7 @@ export class CertificatesService {
     });
 
     if (existingCertificate) {
+      console.log('🎓 Certificate already exists, returning existing one');
       return existingCertificate;
     }
 
@@ -256,7 +261,7 @@ export class CertificatesService {
     // Create certificate
     const verificationCode = this.generateVerificationCode();
     
-    return this.prisma.certificate.create({
+    const certificate = await this.prisma.certificate.create({
       data: {
         student: { connect: { id: studentId } },
         course: { connect: { id: courseId } },
@@ -273,11 +278,54 @@ export class CertificatesService {
         },
         course: {
           include: {
-            instructor: true,
+            instructor: {
+              include: {
+                user: true,
+              },
+            },
           },
         },
       },
     });
+
+    // Update certificate to ISSUED status
+    const issuedCertificate = await this.prisma.certificate.update({
+      where: { id: certificate.id },
+      data: { status: 'ISSUED', issuedAt: new Date() },
+      include: {
+        student: {
+          include: {
+            user: true,
+          },
+        },
+        course: {
+          include: {
+            instructor: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Update student certificates count
+    await this.prisma.student.update({
+      where: { id: studentId },
+      data: {
+        certificatesEarned: {
+          increment: 1,
+        },
+      },
+    });
+
+    console.log('🎓 Certificate issued, sending email to:', issuedCertificate.student?.user?.email);
+
+    // Send certificate email to student
+    this.sendCertificateIssuedEmail(issuedCertificate);
+
+    return issuedCertificate;
   }
 
   private generateVerificationCode(): string {
@@ -303,5 +351,51 @@ export class CertificatesService {
     };
 
     return this.certificateGenerator.generateCertificatePDF(certificateData);
+  }
+
+  /**
+   * Send certificate issued notification email to student
+   */
+  private async sendCertificateIssuedEmail(certificate: any): Promise<void> {
+    try {
+      console.log('=== Sending Certificate Issued Email ===');
+      console.log('Certificate:', { id: certificate.id, studentId: certificate.studentId, courseId: certificate.courseId });
+      
+      const studentEmail = certificate.student?.user?.email;
+      const studentName = certificate.student?.user?.name || 'Student';
+      const courseName = certificate.course?.title || 'Course';
+      const instructorName = certificate.course?.instructor?.user?.name || 'Instructor';
+      
+      console.log('Email details:', { studentEmail, studentName, courseName, instructorName });
+      
+      if (!studentEmail) {
+        console.error('Student email not found for certificate:', certificate.id);
+        return;
+      }
+
+      const result = await this.emailService.sendTemplateEmail(
+        'certificate-issued',
+        studentEmail,
+        {
+          studentName: studentName,
+          courseName: courseName,
+          instructorName: instructorName,
+          issuedDate: new Date(certificate.issuedAt).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          }),
+          verificationCode: certificate.verificationCode,
+          certificateUrl: `${process.env.FRONTEND_URL || 'https://hacktolive.io'}/academy/certificates/download/${certificate.id}`,
+          verificationUrl: `${process.env.FRONTEND_URL || 'https://hacktolive.io'}/academy/certificates/verify/${certificate.verificationCode}`,
+        },
+        studentName,
+      );
+      
+      console.log('Certificate issued email sent:', result);
+    } catch (error) {
+      console.error('Failed to send certificate issued email:', error);
+      console.error('Error stack:', error.stack);
+    }
   }
 }

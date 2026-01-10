@@ -13,8 +13,10 @@ import { CertificatesService } from './certificates/certificates.service';
 import { CertificateGeneratorService } from './certificates/certificate-generator.service';
 import { QuizzesController } from './quizzes/quizzes.controller';
 import { QuizzesService } from './quizzes/quizzes.service';
+import { EmailModule } from '../email/email.module';
 
 @Module({
+  imports: [EmailModule],
   controllers: [
     CoursesController,
     InstructorsController,
