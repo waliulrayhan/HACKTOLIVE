@@ -1296,15 +1296,23 @@ export class InstructorService {
       return;
     }
 
+    const issuedDate = new Date(certificate.issuedAt).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
     this.emailService.sendTemplateEmail(
       'certificate-issued',
       certificate.student.user.email,
       {
         studentName: certificate.student.user.name || 'Student',
-        courseTitle: certificate.course?.title || 'Course',
+        courseName: certificate.course?.title || 'Course',
         certificateUrl: `https://hacktolive.net${certificate.certificateUrl}`,
         verificationCode: certificate.verificationCode,
         instructorName: certificate.course?.instructor?.user?.name || 'Your Instructor',
+        issuedDate: issuedDate,
+        verificationUrl: 'https://hacktolive.net/verify-certificate',
       },
       certificate.student.user.name,
     );

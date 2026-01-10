@@ -232,8 +232,8 @@ export class EmailService {
       'career-application-confirmation',
       applicantEmail,
       {
-        applicantName,
-        jobTitle,
+        name: applicantName,
+        position: jobTitle,
         applicationId,
         date: new Date().toLocaleDateString(),
       },
@@ -253,13 +253,13 @@ export class EmailService {
     notes?: string,
   ): Promise<boolean> {
     return this.sendTemplateEmail(
-      'career-application-status-update',
+      'career-application-status',
       applicantEmail,
       {
-        applicantName,
-        jobTitle,
+        name: applicantName,
+        position: jobTitle,
         status: newStatus,
-        notes: notes || 'No additional notes',
+        message: notes || 'No additional notes',
         date: new Date().toLocaleDateString(),
       },
       applicantName,
