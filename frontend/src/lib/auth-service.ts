@@ -33,6 +33,8 @@ export interface OtpResponse {
   requiresOtp: boolean;
 }
 
+export type LoginResponse = OtpResponse | (AuthResponse & { requiresOtp: false });
+
 export const authService = {
   async signup(name: string, email: string, password: string, role?: string) {
     const response = await api.post<OtpResponse>('/auth/signup', {
@@ -53,7 +55,7 @@ export const authService = {
   },
 
   async login(email: string, password: string) {
-    const response = await api.post<OtpResponse>('/auth/login', {
+    const response = await api.post<LoginResponse>('/auth/login', {
       email,
       password,
     });

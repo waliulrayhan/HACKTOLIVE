@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
       } else {
         // Direct login for STUDENT - set token and user
-        if (data.token && data.user) {
+        if ('token' in data && 'user' in data && data.token && data.user) {
           authService.setToken(data.token);
           authService.setUser(data.user);
           setUser(data.user);
@@ -71,8 +71,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         return {
           requiresOtp: false,
-          user: data.user,
-          token: data.token,
+          user: 'user' in data ? data.user : undefined,
+          token: 'token' in data ? data.token : undefined,
         };
       }
     } catch (error) {
