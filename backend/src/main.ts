@@ -13,7 +13,12 @@ async function bootstrap() {
     logger: isProduction 
       ? ['error', 'warn'] // Only log errors and warnings in production
       : ['log', 'error', 'warn', 'debug', 'verbose'], // All logs in development
+    bodyParser: true,
   });
+
+  // Configure body parser limits for file uploads
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
   // Serve static files from uploads directory
   // In development: uploads folder is at project root

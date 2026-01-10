@@ -206,46 +206,61 @@ export class CareerService {
     createApplicationDto: CreateApplicationDto,
     resume?: Express.Multer.File,
   ) {
-    // Verify career exists
-    const career = await this.prisma.career.findUnique({
-      where: { id: createApplicationDto.careerId },
-    });
+    try {
+      // Verify career exists
+      const career = await this.prisma.career.findUnique({
+        where: { id: createApplicationDto.careerId },
+      });
 
-    if (!career) {
-      throw new NotFoundException(`Career with ID ${createApplicationDto.careerId} not found`);
-    }
+      if (!career) {
+        throw new NotFoundException(`Career with ID ${createApplicationDto.careerId} not found`);
+      }
 
-    // Upload resume if provided
-    let resumeUrl: string | undefined;
-    if (resume) {
-      resumeUrl = await this.uploadService.uploadResume(resume);
-    }
+      // Upload resume if provided
+      let resumeUrl: string | undefined;
+      if (resume) {
+        try {
+          resumeUrl = await this.uploadService.uploadResume(resume);
+        } catch (error) {
+          console.error('Resume upload error:', error);
+          throw new Error(`Failed to upload resume: ${error.message}`);
+        }
+      }
 
-    const application = await this.prisma.application.create({
-      data: {
-        ...createApplicationDto,
-        resumeUrl,
-      },
-      include: {
-        career: {
-          select: {
-            id: true,
-            title: true,
-            department: true,
+      const application = await this.prisma.application.create({
+        data: {
+          ...createApplicationDto,
+          resumeUrl,
+        },
+        include: {
+          career: {
+            select: {
+              id: true,
+              title: true,
+              department: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    // Send confirmation email to applicant
-    await this.emailService.sendCareerApplicationConfirmation(
-      application.email,
-      application.name,
-      application.career.title,
-      application.id,
-    );
+      // Send confirmation email to applicant (non-blocking)
+      try {
+        await this.emailService.sendCareerApplicationConfirmation(
+          application.email,
+          application.name,
+          application.career.title,
+          application.id,
+        );
+      } catch (emailError) {
+        // Log email error but don't fail the application
+        console.error('Failed to send confirmation email:', emailError);
+      }
 
-    return application;
+      return application;
+    } catch (error) {
+      console.error('Error creating application:', error);
+      throw error;
+    }
   }
 
   async findAllApplications(filterDto: FilterApplicationDto) {

@@ -50,7 +50,7 @@ RUN npm ci --only=production && \
 COPY --from=builder /app/dist ./dist
 
 # Create uploads directory with full permissions
-RUN mkdir -p /app/uploads/avatars /app/uploads/documents /app/uploads/images && \
+RUN mkdir -p /app/uploads/avatars /app/uploads/documents /app/uploads/images /app/uploads/resumes /app/uploads/certificates /app/uploads/certificate-templates && \
     chmod -R 777 /app/uploads && \
     chown -R node:node /app/uploads && \
     chown -R node:node /app/node_modules

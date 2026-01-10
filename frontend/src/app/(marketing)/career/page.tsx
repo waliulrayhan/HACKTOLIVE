@@ -877,7 +877,7 @@ export default function CareerPage() {
                 </Heading>
                 <Text color={mutedColor}>
                   Fill out the form below and we'll review your application. You
-                  can also send your resume directly to careers@hacktolive.net
+                  can also send your resume directly to career@hacktolive.net
                 </Text>
               </Box>
 
@@ -1093,20 +1093,20 @@ export default function CareerPage() {
                 </Text>
                 <HStack spacing={4} justify="center" flexWrap="wrap">
                   <Link
-                    href="mailto:careers@hacktolive.net"
+                    href="mailto:career@hacktolive.net"
                     color={iconColor}
                     fontWeight="medium"
                   >
-                    careers@hacktolive.net
+                    career@hacktolive.net
                   </Link>
-                  <Text color={mutedColor}>|</Text>
+                  {/* <Text color={mutedColor}>|</Text>
                   <Link
                     href="tel:+8801521416287"
                     color={iconColor}
                     fontWeight="medium"
                   >
                     +880 1521-416287
-                  </Link>
+                  </Link> */}
                 </HStack>
               </VStack>
             </Card>
