@@ -775,10 +775,10 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                       <Heading size="md">Your Instructor</Heading>
                     </HStack>
                     <Flex gap="4">
-                      {course.instructor.avatar ? (
+                      {course.instructor.user?.avatar ? (
                         <Image
-                          src={course.instructor.avatar}
-                          alt={course.instructor.name}
+                          src={course.instructor.user.avatar}
+                          alt={course.instructor.user?.name || 'Instructor'}
                           width={70}
                           height={70}
                           style={{ borderRadius: "12px", objectFit: "cover" }}
@@ -797,9 +797,9 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                         </Box>
                       )}
                       <VStack align="start" spacing="1" flex="1">
-                        <Text fontWeight="bold" fontSize="lg">{course.instructor.name}</Text>
+                        <Text fontWeight="bold" fontSize="lg">{course.instructor.user?.name || 'Instructor'}</Text>
                         <Text fontSize="sm" color="muted" noOfLines={2}>
-                          {course.instructor.bio}
+                          {course.instructor.user?.bio || 'Expert Instructor'}
                         </Text>
                         <HStack spacing="4" fontSize="xs" color="muted" mt="1">
                           <HStack spacing="1">

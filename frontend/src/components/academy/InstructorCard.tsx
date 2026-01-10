@@ -25,10 +25,10 @@ export default function InstructorCard({ instructor, showFullBio = false }: Inst
     >
       <VStack spacing="5" align="center" textAlign="center">
         {/* Avatar */}
-        {instructor.avatar ? (
+        {instructor.user?.avatar ? (
           <Image
-            src={instructor.avatar}
-            alt={instructor.name}
+            src={instructor.user.avatar}
+            alt={instructor.user?.name || 'Instructor'}
             boxSize="120px"
             borderRadius="full"
             objectFit="cover"
@@ -54,10 +54,10 @@ export default function InstructorCard({ instructor, showFullBio = false }: Inst
         {/* Name */}
         <VStack spacing="2">
           <Text fontSize="xl" fontWeight="bold">
-            {instructor.name}
+            {instructor.user?.name || 'Instructor'}
           </Text>
           <Badge colorScheme="primary" fontSize="xs" borderRadius="full" px="3" py="1">
-            {instructor.bio}
+            {instructor.user?.bio || 'Expert Instructor'}
           </Badge>
         </VStack>
 
@@ -115,7 +115,7 @@ export default function InstructorCard({ instructor, showFullBio = false }: Inst
         {/* Skills */}
         {!showFullBio && (
           <HStack spacing="2" flexWrap="wrap" justify="center">
-            {instructor.skills.slice(0, 3).map((skill) => (
+            {(Array.isArray(instructor.skills) ? instructor.skills : []).slice(0, 3).map((skill) => (
               <Badge key={skill} colorScheme="primary" fontSize="xs" borderRadius="full" px="3" py="1">
                 {skill}
               </Badge>

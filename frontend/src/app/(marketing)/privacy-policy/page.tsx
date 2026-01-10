@@ -1,21 +1,3 @@
-import { Metadata } from 'next'
-
-export const metadata: Metadata = {
-  title: 'Privacy Policy - HACKTOLIVE',
-  description: 'Read HACKTOLIVE\'s privacy policy to understand how we collect, use, and protect your personal information. Your privacy matters to us.',
-  openGraph: {
-    title: 'Privacy Policy - HACKTOLIVE',
-    description: 'Learn how HACKTOLIVE protects your privacy and handles your personal information.',
-    url: 'https://hacktolive.io/privacy-policy',
-    siteName: 'HACKTOLIVE',
-    type: 'website',
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-}
-
 'use client'
 
 import {

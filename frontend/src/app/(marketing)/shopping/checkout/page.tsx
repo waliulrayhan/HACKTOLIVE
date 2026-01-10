@@ -1,14 +1,3 @@
-import { Metadata } from 'next'
-
-export const metadata: Metadata = {
-  title: 'Checkout - HACKTOLIVE',
-  description: 'Complete your purchase securely. Enter shipping and payment details.',
-  robots: {
-    index: false,
-    follow: false,
-  },
-}
-
 'use client'
 
 import {

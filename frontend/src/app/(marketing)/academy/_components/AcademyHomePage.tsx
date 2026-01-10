@@ -712,10 +712,10 @@ export default function AcademyHomePage() {
                         h="full"
                       >
                         <Box position="relative" overflow="hidden">
-                          {instructor.avatar ? (
+                          {instructor.user?.avatar ? (
                             <Image
-                              src={getFullImageUrl(instructor.avatar, 'avatar')}
-                              alt={instructor.name}
+                              src={getFullImageUrl(instructor.user.avatar, 'avatar')}
+                              alt={instructor.user?.name || 'Instructor'}
                               width={400}
                               height={400}
                               unoptimized
@@ -762,10 +762,10 @@ export default function AcademyHomePage() {
                         <VStack p="6" spacing="4" align="start">
                           <VStack align="start" spacing="2" w="full">
                             <Heading size="md" color={headingColor}>
-                              {instructor.name}
+                              {instructor.user?.name || 'Instructor'}
                             </Heading>
                             <Text fontSize="sm" color={textMuted} noOfLines={2} lineHeight="tall">
-                              {instructor.bio || "Expert Cybersecurity Instructor"}
+                              {instructor.user?.bio || "Expert Cybersecurity Instructor"}
                             </Text>
                           </VStack>
 

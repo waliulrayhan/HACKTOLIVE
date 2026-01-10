@@ -98,11 +98,6 @@ import faq from '@/lib/config/data/faq'
 import pricing from '@/lib/config/data/pricing'
 import testimonials from '@/lib/config/data/testimonials'
 
-export const meta: Metadata = {
-  title: 'HackToLive - Cybersecurity & Ethical Hacking Platform',
-  description: 'Bangladesh\'s premier cybersecurity platform offering professional security services and ethical hacking academy with courses in Bengali.',
-}
-
 const Home: NextPage = () => {
   return (
     <Box>
