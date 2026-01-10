@@ -258,11 +258,11 @@ export default function AcademyHomePage() {
               </Flex>
             </FallInPlace>
 
-            <FallInPlace delay={0.4}>
+            {/* <FallInPlace delay={0.4}>
               <Box w="full" maxW="2xl" pt="4">
                 <SearchBar placeholder="Search cybersecurity courses..." />
               </Box>
-            </FallInPlace>
+            </FallInPlace> */}
           </VStack>
         </Container>
       </Box>
