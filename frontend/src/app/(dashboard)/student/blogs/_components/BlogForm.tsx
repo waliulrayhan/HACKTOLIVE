@@ -3,9 +3,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/toast";
-import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
-import Button from "@/components/ui/button/Button";
-import Image from "next/image";
 import ImageCropper from "@/components/ImageCropper";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -19,10 +16,12 @@ import Highlight from "@tiptap/extension-highlight";
 import {
   HiOutlineArrowLeft,
   HiOutlineSave,
-  HiOutlineCamera,
+  HiOutlinePhotograph,
   HiOutlineTag,
   HiOutlineX,
   HiOutlineInformationCircle,
+  HiOutlinePencilAlt,
+  HiOutlineDocumentText,
 } from "react-icons/hi";
 
 interface BlogFormData {
@@ -361,350 +360,507 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
 
   if (loading) {
     return (
-      <div>
-        <PageBreadcrumb pageTitle={mode === "create" ? "Create Blog" : "Edit Blog"} />
-        <div className="animate-pulse space-y-4">
-          <div className="h-32 bg-gray-200 dark:bg-gray-800 rounded-lg"></div>
-          <div className="h-64 bg-gray-200 dark:bg-gray-800 rounded-lg"></div>
-        </div>
+      <div className="space-y-4">
+        <div className="h-10 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+        <div className="h-96 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <PageBreadcrumb pageTitle={mode === "create" ? "Create Blog Post" : "Edit Blog Post"} />
+    <div className="space-y-6">
+      {/* Header with Back Button */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => router.push("/student/blogs")}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
+          >
+            <HiOutlineArrowLeft className="h-5 w-5" />
+          </button>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {mode === "create" ? "Create New Blog" : "Edit Blog"}
+            </h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+              {mode === "create" 
+                ? "Share your knowledge with the community" 
+                : "Update your blog content"}
+            </p>
+          </div>
+        </div>
 
-      {/* Back Button */}
-      <div>
         <button
-          onClick={() => router.push("/student/blogs")}
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+          onClick={handleSubmit}
+          disabled={saving}
+          className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
         >
-          <HiOutlineArrowLeft className="h-4 w-4" />
-          Back to Blogs
+          {saving ? (
+            <>
+              <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Saving...
+            </>
+          ) : (
+            <>
+              <HiOutlineSave className="h-4 w-4" />
+              {mode === "create" ? "Publish Blog" : "Save Changes"}
+            </>
+          )}
         </button>
       </div>
 
-      {/* Header Card */}
-      <div className="rounded-md border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
-        <div className="flex items-center justify-between gap-4">
+      {/* Resubmission Notice */}
+      {mode === "edit" && originalApprovalStatus === "REJECTED" && (
+        <div className="flex items-start gap-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-4">
+          <HiOutlineInformationCircle className="h-5 w-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {mode === "create" ? "Create New Blog Post" : "Edit Blog Post"}
-            </h2>
-            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-              Fill in the details below to {mode === "create" ? "create" : "update"} your blog post
+            <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-300">
+              Resubmitting for Review
+            </h4>
+            <p className="mt-1 text-sm text-amber-700 dark:text-amber-400">
+              Your changes will resubmit this blog for admin approval with status reset to "Pending".
             </p>
           </div>
-
-          <button
-            onClick={handleSubmit}
-            disabled={saving}
-            className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
-          >
-            {saving ? (
-              <>
-                <svg
-                  className="h-4 w-4 animate-spin"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Saving...
-              </>
-            ) : (
-              <>
-                <HiOutlineSave className="h-4 w-4" />
-                {mode === "create" ? "Create Blog" : "Update Blog"}
-              </>
-            )}
-          </button>
         </div>
-        
-        {/* Resubmission Notice for Rejected Blogs */}
-        {mode === "edit" && originalApprovalStatus === "REJECTED" && (
-          <div className="mt-4 flex items-start gap-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 p-4">
-            <HiOutlineInformationCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-500 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <h4 className="text-sm font-semibold text-yellow-800 dark:text-yellow-300">
-                Resubmitting Rejected Blog
-              </h4>
-              <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-400">
-                When you update and save this blog, it will be resubmitted to admin for approval with status reset to "Pending".
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Main Form */}
-      <div className="space-y-4">
-        {/* Basic Information */}
-        <div className="rounded-md border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
-          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-            Basic Information
-          </h3>
-
-          <div className="space-y-4">
-            {/* Title */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Title <span className="text-error-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                placeholder="Enter blog title"
-                className={`w-full rounded-lg border ${
-                  errors.title
-                    ? "border-error-500"
-                    : "border-gray-300 dark:border-gray-700"
-                } bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
-              />
-              {errors.title && (
-                <p className="mt-1 text-xs text-error-500">{errors.title}</p>
-              )}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column - Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Basic Info Card */}
+          <div className="border border-gray-200 rounded-lg bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+            <div className="flex items-center gap-2 mb-5">
+              <HiOutlinePencilAlt className="h-5 w-5 text-brand-600" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Basic Information
+              </h3>
             </div>
 
-            {/* Slug */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Slug <span className="text-error-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="slug"
-                value={formData.slug}
-                onChange={handleInputChange}
-                placeholder="blog-url-slug"
-                className={`w-full rounded-lg border ${
-                  errors.slug
-                    ? "border-error-500"
-                    : "border-gray-300 dark:border-gray-700"
-                } bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
-              />
-              {errors.slug && (
-                <p className="mt-1 text-xs text-error-500">{errors.slug}</p>
-              )}
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                URL-friendly version of the title. Will be auto-generated if left empty.
-              </p>
+            <div className="space-y-5">
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Title <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => handleTitleChange(e.target.value)}
+                  placeholder="Enter your blog title"
+                  className={`w-full h-11 rounded-lg border ${
+                    errors.title ? "border-red-500" : "border-gray-300 dark:border-gray-700"
+                  } bg-white px-4 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
+                />
+                {errors.title && (
+                  <p className="mt-1.5 text-xs text-red-500">{errors.title}</p>
+                )}
+              </div>
+
+              {/* Slug */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  URL Slug <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="slug"
+                  value={formData.slug}
+                  onChange={handleInputChange}
+                  placeholder="blog-url-slug"
+                  className={`w-full h-11 rounded-lg border ${
+                    errors.slug ? "border-red-500" : "border-gray-300 dark:border-gray-700"
+                  } bg-white px-4 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
+                />
+                {errors.slug && (
+                  <p className="mt-1.5 text-xs text-red-500">{errors.slug}</p>
+                )}
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Short Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="metadata"
+                  value={formData.metadata}
+                  onChange={handleInputChange}
+                  rows={3}
+                  placeholder="Brief description for SEO and preview"
+                  className={`w-full rounded-lg border ${
+                    errors.metadata ? "border-red-500" : "border-gray-300 dark:border-gray-700"
+                  } bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
+                />
+                {errors.metadata && (
+                  <p className="mt-1.5 text-xs text-red-500">{errors.metadata}</p>
+                )}
+              </div>
+
+              {/* Category & Type Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Category <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleInputChange}
+                    className={`w-full h-11 rounded-lg border ${
+                      errors.category ? "border-red-500" : "border-gray-300 dark:border-gray-700"
+                    } bg-white px-4 text-sm text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white`}
+                  >
+                    <option value="">Select category</option>
+                    <option value="CYBERSECURITY_INSIGHTS">Cybersecurity Insights</option>
+                    <option value="NEWS">News</option>
+                    <option value="TUTORIALS">Tutorials</option>
+                  </select>
+                  {errors.category && (
+                    <p className="mt-1.5 text-xs text-red-500">{errors.category}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Blog Type <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="blogType"
+                    value={formData.blogType}
+                    onChange={handleInputChange}
+                    className={`w-full h-11 rounded-lg border ${
+                      errors.blogType ? "border-red-500" : "border-gray-300 dark:border-gray-700"
+                    } bg-white px-4 text-sm text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white`}
+                  >
+                    <option value="">Select type</option>
+                    <option value="THREAT_ALERTS">Threat Alerts</option>
+                    <option value="HOW_TO_TUTORIALS">How-to Tutorials</option>
+                    <option value="BEST_SECURITY_PRACTICES">Best Security Practices</option>
+                    <option value="COMPLIANCE_GUIDES">Compliance Guides</option>
+                    <option value="CASE_STUDY_STORIES">Case Study Stories</option>
+                  </select>
+                  {errors.blogType && (
+                    <p className="mt-1.5 text-xs text-red-500">{errors.blogType}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Read Time */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Read Time
+                </label>
+                <input
+                  type="text"
+                  name="readTime"
+                  value={formData.readTime}
+                  onChange={handleInputChange}
+                  placeholder="e.g., 5 min read"
+                  className="w-full h-11 rounded-lg border border-gray-300 dark:border-gray-700 bg-white px-4 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Content Editor Card */}
+          <div className="border border-gray-200 rounded-lg bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+            <div className="flex items-center gap-2 mb-5">
+              <HiOutlineDocumentText className="h-5 w-5 text-brand-600" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Blog Content <span className="text-red-500">*</span>
+              </h3>
             </div>
 
-            {/* Main Image */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Main Image
-              </label>
-              <input
-                ref={imageInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-              
-              {imagePreview ? (
-                <div className="relative w-48 h-48 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700">
+            {editor && (
+              <div className="border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden">
+                {/* Toolbar */}
+                <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 p-2 flex flex-wrap gap-1">
+                  <button
+                    type="button"
+                    onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                    className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                      editor.isActive("heading", { level: 2 })
+                        ? "bg-brand-600 text-white"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    H2
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                    className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                      editor.isActive("heading", { level: 3 })
+                        ? "bg-brand-600 text-white"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    H3
+                  </button>
+                  <div className="w-px bg-gray-300 mx-1"></div>
+                  <button
+                    type="button"
+                    onClick={() => editor.chain().focus().toggleBold().run()}
+                    className={`px-3 py-1.5 text-sm font-bold rounded transition-colors ${
+                      editor.isActive("bold")
+                        ? "bg-brand-600 text-white"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    B
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => editor.chain().focus().toggleItalic().run()}
+                    className={`px-3 py-1.5 text-sm italic rounded transition-colors ${
+                      editor.isActive("italic")
+                        ? "bg-brand-600 text-white"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    I
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => editor.chain().focus().toggleUnderline().run()}
+                    className={`px-3 py-1.5 text-sm underline rounded transition-colors ${
+                      editor.isActive("underline")
+                        ? "bg-brand-600 text-white"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    U
+                  </button>
+                  <div className="w-px bg-gray-300 mx-1"></div>
+                  <button
+                    type="button"
+                    onClick={() => editor.chain().focus().toggleBulletList().run()}
+                    className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                      editor.isActive("bulletList")
+                        ? "bg-brand-600 text-white"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    • List
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                    className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                      editor.isActive("orderedList")
+                        ? "bg-brand-600 text-white"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    1. List
+                  </button>
+                  <div className="w-px bg-gray-300 mx-1"></div>
+                  <button
+                    type="button"
+                    onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                    className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                      editor.isActive("blockquote")
+                        ? "bg-brand-600 text-white"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    &quot; Quote
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                    className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                      editor.isActive("codeBlock")
+                        ? "bg-brand-600 text-white"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    {"</>"}
+                  </button>
+                  <div className="w-px bg-gray-300 mx-1"></div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url = window.prompt("Enter URL:");
+                      if (url) editor.chain().focus().setLink({ href: url }).run();
+                    }}
+                    className="px-3 py-1.5 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  >
+                    🔗 Link
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url = window.prompt("Enter image URL:");
+                      if (url) editor.chain().focus().setImage({ src: url }).run();
+                    }}
+                    className="px-3 py-1.5 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  >
+                    🖼️ Image
+                  </button>
+                </div>
+
+                <style dangerouslySetInnerHTML={{
+                  __html: `
+                    .ProseMirror { 
+                      min-height: 400px; 
+                      padding: 1rem; 
+                      outline: none; 
+                    }
+                    .dark .ProseMirror { 
+                      background: #1f2937; 
+                      color: #f3f4f6; 
+                    }
+                    .ProseMirror h2 { 
+                      font-size: 1.5em; 
+                      font-weight: 700; 
+                      margin: 1em 0 0.5em; 
+                    }
+                    .ProseMirror h3 { 
+                      font-size: 1.25em; 
+                      font-weight: 600; 
+                      margin: 0.75em 0 0.5em; 
+                    }
+                    .ProseMirror p { 
+                      margin-bottom: 0.75em; 
+                      line-height: 1.6; 
+                    }
+                    .ProseMirror ul, .ProseMirror ol { 
+                      padding-left: 1.5rem; 
+                      margin-bottom: 0.75em; 
+                    }
+                    .ProseMirror blockquote { 
+                      border-left: 4px solid #3b82f6; 
+                      padding-left: 1rem; 
+                      margin: 0 0 0.75em; 
+                      font-style: italic; 
+                      color: #6b7280; 
+                    }
+                    .dark .ProseMirror blockquote { 
+                      color: #9ca3af; 
+                    }
+                    .ProseMirror pre { 
+                      background: #1f2937; 
+                      color: #f3f4f6; 
+                      padding: 1rem; 
+                      border-radius: 0.5rem; 
+                      overflow-x: auto; 
+                      margin-bottom: 0.75em; 
+                    }
+                    .ProseMirror code { 
+                      background: #f3f4f6; 
+                      padding: 0.125rem 0.25rem; 
+                      border-radius: 0.25rem; 
+                      font-size: 0.875em; 
+                    }
+                    .dark .ProseMirror code { 
+                      background: #374151; 
+                    }
+                    .ProseMirror a { 
+                      color: #3b82f6; 
+                      text-decoration: underline; 
+                    }
+                    .ProseMirror img { 
+                      max-width: 100%; 
+                      height: auto; 
+                      border-radius: 0.5rem; 
+                      margin: 1rem 0; 
+                    }
+                  `
+                }} />
+                <EditorContent editor={editor} />
+              </div>
+            )}
+
+            {errors.content && (
+              <p className="mt-2 text-xs text-red-500">{errors.content}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column - Sidebar */}
+        <div className="space-y-6">
+          {/* Featured Image Card */}
+          <div className="border border-gray-200 rounded-lg bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+            <div className="flex items-center gap-2 mb-4">
+              <HiOutlinePhotograph className="h-5 w-5 text-brand-600" />
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                Featured Image
+              </h3>
+            </div>
+
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+
+            {imagePreview ? (
+              <div className="space-y-3">
+                <div className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                   <img
                     src={`${process.env.NEXT_PUBLIC_API_URL}${imagePreview}`}
                     alt="Blog preview"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button
-                      type="button"
-                      onClick={handleImageClick}
-                      disabled={uploadingImage}
-                      className="rounded-lg bg-white/90 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-white"
-                    >
-                      <HiOutlineCamera className="h-5 w-5 inline mr-2" />
-                      Change Image
-                    </button>
-                  </div>
                 </div>
-              ) : (
                 <button
                   type="button"
                   onClick={handleImageClick}
                   disabled={uploadingImage}
-                  className="w-full h-64 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center gap-2 hover:border-brand-500 hover:bg-brand-50 dark:hover:bg-brand-950/20 transition-colors"
+                  className="w-full h-9 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  {uploadingImage ? (
-                    <>
-                      <svg
-                        className="h-8 w-8 animate-spin text-brand-600"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Uploading...
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <HiOutlineCamera className="h-12 w-12 text-gray-400" />
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        Click to upload blog image
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        PNG, JPG up to 5MB
-                      </p>
-                    </>
-                  )}
+                  Change Image
                 </button>
-              )}
-            </div>
-
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Description / Metadata <span className="text-error-500">*</span>
-              </label>
-              <textarea
-                name="metadata"
-                value={formData.metadata}
-                onChange={handleInputChange}
-                rows={3}
-                placeholder="Short description of the blog post for SEO"
-                className={`w-full rounded-lg border ${
-                  errors.metadata
-                    ? "border-error-500"
-                    : "border-gray-300 dark:border-gray-700"
-                } bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
-              />
-              {errors.metadata && (
-                <p className="mt-1 text-xs text-error-500">{errors.metadata}</p>
-              )}
-            </div>
-
-            {/* Category and Blog Type */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Category <span className="text-error-500">*</span>
-                </label>
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleInputChange}
-                  className={`w-full rounded-lg border ${
-                    errors.category
-                      ? "border-error-500"
-                      : "border-gray-300 dark:border-gray-700"
-                  } bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white`}
-                >
-                  <option value="">Select Category</option>
-                  <option value="CYBERSECURITY_INSIGHTS">
-                    Cybersecurity Insights
-                  </option>
-                  <option value="NEWS">News</option>
-                  <option value="TUTORIALS">Tutorials</option>
-                </select>
-                {errors.category && (
-                  <p className="mt-1 text-xs text-error-500">{errors.category}</p>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handleImageClick}
+                disabled={uploadingImage}
+                className="w-full h-40 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center gap-2 hover:border-brand-500 hover:bg-brand-50 dark:hover:bg-brand-950/20 transition-colors"
+              >
+                {uploadingImage ? (
+                  <>
+                    <svg className="h-8 w-8 animate-spin text-brand-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Uploading...</p>
+                  </>
+                ) : (
+                  <>
+                    <HiOutlinePhotograph className="h-10 w-10 text-gray-400" />
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Upload Image
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        PNG, JPG (Max 5MB)
+                      </p>
+                    </div>
+                  </>
                 )}
-              </div>
+              </button>
+            )}
+          </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Blog Type <span className="text-error-500">*</span>
-                </label>
-                <select
-                  name="blogType"
-                  value={formData.blogType}
-                  onChange={handleInputChange}
-                  className={`w-full rounded-lg border ${
-                    errors.blogType
-                      ? "border-error-500"
-                      : "border-gray-300 dark:border-gray-700"
-                  } bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white`}
-                >
-                  <option value="">Select Blog Type</option>
-                  <option value="THREAT_ALERTS">Threat Alerts</option>
-                  <option value="HOW_TO_TUTORIALS">How-to Tutorials</option>
-                  <option value="BEST_SECURITY_PRACTICES">
-                    Best Security Practices
-                  </option>
-                  <option value="COMPLIANCE_GUIDES">Compliance Guides</option>
-                  <option value="CASE_STUDY_STORIES">Case Study Stories</option>
-                </select>
-                {errors.blogType && (
-                  <p className="mt-1 text-xs text-error-500">{errors.blogType}</p>
-                )}
-              </div>
+          {/* Tags Card */}
+          <div className="border border-gray-200 rounded-lg bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+            <div className="flex items-center gap-2 mb-4">
+              <HiOutlineTag className="h-5 w-5 text-brand-600" />
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                Tags <span className="text-red-500">*</span>
+              </h3>
             </div>
 
-            {/* Read Time */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Read Time
-              </label>
-              <input
-                type="text"
-                name="readTime"
-                value={formData.readTime}
-                onChange={handleInputChange}
-                placeholder="8 min read"
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-              />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Optional: Estimated reading time (e.g., "5 min read")
-              </p>
-            </div>
-
-            {/* Approval Info */}
-            <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-900/50">
-              <div className="flex items-start gap-2">
-                <HiOutlineInformationCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
-                    📝 About Blog Publishing
-                  </h4>
-                  <p className="text-xs text-blue-800 dark:text-blue-200">
-                    Your blog will be submitted for admin review. Once approved by an administrator, it will be automatically published and visible to all users.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Tags */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Tags <span className="text-error-500">*</span>
-              </label>
+            <div className="space-y-3">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -716,36 +872,36 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
                       addTag();
                     }
                   }}
-                  placeholder="Add a tag and press Enter"
-                  className={`flex-1 rounded-lg border ${
-                    errors.tags
-                      ? "border-error-500"
-                      : "border-gray-300 dark:border-gray-700"
-                  } bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
+                  placeholder="Add tag..."
+                  className={`flex-1 h-9 rounded-lg border ${
+                    errors.tags ? "border-red-500" : "border-gray-300 dark:border-gray-700"
+                  } bg-white px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
                 />
-                <Button
+                <button
+                  type="button"
                   onClick={addTag}
-                  className="bg-brand-600 text-white hover:bg-brand-700"
+                  className="px-4 h-9 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors"
                 >
                   Add
-                </Button>
+                </button>
               </div>
+
               {errors.tags && (
-                <p className="mt-1 text-xs text-error-500">{errors.tags}</p>
+                <p className="text-xs text-red-500">{errors.tags}</p>
               )}
+
               {formData.tags.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2">
                   {formData.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center gap-1 rounded-full bg-brand-100 px-3 py-1 text-sm font-medium text-brand-700 dark:bg-brand-500/15 dark:text-brand-400"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 dark:bg-brand-500/10 px-3 py-1 text-xs font-medium text-brand-700 dark:text-brand-400"
                     >
-                      <HiOutlineTag className="h-3 w-3" />
                       {tag}
                       <button
                         type="button"
                         onClick={() => removeTag(tag)}
-                        className="ml-1 hover:text-brand-900 dark:hover:text-brand-300"
+                        className="hover:text-brand-900 dark:hover:text-brand-300"
                       >
                         <HiOutlineX className="h-3 w-3" />
                       </button>
@@ -755,202 +911,18 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
               )}
             </div>
           </div>
-        </div>
 
-        {/* Content Editor */}
-        <div className="rounded-md border border-gray-200 bg-white p-6 dark:border-white/5 dark:bg-white/3">
-          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-            Blog Content <span className="text-error-500">*</span>
-          </h3>
-
-          {editor && (
-            <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
-              <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 p-2 flex flex-wrap gap-1">
-                <button
-                  type="button"
-                  onClick={() =>
-                    editor.chain().focus().toggleHeading({ level: 2 }).run()
-                  }
-                  className={`px-3 py-1.5 text-sm rounded ${
-                    editor.isActive("heading", { level: 2 })
-                      ? "bg-brand-600 text-white"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  H2
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    editor.chain().focus().toggleHeading({ level: 3 }).run()
-                  }
-                  className={`px-3 py-1.5 text-sm rounded ${
-                    editor.isActive("heading", { level: 3 })
-                      ? "bg-brand-600 text-white"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  H3
-                </button>
-                <div className="w-px bg-gray-300 mx-1"></div>
-                <button
-                  type="button"
-                  onClick={() => editor.chain().focus().toggleBold().run()}
-                  className={`px-3 py-1.5 text-sm font-bold rounded ${
-                    editor.isActive("bold")
-                      ? "bg-brand-600 text-white"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  B
-                </button>
-                <button
-                  type="button"
-                  onClick={() => editor.chain().focus().toggleItalic().run()}
-                  className={`px-3 py-1.5 text-sm italic rounded ${
-                    editor.isActive("italic")
-                      ? "bg-brand-600 text-white"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  I
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    editor.chain().focus().toggleUnderline().run()
-                  }
-                  className={`px-3 py-1.5 text-sm underline rounded ${
-                    editor.isActive("underline")
-                      ? "bg-brand-600 text-white"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  U
-                </button>
-                <div className="w-px bg-gray-300 mx-1"></div>
-                <button
-                  type="button"
-                  onClick={() =>
-                    editor.chain().focus().toggleBulletList().run()
-                  }
-                  className={`px-3 py-1.5 text-sm rounded ${
-                    editor.isActive("bulletList")
-                      ? "bg-brand-600 text-white"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  • List
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    editor.chain().focus().toggleOrderedList().run()
-                  }
-                  className={`px-3 py-1.5 text-sm rounded ${
-                    editor.isActive("orderedList")
-                      ? "bg-brand-600 text-white"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  1. List
-                </button>
-                <div className="w-px bg-gray-300 mx-1"></div>
-                <button
-                  type="button"
-                  onClick={() =>
-                    editor.chain().focus().toggleBlockquote().run()
-                  }
-                  className={`px-3 py-1.5 text-sm rounded ${
-                    editor.isActive("blockquote")
-                      ? "bg-brand-600 text-white"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  &quot; Quote
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    editor.chain().focus().toggleCodeBlock().run()
-                  }
-                  className={`px-3 py-1.5 text-sm rounded ${
-                    editor.isActive("codeBlock")
-                      ? "bg-brand-600 text-white"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  {"</>"}
-                </button>
-                <div className="w-px bg-gray-300 mx-1"></div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const url = window.prompt("URL?");
-                    if (url)
-                      editor.chain().focus().setLink({ href: url }).run();
-                  }}
-                  className="px-3 py-1.5 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                >
-                  🔗
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const url = window.prompt("Image URL?");
-                    if (url)
-                      editor.chain().focus().setImage({ src: url }).run();
-                  }}
-                  className="px-3 py-1.5 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                >
-                  🖼️
-                </button>
-              </div>
-
-              <style
-                dangerouslySetInnerHTML={{
-                  __html: `
-              .ProseMirror { min-height: 500px; padding: 1rem; outline: none; }
-              .dark .ProseMirror { background: #111827; color: #f3f4f6; }
-              .ProseMirror h2 { font-size: 1.5em; font-weight: 700; margin: 1em 0 0.5em; }
-              .ProseMirror h3 { font-size: 1.25em; font-weight: 600; margin: 0.75em 0 0.5em; }
-              .ProseMirror p { margin-bottom: 0.75em; line-height: 1.6; }
-              .ProseMirror ul, .ProseMirror ol { padding-left: 1.5rem; margin-bottom: 0.75em; }
-              .ProseMirror blockquote { border-left: 4px solid #3b82f6; padding-left: 1rem; margin: 0 0 0.75em; font-style: italic; color: #6b7280; }
-              .dark .ProseMirror blockquote { color: #9ca3af; }
-              .ProseMirror pre { background: #1f2937; color: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 0.75em; }
-              .ProseMirror code { background: #f3f4f6; padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-size: 0.875em; }
-              .dark .ProseMirror code { background: #374151; }
-              .ProseMirror a { color: #3b82f6; text-decoration: underline; }
-              .ProseMirror img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 1rem 0; }
-            `,
-                }}
-              />
-              <EditorContent editor={editor} />
-            </div>
-          )}
-
-          {errors.content && (
-            <p className="mt-2 text-xs text-error-500">{errors.content}</p>
-          )}
-
-          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-900/50">
-            <div className="flex items-start gap-2">
-              <HiOutlineInformationCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+          {/* Info Card */}
+          <div className="border border-blue-200 dark:border-blue-800 rounded-lg bg-blue-50 dark:bg-blue-900/20 p-5">
+            <div className="flex items-start gap-3">
+              <HiOutlineInformationCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
-                  💡 Editor Tips
+                <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-1">
+                  Publishing Process
                 </h4>
-                <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
-                  <li>
-                    • Use toolbar to format text with headings, bold, lists, and
-                    more
-                  </li>
-                  <li>• Add images and links to enhance your article</li>
-                  <li>
-                    • Keyboard shortcuts: Ctrl+B (bold), Ctrl+I (italic)
-                  </li>
-                </ul>
+                <p className="text-xs text-blue-700 dark:text-blue-400 leading-relaxed">
+                  Your blog will be submitted for admin review. Once approved, it will be automatically published and visible to all users.
+                </p>
               </div>
             </div>
           </div>

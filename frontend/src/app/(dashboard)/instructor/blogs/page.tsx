@@ -820,40 +820,6 @@ export default function BlogsManagementPage() {
                 </div>
               )}
 
-              {/* Blog Type */}
-              <div className="mb-8 pt-6 border-t border-gray-200 dark:border-gray-800">
-                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                  Blog Type
-                </p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {selectedBlog.blogType.replace(/_/g, ' ')}
-                </p>
-              </div>
-
-              {/* Publish Date Info */}
-              {selectedBlog.publishedAt && (
-                <div className="mb-8 pt-6 border-t border-gray-200 dark:border-gray-800">
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                        Published On
-                      </p>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {formatDate(selectedBlog.publishedAt)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                        Last Updated
-                      </p>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {formatDate(selectedBlog.updatedAt)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200 dark:border-gray-800">
                 <button
