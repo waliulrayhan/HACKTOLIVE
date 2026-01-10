@@ -69,7 +69,7 @@ export default function AllCoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [enrolledCourseIds, setEnrolledCourseIds] = useState<string[]>([]);
-  
+
   const { user } = useAuth();
 
   // Fetch courses from API with filters (with debouncing for search)
@@ -216,7 +216,7 @@ export default function AllCoursesPage() {
               />
             </InputGroup>
           </HStack>
-          
+
           {/* Range Slider */}
           <Box>
             <Text fontSize="xs" mb="2" color="muted">{minPrice} Tk - {maxPrice} Tk</Text>
@@ -289,9 +289,9 @@ export default function AllCoursesPage() {
   return (
     <Box>
       {/* Hero Section */}
-      <Box 
-        position="relative" 
-        overflow="hidden" 
+      <Box
+        position="relative"
+        overflow="hidden"
         pt={{ base: 32, md: 40 }}
         pb={{ base: 16, md: 20 }}
         bgImage="url('https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=2000')"
@@ -314,18 +314,18 @@ export default function AllCoursesPage() {
         <Container maxW="container.xl" position="relative" zIndex={1}>
           <FallInPlace>
             <VStack spacing={{ base: 4, md: 6 }} textAlign="center" maxW="4xl" mx="auto">
-              <Badge 
-                colorScheme="green" 
-                fontSize="sm" 
-                px="4" 
-                py="2" 
-                borderRadius="full"
-                textTransform="uppercase"
-                letterSpacing="wide"
-              >
-                Browse Courses
-              </Badge>
-              
+              <FallInPlace>
+                <Badge
+                  colorScheme="green"
+                  fontSize="sm"
+                  px={4}
+                  py={1}
+                  borderRadius="full"
+                >
+                  Browse All Courses
+                </Badge>
+              </FallInPlace>
+
               <Box>
                 <Heading
                   as="h1"
@@ -345,18 +345,18 @@ export default function AllCoursesPage() {
                   borderRadius="full"
                 />
               </Box>
-              
-              <Text 
-                fontSize={{ base: 'md', md: 'lg', lg: 'xl' }} 
-                color="whiteAlpha.900" 
+
+              <Text
+                fontSize={{ base: 'md', md: 'lg', lg: 'xl' }}
+                color="whiteAlpha.900"
                 maxW="3xl"
               >
                 Choose from 50+ expert-led cybersecurity courses designed to take you from beginner to advanced professional
               </Text>
 
               {/* Stats */}
-              <HStack 
-                spacing={{ base: 6, md: 12 }} 
+              <HStack
+                spacing={{ base: 6, md: 12 }}
                 pt={4}
                 flexWrap="wrap"
                 justify="center"
@@ -419,183 +419,183 @@ export default function AllCoursesPage() {
 
       {/* Filters & Content */}
       <Box py={{ base: '8', md: '12' }} bg={bgColor}>
-      <Container maxW="container.xl">
-        <VStack spacing="8" align="stretch">
+        <Container maxW="container.xl">
+          <VStack spacing="8" align="stretch">
 
-          {/* Search & Filters */}
-          <Box>
-            {/* Search Bar - Full width on mobile */}
-            <Box mb="4">
-              <SearchBar
-                placeholder="Search courses by title or description..."
-                onSearch={setSearchQuery}
-              />
-            </Box>
-            
-            {/* Results Count - Mobile Only (Above Sort/Filter) */}
-            <Text 
-              fontSize="sm" 
-              color="muted" 
-              fontWeight="medium" 
-              display={{ base: "block", lg: "none" }}
-              mb="3"
-            >
-              Showing <chakra.span color="primary.500" fontWeight="semibold">{currentCourses.length}</chakra.span> of {sortedCourses.length} courses
-            </Text>
-            
-            {/* Sort & Filter Row - Mobile */}
-            <Flex 
-              gap="3" 
-              display={{ base: "flex", lg: "none" }}
-              align="center"
-            >
-              <Select
-                size="sm"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                flex="1"
-                borderRadius="lg"
-                focusBorderColor="primary.500"
-              >
-                <option value="popular">Most Popular</option>
-                <option value="rating">Highest Rated</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="newest">Newest First</option>
-              </Select>
-              <Button
-                leftIcon={<Icon as={FiFilter} />}
-                onClick={onOpen}
-                colorScheme="primary"
-                variant="outline"
-                size="sm"
-                flexShrink={0}
-              >
-                Filters
-              </Button>
-            </Flex>
-          </Box>
-
-          {/* Results Header - Desktop Only */}
-          <Flex justify="space-between" align="center" wrap="wrap" gap="4" display={{ base: "none", lg: "flex" }}>
-            <Text fontSize="md" color="muted" fontWeight="medium">
-              Showing <chakra.span color="primary.500" fontWeight="semibold">{currentCourses.length}</chakra.span> of {sortedCourses.length} courses
-            </Text>
-            <HStack spacing="3">
-              <Text fontSize="sm" color="muted">
-                Sort by:
-              </Text>
-              <Select
-                size="sm"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                w="200px"
-                borderRadius="lg"
-                focusBorderColor="primary.500"
-              >
-                <option value="popular">Most Popular</option>
-                <option value="rating">Highest Rated</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="newest">Newest First</option>
-              </Select>
-            </HStack>
-          </Flex>
-
-          {/* Main Content */}
-          <HStack align="start" spacing="8">
-            {/* Sidebar Filters (Desktop) */}
-            <Box
-              w="280px"
-              display={{ base: "none", lg: "block" }}
-              position="sticky"
-              top="100px"
-            >
-              <Box
-                borderWidth="1px"
-                borderRadius="2xl"
-                borderColor={borderColor}
-                p="6"
-                bg={cardBg}
-              >
-                <FilterSection />
-              </Box>
-            </Box>
-
-            {/* Course Grid */}
-            <Box flex="1">
-              {loading ? (
-                <Center py="20">
-                  <VStack spacing="4">
-                    <Spinner size="xl" color="primary.500" thickness="4px" />
-                    <Text color="muted">Loading courses...</Text>
-                  </VStack>
-                </Center>
-              ) : sortedCourses.length === 0 ? (
-                <EmptyState
-                  title="No courses found"
-                  description="Try adjusting your filters or search query to find what you're looking for."
-                  actionLabel="Reset Filters"
-                  onAction={resetFilters}
+            {/* Search & Filters */}
+            <Box>
+              {/* Search Bar - Full width on mobile */}
+              <Box mb="4">
+                <SearchBar
+                  placeholder="Search courses by title or description..."
+                  onSearch={setSearchQuery}
                 />
-              ) : (
-                <VStack spacing="8" align="stretch">
-                  <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} spacing="6">
-                    {currentCourses.map((course, index) => (
-                      <FallInPlace key={course.id} delay={0.05 * index}>
-                        <CourseCard 
-                          course={course} 
-                          isEnrolled={enrolledCourseIds.includes(course.id)}
-                        />
-                      </FallInPlace>
-                    ))}
-                  </SimpleGrid>
-                  
-                  {/* Pagination */}
-                  {totalPages > 1 && (
-                    <Flex justify="center" align="center" gap="2" flexWrap="wrap">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        colorScheme="primary"
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                        isDisabled={currentPage === 1}
-                      >
-                        Previous
-                      </Button>
-                      
-                      <HStack spacing="1">
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                          <Button
-                            key={page}
-                            size="sm"
-                            variant={currentPage === page ? "solid" : "ghost"}
-                            colorScheme="primary"
-                            onClick={() => setCurrentPage(page)}
-                            minW="40px"
-                          >
-                            {page}
-                          </Button>
-                        ))}
-                      </HStack>
-                      
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        colorScheme="primary"
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                        isDisabled={currentPage === totalPages}
-                      >
-                        Next
-                      </Button>
-                    </Flex>
-                  )}
-                </VStack>
-              )}
+              </Box>
+
+              {/* Results Count - Mobile Only (Above Sort/Filter) */}
+              <Text
+                fontSize="sm"
+                color="muted"
+                fontWeight="medium"
+                display={{ base: "block", lg: "none" }}
+                mb="3"
+              >
+                Showing <chakra.span color="primary.500" fontWeight="semibold">{currentCourses.length}</chakra.span> of {sortedCourses.length} courses
+              </Text>
+
+              {/* Sort & Filter Row - Mobile */}
+              <Flex
+                gap="3"
+                display={{ base: "flex", lg: "none" }}
+                align="center"
+              >
+                <Select
+                  size="sm"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  flex="1"
+                  borderRadius="lg"
+                  focusBorderColor="primary.500"
+                >
+                  <option value="popular">Most Popular</option>
+                  <option value="rating">Highest Rated</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="newest">Newest First</option>
+                </Select>
+                <Button
+                  leftIcon={<Icon as={FiFilter} />}
+                  onClick={onOpen}
+                  colorScheme="primary"
+                  variant="outline"
+                  size="sm"
+                  flexShrink={0}
+                >
+                  Filters
+                </Button>
+              </Flex>
             </Box>
-          </HStack>
-        </VStack>
-      </Container>
+
+            {/* Results Header - Desktop Only */}
+            <Flex justify="space-between" align="center" wrap="wrap" gap="4" display={{ base: "none", lg: "flex" }}>
+              <Text fontSize="md" color="muted" fontWeight="medium">
+                Showing <chakra.span color="primary.500" fontWeight="semibold">{currentCourses.length}</chakra.span> of {sortedCourses.length} courses
+              </Text>
+              <HStack spacing="3">
+                <Text fontSize="sm" color="muted">
+                  Sort by:
+                </Text>
+                <Select
+                  size="sm"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  w="200px"
+                  borderRadius="lg"
+                  focusBorderColor="primary.500"
+                >
+                  <option value="popular">Most Popular</option>
+                  <option value="rating">Highest Rated</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="newest">Newest First</option>
+                </Select>
+              </HStack>
+            </Flex>
+
+            {/* Main Content */}
+            <HStack align="start" spacing="8">
+              {/* Sidebar Filters (Desktop) */}
+              <Box
+                w="280px"
+                display={{ base: "none", lg: "block" }}
+                position="sticky"
+                top="100px"
+              >
+                <Box
+                  borderWidth="1px"
+                  borderRadius="2xl"
+                  borderColor={borderColor}
+                  p="6"
+                  bg={cardBg}
+                >
+                  <FilterSection />
+                </Box>
+              </Box>
+
+              {/* Course Grid */}
+              <Box flex="1">
+                {loading ? (
+                  <Center py="20">
+                    <VStack spacing="4">
+                      <Spinner size="xl" color="primary.500" thickness="4px" />
+                      <Text color="muted">Loading courses...</Text>
+                    </VStack>
+                  </Center>
+                ) : sortedCourses.length === 0 ? (
+                  <EmptyState
+                    title="No courses found"
+                    description="Try adjusting your filters or search query to find what you're looking for."
+                    actionLabel="Reset Filters"
+                    onAction={resetFilters}
+                  />
+                ) : (
+                  <VStack spacing="8" align="stretch">
+                    <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} spacing="6">
+                      {currentCourses.map((course, index) => (
+                        <FallInPlace key={course.id} delay={0.05 * index}>
+                          <CourseCard
+                            course={course}
+                            isEnrolled={enrolledCourseIds.includes(course.id)}
+                          />
+                        </FallInPlace>
+                      ))}
+                    </SimpleGrid>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                      <Flex justify="center" align="center" gap="2" flexWrap="wrap">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          colorScheme="primary"
+                          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                          isDisabled={currentPage === 1}
+                        >
+                          Previous
+                        </Button>
+
+                        <HStack spacing="1">
+                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                            <Button
+                              key={page}
+                              size="sm"
+                              variant={currentPage === page ? "solid" : "ghost"}
+                              colorScheme="primary"
+                              onClick={() => setCurrentPage(page)}
+                              minW="40px"
+                            >
+                              {page}
+                            </Button>
+                          ))}
+                        </HStack>
+
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          colorScheme="primary"
+                          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                          isDisabled={currentPage === totalPages}
+                        >
+                          Next
+                        </Button>
+                      </Flex>
+                    )}
+                  </VStack>
+                )}
+              </Box>
+            </HStack>
+          </VStack>
+        </Container>
       </Box>
 
       {/* Mobile Filter Drawer */}
@@ -675,7 +675,7 @@ export default function AllCoursesPage() {
                 }
               }}
             />
-            
+
             <VStack spacing={{ base: '6', md: '8' }} textAlign="center" position="relative" zIndex="1">
               <VStack spacing="4">
                 <Heading
@@ -713,7 +713,7 @@ export default function AllCoursesPage() {
                 <Button
                   size="lg"
                   colorScheme="primary"
-                  _hover={{ 
+                  _hover={{
                     transform: 'translateY(-3px) scale(1.02)',
                     boxShadow: '2xl'
                   }}
@@ -729,7 +729,7 @@ export default function AllCoursesPage() {
                   size="lg"
                   variant="outline"
                   colorScheme="primary"
-                  _hover={{ 
+                  _hover={{
                     transform: 'translateY(-3px) scale(1.02)',
                     bg: useColorModeValue('primary.50', 'whiteAlpha.100')
                   }}
@@ -742,10 +742,10 @@ export default function AllCoursesPage() {
                 </Button>
               </HStack>
 
-              <HStack 
-                spacing="8" 
-                pt="4" 
-                flexWrap="wrap" 
+              <HStack
+                spacing="8"
+                pt="4"
+                flexWrap="wrap"
                 justify="center"
                 animation="fadeIn 1.2s ease-out"
                 sx={{

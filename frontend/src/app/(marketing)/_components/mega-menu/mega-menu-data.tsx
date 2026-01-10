@@ -102,6 +102,12 @@ export const megaMenuData: MegaMenuData = {
         title: 'Student Resources',
         items: [
           {
+            title: 'Verify Certificate',
+            description: 'Verify certificate authenticity',
+            href: '/verify-certificate',
+            icon: FiShield,
+          },
+          {
             title: 'Certifications',
             description: 'Earn industry-recognized certificates',
             href: '/student/certificates',
@@ -244,6 +250,17 @@ export const megaMenuData: MegaMenuData = {
             description: 'Get in touch',
             href: '/contact',
             icon: FiMail,
+          },
+        ],
+      },
+      {
+        title: 'Verification',
+        items: [
+          {
+            title: 'Verify Certificate',
+            description: 'Check certificate authenticity',
+            href: '/verify-certificate',
+            icon: FiShield,
           },
         ],
       },

@@ -122,16 +122,22 @@ export class CertificatesService {
     });
   }
 
-  async findByVerificationCode(
-    verificationCode: string,
-  ): Promise<Certificate | null> {
+  async findByVerificationCode(verificationCode: string) {
     const certificate = await this.prisma.certificate.findUnique({
       where: { verificationCode },
       include: {
-        student: true,
+        student: {
+          include: {
+            user: true,
+          },
+        },
         course: {
           include: {
-            instructor: true,
+            instructor: {
+              include: {
+                user: true,
+              },
+            },
           },
         },
       },

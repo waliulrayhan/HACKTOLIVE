@@ -54,8 +54,30 @@ export class CertificatesController {
   }
 
   @Get('verify/:verificationCode')
-  verify(@Param('verificationCode') verificationCode: string) {
-    return this.certificatesService.findByVerificationCode(verificationCode);
+  async verify(@Param('verificationCode') verificationCode: string) {
+    try {
+      const certificate = await this.certificatesService.findByVerificationCode(verificationCode);
+      
+      // Return formatted data for public verification
+      return {
+        valid: true,
+        certificate: {
+          id: certificate.id,
+          verificationCode: certificate.verificationCode,
+          studentName: certificate.student?.user?.name || 'Unknown Student',
+          courseName: certificate.course?.title || 'Unknown Course',
+          instructorName: certificate.course?.instructor?.user?.name || 'Unknown Instructor',
+          issuedAt: certificate.issuedAt,
+          status: certificate.status,
+          certificateUrl: certificate.certificateUrl,
+        }
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw error;
+    }
   }
 
   @Get(':id')
