@@ -26,6 +26,9 @@ import {
   useBreakpointValue,
   Spinner,
   Input,
+  Alert,
+  AlertIcon,
+  AlertDescription,
 } from "@chakra-ui/react";
 import { FiSearch, FiMail } from "react-icons/fi";
 import SearchBar from "@/components/academy/SearchBar";
@@ -45,6 +48,15 @@ const BlogPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  
+  // Newsletter subscription states
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterName, setNewsletterName] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [subscriptionMessage, setSubscriptionMessage] = useState<{
+    type: 'success' | 'error';
+    text: string;
+  } | null>(null);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const isDesktop = useBreakpointValue({ base: false, lg: true });
@@ -148,6 +160,63 @@ const BlogPage = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory, selectedType, searchQuery]);
+
+  // Newsletter subscription handler
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!newsletterEmail) {
+      setSubscriptionMessage({
+        type: 'error',
+        text: 'Please enter your email address',
+      });
+      return;
+    }
+
+    setIsSubscribing(true);
+    setSubscriptionMessage(null);
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/newsletter/subscribe`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: newsletterEmail,
+            name: newsletterName,
+            source: 'blog',
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubscriptionMessage({
+          type: 'success',
+          text: data.message || 'Successfully subscribed to newsletter! Check your email.',
+        });
+        setNewsletterEmail('');
+        setNewsletterName('');
+      } else {
+        setSubscriptionMessage({
+          type: 'error',
+          text: data.message || 'Failed to subscribe. Please try again.',
+        });
+      }
+    } catch (error) {
+      console.error('Newsletter subscription error:', error);
+      setSubscriptionMessage({
+        type: 'error',
+        text: 'An error occurred. Please try again later.',
+      });
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
 
   return (
     <Box>
@@ -405,9 +474,52 @@ const BlogPage = () => {
             <Text fontSize="lg" color="muted" maxW="xl">
               Get the latest cybersecurity insights, threat alerts, and tutorials delivered directly to your inbox.
             </Text>
-            <Stack as="form" w="full" maxW="md" spacing="3" direction={{ base: "column", md: "row" }} px={{ base: "4", md: "0" }} onSubmit={(e) => e.preventDefault()}>
-              <Input placeholder="Enter your email" type="email" size="lg" bg={cardBg} borderWidth="2px" _focus={{ borderColor: accentColor }} h="12" flex={{ base: "auto", md: "1" }} />
-              <Button type="submit" colorScheme="green" size="lg" rightIcon={<Icon as={FiMail} />} h="12" flexShrink={{ base: "auto", md: 0 }}>
+            
+            {subscriptionMessage && (
+              <Alert 
+                status={subscriptionMessage.type} 
+                borderRadius="md" 
+                maxW="md"
+                variant="subtle"
+              >
+                <AlertIcon />
+                <AlertDescription>{subscriptionMessage.text}</AlertDescription>
+              </Alert>
+            )}
+
+            <Stack 
+              as="form" 
+              w="full" 
+              maxW="md" 
+              spacing="3" 
+              direction={{ base: "column", md: "row" }} 
+              px={{ base: "4", md: "0" }} 
+              onSubmit={handleNewsletterSubmit}
+            >
+              <Input 
+                placeholder="Enter your email" 
+                type="email" 
+                size="lg" 
+                bg={cardBg} 
+                borderWidth="2px" 
+                _focus={{ borderColor: accentColor }} 
+                h="12" 
+                flex={{ base: "auto", md: "1" }}
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                isDisabled={isSubscribing}
+                required
+              />
+              <Button 
+                type="submit" 
+                colorScheme="green" 
+                size="lg" 
+                rightIcon={<Icon as={FiMail} />} 
+                h="12" 
+                flexShrink={{ base: "auto", md: 0 }}
+                isLoading={isSubscribing}
+                loadingText="Subscribing..."
+              >
                 Subscribe
               </Button>
             </Stack>

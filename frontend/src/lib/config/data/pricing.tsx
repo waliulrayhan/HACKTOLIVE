@@ -72,7 +72,8 @@ export default {
         },
       ],
       action: {
-        href: 'tel:+8801521416287',
+        href: '/signup',
+        label: 'Get Started',
       },
     },
     {
@@ -109,7 +110,8 @@ export default {
         },
       ],
       action: {
-        href: 'tel:+8801521416287',
+        href: '/service',
+        label: 'Contact Us',
       },
     },
   ],

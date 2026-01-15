@@ -648,7 +648,11 @@ enum EmailSender {
 enum EmailStatus {
   PENDING
   SENT
+  DELIVERED
+  OPENED
+  CLICKED
   FAILED
+  BOUNCED
 }
 
 // ============================================
@@ -1005,4 +1009,90 @@ enum PaymentMethod {
   CARD
   BANK_TRANSFER
   CASH_ON_DELIVERY
+}
+
+// ============================================
+// NEWSLETTER SYSTEM
+// ============================================
+
+model Newsletter {
+  id          String             @id @default(uuid())
+  email       String             @unique @db.VarChar(255)
+  name        String?            @db.VarChar(255)
+  status      NewsletterStatus   @default(SUBSCRIBED)
+  source      String?            @db.VarChar(100) // blog, homepage, footer, etc.
+  tags        String?            @db.Text // JSON array of tags
+  metadata    String?            @db.Text // JSON for additional data
+  subscribedAt DateTime          @default(now())
+  unsubscribedAt DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  
+  campaigns   NewsletterCampaignLog[]
+
+  @@index([email])
+  @@index([status])
+  @@index([subscribedAt])
+}
+
+model NewsletterCampaign {
+  id            String                   @id @default(uuid())
+  name          String                   @db.VarChar(255)
+  subject       String                   @db.VarChar(500)
+  body          String                   @db.LongText
+  status        CampaignStatus           @default(DRAFT)
+  scheduledAt   DateTime?
+  sentAt        DateTime?
+  totalSent     Int                      @default(0)
+  totalDelivered Int                     @default(0)
+  totalFailed   Int                      @default(0)
+  totalOpened   Int                      @default(0)
+  totalClicked  Int                      @default(0)
+  tags          String?                  @db.Text // JSON array - filter subscribers by tags
+  createdBy     String?                  @db.VarChar(255)
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
+  
+  logs          NewsletterCampaignLog[]
+
+  @@index([status])
+  @@index([scheduledAt])
+  @@index([sentAt])
+}
+
+model NewsletterCampaignLog {
+  id          String              @id @default(uuid())
+  campaignId  String
+  subscriberId String
+  status      EmailStatus         @default(PENDING)
+  sentAt      DateTime?
+  deliveredAt DateTime?
+  openedAt    DateTime?
+  clickedAt   DateTime?
+  failedReason String?            @db.Text
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  
+  campaign    NewsletterCampaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  subscriber  Newsletter          @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, subscriberId])
+  @@index([campaignId])
+  @@index([subscriberId])
+  @@index([status])
+}
+
+enum NewsletterStatus {
+  SUBSCRIBED
+  UNSUBSCRIBED
+  BOUNCED
+  COMPLAINED
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  SENT
+  CANCELLED
 }

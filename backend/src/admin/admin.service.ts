@@ -611,4 +611,259 @@ export class AdminService {
       where: { id: blogId },
     });
   }
+
+  // Newsletter Management Methods
+  async getNewsletterSubscribers(filters: {
+    page: number;
+    limit: number;
+    status?: string;
+    search?: string;
+  }) {
+    const { page, limit, status, search } = filters;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (status) {
+      where.status = status;
+    }
+
+    if (search) {
+      where.OR = [
+        { email: { contains: search } },
+        { name: { contains: search } },
+      ];
+    }
+
+    const [subscribers, total] = await Promise.all([
+      this.prisma.newsletter.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { subscribedAt: 'desc' },
+      }),
+      this.prisma.newsletter.count({ where }),
+    ]);
+
+    return {
+      data: subscribers,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async deleteNewsletterSubscriber(id: string) {
+    await this.prisma.newsletter.delete({
+      where: { id },
+    });
+
+    return {
+      success: true,
+      message: 'Subscriber deleted successfully',
+    };
+  }
+
+  async getNewsletterCampaigns(filters: {
+    page: number;
+    limit: number;
+    status?: string;
+  }) {
+    const { page, limit, status } = filters;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (status) {
+      where.status = status;
+    }
+
+    const [campaigns, total] = await Promise.all([
+      this.prisma.newsletterCampaign.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.newsletterCampaign.count({ where }),
+    ]);
+
+    return {
+      data: campaigns.map(c => ({
+        ...c,
+        tags: c.tags ? JSON.parse(c.tags) : [],
+      })),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async getNewsletterCampaignById(id: string) {
+    const campaign = await this.prisma.newsletterCampaign.findUnique({
+      where: { id },
+      include: {
+        logs: {
+          take: 100,
+          orderBy: { createdAt: 'desc' },
+          include: {
+            subscriber: true,
+          },
+        },
+      },
+    });
+
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+
+    return {
+      ...campaign,
+      tags: campaign.tags ? JSON.parse(campaign.tags) : [],
+    };
+  }
+
+  async createNewsletterCampaign(data: any) {
+    const campaign = await this.prisma.newsletterCampaign.create({
+      data: {
+        name: data.name,
+        subject: data.subject,
+        body: data.body,
+        tags: data.tags ? JSON.stringify(data.tags) : null,
+        scheduledAt: data.scheduledAt,
+        status: data.scheduledAt ? 'SCHEDULED' : 'DRAFT',
+        createdBy: data.createdBy,
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Campaign created successfully',
+      data: {
+        ...campaign,
+        tags: campaign.tags ? JSON.parse(campaign.tags) : [],
+      },
+    };
+  }
+
+  async updateNewsletterCampaign(id: string, data: any) {
+    const campaign = await this.prisma.newsletterCampaign.findUnique({
+      where: { id },
+    });
+
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+
+    if (campaign.status === 'SENT' || campaign.status === 'SENDING') {
+      throw new Error('Cannot update a sent or sending campaign');
+    }
+
+    const updated = await this.prisma.newsletterCampaign.update({
+      where: { id },
+      data: {
+        ...data,
+        tags: data.tags ? JSON.stringify(data.tags) : undefined,
+        status: data.scheduledAt ? 'SCHEDULED' : undefined,
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Campaign updated successfully',
+      data: {
+        ...updated,
+        tags: updated.tags ? JSON.parse(updated.tags) : [],
+      },
+    };
+  }
+
+  async deleteNewsletterCampaign(id: string) {
+    const campaign = await this.prisma.newsletterCampaign.findUnique({
+      where: { id },
+    });
+
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+
+    if (campaign.status === 'SENDING') {
+      throw new Error('Cannot delete a campaign that is currently sending');
+    }
+
+    await this.prisma.newsletterCampaign.delete({
+      where: { id },
+    });
+
+    return {
+      success: true,
+      message: 'Campaign deleted successfully',
+    };
+  }
+
+  async sendNewsletterCampaign(id: string) {
+    // This will delegate to the newsletter service
+    const campaign = await this.prisma.newsletterCampaign.findUnique({
+      where: { id },
+    });
+
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+
+    if (campaign.status === 'SENT' || campaign.status === 'SENDING') {
+      throw new Error('Campaign has already been sent or is sending');
+    }
+
+    // Import and use newsletter service
+    const { NewsletterService } = require('../newsletter/newsletter.service');
+    const { EmailService } = require('../email/email.service');
+    
+    const newsletterService = new NewsletterService(this.prisma, new EmailService(this.prisma));
+    return newsletterService.sendCampaign(id);
+  }
+
+  async getNewsletterStats() {
+    const [
+      totalSubscribers,
+      activeSubscribers,
+      unsubscribed,
+      totalCampaigns,
+      sentCampaigns,
+    ] = await Promise.all([
+      this.prisma.newsletter.count(),
+      this.prisma.newsletter.count({ where: { status: 'SUBSCRIBED' } }),
+      this.prisma.newsletter.count({ where: { status: 'UNSUBSCRIBED' } }),
+      this.prisma.newsletterCampaign.count(),
+      this.prisma.newsletterCampaign.count({ where: { status: 'SENT' } }),
+    ]);
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const recentSubscriptions = await this.prisma.newsletter.count({
+      where: {
+        subscribedAt: { gte: thirtyDaysAgo },
+        status: 'SUBSCRIBED',
+      },
+    });
+
+    return {
+      totalSubscribers,
+      activeSubscribers,
+      unsubscribed,
+      totalCampaigns,
+      sentCampaigns,
+      recentSubscriptions,
+      subscriptionRate: totalSubscribers > 0 
+        ? ((activeSubscribers / totalSubscribers) * 100).toFixed(2) 
+        : '0',
+    };
+  }
 }

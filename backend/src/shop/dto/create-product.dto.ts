@@ -2,7 +2,7 @@ import { IsString, IsNumber, IsOptional, IsEnum, IsBoolean, IsArray, Min, MaxLen
 
 export enum ProductType {
   COURSE_VOUCHER = 'COURSE_VOUCHER',
-  DAILY_SPECIAL = 'DAILY_SPECIAL',
+  TSHIRT = 'TSHIRT',
   MERCHANDISE = 'MERCHANDISE',
   TRAINING_BUNDLE = 'TRAINING_BUNDLE',
 }

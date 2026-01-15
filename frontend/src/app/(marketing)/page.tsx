@@ -1420,7 +1420,7 @@ const PhotoGallerySection = () => {
             </Box>
           </Box>
 
-          <FallInPlace delay={0.4}>
+          {/* <FallInPlace delay={0.4}>
             <ButtonLink 
               variant="outline" 
               size="lg" 
@@ -1430,7 +1430,7 @@ const PhotoGallerySection = () => {
             >
               View Full Gallery
             </ButtonLink>
-          </FallInPlace>
+          </FallInPlace> */}
 
           {/* Lightbox Modal */}
           <Modal 

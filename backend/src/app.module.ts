@@ -13,6 +13,7 @@ import { CareerModule } from './career/career.module';
 import { ShopModule } from './shop/shop.module';
 import { EmailModule } from './email/email.module';
 import { ContactModule } from './contact/contact.module';
+import { NewsletterModule } from './newsletter/newsletter.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ContactModule } from './contact/contact.module';
     ShopModule,
     EmailModule,
     ContactModule,
+    NewsletterModule,
   ],
   controllers: [AppController],
   providers: [AppService],

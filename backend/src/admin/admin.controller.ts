@@ -171,4 +171,82 @@ export class AdminController {
   syncInstructorStats() {
     return this.adminService.syncInstructorStats();
   }
+
+  // Newsletter Management
+  @Get('newsletter/subscribers')
+  @ApiOperation({ summary: 'Get all newsletter subscribers' })
+  getNewsletterSubscribers(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('status') status?: string,
+    @Query('search') search?: string,
+  ) {
+    return this.adminService.getNewsletterSubscribers({
+      page: page ? parseInt(page) : 1,
+      limit: limit ? parseInt(limit) : 20,
+      status,
+      search,
+    });
+  }
+
+  @Delete('newsletter/subscribers/:id')
+  @ApiOperation({ summary: 'Delete newsletter subscriber' })
+  deleteNewsletterSubscriber(@Param('id') id: string) {
+    return this.adminService.deleteNewsletterSubscriber(id);
+  }
+
+  @Get('newsletter/campaigns')
+  @ApiOperation({ summary: 'Get all newsletter campaigns' })
+  getNewsletterCampaigns(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('status') status?: string,
+  ) {
+    return this.adminService.getNewsletterCampaigns({
+      page: page ? parseInt(page) : 1,
+      limit: limit ? parseInt(limit) : 20,
+      status,
+    });
+  }
+
+  @Get('newsletter/campaigns/:id')
+  @ApiOperation({ summary: 'Get newsletter campaign by ID' })
+  getNewsletterCampaignById(@Param('id') id: string) {
+    return this.adminService.getNewsletterCampaignById(id);
+  }
+
+  @Post('newsletter/campaigns')
+  @ApiOperation({ summary: 'Create newsletter campaign' })
+  createNewsletterCampaign(
+    @Body() data: any,
+  ) {
+    return this.adminService.createNewsletterCampaign(data);
+  }
+
+  @Patch('newsletter/campaigns/:id')
+  @ApiOperation({ summary: 'Update newsletter campaign' })
+  updateNewsletterCampaign(
+    @Param('id') id: string,
+    @Body() data: any,
+  ) {
+    return this.adminService.updateNewsletterCampaign(id, data);
+  }
+
+  @Delete('newsletter/campaigns/:id')
+  @ApiOperation({ summary: 'Delete newsletter campaign' })
+  deleteNewsletterCampaign(@Param('id') id: string) {
+    return this.adminService.deleteNewsletterCampaign(id);
+  }
+
+  @Post('newsletter/campaigns/:id/send')
+  @ApiOperation({ summary: 'Send newsletter campaign' })
+  sendNewsletterCampaign(@Param('id') id: string) {
+    return this.adminService.sendNewsletterCampaign(id);
+  }
+
+  @Get('newsletter/stats')
+  @ApiOperation({ summary: 'Get newsletter statistics' })
+  getNewsletterStats() {
+    return this.adminService.getNewsletterStats();
+  }
 }
