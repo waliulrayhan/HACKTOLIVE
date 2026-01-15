@@ -16,7 +16,7 @@ import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { UpdateProfileDto, UpdateSocialLinksDto, ChangePasswordDto } from './dto/update-profile.dto';
-import { VerifyOtpDto, SendPasswordResetOtpDto, ResetPasswordDto } from './dto/otp.dto';
+import { VerifyOtpDto, SendPasswordResetOtpDto, ResetPasswordDto, VerifyPasswordResetOtpDto } from './dto/otp.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { GoogleAuthGuard } from './google-auth.guard';
 
@@ -72,6 +72,18 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Password reset OTP sent to email' })
   async forgotPassword(@Body() sendOtpDto: SendPasswordResetOtpDto) {
     return this.authService.sendPasswordResetOtp(sendOtpDto.email);
+  }
+
+  @Post('verify-password-reset-otp')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify password reset OTP before resetting password' })
+  @ApiResponse({ status: 200, description: 'OTP verified successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired OTP' })
+  async verifyPasswordResetOtp(@Body() verifyOtpDto: VerifyPasswordResetOtpDto) {
+    return this.authService.verifyPasswordResetOtp(
+      verifyOtpDto.email,
+      verifyOtpDto.code,
+    );
   }
 
   @Post('reset-password')

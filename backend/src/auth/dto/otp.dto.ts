@@ -21,6 +21,19 @@ export class SendPasswordResetOtpDto {
   email: string;
 }
 
+export class VerifyPasswordResetOtpDto {
+  @ApiProperty({ example: 'user@example.com' })
+  @IsString()
+  @IsNotEmpty()
+  email: string;
+
+  @ApiProperty({ example: '123456', description: '6-digit OTP code' })
+  @IsString()
+  @IsNotEmpty()
+  @Length(6, 6)
+  code: string;
+}
+
 export class ResetPasswordDto {
   @ApiProperty({ example: 'user@example.com' })
   @IsString()

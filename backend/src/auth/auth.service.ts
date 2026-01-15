@@ -233,10 +233,7 @@ export class AuthService {
     });
 
     if (!user) {
-      // Don't reveal if user exists or not for security
-      return {
-        message: 'If an account with that email exists, we\'ve sent a password reset OTP.',
-      };
+      throw new BadRequestException('No account found with this email address. Please check your email or sign up for a new account.');
     }
 
     await this.otpService.createAndSendOtp(
@@ -248,6 +245,24 @@ export class AuthService {
 
     return {
       message: 'Password reset OTP sent to your email.',
+      email: user.email,
+    };
+  }
+
+  async verifyPasswordResetOtp(email: string, code: string) {
+    const { valid, userId } = await this.otpService.verifyOtpByEmail(
+      email,
+      code,
+      'PASSWORD_RESET',
+    );
+
+    if (!valid || !userId) {
+      throw new BadRequestException('Invalid or expired OTP code. Please try again or request a new code.');
+    }
+
+    return {
+      message: 'OTP verified successfully.',
+      valid: true,
     };
   }
 
