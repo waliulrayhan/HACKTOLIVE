@@ -1,19 +1,5 @@
 import { IsString, IsNumber, IsOptional, IsEnum, IsBoolean, IsArray, Min, MaxLength } from 'class-validator';
-
-export enum ProductType {
-  COURSE_VOUCHER = 'COURSE_VOUCHER',
-  TSHIRT = 'TSHIRT',
-  MERCHANDISE = 'MERCHANDISE',
-  TRAINING_BUNDLE = 'TRAINING_BUNDLE',
-}
-
-export enum ProductStatus {
-  DRAFT = 'DRAFT',
-  ACTIVE = 'ACTIVE',
-  ARCHIVED = 'ARCHIVED',
-  OUT_OF_STOCK = 'OUT_OF_STOCK',
-}
-
+import { ProductType, ProductStatus } from '@prisma/client';
 export class CreateProductDto {
   @IsString()
   name: string;

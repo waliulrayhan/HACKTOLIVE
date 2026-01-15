@@ -53,7 +53,7 @@ interface Campaign {
 }
 
 const CampaignsPage = () => {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const toast = useToast();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -72,6 +72,7 @@ const CampaignsPage = () => {
   const fetchCampaigns = async () => {
     setLoading(true);
     try {
+      const token = localStorage.getItem('token');
       const params = new URLSearchParams({
         page: page.toString(),
         limit: "20",
@@ -109,6 +110,7 @@ const CampaignsPage = () => {
     if (!confirm("Are you sure you want to send this campaign to all subscribers?")) return;
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/admin/newsletter/campaigns/${id}/send`,
         {
@@ -145,6 +147,7 @@ const CampaignsPage = () => {
     if (!confirm("Are you sure you want to delete this campaign?")) return;
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/admin/newsletter/campaigns/${id}`,
         {
@@ -194,12 +197,12 @@ const CampaignsPage = () => {
   };
 
   const calculateOpenRate = (campaign: Campaign) => {
-    if (campaign.totalSent === 0) return 0;
+    if (campaign.totalSent === 0) return "0";
     return ((campaign.totalOpened / campaign.totalSent) * 100).toFixed(1);
   };
 
   const calculateClickRate = (campaign: Campaign) => {
-    if (campaign.totalSent === 0) return 0;
+    if (campaign.totalSent === 0) return "0";
     return ((campaign.totalClicked / campaign.totalSent) * 100).toFixed(1);
   };
 

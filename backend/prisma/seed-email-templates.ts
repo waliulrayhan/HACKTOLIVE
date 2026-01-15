@@ -876,6 +876,62 @@ async function seedEmailTemplates() {
 </body>
 </html>`,
     },
+    {
+      name: 'Newsletter Welcome',
+      slug: 'newsletter-welcome',
+      subject: 'Welcome to HackToLive Newsletter! 🎉',
+      type: 'GENERAL' as EmailTemplateType,
+      fromEmail: 'NOREPLY' as EmailSender,
+      variables: JSON.stringify(['name', 'email']),
+      description: 'Welcome email sent when user subscribes to newsletter',
+      isActive: true,
+      body: `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>.logo-light{display:block!important}.logo-dark{display:none!important}@media (prefers-color-scheme:dark){.logo-light{display:none!important}.logo-dark{display:block!important}}</style></head>
+<body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:20px 0">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#fff;border-radius:8px;overflow:hidden">
+        <tr><td style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:30px;text-align:center">
+          <h1 style="margin:0;color:#fff;font-size:28px">Welcome to HackToLive! 🚀</h1>
+        </td></tr>
+        <tr><td style="padding:40px 30px">
+          <p style="margin:0 0 20px;color:#333;font-size:16px">{{name}},</p>
+          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Thank you for subscribing to the HackToLive newsletter! We're thrilled to have you join our community of cybersecurity enthusiasts and professionals.</p>
+          <div style="background-color:#f0fdf4;border-left:4px solid #48bb78;padding:20px;margin:30px 0;border-radius:4px">
+            <h3 style="margin:0 0 15px;color:#2d3748;font-size:16px">What to expect:</h3>
+            <ul style="margin:0;padding-left:20px;color:#666;font-size:14px;line-height:1.8">
+              <li>Latest cybersecurity insights and threat alerts</li>
+              <li>Step-by-step tutorials and how-to guides</li>
+              <li>Best security practices and compliance guides</li>
+              <li>Exclusive content and early access to new courses</li>
+              <li>Industry news and case studies</li>
+            </ul>
+          </div>
+          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">You'll receive our newsletter regularly with valuable content to help you stay ahead in the ever-evolving world of cybersecurity.</p>
+          <div style="text-align:center;margin:30px 0">
+            <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/blog" style="display:inline-block;background:#48bb78;color:#fff;padding:12px 30px;text-decoration:none;border-radius:5px;font-weight:bold">Explore Our Blog</a>
+          </div>
+          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Have questions or feedback? Feel free to reply to this email - we'd love to hear from you!</p>
+          <div style="border-top:1px solid #e5e7eb;padding-top:20px;margin-top:30px">
+            <p style="margin:0;color:#666;font-size:14px">Best regards,<br><strong>The HackToLive Team</strong></p>
+          </div>
+        </td></tr>
+        <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
+          <div style="margin:0 0 10px">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+          </div>
+          <p style="margin:0 0 5px;color:#999;font-size:11px">You're receiving this email because you subscribed to HackToLive newsletter.</p>
+          <p style="margin:0;color:#999;font-size:11px"><a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/newsletter/unsubscribe?email={{email}}" style="color:#4299e1;text-decoration:underline">Unsubscribe</a> from our mailing list.</p>
+          <p style="margin:10px 0 0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+    },
   ];
 
   for (const template of templates) {

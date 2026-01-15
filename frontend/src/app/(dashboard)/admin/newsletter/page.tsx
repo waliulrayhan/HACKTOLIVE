@@ -35,7 +35,7 @@ interface NewsletterStats {
 }
 
 const NewsletterDashboard = () => {
-  const { token } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState<NewsletterStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,6 +50,7 @@ const NewsletterDashboard = () => {
   const fetchStats = async () => {
     setLoading(true);
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/admin/newsletter/stats`,
         {

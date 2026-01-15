@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   Box,
@@ -19,7 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { FiCheckCircle, FiXCircle } from "react-icons/fi";
 
-export default function UnsubscribePage() {
+function UnsubscribeContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
   const [loading, setLoading] = useState(false);
@@ -169,5 +169,17 @@ export default function UnsubscribePage() {
         </VStack>
       </Container>
     </Box>
+  );
+}
+
+export default function UnsubscribePage() {
+  return (
+    <Suspense fallback={
+      <Box minH="100vh" bg={useColorModeValue("gray.50", "gray.900")} py={20} display="flex" alignItems="center" justifyContent="center">
+        <Spinner size="xl" />
+      </Box>
+    }>
+      <UnsubscribeContent />
+    </Suspense>
   );
 }

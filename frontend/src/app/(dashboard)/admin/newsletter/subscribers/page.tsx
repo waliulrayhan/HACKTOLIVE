@@ -46,7 +46,7 @@ interface Subscriber {
 }
 
 const SubscribersPage = () => {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
@@ -68,6 +68,7 @@ const SubscribersPage = () => {
   const fetchSubscribers = async () => {
     setLoading(true);
     try {
+      const token = localStorage.getItem('token');
       const params = new URLSearchParams({
         page: page.toString(),
         limit: "20",
@@ -108,6 +109,7 @@ const SubscribersPage = () => {
     if (!confirm("Are you sure you want to delete this subscriber?")) return;
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/admin/newsletter/subscribers/${id}`,
         {

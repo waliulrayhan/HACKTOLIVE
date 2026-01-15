@@ -129,11 +129,20 @@ export default function DashboardLayout({
             name: "Contact Messages",
             path: "/admin/contacts",
           },
-          // {
-          //   icon: <FileIcon />,
-          //   name: "Email Templates",
-          //   path: "/admin/email-templates",
-          // },
+          {
+            icon: <FileIcon />,
+            name: "Email Templates",
+            path: "/admin/email-templates",
+          },
+          {
+            icon: <FileIcon />,
+            name: "Newsletter",
+            subItems: [
+              { icon: <GridIcon />, name: "Dashboard", path: "/admin/newsletter" },
+              { icon: <GroupIcon />, name: "Subscribers", path: "/admin/newsletter/subscribers" },
+              { icon: <DocsIcon />, name: "Campaigns", path: "/admin/newsletter/campaigns" },
+            ],
+          },
           // {
           //   icon: <PieChartIcon />,
           //   name: "System Analytics",

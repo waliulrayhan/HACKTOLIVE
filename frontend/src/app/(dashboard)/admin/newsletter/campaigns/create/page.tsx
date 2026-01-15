@@ -28,7 +28,7 @@ import { useRouter } from "next/navigation";
 import { FiSave, FiSend, FiArrowLeft } from "react-icons/fi";
 
 const CreateCampaignPage = () => {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
@@ -62,6 +62,7 @@ const CreateCampaignPage = () => {
 
     setLoading(true);
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/admin/newsletter/campaigns`,
         {
@@ -83,12 +84,13 @@ const CreateCampaignPage = () => {
 
       // If send now, trigger send
       if (sendNow && data.data?.id) {
+        const sendToken = localStorage.getItem('token');
         const sendResponse = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/admin/newsletter/campaigns/${data.data.id}/send`,
           {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${sendToken}`,
             },
           }
         );

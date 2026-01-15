@@ -26,10 +26,8 @@ import {
   useBreakpointValue,
   Spinner,
   Input,
-  Alert,
-  AlertIcon,
-  AlertDescription,
 } from "@chakra-ui/react";
+import { toast } from '@/components/ui/toast';
 import { FiSearch, FiMail } from "react-icons/fi";
 import SearchBar from "@/components/academy/SearchBar";
 import BlogItem from "./_components/BlogItem";
@@ -53,10 +51,6 @@ const BlogPage = () => {
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterName, setNewsletterName] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
-  const [subscriptionMessage, setSubscriptionMessage] = useState<{
-    type: 'success' | 'error';
-    text: string;
-  } | null>(null);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const isDesktop = useBreakpointValue({ base: false, lg: true });
@@ -166,15 +160,14 @@ const BlogPage = () => {
     e.preventDefault();
     
     if (!newsletterEmail) {
-      setSubscriptionMessage({
-        type: 'error',
-        text: 'Please enter your email address',
+      toast.error('Validation Error', {
+        description: 'Please enter your email address',
+        duration: 3000,
       });
       return;
     }
 
     setIsSubscribing(true);
-    setSubscriptionMessage(null);
 
     try {
       const response = await fetch(
@@ -195,23 +188,23 @@ const BlogPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSubscriptionMessage({
-          type: 'success',
-          text: data.message || 'Successfully subscribed to newsletter! Check your email.',
+        toast.success('Successfully Subscribed!', {
+          description: data.message || 'Check your email for confirmation.',
+          duration: 5000,
         });
         setNewsletterEmail('');
         setNewsletterName('');
       } else {
-        setSubscriptionMessage({
-          type: 'error',
-          text: data.message || 'Failed to subscribe. Please try again.',
+        toast.error('Subscription Failed', {
+          description: data.message || 'Failed to subscribe. Please try again.',
+          duration: 4000,
         });
       }
     } catch (error) {
       console.error('Newsletter subscription error:', error);
-      setSubscriptionMessage({
-        type: 'error',
-        text: 'An error occurred. Please try again later.',
+      toast.error('Something Went Wrong', {
+        description: 'An error occurred. Please try again later.',
+        duration: 4000,
       });
     } finally {
       setIsSubscribing(false);
@@ -474,18 +467,6 @@ const BlogPage = () => {
             <Text fontSize="lg" color="muted" maxW="xl">
               Get the latest cybersecurity insights, threat alerts, and tutorials delivered directly to your inbox.
             </Text>
-            
-            {subscriptionMessage && (
-              <Alert 
-                status={subscriptionMessage.type} 
-                borderRadius="md" 
-                maxW="md"
-                variant="subtle"
-              >
-                <AlertIcon />
-                <AlertDescription>{subscriptionMessage.text}</AlertDescription>
-              </Alert>
-            )}
 
             <Stack 
               as="form" 

@@ -505,74 +505,20 @@ export class NewsletterService {
    */
   private async sendWelcomeEmail(email: string, name?: string) {
     try {
-      const subject = 'Welcome to HackToLive Newsletter! 🎉';
-      const body = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          </head>
-          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-              <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to HackToLive! 🚀</h1>
-            </div>
-            
-            <div style="background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 10px 10px;">
-              <p style="font-size: 16px; margin-bottom: 20px;">
-                ${name ? `Hi ${name},` : 'Hello!'}
-              </p>
-              
-              <p style="font-size: 16px; margin-bottom: 20px;">
-                Thank you for subscribing to the HackToLive newsletter! We're thrilled to have you join our community of cybersecurity enthusiasts and professionals.
-              </p>
-              
-              <div style="background: #f7fafc; padding: 20px; border-left: 4px solid #48bb78; margin: 30px 0;">
-                <h3 style="margin-top: 0; color: #2d3748;">What to expect:</h3>
-                <ul style="margin: 0; padding-left: 20px;">
-                  <li>Latest cybersecurity insights and threat alerts</li>
-                  <li>Step-by-step tutorials and how-to guides</li>
-                  <li>Best security practices and compliance guides</li>
-                  <li>Exclusive content and early access to new courses</li>
-                  <li>Industry news and case studies</li>
-                </ul>
-              </div>
-              
-              <p style="font-size: 16px; margin-bottom: 20px;">
-                You'll receive our newsletter regularly with valuable content to help you stay ahead in the ever-evolving world of cybersecurity.
-              </p>
-              
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/blog" style="display: inline-block; background: #48bb78; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                  Explore Our Blog
-                </a>
-              </div>
-              
-              <p style="font-size: 16px; margin-bottom: 20px;">
-                Have questions or feedback? Feel free to reply to this email - we'd love to hear from you!
-              </p>
-              
-              <p style="font-size: 16px;">
-                Best regards,<br>
-                <strong>The HackToLive Team</strong>
-              </p>
-            </div>
-            
-            <div style="margin-top: 20px; padding: 20px; text-align: center; color: #718096; font-size: 12px;">
-              <p>You're receiving this email because you subscribed to HackToLive newsletter.</p>
-              <p><a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/newsletter/unsubscribe?email=${encodeURIComponent(email)}" style="color: #4299e1; text-decoration: underline;">Unsubscribe</a> from our mailing list.</p>
-            </div>
-          </body>
-        </html>
-      `;
-
-      await this.emailService.sendEmail({
-        to: email,
-        toName: name,
-        subject,
-        body,
-        from: 'noreply',
-      });
+      // Use email template service
+      await this.emailService.sendTemplateEmail(
+        'newsletter-welcome',
+        email,
+        {
+          name: name || 'Subscriber',
+          email: email,
+        },
+        name,
+        {
+          type: 'newsletter',
+          action: 'welcome',
+        }
+      );
     } catch (error) {
       this.logger.error(`Error sending welcome email: ${error.message}`);
     }
