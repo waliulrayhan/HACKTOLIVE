@@ -1,7 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useModal } from "@/lib/hooks/useModal";
-import { HiOutlineLockClosed, HiOutlineX, HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
+import { HiOutlineLockClosed, HiOutlineX, HiOutlineEye, HiOutlineEyeOff, HiCheckCircle, HiXCircle } from "react-icons/hi";
 import { userService } from "@/lib/user-service";
 import { toast } from "@/components/ui/toast/use-toast";
 
@@ -18,6 +18,21 @@ export default function UserPasswordCard() {
     confirmPassword: "",
   });
 
+  // Password complexity requirements
+  const passwordRequirements = useMemo(() => {
+    return {
+      minLength: formData.newPassword.length >= 8,
+      hasUpperCase: /[A-Z]/.test(formData.newPassword),
+      hasLowerCase: /[a-z]/.test(formData.newPassword),
+      hasNumber: /[0-9]/.test(formData.newPassword),
+      hasSpecialChar: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.newPassword),
+    }
+  }, [formData.newPassword]);
+
+  const isPasswordValid = useMemo(() => {
+    return Object.values(passwordRequirements).every(req => req)
+  }, [passwordRequirements]);
+
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
     
@@ -27,8 +42,8 @@ export default function UserPasswordCard() {
     
     if (!formData.newPassword.trim()) {
       newErrors.newPassword = 'New password is required';
-    } else if (formData.newPassword.length < 6) {
-      newErrors.newPassword = 'Password must be at least 6 characters';
+    } else if (!isPasswordValid) {
+      newErrors.newPassword = 'Password does not meet all requirements';
     }
     
     if (!formData.confirmPassword.trim()) {
@@ -238,9 +253,64 @@ export default function UserPasswordCard() {
                 {errors.newPassword && (
                   <p className="mt-1 text-xs text-red-500">{errors.newPassword}</p>
                 )}
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Password must be at least 6 characters
-                </p>
+                {/* Password Requirements */}
+                {formData.newPassword && (
+                  <div className="mt-3 space-y-2">
+                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300">Password must contain:</p>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        {passwordRequirements.minLength ? (
+                          <HiCheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <HiXCircle className="h-4 w-4 text-gray-400" />
+                        )}
+                        <span className={`text-xs ${passwordRequirements.minLength ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                          At least 8 characters
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {passwordRequirements.hasUpperCase ? (
+                          <HiCheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <HiXCircle className="h-4 w-4 text-gray-400" />
+                        )}
+                        <span className={`text-xs ${passwordRequirements.hasUpperCase ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                          One uppercase letter
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {passwordRequirements.hasLowerCase ? (
+                          <HiCheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <HiXCircle className="h-4 w-4 text-gray-400" />
+                        )}
+                        <span className={`text-xs ${passwordRequirements.hasLowerCase ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                          One lowercase letter
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {passwordRequirements.hasNumber ? (
+                          <HiCheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <HiXCircle className="h-4 w-4 text-gray-400" />
+                        )}
+                        <span className={`text-xs ${passwordRequirements.hasNumber ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                          One number
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {passwordRequirements.hasSpecialChar ? (
+                          <HiCheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <HiXCircle className="h-4 w-4 text-gray-400" />
+                        )}
+                        <span className={`text-xs ${passwordRequirements.hasSpecialChar ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                          One special character (!@#$%^&*)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>

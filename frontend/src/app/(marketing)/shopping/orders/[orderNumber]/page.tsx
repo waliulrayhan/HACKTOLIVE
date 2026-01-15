@@ -531,7 +531,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
                 >
                   Continue Shopping
                 </Button>
-                {order.status === 'PENDING' && (
+                {/* {order.status === 'PENDING' && (
                   <Button
                     variant="outline"
                     colorScheme="red"
@@ -541,7 +541,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
                   >
                     Cancel Order
                   </Button>
-                )}
+                )} */}
               </HStack>
             </VStack>
           </FallInPlace>
