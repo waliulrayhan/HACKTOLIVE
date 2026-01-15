@@ -204,29 +204,69 @@ export const megaMenuData: MegaMenuData = {
   'Shopping': {
     sections: [
       {
-        title: 'Products',
+        title: 'Shop by Type',
         items: [
           {
-            title: 'Security Tools',
-            description: 'Professional hacking tools',
-            href: '/shopping#tools',
+            title: 'All Products',
+            description: 'Browse our complete catalog',
+            href: '/shopping',
             icon: FiShoppingCart,
           },
           {
-            title: 'Books & Resources',
-            description: 'Cybersecurity learning materials',
-            href: '/shopping#books',
+            title: 'Course Vouchers',
+            description: 'Gift learning experiences',
+            href: '/shopping/vouchers',
+            icon: FiAward,
+          },
+          {
+            title: 'Daily Deals',
+            description: 'Today\'s special offers',
+            href: '/shopping/daily-deals',
+            icon: FiTrendingUp,
+          },
+          {
+            title: 'Daily Specials',
+            description: 'Limited time special offers',
+            href: '/shopping?type=DAILY_SPECIAL',
+            icon: FiShoppingCart,
+          },
+        ],
+      },
+      {
+        title: 'Quick Access',
+        items: [
+          {
+            title: 'My Cart',
+            description: 'View your shopping cart',
+            href: '/shopping/cart',
+            icon: FiShoppingCart,
+          },
+          {
+            title: 'My Orders',
+            description: 'Track your purchases',
+            href: '/shopping/orders',
+            icon: FiFileText,
+          },
+          {
+            title: 'Training Bundles',
+            description: 'Complete course packages',
+            href: '/shopping?type=TRAINING_BUNDLE',
             icon: FiBookOpen,
           },
           {
             title: 'Merchandise',
-            description: 'HackToLive branded items',
-            href: '/shopping#merchandise',
+            description: 'Exclusive HackToLive gear',
+            href: '/shopping?type=MERCHANDISE',
             icon: FiShoppingCart,
           },
         ],
       },
     ],
+    featured: {
+      title: 'Special Offers This Week',
+      description: 'Get up to 30% off on selected courses and merchandise',
+      href: '/shopping/daily-deals',
+    },
   },
   'About Us': {
     sections: [

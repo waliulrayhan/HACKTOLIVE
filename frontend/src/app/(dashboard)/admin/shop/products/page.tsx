@@ -186,7 +186,7 @@ export default function AdminProductsPage() {
   const getTypeBadgeColor = (type: string) => {
     switch (type) {
       case 'COURSE_VOUCHER': return 'info';
-      case 'TSHIRT': return 'success';
+      case 'DAILY_SPECIAL': return 'success';
       case 'MERCHANDISE': return 'warning';
       case 'TRAINING_BUNDLE': return 'error';
       default: return 'light';
@@ -332,7 +332,7 @@ export default function AdminProductsPage() {
               >
                 <option value="ALL">All Types</option>
                 <option value="COURSE_VOUCHER">Course Voucher</option>
-                <option value="TSHIRT">T-Shirt</option>
+                <option value="DAILY_SPECIAL">Daily Special</option>
                 <option value="MERCHANDISE">Merchandise</option>
                 <option value="TRAINING_BUNDLE">Training Bundle</option>
               </select>
