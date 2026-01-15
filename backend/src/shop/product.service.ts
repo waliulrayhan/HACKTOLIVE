@@ -97,7 +97,13 @@ export class ProductService {
     }
 
     if (type) {
-      where.type = type;
+      // Handle multiple types separated by comma
+      if (type.includes(',')) {
+        const types = type.split(',').map((t: string) => t.trim());
+        where.type = { in: types };
+      } else {
+        where.type = type;
+      }
     }
 
     // Only filter by status if explicitly provided (allow empty string to show all)

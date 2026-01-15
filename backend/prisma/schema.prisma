@@ -970,7 +970,7 @@ model ProductReview {
 
 enum ProductType {
   COURSE_VOUCHER
-  TSHIRT
+  DAILY_SPECIAL
   MERCHANDISE
   TRAINING_BUNDLE
 }

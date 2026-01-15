@@ -8,6 +8,8 @@ import Button from "@/components/ui/button/Button";
 import Image from "next/image";
 import ImageCropper from "@/components/ImageCropper";
 import { productService, categoryService, ProductCategory } from '@/lib/shop-service';
+import { academyService } from '@/lib/academy-service';
+import type { Course } from '@/types/academy';
 import {
   HiOutlineInformationCircle,
   HiOutlineCurrencyDollar,
@@ -21,6 +23,7 @@ import {
   HiOutlinePlus,
   HiOutlineTrash,
   HiOutlinePhotograph,
+  HiOutlineGift,
 } from "react-icons/hi";
 
 export default function CreateProductPage() {
@@ -29,6 +32,7 @@ export default function CreateProductPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   
   // Image upload states
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -42,7 +46,7 @@ export default function CreateProductPage() {
     description: "",
     shortDescription: "",
     categoryId: "",
-    type: "MERCHANDISE" as 'COURSE_VOUCHER' | 'TSHIRT' | 'MERCHANDISE' | 'TRAINING_BUNDLE',
+    type: "MERCHANDISE" as 'COURSE_VOUCHER' | 'DAILY_SPECIAL' | 'MERCHANDISE' | 'TRAINING_BUNDLE',
     price: 0,
     compareAtPrice: 0,
     sku: "",
@@ -60,7 +64,7 @@ export default function CreateProductPage() {
     tags: "",
     // Type-specific fields
     courseId: "",
-    voucherDuration: 0,
+    voucherDuration: 1, // in months
     sizes: [] as string[],
     colors: [] as string[],
     material: "",
@@ -70,6 +74,7 @@ export default function CreateProductPage() {
   useEffect(() => {
     document.title = "Create Product - HACKTOLIVE Academy";
     fetchCategories();
+    fetchCourses();
   }, []);
 
   const fetchCategories = async () => {
@@ -79,6 +84,16 @@ export default function CreateProductPage() {
     } catch (error) {
       console.error('Failed to fetch categories:', error);
       toast.error('Failed to load categories');
+    }
+  };
+
+  const fetchCourses = async () => {
+    try {
+      const data = await academyService.getCourses();
+      setCourses(data);
+    } catch (error) {
+      console.error('Failed to fetch courses:', error);
+      toast.error('Failed to load courses');
     }
   };
 
@@ -243,11 +258,11 @@ export default function CreateProductPage() {
       const productData = {
         ...formData,
         tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : [],
-        sizes: formData.type === 'TSHIRT' ? formData.sizes : undefined,
-        colors: formData.type === 'TSHIRT' ? formData.colors : undefined,
-        material: formData.type === 'TSHIRT' ? formData.material : undefined,
-        courseId: formData.type === 'COURSE_VOUCHER' ? formData.courseId : undefined,
-        voucherDuration: formData.type === 'COURSE_VOUCHER' ? formData.voucherDuration : undefined,
+        sizes: formData.type === 'DAILY_SPECIAL' || formData.type === 'MERCHANDISE' ? formData.sizes : undefined,
+        colors: formData.type === 'DAILY_SPECIAL' || formData.type === 'MERCHANDISE' ? formData.colors : undefined,
+        material: formData.type === 'DAILY_SPECIAL' || formData.type === 'MERCHANDISE' ? formData.material : undefined,
+        courseId: formData.type === 'COURSE_VOUCHER' ? (formData.courseId || undefined) : undefined,
+        voucherDuration: formData.type === 'COURSE_VOUCHER' ? (formData.voucherDuration * 30) : undefined, // Convert months to days
         bundleProducts: formData.type === 'TRAINING_BUNDLE' ? formData.bundleProducts : undefined,
       };
 
@@ -496,7 +511,7 @@ export default function CreateProductPage() {
                     }`}
                   >
                     <option value="MERCHANDISE">Merchandise</option>
-                    <option value="TSHIRT">T-Shirt</option>
+                    <option value="DAILY_SPECIAL">Daily Special</option>
                     <option value="COURSE_VOUCHER">Course Voucher</option>
                     <option value="TRAINING_BUNDLE">Training Bundle</option>
                   </select>
@@ -709,6 +724,144 @@ export default function CreateProductPage() {
                 </div>
               </div>
             </div>
+
+            {/* Type-Specific Fields */}
+            {formData.type === 'COURSE_VOUCHER' && (
+              <div className="rounded-xl border border-gray-200 bg-linear-to-br from-green-50 to-white p-5 dark:border-white/5 dark:from-green-900/20 dark:to-gray-900/50">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <HiOutlineGift className="h-4 w-4 text-green-500" />
+                  Voucher Details
+                </h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Course (Optional)
+                    </label>
+                    <select
+                      name="courseId"
+                      value={formData.courseId}
+                      onChange={handleInputChange}
+                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    >
+                      <option value="">All Courses (General Voucher)</option>
+                      {courses.map((course) => (
+                        <option key={course.id} value={course.id}>
+                          {course.title}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Leave as "All Courses" for a general voucher
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Voucher Duration (months)
+                    </label>
+                    <input
+                      type="number"
+                      name="voucherDuration"
+                      value={formData.voucherDuration}
+                      onChange={handleInputChange}
+                      min="1"
+                      max="12"
+                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      placeholder="e.g., 1, 3, 6, 12"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Duration in months (1-12 months)
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {(formData.type === 'MERCHANDISE' || formData.type === 'DAILY_SPECIAL') && (
+              <div className="rounded-xl border border-gray-200 bg-linear-to-br from-purple-50 to-white p-5 dark:border-white/5 dark:from-purple-900/20 dark:to-gray-900/50">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <HiOutlineTag className="h-4 w-4 text-purple-500" />
+                  Merchandise Options
+                </h4>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Available Sizes (comma-separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.sizes.join(', ')}
+                      onChange={(e) => {
+                        const sizes = e.target.value.split(',').map(s => s.trim()).filter(s => s);
+                        setFormData(prev => ({ ...prev, sizes }));
+                      }}
+                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      placeholder="XS, S, M, L, XL, XXL"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Available Colors (comma-separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.colors.join(', ')}
+                      onChange={(e) => {
+                        const colors = e.target.value.split(',').map(c => c.trim()).filter(c => c);
+                        setFormData(prev => ({ ...prev, colors }));
+                      }}
+                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      placeholder="Black, White, Red, Blue"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Material
+                    </label>
+                    <input
+                      type="text"
+                      name="material"
+                      value={formData.material}
+                      onChange={handleInputChange}
+                      className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      placeholder="e.g., 100% Cotton, Polyester Blend"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {formData.type === 'TRAINING_BUNDLE' && (
+              <div className="rounded-xl border border-gray-200 bg-linear-to-br from-blue-50 to-white p-5 dark:border-white/5 dark:from-blue-900/20 dark:to-gray-900/50">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <HiOutlineShoppingBag className="h-4 w-4 text-blue-500" />
+                  Bundle Configuration
+                </h4>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Bundle Product IDs (comma-separated)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.bundleProducts.join(', ')}
+                    onChange={(e) => {
+                      const bundleProducts = e.target.value.split(',').map(p => p.trim()).filter(p => p);
+                      setFormData(prev => ({ ...prev, bundleProducts }));
+                    }}
+                    className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    placeholder="product-id-1, product-id-2, product-id-3"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Enter product IDs that are included in this bundle
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* SEO Section */}
             <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-white/5 dark:bg-white/3">

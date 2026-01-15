@@ -77,7 +77,7 @@ export default function ShoppingPage() {
 
   const productTypes = [
     { value: 'COURSE_VOUCHER', label: 'Course Vouchers' },
-    { value: 'TSHIRT', label: 'T-Shirts' },
+    { value: 'DAILY_SPECIAL', label: 'Daily Specials' },
     { value: 'MERCHANDISE', label: 'Merchandise' },
     { value: 'TRAINING_BUNDLE', label: 'Training Bundles' },
   ]
@@ -447,6 +447,54 @@ export default function ShoppingPage() {
               </Flex>
             </Box>
           </VStack>
+
+          {/* Category Tags */}
+          {categories.length > 0 && (
+            <Box>
+              <Text fontSize="sm" fontWeight="medium" mb={3} color={mutedColor}>
+                Shop by Category:
+              </Text>
+              <Flex gap={2} flexWrap="wrap">
+                <Badge
+                  px={4}
+                  py={2}
+                  borderRadius="full"
+                  cursor="pointer"
+                  fontSize="sm"
+                  variant={selectedCategory === '' ? 'solid' : 'outline'}
+                  colorScheme={selectedCategory === '' ? 'primary' : 'gray'}
+                  transition="all 0.2s"
+                  onClick={() => setSelectedCategory('')}
+                  _hover={{
+                    transform: 'translateY(-2px)',
+                    shadow: 'md',
+                  }}
+                >
+                  All Products
+                </Badge>
+                {categories.map((cat) => (
+                  <Badge
+                    key={cat.id}
+                    px={4}
+                    py={2}
+                    borderRadius="full"
+                    cursor="pointer"
+                    fontSize="sm"
+                    variant={selectedCategory === cat.id ? 'solid' : 'outline'}
+                    colorScheme={selectedCategory === cat.id ? 'primary' : 'gray'}
+                    transition="all 0.2s"
+                    onClick={() => setSelectedCategory(cat.id)}
+                    _hover={{
+                      transform: 'translateY(-2px)',
+                      shadow: 'md',
+                    }}
+                  >
+                    {cat.name} ({cat._count?.products || 0})
+                  </Badge>
+                ))}
+              </Flex>
+            </Box>
+          )}
 
           <Flex gap={8} direction={{ base: 'column', lg: 'row' }} mt={8}>
             {/* Desktop Filters */}
