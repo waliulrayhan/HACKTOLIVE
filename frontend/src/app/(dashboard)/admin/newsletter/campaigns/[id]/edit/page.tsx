@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
+import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
 import Button from "@/components/ui/button/Button";
 import {
   HiOutlineSave,
@@ -13,12 +14,22 @@ import {
   HiOutlineTemplate,
   HiOutlineClipboardCopy,
 } from "react-icons/hi";
-import { useAuth } from "@/context/AuthContext";
 
-export default function CreateCampaignPage() {
-  const { user } = useAuth();
+interface Campaign {
+  id: string;
+  name: string;
+  subject: string;
+  body: string;
+  status: string;
+}
+
+export default function EditCampaignPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const params = useParams();
+  const campaignId = params?.id as string;
+
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<'editor' | 'template'>('editor');
 
   const [formData, setFormData] = useState({
@@ -28,8 +39,44 @@ export default function CreateCampaignPage() {
   });
 
   useEffect(() => {
-    document.title = "Create Email Campaign - HACKTOLIVE Academy";
-  }, []);
+    document.title = "Edit Email Campaign - HACKTOLIVE Academy";
+    if (campaignId) {
+      fetchCampaign();
+    }
+  }, [campaignId]);
+
+  const fetchCampaign = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/newsletter/campaigns/${campaignId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error('Failed to fetch campaign');
+      
+      const result = await response.json();
+      const campaign = result.data || result;
+      
+      setFormData({
+        name: campaign.name,
+        subject: campaign.subject,
+        body: campaign.body,
+      });
+    } catch (error: any) {
+      console.error('Error fetching campaign:', error);
+      toast.error('Failed to load campaign', {
+        description: 'Please try again',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -46,60 +93,52 @@ export default function CreateCampaignPage() {
       return;
     }
 
-    setLoading(true);
+    setSubmitting(true);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/newsletter/campaigns`,
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/newsletter/campaigns/${campaignId}`,
         {
-          method: "POST",
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            ...formData,
-            createdBy: user?.name || user?.email,
-          }),
+          body: JSON.stringify(formData),
         }
       );
 
-      if (!response.ok) throw new Error("Failed to create campaign");
-
-      const data = await response.json();
+      if (!response.ok) throw new Error("Failed to update campaign");
 
       // If send now, trigger send
-      if (sendNow && data.data?.id) {
-        const sendToken = localStorage.getItem('token');
+      if (sendNow) {
         const sendResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/admin/newsletter/campaigns/${data.data.id}/send`,
+          `${process.env.NEXT_PUBLIC_API_URL}/admin/newsletter/campaigns/${campaignId}/send`,
           {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${sendToken}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
 
-        if (!sendResponse.ok) throw new Error("Campaign created but failed to send");
+        if (!sendResponse.ok) throw new Error("Campaign updated but failed to send");
 
-        toast.success('Campaign created and sent!', {
+        toast.success('Campaign updated and sent!', {
           description: 'Campaign is being sent to subscribers',
         });
       } else {
-        toast.success('Campaign created successfully!', {
-          description: 'You can now send it to subscribers',
-        });
+        toast.success('Campaign updated successfully!');
       }
 
       router.push("/admin/newsletter/campaigns");
     } catch (error: any) {
-      console.error("Error creating campaign:", error);
-      toast.error('Failed to create campaign', {
+      console.error("Error updating campaign:", error);
+      toast.error('Failed to update campaign', {
         description: error.message || 'Please try again',
       });
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -185,9 +224,18 @@ export default function CreateCampaignPage() {
     });
   };
 
+  if (loading) {
+    return (
+      <div>
+        <PageBreadcrumb pageTitle="Edit Email Campaign" />
+        <TablePageLoadingSkeleton />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      <PageBreadcrumb pageTitle="Create Email Campaign" />
+      <PageBreadcrumb pageTitle="Edit Email Campaign" />
 
       {/* Form Card */}
       <div className="rounded-md border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
@@ -195,7 +243,7 @@ export default function CreateCampaignPage() {
         <div className="border-b border-gray-200 p-3 sm:p-4 dark:border-white/5">
           <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Campaign Details</h2>
           <p className="mt-0.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-            Create and send promotional emails to your subscribers
+            Update campaign information and content
           </p>
         </div>
 
@@ -307,10 +355,10 @@ export default function CreateCampaignPage() {
           <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={() => handleSubmit(false)}
-              disabled={loading}
+              disabled={submitting}
               className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-success-600 text-white hover:bg-success-700 shadow-lg shadow-success-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? (
+              {submitting ? (
                 <>
                   <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -321,16 +369,16 @@ export default function CreateCampaignPage() {
               ) : (
                 <>
                   <HiOutlineSave className="h-4 w-4" />
-                  Save as Draft
+                  Save Changes
                 </>
               )}
             </button>
             <button
               onClick={() => handleSubmit(true)}
-              disabled={loading}
+              disabled={submitting}
               className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? (
+              {submitting ? (
                 <>
                   <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -347,7 +395,7 @@ export default function CreateCampaignPage() {
             </button>
             <button
               onClick={() => router.back()}
-              disabled={loading}
+              disabled={submitting}
               className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <HiOutlineX className="h-4 w-4" />

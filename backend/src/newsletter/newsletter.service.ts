@@ -420,8 +420,8 @@ export class NewsletterService {
           },
         });
 
-        // Prepare email body with unsubscribe link
-        const emailBody = this.prepareEmailBody(campaign.body, subscriber.email);
+        // Prepare email body with tracking pixel, link tracking, and unsubscribe link
+        const emailBody = this.prepareEmailBody(campaign.body, subscriber.email, campaign.id, subscriber.id);
 
         // Send email
         const sent = await this.emailService.sendEmail({
@@ -482,10 +482,29 @@ export class NewsletterService {
   }
 
   /**
-   * Prepare email body with unsubscribe link
+   * Prepare email body with tracking pixel, link tracking, and unsubscribe link
    */
-  private prepareEmailBody(body: string, email: string): string {
+  private prepareEmailBody(body: string, email: string, campaignId?: string, subscriberId?: string): string {
     const unsubscribeUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:4000';
+    
+    // Wrap links with click tracking
+    if (campaignId && subscriberId) {
+      // Replace all href attributes with tracking URLs
+      body = body.replace(/href="([^"]+)"/g, (match, url) => {
+        // Skip mailto, tel, and anchor links
+        if (url.startsWith('mailto:') || url.startsWith('tel:') || url.startsWith('#')) {
+          return match;
+        }
+        // Create tracking URL
+        const trackingUrl = `${backendUrl}/newsletter/track/click/${campaignId}/${subscriberId}?url=${encodeURIComponent(url)}`;
+        return `href="${trackingUrl}"`;
+      });
+
+      // Add tracking pixel at the end of the body
+      const trackingPixel = `<img src="${backendUrl}/newsletter/track/open/${campaignId}/${subscriberId}" width="1" height="1" style="display:none;" alt="" />`;
+      body += trackingPixel;
+    }
     
     // Add unsubscribe link at the bottom if not already present
     if (!body.includes('unsubscribe')) {
@@ -521,6 +540,86 @@ export class NewsletterService {
       );
     } catch (error) {
       this.logger.error(`Error sending welcome email: ${error.message}`);
+    }
+  }
+
+  /**
+   * Track email open
+   */
+  async trackEmailOpen(campaignId: string, subscriberId: string) {
+    try {
+      // Find the campaign log
+      const log = await this.prisma.newsletterCampaignLog.findUnique({
+        where: {
+          campaignId_subscriberId: {
+            campaignId,
+            subscriberId,
+          },
+        },
+      });
+
+      if (!log) {
+        this.logger.warn(`Campaign log not found for campaign ${campaignId}, subscriber ${subscriberId}`);
+        return;
+      }
+
+      // Only track first open
+      if (!log.openedAt) {
+        await this.prisma.newsletterCampaignLog.update({
+          where: { id: log.id },
+          data: { openedAt: new Date() },
+        });
+
+        // Increment campaign's totalOpened
+        await this.prisma.newsletterCampaign.update({
+          where: { id: campaignId },
+          data: { totalOpened: { increment: 1 } },
+        });
+
+        this.logger.log(`Email opened: campaign ${campaignId}, subscriber ${subscriberId}`);
+      }
+    } catch (error) {
+      this.logger.error(`Error tracking email open: ${error.message}`);
+    }
+  }
+
+  /**
+   * Track email click
+   */
+  async trackEmailClick(campaignId: string, subscriberId: string) {
+    try {
+      // Find the campaign log
+      const log = await this.prisma.newsletterCampaignLog.findUnique({
+        where: {
+          campaignId_subscriberId: {
+            campaignId,
+            subscriberId,
+          },
+        },
+      });
+
+      if (!log) {
+        this.logger.warn(`Campaign log not found for campaign ${campaignId}, subscriber ${subscriberId}`);
+        return;
+      }
+
+      // Only track first click
+      if (!log.clickedAt) {
+        await this.prisma.newsletterCampaignLog.update({
+          where: { id: log.id },
+          data: { clickedAt: new Date() },
+        });
+
+        // Increment campaign's totalClicked
+        await this.prisma.newsletterCampaign.update({
+          where: { id: campaignId },
+          data: { totalClicked: { increment: 1 } },
+        });
+
+        this.logger.log(`Email clicked: campaign ${campaignId}, subscriber ${subscriberId}`);
+      }
+    } catch (error) {
+      this.logger.error(`Error tracking email click: ${error.message}`);
     }
   }
 
