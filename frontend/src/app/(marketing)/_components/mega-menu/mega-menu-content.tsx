@@ -181,13 +181,12 @@ const MenuItemCard = ({ item, hoverBg, onClose }: MenuItemCardProps) => {
           transform: 'translateX(4px)',
         }}
       >
-        <HStack spacing={3} align="start">
+        <HStack spacing={3} align="center">
           {item.icon && (
             <Icon
               as={item.icon}
               boxSize={5}
               color={useColorModeValue('blue.500', 'blue.300')}
-              mt={0.5}
             />
           )}
           <VStack align="start" spacing={0.5} flex="1">

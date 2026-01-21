@@ -22,12 +22,13 @@ export const NavLink = forwardRef<NavLinkProps, "a">((props, ref) => {
       variant="nav-link"
       lineHeight="2rem"
       isActive={isActive}
-      fontWeight="medium"
+      fontWeight="bold"
+      fontSize="md"
       {...rest}
     >
-      <HStack spacing={1} align="center">
-        <Text>{children}</Text>
-        {hasMegaMenu && <Icon as={FiChevronDown} boxSize={3.5} />}
+      <HStack spacing={1.5} align="center">
+        <Text fontWeight="bold" fontSize="lg">{children}</Text>
+        {hasMegaMenu && <Icon as={FiChevronDown} boxSize={5} />}
       </HStack>
     </Button>
   );

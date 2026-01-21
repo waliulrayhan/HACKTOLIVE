@@ -64,6 +64,7 @@ import {
   FiUsers,
   FiTarget,
   FiBookOpen,
+  FiBook,
   FiZap,
   FiGlobe,
   FiActivity,
@@ -106,6 +107,8 @@ const Home: NextPage = () => {
       <ServicesOverviewSection />
 
       <AcademyProgramsSection />
+
+      <MeetOurExpertsSection />
 
       <KeyAchievementsSection />
 
@@ -206,7 +209,7 @@ const HeroSection: React.FC = () => {
             flex="1" 
             alignItems={{ base: 'center', md: 'flex-start' }} 
             spacing={{ base: '4', md: '8' }}
-            maxW={{ base: '100%', lg: '50%' }}
+            maxW={{ base: '100%', lg: '60%' }}
             width="100%"
             px={{ base: '2', sm: '3', md: '0' }}
           >
@@ -217,9 +220,9 @@ const HeroSection: React.FC = () => {
                 lineHeight="1.2"
                 textAlign={{ base: 'center', md: 'left' }}
               >
-                Master Cybersecurity
+                Build Cybersecurity Skills
                 <Br />
-                Defend Bangladesh
+                Secure the Digital Future
               </Heading>
             </FallInPlace>
 
@@ -227,11 +230,9 @@ const HeroSection: React.FC = () => {
               <Text 
                 fontSize={{ base: 'md', sm: 'lg', md: 'xl' }} 
                 fontWeight="medium"
-                textAlign={{ base: 'center', md: 'left' }}
+                textAlign="justify"
               >
-                HackToLive is <Em>Bangladesh's premier cybersecurity platform</Em>
-                offering professional security services and
-                ethical hacking education in Bengali.
+                HackToLive provides hands-on cybersecurity training and enterprise-grade security services, empowering individuals and organizations to stay secure in a dynamic threat landscape
               </Text>
             </FallInPlace>
 
@@ -257,7 +258,7 @@ const HeroSection: React.FC = () => {
                     variant="outline"
                     flex={{ base: '1', sm: 'none' }}
                   >
-                  Enroll in Academy
+                  Explore Academy
                   </ButtonLink>
                 </Flex>
             </FallInPlace>
@@ -284,7 +285,7 @@ const HeroSection: React.FC = () => {
                   // }}
                 >
                   <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
-                    5000+
+                    1000+
                   </Text>
                   <Text fontSize={{ base: 'xs', md: 'sm' }} textAlign="center" whiteSpace="nowrap">
                     Students Trained
@@ -304,7 +305,7 @@ const HeroSection: React.FC = () => {
                   // }}
                 >
                   <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
-                    50+
+                    10+
                   </Text>
                   <Text fontSize={{ base: 'xs', md: 'sm' }} textAlign="center" whiteSpace="nowrap">
                     Security Audits
@@ -327,7 +328,7 @@ const HeroSection: React.FC = () => {
                     100%
                   </Text>
                   <Text fontSize={{ base: 'xs', md: 'sm' }} textAlign="center" whiteSpace="nowrap">
-                    Bengali Content
+                    Global Standard
                   </Text>
                 </VStack>
               </Flex>
@@ -501,7 +502,7 @@ const ServicesOverviewSection = () => {
             <VStack spacing="4" textAlign="center">
               <Badge 
                 colorScheme="green" 
-                fontSize="sm" 
+                fontSize="2xl" 
                 px="3" 
                 py="1" 
                 borderRadius="full"
@@ -515,11 +516,14 @@ const ServicesOverviewSection = () => {
               >
                 Professional Services
               </Badge>
-              <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
+              {/* <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
                 Enterprise-Grade Security Solutions
-              </Heading>
+              </Heading> */}
+              {/* <Heading fontSize={{ base: '3xl', md: '4xl', lg: '4xl' }}>
+                Professional Services
+              </Heading> */}
               <Text fontSize={{ base: 'lg', md: 'xl' }} color="muted" maxW="3xl">
-                Protect your business with our comprehensive cybersecurity services delivered by certified professionals
+                AI-ready cybersecurity: expert services to detect risks, strengthen defenses, and ensure resilience
               </Text>
             </VStack>
           </FallInPlace>
@@ -763,8 +767,8 @@ const AcademyProgramsSection = () => {
             <VStack spacing="4" textAlign="center">
               <Badge 
                 colorScheme="green" 
-                fontSize="sm" 
-                px="3" 
+                fontSize="2xl" 
+                px="3"
                 py="1" 
                 borderRadius="full"
                 animation="slideInDown 0.5s ease-out"
@@ -777,9 +781,9 @@ const AcademyProgramsSection = () => {
               >
                 Academy Programs
               </Badge>
-              <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
-                Learn Cybersecurity in Bengali
-              </Heading>
+              {/* <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
+                Learn Cybersecurity – From Beginner to Expert
+              </Heading> */}
               <Text fontSize={{ base: 'lg', md: 'xl' }} color="muted" maxW="3xl">
                 Structured learning paths from beginner to expert with hands-on labs and real-world scenarios
               </Text>
@@ -913,6 +917,194 @@ const AcademyProgramsSection = () => {
   )
 }
 
+const MeetOurExpertsSection = () => {
+  const cardBg = useColorModeValue('white', 'gray.800')
+  const borderColor = useColorModeValue('gray.200', 'gray.600')
+  const textMuted = useColorModeValue('gray.600', 'gray.400')
+  const headingColor = useColorModeValue('gray.800', 'white')
+
+  const experts = [
+    {
+      name: 'Md. Rayhan Ahmed',
+      title: 'Senior Security Researcher',
+      bio: 'OSCP & CEH certified with 7+ years of experience in penetration testing and red teaming operations.',
+      avatar: '/images/team/team-01.jpg',
+      rating: 4.9,
+      students: 3500,
+      courses: 8,
+      certifications: ['OSCP', 'CEH', 'Security+']
+    },
+    {
+      name: 'Fahim Hassan',
+      title: 'Penetration Testing Lead',
+      bio: 'Specializes in web application security and has discovered critical vulnerabilities in major platforms.',
+      avatar: '/images/cards/card-02.jpg',
+      rating: 4.8,
+      students: 2800,
+      courses: 6,
+      certifications: ['OSWE', 'OSCE', 'GWAPT']
+    },
+    {
+      name: 'Sakib Rahman',
+      title: 'Red Team Specialist',
+      bio: 'Expert in advanced exploitation techniques and infrastructure penetration testing.',
+      avatar: '/images/team/team-03.jpg',
+      rating: 4.9,
+      students: 2200,
+      courses: 5,
+      certifications: ['OSEP', 'CRTO', 'CRTE']
+    },
+  ]
+
+  return (
+    <Box py={{ base: '16', md: '24' }} bg={useColorModeValue('white', 'gray.900')}>
+      <Container maxW="container.xl">
+        <VStack spacing={{ base: '8', md: '12' }}>
+          <FallInPlace>
+            <VStack spacing="4" textAlign="center">
+              <Badge colorScheme="purple" fontSize="2xl" px="3" py="1" borderRadius="full">
+                Meet Our Expert
+              </Badge>
+              {/* <Heading fontSize={{ base: '3xl', md: '4xl', lg: '4xl' }}>
+                Meet Our Expert Instructors
+              </Heading> */}
+              <Text fontSize={{ base: 'lg', md: 'xl' }} color={textMuted} maxW="3xl">
+                Learn from industry professionals with years of real-world experience in cybersecurity
+              </Text>
+            </VStack>
+          </FallInPlace>
+
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="8">
+            {experts.map((expert, index) => (
+              <FallInPlace key={expert.name} delay={0.1 * index}>
+                <Box
+                  bg={cardBg}
+                  borderRadius="3xl"
+                  overflow="hidden"
+                  borderWidth="1px"
+                  borderColor={borderColor}
+                  transition="all 0.4s ease"
+                  position="relative"
+                  _hover={{
+                    transform: "translateY(-8px)",
+                    shadow: "2xl",
+                    borderColor: "purple.500",
+                  }}
+                  cursor="pointer"
+                  h="full"
+                >
+                  <Box position="relative" overflow="hidden">
+                    <Image
+                      src={expert.avatar}
+                      alt={expert.name}
+                      width={400}
+                      height={400}
+                      style={{
+                        width: "100%",
+                        height: "280px",
+                        objectFit: "cover"
+                      }}
+                    />
+                    <Box
+                      position="absolute"
+                      bottom="0"
+                      left="0"
+                      right="0"
+                      bg="linear-gradient(to top, rgba(0,0,0,0.7), transparent)"
+                      p="4"
+                    >
+                      {/* <Badge
+                        colorScheme="purple"
+                        fontSize="xs"
+                        px="3"
+                        py="1"
+                        borderRadius="full"
+                      >
+                        Expert Instructor
+                      </Badge> */}
+                    </Box>
+                  </Box>
+
+                  <VStack p="6" spacing="4" align="start">
+                    <VStack align="start" spacing="2" w="full">
+                      <Heading size="md" color={headingColor}>
+                        {expert.name}
+                      </Heading>
+                      <Text fontSize="sm" fontWeight="semibold" color="purple.500">
+                        {expert.title}
+                      </Text>
+                      <Text fontSize="sm" color={textMuted} lineHeight="tall">
+                        {expert.bio}
+                      </Text>
+                    </VStack>
+
+                    <Wrap spacing="2">
+                      {expert.certifications.map((cert) => (
+                        <Badge key={cert} colorScheme="green" fontSize="xs">
+                          {cert}
+                        </Badge>
+                      ))}
+                    </Wrap>
+
+                    <Box
+                      w="full"
+                      pt="4"
+                      borderTopWidth="1px"
+                      borderColor={borderColor}
+                    >
+                      <SimpleGrid columns={3} spacing="4" fontSize="sm">
+                        <VStack spacing="1">
+                          <HStack spacing="1" color="yellow.500">
+                            <Icon as={FiStar} />
+                            <Text fontWeight="bold">{expert.rating}</Text>
+                          </HStack>
+                          <Text fontSize="xs" color={textMuted}>Rating</Text>
+                        </VStack>
+
+                        <VStack spacing="1">
+                          <HStack spacing="1" color="purple.500">
+                            <Icon as={FiUsers} />
+                            <Text fontWeight="bold">
+                              {expert.students > 999
+                                ? `${(expert.students / 1000).toFixed(1)}k`
+                                : expert.students}
+                            </Text>
+                          </HStack>
+                          <Text fontSize="xs" color={textMuted}>Students</Text>
+                        </VStack>
+
+                        <VStack spacing="1">
+                          <HStack spacing="1" color="blue.500">
+                            <Icon as={FiBook} />
+                            <Text fontWeight="bold">{expert.courses}</Text>
+                          </HStack>
+                          <Text fontSize="xs" color={textMuted}>Courses</Text>
+                        </VStack>
+                      </SimpleGrid>
+                    </Box>
+                  </VStack>
+                </Box>
+              </FallInPlace>
+            ))}
+          </SimpleGrid>
+
+          <FallInPlace delay={0.4}>
+            <ButtonLink
+              href="/academy/instructors"
+              colorScheme="primary"
+              variant="outline"
+              size="lg"
+              rightIcon={<Icon as={FiArrowRight} />}
+            >
+              View All Instructors
+            </ButtonLink>
+          </FallInPlace>
+        </VStack>
+      </Container>
+    </Box>
+  )
+}
+
 const KeyAchievementsSection = () => {
   const bgColor = useColorModeValue('green.50', 'gray.900')
   const cardBg = useColorModeValue('white', 'gray.800')
@@ -1031,9 +1223,9 @@ const KeyAchievementsSection = () => {
         <VStack spacing={{ base: '8', md: '12' }}>
           <FallInPlace>
             <VStack spacing="4" textAlign="center">
-              <Badge 
+              {/* <Badge 
                 colorScheme="green" 
-                fontSize="sm" 
+                fontSize="2xl" 
                 px="3" 
                 py="1" 
                 borderRadius="full"
@@ -1046,12 +1238,15 @@ const KeyAchievementsSection = () => {
                 }}
               >
                 Our Achievements
-              </Badge>
-              <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
-                Proven Track Record
+              </Badge> */}
+              <Heading fontSize={{ base: '3xl', md: '4xl', lg: '4xl' }}>
+                Our Achievements
               </Heading>
+              {/* <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
+                A Legacy of Impact & Excellence
+              </Heading> */}
               <Text fontSize={{ base: 'lg', md: 'xl' }} color="muted" maxW="3xl">
-                Numbers that speak for our expertise and commitment to cybersecurity excellence
+                HackToLive is more than an organization — it is a movement advancing cybersecurity education and protection across the world
               </Text>
             </VStack>
           </FallInPlace>
@@ -1168,16 +1363,16 @@ const VideoShowcaseSection = () => {
             <VStack spacing="4" textAlign="center">
               <Badge 
                 colorScheme="green" 
-                fontSize="sm" 
+                fontSize="2xl" 
                 px="3" 
                 py="1" 
                 borderRadius="full"
               >
                 Video Showcase
               </Badge>
-              <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
+              {/* <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
                 See Our Work in Action
-              </Heading>
+              </Heading> */}
               <Text fontSize={{ base: 'lg', md: 'xl' }} color="muted" maxW="3xl">
                 Watch demonstrations of our security testing and training programs
               </Text>
@@ -1335,12 +1530,12 @@ const PhotoGallerySection = () => {
         <VStack spacing={{ base: '10', md: '14' }}>
           <FallInPlace>
             <VStack spacing="3" textAlign="center">
-              <Badge colorScheme="green" fontSize="xs" px="3" py="1" borderRadius="full" fontWeight="medium">
+              <Badge colorScheme="green" fontSize="2xl" px="3" py="1" borderRadius="full" fontWeight="medium">
                 Gallery
               </Badge>
-              <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }} fontWeight="bold">
+              {/* <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }} fontWeight="bold">
                 Moments That Matter
-              </Heading>
+              </Heading> */}
               <Text fontSize={{ base: 'md', md: 'lg' }} color="muted" maxW="2xl">
                 Explore our journey through training sessions, events, and successful projects
               </Text>
@@ -1679,16 +1874,16 @@ const BlogSection = () => {
             <VStack spacing="4" textAlign="center">
               <Badge 
                 colorScheme="green" 
-                fontSize="sm" 
+                fontSize="2xl" 
                 px="3" 
                 py="1" 
                 borderRadius="full"
               >
                 Latest from Blog
               </Badge>
-              <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
+              {/* <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}>
                 Insights & Updates
-              </Heading>
+              </Heading> */}
               <Text fontSize={{ base: 'lg', md: 'xl' }} color="muted" maxW="3xl">
                 Stay updated with the latest cybersecurity trends, tutorials, and our community news
               </Text>
@@ -1901,14 +2096,14 @@ const TrustedBySection = () => {
             </Flex>
           </Box>
 
-          <FallInPlace delay={0.5}>
+          {/* <FallInPlace delay={0.5}>
             <HStack spacing="4" pt="4">
               <Icon as={FiCheck} color="green.500" boxSize="5" />
               <Text color="muted" fontSize={{ base: 'sm', md: 'md' }}>
                 Protecting 100+ organizations across Bangladesh since 2019
               </Text>
             </HStack>
-          </FallInPlace>
+          </FallInPlace> */}
         </VStack>
       </Container>
     </Box>

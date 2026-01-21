@@ -72,7 +72,7 @@ const Navigation: React.FC<NavigationProps> = ({
             return null
           }
           
-          const hasMegaMenu = megaMenuData[label]
+          const hasMegaMenu = !!megaMenuData[label]
           
           return (
             <MegaMenuItem
