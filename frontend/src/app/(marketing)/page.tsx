@@ -37,6 +37,8 @@ import {
   ModalCloseButton,
   ModalBody,
   useBreakpointValue,
+  Spinner,
+  Center,
 } from '@chakra-ui/react'
 import { Br, Link } from '@saas-ui/react'
 import type { NextPage } from 'next'
@@ -79,6 +81,7 @@ import {
 } from 'react-icons/fi'
 
 import * as React from 'react'
+import { useState, useEffect } from 'react'
 
 import { ButtonLink } from '@/components/shared/button-link/button-link'
 import { Faq } from './_components/faq'
@@ -98,6 +101,9 @@ import { Em } from '@/components/shared/typography'
 import faq from '@/lib/config/data/faq'
 import pricing from '@/lib/config/data/pricing'
 import testimonials from '@/lib/config/data/testimonials'
+import { Course } from '@/types/academy'
+import academyService from '@/lib/academy-service'
+import CourseCard from '@/components/academy/CourseCard'
 
 const Home: NextPage = () => {
   return (
@@ -220,9 +226,9 @@ const HeroSection: React.FC = () => {
                 lineHeight="1.2"
                 textAlign={{ base: 'center', md: 'left' }}
               >
-                Build Cybersecurity Skills
+                Master Cybersecurity
                 <Br />
-                Secure the Digital Future
+                Defend Organizations
               </Heading>
             </FallInPlace>
 
@@ -673,84 +679,26 @@ const AcademyProgramsSection = () => {
   const hoverBg = useColorModeValue('green.50', 'green.900')
   const mutedColor = useColorModeValue('gray.600', 'gray.300')
 
-  const programs = [
-    {
-      icon: FiBookOpen,
-      title: 'Ethical Hacking Fundamentals',
-      level: 'Beginner',
-      duration: '8 Weeks',
-      students: '2000+',
-      description: 'Start your cybersecurity journey with comprehensive basics in Bengali.',
-      topics: ['Linux Basics', 'Networking', 'Basic Tools', 'Web Fundamentals'],
-      color: 'green',
-      image: '/images/cards/card-01.jpg',
-      instructor: {
-        name: 'Md. Rayhan Ahmed',
-        title: 'Senior Security Researcher',
-        avatar: '',
-        certifications: ['OSCP', 'CEH']
-      },
-      rating: 4.8,
-      reviews: 450
-    },
-    {
-      icon: FiTool,
-      title: 'Web Application Pentesting',
-      level: 'Intermediate',
-      duration: '10 Weeks',
-      students: '1500+',
-      description: 'Master web application security testing with hands-on practice.',
-      topics: ['OWASP Top 10', 'BurpSuite', 'SQL Injection', 'XSS'],
-      color: 'blue',
-      image: '/images/cards/card-02.jpg',
-      instructor: {
-        name: 'Fahim Hassan',
-        title: 'Penetration Testing Lead',
-        avatar: '',
-        certifications: ['OSWE', 'OSCE']
-      },
-      rating: 4.9,
-      reviews: 380
-    },
-    {
-      icon: FiTarget,
-      title: 'Advanced Penetration Testing',
-      level: 'Advanced',
-      duration: '12 Weeks',
-      students: '800+',
-      description: 'Become an expert with advanced exploitation techniques.',
-      topics: ['Metasploit', 'Post Exploitation', 'Privilege Escalation', 'Red Teaming'],
-      color: 'purple',
-      image: '/images/cards/card-03.jpg',
-      instructor: {
-        name: 'Sakib Rahman',
-        title: 'Red Team Specialist',
-        avatar: '',
-        certifications: ['OSEP', 'CRTO']
-      },
-      rating: 4.7,
-      reviews: 220
-    },
-    {
-      icon: FiFlag,
-      title: 'CTF & Bug Bounty',
-      level: 'All Levels',
-      duration: 'Ongoing',
-      students: '1000+',
-      description: 'Join competitions and earn from bug bounty programs.',
-      topics: ['CTF Challenges', 'Bug Hunting', 'Write-ups', 'Live Practice'],
-      color: 'orange',
-      image: '/images/cards/card-01.jpg',
-      instructor: {
-        name: 'Tanvir Islam',
-        title: 'Bug Bounty Hunter',
-        avatar: '',
-        certifications: ['CTF Champion', 'HackerOne MVH']
-      },
-      rating: 4.9,
-      reviews: 520
-    },
-  ]
+  const [courses, setCourses] = useState<Course[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      setLoading(true)
+      try {
+        // Fetch published courses and limit to 4
+        const allCourses = await academyService.getCourses()
+        const publishedCourses = allCourses.filter((c) => c.status === 'published').slice(0, 4)
+        setCourses(publishedCourses)
+      } catch (error) {
+        console.error('Error fetching courses:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCourses()
+  }, [])
 
   return (
     <Box
@@ -790,116 +738,25 @@ const AcademyProgramsSection = () => {
             </VStack>
           </FallInPlace>
 
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={{ base: '6', md: '6' }} width="100%">
-            {programs.map((program, index) => (
-              <FallInPlace key={program.title} delay={0.1 * index}>
-                <Card
-                  bg={cardBg}
-                  borderWidth="2px"
-                  borderColor={borderColor}
-                  borderRadius="xl"
-                  overflow="hidden"
-                  transition="all 0.3s ease"
-                  cursor="pointer"
-                  boxShadow={useColorModeValue('sm', '0 8px 30px rgba(0,0,0,0.6)')}
-                  _hover={{
-                    transform: 'translateY(-8px)',
-                    borderColor: `${program.color}.500`,
-                    shadow: 'xl',
-                  }}
-                  _dark={{
-                    bg: 'gray.800',
-                    borderColor: 'gray.600',
-                  }}
-                  height="100%"
-                >
-                  {/* Course Image */}
-                  <Box position="relative" height="180px">
-                    <Image
-                      src={program.image}
-                      alt={program.title}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                    />
-                    <Badge
-                      position="absolute"
-                      top="3"
-                      right="3"
-                      colorScheme={program.color}
-                    >
-                      {program.level}
-                    </Badge>
-                  </Box>
-
-                  <CardBody p={{ base: '5', md: '6' }}>
-                    <VStack align="start" spacing="4" height="100%">
-                      <VStack align="start" spacing="2" flex="1" width="100%">
-                        <Heading size="sm" fontSize={{ base: 'md', md: 'lg' }} noOfLines={2}>
-                          {program.title}
-                        </Heading>
-                        
-                        {/* Rating */}
-                        <HStack spacing="2">
-                          <HStack spacing="1">
-                            <Icon as={FiStar} color="yellow.400" boxSize="4" fill="currentColor" />
-                            <Text fontWeight="bold" fontSize="sm">{program.rating}</Text>
-                          </HStack>
-                          <Text fontSize="xs" color={mutedColor}>({program.reviews} reviews)</Text>
-                        </HStack>
-
-                        <Text color={mutedColor} fontSize="sm" noOfLines={2}>
-                          {program.description}
-                        </Text>
-
-                        <Wrap spacing="1" pt="1">
-                          {program.topics.slice(0, 3).map((topic) => (
-                            <Tag key={topic} size="sm" variant="subtle" colorScheme={program.color}>
-                              {topic}
-                            </Tag>
-                          ))}
-                        </Wrap>
-                      </VStack>
-
-                      <Divider />
-
-                      {/* Instructor Info */}
-                      <HStack width="100%" spacing="3">
-                        <Avatar
-                          src={program.instructor.avatar}
-                          name={program.instructor.name}
-                          size="sm"
-                        />
-                        <VStack align="start" spacing="0" flex="1">
-                          <Text fontSize="xs" color={mutedColor} fontWeight="medium">
-                            Instructed by
-                          </Text>
-                          <Text fontSize={{ base: 'xs', md: 'sm', lg: 'md' }} fontWeight="semibold" noOfLines={1}>
-                            {program.instructor.name}
-                          </Text>
-                          <Text fontSize={{ base: 'xs', md: 'sm', lg: 'md' }} color={mutedColor} noOfLines={1}>
-                            {program.instructor.title}
-                          </Text>
-                        </VStack>
-                      </HStack>
-
-                      <Divider />
-
-                      <HStack justify="space-between" width="100%">
-                        <HStack>
-                          <Icon as={FiUsers} color="muted" boxSize="4" />
-                          <Text fontSize="sm" color="muted">{program.students}</Text>
-                        </HStack>
-                        <HStack>
-                          <Icon as={FiClock} color="muted" boxSize="4" />
-                          <Text fontSize="sm" color="muted">{program.duration}</Text>
-                        </HStack>
-                      </HStack>
-                    </VStack>
-                  </CardBody>
-                </Card>
-              </FallInPlace>
-            ))}
-          </SimpleGrid>
+          {loading ? (
+            <Center width="100%" py="16">
+              <Spinner size="xl" color={accentColor} thickness="4px" />
+            </Center>
+          ) : courses.length === 0 ? (
+            <Center width="100%" py="16">
+              <Text fontSize="lg" color={mutedColor}>
+                No courses available at the moment.
+              </Text>
+            </Center>
+          ) : (
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={{ base: '6', md: '6' }} width="100%">
+              {courses.map((course, index) => (
+                <FallInPlace key={course.id} delay={0.1 * index}>
+                  <CourseCard course={course} />
+                </FallInPlace>
+              ))}
+            </SimpleGrid>
+          )}
 
           <FallInPlace delay={0.5}>
             <ButtonLink

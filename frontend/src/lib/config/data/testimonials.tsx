@@ -1,5 +1,5 @@
 export default {
-  title: 'Trusted by Security Professionals & Students',
+  title: 'Trusted by Cybersecurity Professionals and Emerging Talent',
   items: [
     {
       name: 'Md. Shakib Rahman',
