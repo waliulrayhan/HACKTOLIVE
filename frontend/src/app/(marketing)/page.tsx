@@ -103,7 +103,7 @@ import pricing from '@/lib/config/data/pricing'
 import testimonials from '@/lib/config/data/testimonials'
 import { Course } from '@/types/academy'
 import academyService from '@/lib/academy-service'
-import CourseCard from '@/components/academy/CourseCard'
+import SimpleCourseCard from '@/components/academy/SimpleCourseCard'
 
 const Home: NextPage = () => {
   return (
@@ -686,9 +686,9 @@ const AcademyProgramsSection = () => {
     const fetchCourses = async () => {
       setLoading(true)
       try {
-        // Fetch published courses and limit to 4
+        // Fetch published courses and limit to 3
         const allCourses = await academyService.getCourses()
-        const publishedCourses = allCourses.filter((c) => c.status === 'published').slice(0, 4)
+        const publishedCourses = allCourses.filter((c) => c.status === 'published').slice(0, 3)
         setCourses(publishedCourses)
       } catch (error) {
         console.error('Error fetching courses:', error)
@@ -749,10 +749,10 @@ const AcademyProgramsSection = () => {
               </Text>
             </Center>
           ) : (
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={{ base: '6', md: '6' }} width="100%">
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={{ base: '6', md: '6' }} width="100%">
               {courses.map((course, index) => (
                 <FallInPlace key={course.id} delay={0.1 * index}>
-                  <CourseCard course={course} />
+                  <SimpleCourseCard course={course} />
                 </FallInPlace>
               ))}
             </SimpleGrid>
@@ -1231,7 +1231,7 @@ const VideoShowcaseSection = () => {
                 See Our Work in Action
               </Heading> */}
               <Text fontSize={{ base: 'lg', md: 'xl' }} color="muted" maxW="3xl">
-                Watch demonstrations of our security testing and training programs
+                Experience live penetration tests, red team exercises, and hands-on labs showcasing our training and cybersecurity expertise
               </Text>
             </VStack>
           </FallInPlace>
