@@ -70,6 +70,14 @@ export const authService = {
     return response.data;
   },
 
+  async resendOtp(userId: string, type: 'REGISTRATION' | 'LOGIN' | 'PASSWORD_RESET') {
+    const response = await api.post<OtpResponse>('/auth/resend-otp', {
+      userId,
+      type,
+    });
+    return response.data;
+  },
+
   async forgotPassword(email: string) {
     const response = await api.post('/auth/forgot-password', {
       email,

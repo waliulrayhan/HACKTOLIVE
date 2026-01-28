@@ -104,6 +104,7 @@ import testimonials from '@/lib/config/data/testimonials'
 import { Course } from '@/types/academy'
 import academyService from '@/lib/academy-service'
 import SimpleCourseCard from '@/components/academy/SimpleCourseCard'
+import { Blog } from '@/types/blog'
 
 const Home: NextPage = () => {
   return (
@@ -143,7 +144,7 @@ const HeroSection: React.FC = () => {
   const overlayBg = useColorModeValue('whiteAlpha.800', 'blackAlpha.700')
   const videoFilter = useColorModeValue('brightness(1.2) contrast(0.9)', 'brightness(0.7)')
   const accentColor = useColorModeValue('green.500', 'green.400')
-  
+
   const [animationData, setAnimationData] = React.useState<any>(null)
 
   React.useEffect(() => {
@@ -153,10 +154,10 @@ const HeroSection: React.FC = () => {
       .then((data) => setAnimationData(data))
       .catch((error) => console.error('Animation error:', error))
   }, [])
-  
+
   return (
-    <Box 
-      position="relative" 
+    <Box
+      position="relative"
       overflow="hidden"
       height="100vh"
     >
@@ -201,19 +202,19 @@ const HeroSection: React.FC = () => {
           style={{ willChange: 'background-color' }}
         />
       </Box>
-      
-      <Container 
-        maxW="container.xl" 
-        pt={{ base: '80px', md: '140px', lg: '180px' }} 
+
+      <Container
+        maxW="container.xl"
+        pt={{ base: '80px', md: '140px', lg: '180px' }}
         pb={{ base: '60px', md: '80px', lg: '100px' }}
         height="100%"
         display="flex"
         alignItems="center"
       >
         <Stack direction={{ base: 'column', lg: 'row' }} alignItems="center" width="100%" spacing={{ base: '8', lg: '12' }}>
-          <VStack 
-            flex="1" 
-            alignItems={{ base: 'center', md: 'flex-start' }} 
+          <VStack
+            flex="1"
+            alignItems={{ base: 'center', md: 'flex-start' }}
             spacing={{ base: '4', md: '8' }}
             maxW={{ base: '100%', lg: '60%' }}
             width="100%"
@@ -233,8 +234,8 @@ const HeroSection: React.FC = () => {
             </FallInPlace>
 
             <FallInPlace delay={0.2}>
-              <Text 
-                fontSize={{ base: 'md', sm: 'lg', md: 'xl' }} 
+              <Text
+                fontSize={{ base: 'md', sm: 'lg', md: 'xl' }}
                 fontWeight="medium"
                 textAlign="justify"
               >
@@ -243,52 +244,52 @@ const HeroSection: React.FC = () => {
             </FallInPlace>
 
             <FallInPlace delay={0.4}>
-                <Flex 
-                  gap={{ base: '2', sm: '4' }} 
+              <Flex
+                gap={{ base: '2', sm: '4' }}
                 flexDirection={{ base: 'row', sm: 'row' }}
-                  width="100%"
-                  justifyContent={{ base: 'center', md: 'flex-start' }}
-                >
-                  <ButtonLink 
-                    colorScheme="primary" 
-                    size={{ base: 'md', md: 'lg' }}
+                width="100%"
+                justifyContent={{ base: 'center', md: 'flex-start' }}
+              >
+                <ButtonLink
+                  colorScheme="primary"
+                  size={{ base: 'md', md: 'lg' }}
                   href="/signup"
                   rightIcon={<Icon as={FiArrowRight} />}
-                    flex={{ base: '1', sm: 'none' }}
-                  >
+                  flex={{ base: '1', sm: 'none' }}
+                >
                   Get Started
-                  </ButtonLink>
-                  <ButtonLink
-                    size={{ base: 'md', md: 'lg' }}
+                </ButtonLink>
+                <ButtonLink
+                  size={{ base: 'md', md: 'lg' }}
                   href="/academy"
-                    variant="outline"
-                    flex={{ base: '1', sm: 'none' }}
-                  >
+                  variant="outline"
+                  flex={{ base: '1', sm: 'none' }}
+                >
                   Explore Academy
-                  </ButtonLink>
-                </Flex>
+                </ButtonLink>
+              </Flex>
             </FallInPlace>
 
             <FallInPlace delay={0.3}>
-              <Flex 
-                direction={{ base: 'row', sm: 'row' }} 
-                gap={{ base: '8', sm: '10', md: '12' }} 
+              <Flex
+                direction={{ base: 'row', sm: 'row' }}
+                gap={{ base: '8', sm: '10', md: '12' }}
                 pt="4"
                 width="100%"
                 justify={{ base: 'center', md: 'flex-start' }}
                 style={{ willChange: 'transform, opacity' }}
               >
-                <VStack 
-                  alignItems="center" 
-                  spacing="1" 
+                <VStack
+                  alignItems="center"
+                  spacing="1"
                   flex={{ base: '1', sm: 'none' }}
-                  // animation="float 3s ease-in-out infinite"
-                  // sx={{
-                  //   '@keyframes float': {
-                  //     '0%, 100%': { transform: 'translateY(0px)' },
-                  //     '50%': { transform: 'translateY(-10px)' },
-                  //   },
-                  // }}
+                // animation="float 3s ease-in-out infinite"
+                // sx={{
+                //   '@keyframes float': {
+                //     '0%, 100%': { transform: 'translateY(0px)' },
+                //     '50%': { transform: 'translateY(-10px)' },
+                //   },
+                // }}
                 >
                   <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                     1000+
@@ -297,18 +298,18 @@ const HeroSection: React.FC = () => {
                     Students Trained
                   </Text>
                 </VStack>
-                <VStack 
-                  alignItems="center" 
-                  spacing="1" 
+                <VStack
+                  alignItems="center"
+                  spacing="1"
                   flex={{ base: '1', sm: 'none' }}
-                  // animation="float 3s ease-in-out infinite"
-                  // sx={{
-                  //   '@keyframes float': {
-                  //     '0%, 100%': { transform: 'translateY(0px)' },
-                  //     '50%': { transform: 'translateY(-10px)' },
-                  //   },
-                  //   animationDelay: '0.5s',
-                  // }}
+                // animation="float 3s ease-in-out infinite"
+                // sx={{
+                //   '@keyframes float': {
+                //     '0%, 100%': { transform: 'translateY(0px)' },
+                //     '50%': { transform: 'translateY(-10px)' },
+                //   },
+                //   animationDelay: '0.5s',
+                // }}
                 >
                   <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                     10+
@@ -317,18 +318,18 @@ const HeroSection: React.FC = () => {
                     Security Audits
                   </Text>
                 </VStack>
-                <VStack 
-                  alignItems="center" 
-                  spacing="1" 
+                <VStack
+                  alignItems="center"
+                  spacing="1"
                   flex={{ base: '1', sm: 'none' }}
-                  // animation="float 3s ease-in-out infinite"
-                  // sx={{
-                  //   '@keyframes float': {
-                  //     '0%, 100%': { transform: 'translateY(0px)' },
-                  //     '50%': { transform: 'translateY(-10px)' },
-                  //   },
-                  //   animationDelay: '1s',
-                  // }}
+                // animation="float 3s ease-in-out infinite"
+                // sx={{
+                //   '@keyframes float': {
+                //     '0%, 100%': { transform: 'translateY(0px)' },
+                //     '50%': { transform: 'translateY(-10px)' },
+                //   },
+                //   animationDelay: '1s',
+                // }}
                 >
                   <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color={accentColor}>
                     100%
@@ -501,16 +502,16 @@ const ServicesOverviewSection = () => {
         filter="blur(100px)"
         pointerEvents="none"
       />
-      
+
       <Container maxW="container.xl">
         <VStack spacing={{ base: '8', md: '12' }}>
           <FallInPlace>
             <VStack spacing="4" textAlign="center">
-              <Badge 
-                colorScheme="green" 
-                fontSize="2xl" 
-                px="3" 
-                py="1" 
+              <Badge
+                colorScheme="green"
+                fontSize="2xl"
+                px="3"
+                py="1"
                 borderRadius="full"
                 animation="slideInDown 0.5s ease-out"
                 sx={{
@@ -584,7 +585,7 @@ const ServicesOverviewSection = () => {
                     >
                       <Icon as={services[activeService].icon} boxSize="10" color={`${services[activeService].color}.500`} />
                     </Flex>
-                    
+
                     <VStack align="start" spacing="3" flex="1">
                       <Heading size="lg">{services[activeService].title}</Heading>
                       <Text color="muted" fontSize="lg">
@@ -623,7 +624,7 @@ const ServicesOverviewSection = () => {
                 </CardBody>
               </Grid>
             </Card>
-            
+
             <IconButton
               aria-label="Previous service"
               icon={<FiChevronLeft />}
@@ -713,11 +714,11 @@ const AcademyProgramsSection = () => {
         <VStack spacing={{ base: '8', md: '12' }}>
           <FallInPlace>
             <VStack spacing="4" textAlign="center">
-              <Badge 
-                colorScheme="green" 
-                fontSize="2xl" 
+              <Badge
+                colorScheme="green"
+                fontSize="2xl"
                 px="3"
-                py="1" 
+                py="1"
                 borderRadius="full"
                 animation="slideInDown 0.5s ease-out"
                 sx={{
@@ -1042,20 +1043,20 @@ const KeyAchievementsSection = () => {
       achievements.forEach((achievement) => {
         let currentStep = 0
         const increment = achievement.number / steps
-        
+
         const timer = setInterval(() => {
           currentStep++
           setCounts((prev) => ({
             ...prev,
             [achievement.key]: Math.min(Math.round(increment * currentStep), achievement.number)
           }))
-          
+
           if (currentStep >= steps) {
             clearInterval(timer)
           }
         }, stepDuration)
       })
-      
+
       setHasAnimated(true)
     }
   }, [hasAnimated])
@@ -1075,7 +1076,7 @@ const KeyAchievementsSection = () => {
         filter="blur(120px)"
         pointerEvents="none"
       />
-      
+
       <Container maxW="container.xl">
         <VStack spacing={{ base: '8', md: '12' }}>
           <FallInPlace>
@@ -1141,9 +1142,9 @@ const KeyAchievementsSection = () => {
                       </Flex>
 
                       <VStack spacing="2">
-                        <Text 
-                          fontSize={{ base: '3xl', md: '4xl' }} 
-                          fontWeight="bold" 
+                        <Text
+                          fontSize={{ base: '3xl', md: '4xl' }}
+                          fontWeight="bold"
                           color={accentColor}
                         >
                           {counts[achievement.key as keyof typeof counts]}{achievement.suffix}
@@ -1189,23 +1190,23 @@ const VideoShowcaseSection = () => {
   const videoRef = React.useRef<HTMLVideoElement | null>(null)
 
   const videos = [
-    { 
-      title: 'Penetration Testing Demo', 
-      duration: '5:30', 
+    {
+      title: 'Penetration Testing Demo',
+      duration: '5:30',
       views: '2.3K',
       url: '/sample vedio.mp4',
       thumbnail: '/images/grid-image/image-01.png'
     },
-    { 
-      title: 'Student Success Stories', 
-      duration: '3:45', 
+    {
+      title: 'Student Success Stories',
+      duration: '3:45',
       views: '1.8K',
       url: '/sample vedio 2.mp4',
       thumbnail: '/images/grid-image/image-02.png'
     },
-    { 
-      title: 'CTF Competition Highlights', 
-      duration: '4:20', 
+    {
+      title: 'CTF Competition Highlights',
+      duration: '4:20',
       views: '3.1K',
       url: '/sample vedio 3.mp4',
       thumbnail: '/images/grid-image/image-03.png'
@@ -1218,11 +1219,11 @@ const VideoShowcaseSection = () => {
         <VStack spacing={{ base: '8', md: '12' }}>
           <FallInPlace>
             <VStack spacing="4" textAlign="center">
-              <Badge 
-                colorScheme="green" 
-                fontSize="2xl" 
-                px="3" 
-                py="1" 
+              <Badge
+                colorScheme="green"
+                fontSize="2xl"
+                px="3"
+                py="1"
                 borderRadius="full"
               >
                 Video Showcase
@@ -1436,11 +1437,11 @@ const PhotoGallerySection = () => {
                   }}
                 >
                   <Box position="relative" width="100%" height="100%">
-                    <Image 
-                      src={image.src} 
-                      alt={image.title} 
-                      fill 
-                      style={{ objectFit: 'cover' }} 
+                    <Image
+                      src={image.src}
+                      alt={image.title}
+                      fill
+                      style={{ objectFit: 'cover' }}
                     />
                     <Box
                       position="absolute"
@@ -1485,16 +1486,16 @@ const PhotoGallerySection = () => {
           </FallInPlace> */}
 
           {/* Lightbox Modal */}
-          <Modal 
-            isOpen={selectedImage != null} 
-            onClose={() => setSelectedImage(null)} 
+          <Modal
+            isOpen={selectedImage != null}
+            onClose={() => setSelectedImage(null)}
             size={{ base: 'full', md: '6xl' }}
             isCentered
             scrollBehavior="inside"
           >
-            <ModalOverlay 
-              bg="blackAlpha.900" 
-              backdropFilter="blur(8px)" 
+            <ModalOverlay
+              bg="blackAlpha.900"
+              backdropFilter="blur(8px)"
             />
             <ModalContent
               bg="transparent"
@@ -1516,7 +1517,7 @@ const PhotoGallerySection = () => {
                 borderRadius="full"
                 zIndex={20}
               />
-              
+
               <ModalBody p={0} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} overflow="hidden">
                 {selectedImage != null && (
                   <>
@@ -1530,8 +1531,8 @@ const PhotoGallerySection = () => {
                       px={4}
                     >
                       <VStack spacing={4} flex={1} justify="center">
-                        <Box 
-                          position="relative" 
+                        <Box
+                          position="relative"
                           width="100%"
                           maxH="60vh"
                           aspectRatio="4/3"
@@ -1547,7 +1548,7 @@ const PhotoGallerySection = () => {
                             style={{ objectFit: 'contain' }}
                           />
                         </Box>
-                        
+
                         <VStack spacing={4} width="100%">
                           <VStack spacing={2} width="100%" textAlign="center">
                             <Heading size="md" color="white">
@@ -1570,11 +1571,11 @@ const PhotoGallerySection = () => {
                             >
                               Previous
                             </Button>
-                            
+
                             <Text fontSize="md" color="white" fontWeight="semibold" px={2}>
                               {selectedImage + 1} / {galleryImages.length}
                             </Text>
-                            
+
                             <Button
                               onClick={goToNext}
                               size="md"
@@ -1658,11 +1659,11 @@ const PhotoGallerySection = () => {
                             >
                               Previous
                             </Button>
-                            
+
                             <Text fontSize="md" color="white" fontWeight="semibold" px={3}>
                               {selectedImage + 1} / {galleryImages.length}
                             </Text>
-                            
+
                             <Button
                               onClick={goToNext}
                               size="md"
@@ -1692,36 +1693,46 @@ const PhotoGallerySection = () => {
 const BlogSection = () => {
   const cardBg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
+  const accentColor = useColorModeValue('green.500', 'green.400')
+  const mutedColor = useColorModeValue('gray.600', 'gray.300')
 
-  const blogPosts = [
-    {
-      title: 'Top 10 Web Application Vulnerabilities in 2024',
-      excerpt: 'Learn about the most common security vulnerabilities found in modern web applications and how to prevent them.',
-      author: 'H4K2LIV3 Team',
-      date: 'Nov 20, 2024',
-      readTime: '8 min read',
-      category: 'Security',
-      image: '/images/cards/card-01.jpg'
-    },
-    {
-      title: 'Getting Started with Bug Bounty Hunting',
-      excerpt: 'A comprehensive guide for beginners to start their journey in bug bounty programs and ethical hacking.',
-      author: 'Security Expert',
-      date: 'Nov 18, 2024',
-      readTime: '12 min read',
-      category: 'Tutorial',
-      image: '/images/cards/card-02.jpg'
-    },
-    {
-      title: 'Our Team Won the National CTF Championship',
-      excerpt: 'Read about our recent victory at the national Capture The Flag competition and the challenges we solved.',
-      author: 'CTF Team',
-      date: 'Nov 15, 2024',
-      readTime: '5 min read',
-      category: 'News',
-      image: '/images/cards/card-03.jpg'
-    },
-  ]
+  const [blogs, setBlogs] = useState<Blog[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      setLoading(true)
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/blog?limit=3&status=PUBLISHED&sortBy=publishDate&sortOrder=desc`
+        )
+
+        if (!response.ok) throw new Error('Failed to fetch blogs')
+
+        const data = await response.json()
+
+        const categoryMap: Record<string, string> = {
+          'CYBERSECURITY_INSIGHTS': 'Cybersecurity Insights',
+          'NEWS': 'News',
+          'TUTORIALS': 'Tutorials',
+        }
+
+        const convertedBlogs = data.data.map((blog: any) => ({
+          ...blog,
+          _id: blog.id,
+          category: categoryMap[blog.category] || blog.category,
+        }))
+
+        setBlogs(convertedBlogs)
+      } catch (error) {
+        console.error('Error fetching blogs:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchBlogs()
+  }, [])
 
   return (
     <Box py={{ base: '16', md: '24' }} position="relative">
@@ -1729,11 +1740,11 @@ const BlogSection = () => {
         <VStack spacing={{ base: '8', md: '12' }}>
           <FallInPlace>
             <VStack spacing="4" textAlign="center">
-              <Badge 
-                colorScheme="green" 
-                fontSize="2xl" 
-                px="3" 
-                py="1" 
+              <Badge
+                colorScheme="green"
+                fontSize="2xl"
+                px="3"
+                py="1"
                 borderRadius="full"
               >
                 Latest from Blog
@@ -1742,86 +1753,112 @@ const BlogSection = () => {
                 Insights & Updates
               </Heading> */}
               <Text fontSize={{ base: 'lg', md: 'xl' }} color="muted" maxW="3xl">
-                Stay updated with the latest cybersecurity trends, tutorials, and our community news
+                Get the latest cybersecurity insights, tutorials, and company updates
               </Text>
             </VStack>
           </FallInPlace>
 
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="8" width="100%">
-            {blogPosts.map((post, index) => (
-              <FallInPlace key={post.title} delay={0.1 * index}>
-                <Card
-                  bg={cardBg}
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  borderRadius="xl"
-                  overflow="hidden"
-                  transition="all 0.3s ease"
-                  cursor="pointer"
-                  _hover={{
-                    transform: 'translateY(-8px)',
-                    shadow: '2xl',
-                    borderColor: 'green.500',
-                  }}
-                  height="100%"
-                >
-                  <Box position="relative" height="200px">
-                    <Image
-                      src={post.image}
-                      alt={post.title}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                    />
-                    <Badge
-                      position="absolute"
-                      top="4"
-                      right="4"
-                      colorScheme="green"
-                    >
-                      {post.category}
-                    </Badge>
-                  </Box>
-                  <CardBody p="6">
-                    <VStack align="start" spacing="4" height="100%">
-                      <Heading size="md" noOfLines={2}>
-                        {post.title}
-                      </Heading>
-                      <Text color="muted" fontSize="sm" noOfLines={3} flex="1">
-                        {post.excerpt}
-                      </Text>
-                      <Divider />
-                      <HStack justify="space-between" width="100%" fontSize="xs" color="muted">
-                        <HStack spacing="4">
-                          <HStack spacing="1">
-                            <Icon as={FiUsers} />
-                            <Text>{post.author}</Text>
-                          </HStack>
-                          <HStack spacing="1">
-                            <Icon as={FiCalendar} />
-                            <Text>{post.date}</Text>
-                          </HStack>
-                        </HStack>
-                        <HStack spacing="1">
-                          <Icon as={FiClock} />
-                          <Text>{post.readTime}</Text>
-                        </HStack>
-                      </HStack>
-                      <ButtonLink
-                        href="/blog"
-                        size="sm"
-                        variant="ghost"
+          {loading ? (
+            <Center width="100%" py="16">
+              <Spinner size="xl" color={accentColor} thickness="4px" />
+            </Center>
+          ) : blogs.length === 0 ? (
+            <Center width="100%" py="16">
+              <Text fontSize="lg" color={mutedColor}>
+                No blog posts available at the moment.
+              </Text>
+            </Center>
+          ) : (
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="8" width="100%">
+              {blogs.map((post, index) => (
+                <FallInPlace key={post._id} delay={0.1 * index}>
+                  <Card
+                    as="a"
+                    href={`/blog/${post.slug}`}
+                    bg={cardBg}
+                    borderWidth="1px"
+                    borderColor={borderColor}
+                    borderRadius="xl"
+                    overflow="hidden"
+                    transition="all 0.3s ease"
+                    cursor="pointer"
+                    _hover={{
+                      transform: 'translateY(-8px)',
+                      shadow: '2xl',
+                      borderColor: 'green.500',
+                    }}
+                    height="100%"
+                    textDecoration="none"
+                  >
+                    <Box position="relative" height="200px">
+                      {post.mainImage ? (
+                        <Image
+                          src={post.mainImage}
+                          alt={post.title}
+                          fill
+                          style={{ objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <Box
+                          width="100%"
+                          height="100%"
+                          bg="gray.200"
+                          _dark={{ bg: 'gray.700' }}
+                        />
+                      )}
+                      <Badge
+                        position="absolute"
+                        top="4"
+                        right="4"
                         colorScheme="green"
-                        rightIcon={<Icon as={FiExternalLink} />}
-                        width="100%"
                       >
-                        Read More
-                      </ButtonLink>
-                    </VStack>
-                  </CardBody>
-                </Card>
-              </FallInPlace>
-            ))}
-          </SimpleGrid>
+                        {post.category}
+                      </Badge>
+                    </Box>
+                    <CardBody p="6">
+                      <VStack align="start" spacing="4" height="100%">
+                        <Heading size="md" noOfLines={2}>
+                          {post.title}
+                        </Heading>
+                        <Text color="muted" fontSize="sm" noOfLines={3} flex="1">
+                          {post.metadata}
+                        </Text>
+                        <Divider />
+                        <HStack justify="space-between" width="100%" fontSize="xs" color="muted">
+                          <HStack spacing="4">
+                            <HStack spacing="1">
+                              <Icon as={FiUsers} />
+                              <Text>{post.author.name}</Text>
+                            </HStack>
+                            <HStack spacing="1">
+                              <Icon as={FiCalendar} />
+                              <Text>{new Date(post.publishDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</Text>
+                            </HStack>
+                          </HStack>
+                          {post.readTime && (
+                            <HStack spacing="1">
+                              <Icon as={FiClock} />
+                              <Text>{post.readTime}</Text>
+                            </HStack>
+                          )}
+                        </HStack>
+                        <ButtonLink
+                          href={`/blog/${post.slug}`}
+                          size="sm"
+                          variant="ghost"
+                          colorScheme="green"
+                          rightIcon={<Icon as={FiExternalLink} />}
+                          width="100%"
+                        >
+                          Read More
+                        </ButtonLink>
+                      </VStack>
+                    </CardBody>
+                  </Card>
+                </FallInPlace>
+              ))}
+            </SimpleGrid>
+          )}
 
           <FallInPlace delay={0.4}>
             <ButtonLink
@@ -1871,7 +1908,7 @@ const TrustedBySection = () => {
                 Trusted By Leading Organizations
               </Text>
               <Heading fontSize={{ base: 'xl', md: '2xl' }}>
-                Protecting Bangladesh's Digital Infrastructure
+                Protecting the World's Digital Infrastructure
               </Heading>
             </VStack>
           </FallInPlace>
@@ -1953,14 +1990,14 @@ const TrustedBySection = () => {
             </Flex>
           </Box>
 
-          {/* <FallInPlace delay={0.5}>
+          <FallInPlace delay={0.5}>
             <HStack spacing="4" pt="4">
               <Icon as={FiCheck} color="green.500" boxSize="5" />
               <Text color="muted" fontSize={{ base: 'sm', md: 'md' }}>
-                Protecting 100+ organizations across Bangladesh since 2019
+                Protecting 10+ organizations across Bangladesh since 2021
               </Text>
             </HStack>
-          </FallInPlace> */}
+          </FallInPlace>
         </VStack>
       </Container>
     </Box>
@@ -2093,10 +2130,11 @@ const FeaturesSection = () => {
       }
       description={
         <>
-          We provide comprehensive cybersecurity services and education.
+          HackToLive provides expert cybersecurity training <br /> and services, empowering individuals and organizations to stay secure in a dynamic digital landscape.
+          {/* We provide comprehensive cybersecurity services and education.
           <Br />
           From professional security audits to hands-on ethical hacking courses,
-          we've got you covered.
+          we've got you covered. */}
         </>
       }
       align="left"
@@ -2104,52 +2142,52 @@ const FeaturesSection = () => {
       iconSize={4}
       features={[
         {
+          title: 'Academy Courses.',
+          icon: FiUserPlus,
+          description:
+            'Comprehensive ethical hacking training programs, ranging from foundational concepts to advanced penetration testing techniques.',
+          variant: 'inline',
+        },
+        {
           title: 'Penetration Testing.',
           icon: FiBox,
           description:
-            'Comprehensive web and mobile application security testing to identify vulnerabilities before attackers do.',
+            'Proactively identify vulnerabilities in web and mobile applications to stay ahead of potential attackers.',
           variant: 'inline',
         },
         {
           title: 'Vulnerability Assessment.',
           icon: FiLock,
           description:
-            'Thorough security evaluations of your infrastructure and applications with detailed remediation guidance.',
+            'Creation of custom vulnerable machines or labs tailored to client requirements for training, testing, or assessment purposes.',
           variant: 'inline',
         },
         {
           title: 'Digital Forensics.',
           icon: FiSearch,
           description:
-            'Expert investigation and analysis services for security incidents and digital evidence collection.',
-          variant: 'inline',
-        },
-        {
-          title: 'Academy Courses.',
-          icon: FiUserPlus,
-          description:
-            'Structured ethical hacking courses taught in Bengali, from fundamentals to advanced penetration testing.',
+            'Expert investigation and analysis of security incidents, including digital evidence collection and forensic reporting.',
           variant: 'inline',
         },
         {
           title: 'CTF Participation.',
           icon: FiFlag,
           description:
-            "Join our H4K2LIV3_Academy team in competitive cybersecurity challenges. Learn by competing with the best.",
+            "Custom organization of CTF competitions for corporate or client environments to enhance cybersecurity skills and awareness.",
           variant: 'inline',
         },
         {
           title: 'SOC Services.',
           icon: FiTrendingUp,
           description:
-            'Security Operations Center monitoring and incident response to keep your organization protected 24/7.',
+            "24/7 monitoring and incident response to protect your organization from cyber threats and minimize risk exposure.",
           variant: 'inline',
         },
         {
           title: 'OSINT.',
           icon: FiToggleLeft,
           description:
-            'Open Source Intelligence investigations and reconnaissance for security assessments and threat analysis.',
+            'Gather and analyze publicly available information to identify potential risks, threats, and security gaps for your organization.',
           variant: 'inline',
         },
         {

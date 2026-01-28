@@ -35,11 +35,11 @@ import { toast } from '@/components/ui/toast'
 const VerifyOTPContent = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { verifyOtp } = useAuth()
+  const { verifyOtp, resendOtp } = useAuth()
   const [otp, setOtp] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [timer, setTimer] = useState(300) // 5 minutes = 300 seconds
+  const [timer, setTimer] = useState(10) // 5 minutes = 300 seconds
   const [canResend, setCanResend] = useState(false)
   const leftBgColor = useColorModeValue('#4d7c0f', '#365314')
   const rightBgColor = useColorModeValue('white', 'gray.800')
@@ -108,25 +108,31 @@ if (!userId) {
   const handleResendCode = async () => {
     if (!canResend) return
     
+    if (!userId) {
+      setError('Invalid verification session. Please try again.')
+      return
+    }
+    
     setIsLoading(true)
     setOtp('')
     setError('')
     
     try {
-      // Resend OTP by redirecting back to login/signup flow
-      toast.info('Redirecting to resend code...', {
-        description: 'Please login or signup again to receive a new code.',
+      await resendOtp(userId, type)
+      
+      toast.success('Code resent successfully!', {
+        description: 'Please check your email for the new verification code.',
         duration: 3000,
       })
       
-      setTimeout(() => {
-        router.push(type === 'registration' ? '/signup' : '/login')
-      }, 1000)
-      
+      // Reset timer
       setTimer(300)
       setCanResend(false)
-    } catch (err) {
-      toast.error('Failed to resend code. Please try again.', {
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.message || 'Failed to resend code. Please try again.'
+      setError(errorMsg)
+      toast.error('Failed to resend code', {
+        description: errorMsg,
         duration: 4000,
       })
     } finally {

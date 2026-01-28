@@ -11,6 +11,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ userId?: string; email?: string; requiresOtp: boolean; user?: User; token?: string }>;
   signup: (name: string, email: string, password: string, role?: string) => Promise<{ userId: string; email: string; requiresOtp: boolean }>;
   verifyOtp: (userId: string, code: string, type: 'registration' | 'login') => Promise<void>;
+  resendOtp: (userId: string, type: 'registration' | 'login') => Promise<void>;
   logout: () => void;
   updateUser: (user: User) => void;
   setUser: (user: User | null) => void;
@@ -125,6 +126,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const resendOtp = async (userId: string, type: 'registration' | 'login') => {
+    try {
+      const otpType = type === 'registration' ? 'REGISTRATION' : 'LOGIN';
+      await authService.resendOtp(userId, otpType);
+    } catch (error) {
+      console.error('Resend OTP failed:', error);
+      throw error;
+    }
+  };
+
   const logout = () => {
     authService.clearAuth();
     setUser(null);
@@ -157,6 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       login, 
       signup,
       verifyOtp,
+      resendOtp,
       logout, 
       updateUser,
       setUser: setUserAndStore,

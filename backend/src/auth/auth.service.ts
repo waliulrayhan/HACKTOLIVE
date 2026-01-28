@@ -295,6 +295,30 @@ export class AuthService {
     };
   }
 
+  async resendOtp(userId: string, type: 'REGISTRATION' | 'LOGIN' | 'PASSWORD_RESET') {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    // Send OTP
+    await this.otpService.createAndSendOtp(
+      user.id,
+      user.email,
+      user.name || 'User',
+      type,
+    );
+
+    return {
+      message: 'OTP resent successfully!',
+      userId: user.id,
+      email: user.email,
+    };
+  }
+
   async validateUser(userId: string): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: { id: userId },

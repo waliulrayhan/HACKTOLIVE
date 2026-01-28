@@ -9,7 +9,7 @@ import { Logo } from './logo'
 const siteConfig = {
   logo: Logo,
   seo: {
-    title: 'HackToLive (H4K2LIV3) - Cybersecurity & Ethical Hacking Platform',
+    title: 'HackToLive - Cybersecurity & Ethical Hacking Platform',
     description: 'Bangladesh\'s premier cybersecurity platform offering professional security services, ethical hacking training, and academy courses in Bengali.',
   },
   termsUrl: '/terms-of-service',
@@ -59,7 +59,7 @@ const siteConfig = {
   footer: {
     copyright: (
       <>
-        © Copyright 2025 HackToLive (H4K2LIV3). All Rights Reserved.
+        © Copyright 2026 HackToLive. All Rights Reserved.
       </>
     ),
     logoLinks: [
@@ -225,7 +225,7 @@ const siteConfig = {
         icon: FiCheck,
         title: 'CTF Participation',
         description:
-          'Join our H4K2LIV3_Academy team in competitive Capture-The-Flag challenges worldwide.',
+          'Join our HackToLive_Academy team in competitive Capture-The-Flag challenges worldwide.',
       },
     ],
   },

@@ -17,11 +17,11 @@ const faq = {
     },
     {
       q: 'Are the academy courses available in Bengali?',
-      a: "Yes, all HackToLive Academy courses are taught in Bengali (Bangla) to make cybersecurity education more accessible to local learners. We offer both fundamental paths for beginners and premium batches for intensive training.",
+      a: "Yes, HackToLive Academy courses are taught in Bengali (Bangla) and English to make cybersecurity education more accessible to local learners. We offer both fundamental paths for beginners and premium batches for intensive training.",
     },
     {
       q: 'Do you offer hands-on training and practical labs?',
-      a: 'Absolutely! We emphasize practical, hands-on learning with real-world scenarios, lab exercises, and CTF (Capture-The-Flag) challenges. Our H4K2LIV3_Academy team actively participates in competitive cybersecurity events.',
+      a: 'Absolutely! We emphasize practical, hands-on learning with real-world scenarios, lab exercises, and CTF (Capture-The-Flag) challenges. Our HackToLive Academy team actively participates in competitive cybersecurity events.',
     },
     {
       q: 'What topics are covered in the courses?',
@@ -29,7 +29,7 @@ const faq = {
     },
     {
       q: 'How can I enroll in HackToLive Academy?',
-      a: 'You can enroll by visiting academy.hacktolive.net or contacting us at +880 1521-416287 or +880 1601-020699. We offer different course packages including free fundamental paths and premium training batches.',
+      a: 'You can enroll by visiting hacktolive.net/academy or contacting us via hacktolive.net/contact We offer different course packages including free fundamental paths and premium training batches.',
     },
     {
       q: 'Do you provide cybersecurity services for businesses?',

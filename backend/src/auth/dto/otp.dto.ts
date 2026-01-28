@@ -51,3 +51,19 @@ export class ResetPasswordDto {
   @IsNotEmpty()
   newPassword: string;
 }
+
+export class ResendOtpDto {
+  @ApiProperty({ example: 'user-uuid', description: 'User ID' })
+  @IsString()
+  @IsNotEmpty()
+  userId: string;
+
+  @ApiProperty({ 
+    example: 'REGISTRATION', 
+    description: 'OTP type', 
+    enum: ['REGISTRATION', 'LOGIN', 'PASSWORD_RESET'] 
+  })
+  @IsString()
+  @IsNotEmpty()
+  type: 'REGISTRATION' | 'LOGIN' | 'PASSWORD_RESET';
+}

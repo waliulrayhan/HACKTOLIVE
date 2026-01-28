@@ -16,7 +16,7 @@ import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { UpdateProfileDto, UpdateSocialLinksDto, ChangePasswordDto } from './dto/update-profile.dto';
-import { VerifyOtpDto, SendPasswordResetOtpDto, ResetPasswordDto, VerifyPasswordResetOtpDto } from './dto/otp.dto';
+import { VerifyOtpDto, SendPasswordResetOtpDto, ResetPasswordDto, VerifyPasswordResetOtpDto, ResendOtpDto } from './dto/otp.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { GoogleAuthGuard } from './google-auth.guard';
 
@@ -63,6 +63,18 @@ export class AuthController {
     return this.authService.verifyLoginOtp(
       verifyOtpDto.userId,
       verifyOtpDto.code,
+    );
+  }
+
+  @Post('resend-otp')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Resend OTP for verification' })
+  @ApiResponse({ status: 200, description: 'OTP resent successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid request' })
+  async resendOtp(@Body() resendOtpDto: ResendOtpDto) {
+    return this.authService.resendOtp(
+      resendOtpDto.userId,
+      resendOtpDto.type,
     );
   }
 
