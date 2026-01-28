@@ -194,6 +194,35 @@ export const megaMenuData: MegaMenuData = {
           },
         ],
       },
+      {
+        title: 'Compliance & Certifications',
+        items: [
+          {
+            title: 'ISO 27001 Implementation',
+            description: 'Information security management system',
+            href: '/service/iso-27001',
+            icon: FiShield,
+          },
+          {
+            title: 'ISO 9001 Implementation',
+            description: 'Quality management system',
+            href: '/service/iso-9001',
+            icon: FiAward,
+          },
+          {
+            title: 'PCI DSS Compliance',
+            description: 'Payment card industry standards',
+            href: '/service/pci-dss',
+            icon: FiLock,
+          },
+          {
+            title: 'SOC 2 Readiness',
+            description: 'Trust services criteria compliance',
+            href: '/service/soc-2',
+            icon: FiFileText,
+          },
+        ],
+      },
     ],
     featured: {
       title: 'Enterprise Security Solutions',
@@ -261,6 +290,35 @@ export const megaMenuData: MegaMenuData = {
           },
         ],
       },
+      {
+        title: 'Categories',
+        items: [
+          {
+            title: 'Course Vouchers',
+            description: 'Gift vouchers for courses',
+            href: '/shopping/vouchers',
+            icon: FiAward,
+          },
+          {
+            title: 'Daily Specials',
+            description: 'Limited time offers',
+            href: '/shopping?type=DAILY_SPECIAL',
+            icon: FiTrendingUp,
+          },
+          {
+            title: 'Checkout',
+            description: 'Complete your purchase',
+            href: '/shopping/checkout',
+            icon: FiShoppingCart,
+          },
+          {
+            title: 'Browse All',
+            description: 'View complete catalog',
+            href: '/shopping',
+            icon: FiSearch,
+          },
+        ],
+      },
     ],
     featured: {
       title: 'Special Offers This Week',
@@ -301,6 +359,35 @@ export const megaMenuData: MegaMenuData = {
             description: 'Check certificate authenticity',
             href: '/verify-certificate',
             icon: FiShield,
+          },
+        ],
+      },
+      {
+        title: 'Resources',
+        items: [
+          {
+            title: 'Blog',
+            description: 'Latest cybersecurity insights',
+            href: '/blog',
+            icon: FiBookOpen,
+          },
+          {
+            title: 'Privacy Policy',
+            description: 'How we protect your data',
+            href: '/privacy-policy',
+            icon: FiShield,
+          },
+          {
+            title: 'Terms of Service',
+            description: 'Our terms and conditions',
+            href: '/terms-of-service',
+            icon: FiFileText,
+          },
+          {
+            title: 'Newsletter',
+            description: 'Subscribe to updates',
+            href: '/blog#newsletter',
+            icon: FiMail,
           },
         ],
       },

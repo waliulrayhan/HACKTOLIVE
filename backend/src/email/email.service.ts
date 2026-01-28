@@ -63,12 +63,12 @@ export class EmailService {
         pass: config.password,
       },
       tls: this.smtpConfig.tls,
-      pool: true, // Enable connection pooling
-      maxConnections: 5, // Max concurrent connections
-      maxMessages: 100, // Max messages per connection
-      rateDelta: 1000, // Time window in ms
-      rateLimit: 10, // Max messages per rateDelta
-    });
+      pool: true,
+      maxConnections: 5,
+      maxMessages: 100,
+      rateDelta: 1000,
+      rateLimit: 10,
+    } as nodemailer.TransportOptions);
 
     this.logger.log(`Email transporter initialized with ${account} account`);
   }

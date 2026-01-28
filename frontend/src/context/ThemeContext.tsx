@@ -15,7 +15,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>("dark");
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     const chakraColorMode = localStorage.getItem("chakra-ui-color-mode") as Theme | null;
     
     // Prefer the custom theme, but fall back to Chakra's color mode if available
-    const initialTheme = savedTheme || chakraColorMode || "light"; // Default to light theme
+    const initialTheme = savedTheme || chakraColorMode || "dark"; // Default to dark theme
 
     setTheme(initialTheme);
     setIsInitialized(true);

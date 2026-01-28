@@ -64,38 +64,38 @@ const siteConfig = {
     ),
     logoLinks: [
       {
-        href: '#',
+        href: '/service/vapt',
         label: 'Penetration Testing',
       },
       {
-        href: '#',
+        href: '/service/vapt',
         label: 'Vulnerability Assessment',
       },
       {
-        href: '#',
+        href: '/service#digital-forensics',
         label: 'Digital Forensics',
       },
       {
-        href: '#',
+        href: '/service#soc-services',
         label: 'SOC Services',
       },
     ],
     resources: [
       {
-        href: '#',
+        href: '/academy/courses',
         label: 'Academy Courses',
       },
       {
-        href: '#',
-        label: 'CTF Challenges',
+        href: '/academy/instructors',
+        label: 'Instructors',
       },
       {
-        href: '#',
+        href: '/blog',
         label: 'Security Blog',
       },
       {
-        href: '#',
-        label: 'Documentation',
+        href: '/verify-certificate',
+        label: 'Verify Certificate',
       },
     ],
     contact: [
@@ -108,8 +108,8 @@ const siteConfig = {
         label: '+880 1601-020699',
       },
       {
-        href: '#',
-        label: 'Mohammadpur, Dhaka',
+        href: '/contact',
+        label: 'Contact Us',
       },
       {
         href: 'https://hacktolive.net',
@@ -126,30 +126,30 @@ const siteConfig = {
         label: 'Privacy Policy',
       },
       {
-        href: '#',
-        label: 'Code of Conduct',
+        href: '/shopping',
+        label: 'Shopping',
       },
       {
-        href: '#',
-        label: 'Responsible Disclosure',
+        href: '/shopping/cart',
+        label: 'My Cart',
       },
     ],
     press: [
       {
-        href: '#',
+        href: '/about',
         label: 'About Us',
       },
       {
-        href: '#',
-        label: 'Our Team',
+        href: '/career',
+        label: 'Career',
       },
       {
-        href: '#',
-        label: 'Success Stories',
+        href: '/service',
+        label: 'Our Services',
       },
       {
-        href: '#',
-        label: 'Media Kit',
+        href: '/academy',
+        label: 'Academy',
       },
     ],
     socialIcons: [

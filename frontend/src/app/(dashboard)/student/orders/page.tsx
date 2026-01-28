@@ -265,7 +265,7 @@ export default function OrderHistoryPage() {
             <div>
               <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Total Spent</p>
               <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">
-                ৳{totalSpent.toLocaleString()}
+                {totalSpent.toLocaleString()} Tk
               </p>
             </div>
           </div>

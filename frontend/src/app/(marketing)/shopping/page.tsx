@@ -452,7 +452,7 @@ export default function ShoppingPage() {
           {categories.length > 0 && (
             <Box>
               <Text fontSize="sm" fontWeight="medium" mb={3} color={mutedColor}>
-                Shop by Category:
+                {/* Shop by Category: */}
               </Text>
               <Flex gap={2} flexWrap="wrap">
                 <Badge

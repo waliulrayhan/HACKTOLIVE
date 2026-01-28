@@ -53,6 +53,12 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [currentTag, setCurrentTag] = useState("");
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [linkModalOpen, setLinkModalOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
+  const [insertImageModalOpen, setInsertImageModalOpen] = useState(false);
+  const [insertImageUrl, setInsertImageUrl] = useState("");
 
   const [formData, setFormData] = useState<BlogFormData>({
     title: "",
@@ -102,6 +108,36 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
       editor.commands.setContent(formData.content);
     }
   }, [formData.content, editor]);
+
+  // Add click handler for images in editor
+  useEffect(() => {
+    if (!editor) return;
+
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'IMG') {
+        e.preventDefault();
+        const img = target as HTMLImageElement;
+        setSelectedImage(img.src);
+        setImageModalOpen(true);
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && imageModalOpen) {
+        setImageModalOpen(false);
+      }
+    };
+
+    const editorElement = editor.view.dom;
+    editorElement.addEventListener('click', handleClick);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      editorElement.removeEventListener('click', handleClick);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [editor, imageModalOpen]);
 
   const fetchBlog = async () => {
     try {
@@ -593,199 +629,382 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
             </div>
 
             {editor && (
-              <div className="border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden">
-                {/* Toolbar */}
+              <div className="border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-900">
+                {/* Enhanced Toolbar */}
                 <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 p-2 flex flex-wrap gap-1">
-                  <button
-                    type="button"
-                    onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                    className={`px-3 py-1.5 text-sm rounded transition-colors ${
-                      editor.isActive("heading", { level: 2 })
-                        ? "bg-brand-600 text-white"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                    }`}
-                  >
-                    H2
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-                    className={`px-3 py-1.5 text-sm rounded transition-colors ${
-                      editor.isActive("heading", { level: 3 })
-                        ? "bg-brand-600 text-white"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                    }`}
-                  >
-                    H3
-                  </button>
-                  <div className="w-px bg-gray-300 mx-1"></div>
-                  <button
-                    type="button"
-                    onClick={() => editor.chain().focus().toggleBold().run()}
-                    className={`px-3 py-1.5 text-sm font-bold rounded transition-colors ${
-                      editor.isActive("bold")
-                        ? "bg-brand-600 text-white"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                    }`}
-                  >
-                    B
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => editor.chain().focus().toggleItalic().run()}
-                    className={`px-3 py-1.5 text-sm italic rounded transition-colors ${
-                      editor.isActive("italic")
-                        ? "bg-brand-600 text-white"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                    }`}
-                  >
-                    I
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => editor.chain().focus().toggleUnderline().run()}
-                    className={`px-3 py-1.5 text-sm underline rounded transition-colors ${
-                      editor.isActive("underline")
-                        ? "bg-brand-600 text-white"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                    }`}
-                  >
-                    U
-                  </button>
-                  <div className="w-px bg-gray-300 mx-1"></div>
-                  <button
-                    type="button"
-                    onClick={() => editor.chain().focus().toggleBulletList().run()}
-                    className={`px-3 py-1.5 text-sm rounded transition-colors ${
-                      editor.isActive("bulletList")
-                        ? "bg-brand-600 text-white"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                    }`}
-                  >
-                    • List
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                    className={`px-3 py-1.5 text-sm rounded transition-colors ${
-                      editor.isActive("orderedList")
-                        ? "bg-brand-600 text-white"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                    }`}
-                  >
-                    1. List
-                  </button>
-                  <div className="w-px bg-gray-300 mx-1"></div>
-                  <button
-                    type="button"
-                    onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                    className={`px-3 py-1.5 text-sm rounded transition-colors ${
-                      editor.isActive("blockquote")
-                        ? "bg-brand-600 text-white"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                    }`}
-                  >
-                    &quot; Quote
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-                    className={`px-3 py-1.5 text-sm rounded transition-colors ${
-                      editor.isActive("codeBlock")
-                        ? "bg-brand-600 text-white"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                    }`}
-                  >
-                    {"</>"}
-                  </button>
-                  <div className="w-px bg-gray-300 mx-1"></div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const url = window.prompt("Enter URL:");
-                      if (url) editor.chain().focus().setLink({ href: url }).run();
-                    }}
-                    className="px-3 py-1.5 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  >
-                    🔗 Link
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const url = window.prompt("Enter image URL:");
-                      if (url) editor.chain().focus().setImage({ src: url }).run();
-                    }}
-                    className="px-3 py-1.5 text-sm rounded text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  >
-                    🖼️ Image
-                  </button>
+                  <div className="flex flex-wrap gap-1.5">
+                    {/* Text Formatting Group */}
+                    <div className="flex items-center gap-1 bg-white dark:bg-gray-900 rounded-lg p-1 border border-gray-200 dark:border-gray-700">
+                      <button
+                        type="button"
+                        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                        className={`px-3 py-1.5 text-sm font-semibold rounded transition-all ${
+                          editor.isActive("heading", { level: 2 })
+                            ? "bg-brand-600 text-white"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        }`}
+                        title="Heading 2"
+                      >
+                        H2
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                        className={`px-3 py-1.5 text-sm font-semibold rounded transition-all ${
+                          editor.isActive("heading", { level: 3 })
+                            ? "bg-brand-600 text-white"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        }`}
+                        title="Heading 3"
+                      >
+                        H3
+                      </button>
+                    </div>
+
+                    {/* Text Style Group */}
+                    <div className="flex items-center gap-1 bg-white dark:bg-gray-900 rounded-lg p-1 border border-gray-200 dark:border-gray-700">
+                      <button
+                        type="button"
+                        onClick={() => editor.chain().focus().toggleBold().run()}
+                        className={`px-3 py-1.5 text-sm font-bold rounded transition-all ${
+                          editor.isActive("bold")
+                            ? "bg-brand-600 text-white"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        }`}
+                        title="Bold"
+                      >
+                        B
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => editor.chain().focus().toggleItalic().run()}
+                        className={`px-3 py-1.5 text-sm italic rounded transition-all ${
+                          editor.isActive("italic")
+                            ? "bg-brand-600 text-white"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        }`}
+                        title="Italic"
+                      >
+                        I
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => editor.chain().focus().toggleUnderline().run()}
+                        className={`px-3 py-1.5 text-sm underline rounded transition-all ${
+                          editor.isActive("underline")
+                            ? "bg-brand-600 text-white"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        }`}
+                        title="Underline"
+                      >
+                        U
+                      </button>
+                    </div>
+
+                    {/* List Group */}
+                    <div className="flex items-center gap-1 bg-white dark:bg-gray-900 rounded-lg p-1 border border-gray-200 dark:border-gray-700">
+                      <button
+                        type="button"
+                        onClick={() => editor.chain().focus().toggleBulletList().run()}
+                        className={`px-3 py-1.5 text-sm rounded transition-all flex items-center gap-1.5 ${
+                          editor.isActive("bulletList")
+                            ? "bg-brand-600 text-white"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        }`}
+                        title="Bullet List"
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                        className={`px-3 py-1.5 text-sm rounded transition-all flex items-center gap-1.5 ${
+                          editor.isActive("orderedList")
+                            ? "bg-brand-600 text-white"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        }`}
+                        title="Numbered List"
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M5.5 3a.5.5 0 00-1 0v5a.5.5 0 001 0V3zm0 7a.5.5 0 00-1 0v5a.5.5 0 001 0v-5zM2 4h1.5v1H2V4zm0 6h1.5v1H2v-1zm5-6h11v1H7V4zm0 6h11v1H7v-1z" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Block Elements Group */}
+                    <div className="flex items-center gap-1 bg-white dark:bg-gray-900 rounded-lg p-1 border border-gray-200 dark:border-gray-700">
+                      <button
+                        type="button"
+                        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                        className={`px-3 py-1.5 text-sm rounded transition-all ${
+                          editor.isActive("blockquote")
+                            ? "bg-brand-600 text-white"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        }`}
+                        title="Quote"
+                      >
+                        &quot;
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                        className={`px-3 py-1.5 text-sm rounded transition-all ${
+                          editor.isActive("codeBlock")
+                            ? "bg-brand-600 text-white"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        }`}
+                        title="Code Block"
+                      >
+                        {"</>"}
+                      </button>
+                    </div>
+
+                    {/* Insert Elements Group */}
+                    <div className="flex items-center gap-1 bg-white dark:bg-gray-900 rounded-lg p-1 border border-gray-200 dark:border-gray-700">
+                      <button
+                        type="button"
+                        onClick={() => setLinkModalOpen(true)}
+                        className="px-3 py-1.5 text-sm rounded transition-all text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-1.5"
+                        title="Insert Link"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                        <span className="hidden sm:inline">Link</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setInsertImageModalOpen(true)}
+                        className="px-3 py-1.5 text-sm rounded transition-all text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-1.5"
+                        title="Insert Image"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span className="hidden sm:inline">Image</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
+                {/* Enhanced Editor Styles */}
                 <style dangerouslySetInnerHTML={{
                   __html: `
                     .ProseMirror { 
-                      min-height: 400px; 
-                      padding: 1rem; 
-                      outline: none; 
+                      min-height: 450px; 
+                      padding: 1.5rem; 
+                      outline: none;
+                      background: white;
+                      color: #111827;
+                      font-size: 16px;
+                      line-height: 1.75;
                     }
+                    
                     .dark .ProseMirror { 
-                      background: #1f2937; 
-                      color: #f3f4f6; 
+                      background: #0f172a; 
+                      color: #f1f5f9; 
                     }
+                    
+                    .ProseMirror:focus {
+                      outline: none;
+                    }
+                    
+                    /* Headings */
                     .ProseMirror h2 { 
-                      font-size: 1.5em; 
+                      font-size: 1.875em; 
                       font-weight: 700; 
-                      margin: 1em 0 0.5em; 
+                      margin: 1.5em 0 0.75em;
+                      color: #1e293b;
+                      line-height: 1.3;
                     }
+                    
+                    .dark .ProseMirror h2 {
+                      color: #f1f5f9;
+                    }
+                    
                     .ProseMirror h3 { 
-                      font-size: 1.25em; 
+                      font-size: 1.5em; 
                       font-weight: 600; 
-                      margin: 0.75em 0 0.5em; 
+                      margin: 1.25em 0 0.5em;
+                      color: #334155;
+                      line-height: 1.4;
                     }
+                    
+                    .dark .ProseMirror h3 {
+                      color: #e2e8f0;
+                    }
+                    
+                    .ProseMirror h2:first-child,
+                    .ProseMirror h3:first-child {
+                      margin-top: 0;
+                    }
+                    
+                    /* Paragraphs */
                     .ProseMirror p { 
-                      margin-bottom: 0.75em; 
-                      line-height: 1.6; 
+                      margin-bottom: 1em; 
+                      line-height: 1.75;
+                      color: #334155;
                     }
-                    .ProseMirror ul, .ProseMirror ol { 
-                      padding-left: 1.5rem; 
-                      margin-bottom: 0.75em; 
+                    
+                    .dark .ProseMirror p {
+                      color: #cbd5e1;
                     }
+                    
+                    .ProseMirror p:last-child {
+                      margin-bottom: 0;
+                    }
+                    
+                    /* Lists */
+                    .ProseMirror ul, 
+                    .ProseMirror ol { 
+                      padding-left: 1.75rem; 
+                      margin: 1em 0;
+                    }
+                    
+                    .ProseMirror ul li,
+                    .ProseMirror ol li {
+                      margin-bottom: 0.5em;
+                      color: #334155;
+                    }
+                    
+                    .dark .ProseMirror ul li,
+                    .dark .ProseMirror ol li {
+                      color: #cbd5e1;
+                    }
+                    
+                    .ProseMirror ul {
+                      list-style-type: disc;
+                    }
+                    
+                    .ProseMirror ol {
+                      list-style-type: decimal;
+                    }
+                    
+                    /* Blockquote */
                     .ProseMirror blockquote { 
                       border-left: 4px solid #3b82f6; 
-                      padding-left: 1rem; 
-                      margin: 0 0 0.75em; 
+                      padding-left: 1.25rem;
+                      padding-top: 0.5rem;
+                      padding-bottom: 0.5rem; 
+                      margin: 1.5em 0; 
                       font-style: italic; 
-                      color: #6b7280; 
+                      color: #64748b;
+                      background: #f8fafc;
+                      border-radius: 0 0.375rem 0.375rem 0;
                     }
+                    
                     .dark .ProseMirror blockquote { 
-                      color: #9ca3af; 
+                      color: #94a3b8;
+                      background: #1e293b;
+                      border-left-color: #60a5fa;
                     }
+                    
+                    /* Code */
                     .ProseMirror pre { 
-                      background: #1f2937; 
-                      color: #f3f4f6; 
-                      padding: 1rem; 
+                      background: #1e293b; 
+                      color: #f1f5f9; 
+                      padding: 1.25rem; 
                       border-radius: 0.5rem; 
                       overflow-x: auto; 
-                      margin-bottom: 0.75em; 
+                      margin: 1.5em 0;
+                      border: 1px solid #334155;
+                      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+                      font-size: 0.9em;
+                      line-height: 1.6;
                     }
+                    
+                    .dark .ProseMirror pre {
+                      background: #0f172a;
+                      border-color: #1e293b;
+                    }
+                    
                     .ProseMirror code { 
-                      background: #f3f4f6; 
-                      padding: 0.125rem 0.25rem; 
+                      background: #f1f5f9; 
+                      padding: 0.2em 0.4em; 
                       border-radius: 0.25rem; 
-                      font-size: 0.875em; 
+                      font-size: 0.9em;
+                      color: #e11d48;
+                      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
                     }
+                    
                     .dark .ProseMirror code { 
-                      background: #374151; 
+                      background: #1e293b;
+                      color: #fca5a5;
                     }
+                    
+                    .ProseMirror pre code {
+                      background: transparent;
+                      padding: 0;
+                      color: inherit;
+                      font-size: 1em;
+                    }
+                    
+                    /* Links */
                     .ProseMirror a { 
                       color: #3b82f6; 
-                      text-decoration: underline; 
+                      text-decoration: underline;
+                      text-underline-offset: 2px;
+                      transition: color 0.2s;
                     }
+                    
+                    .ProseMirror a:hover {
+                      color: #2563eb;
+                    }
+                    
+                    .dark .ProseMirror a {
+                      color: #60a5fa;
+                    }
+                    
+                    .dark .ProseMirror a:hover {
+                      color: #93c5fd;
+                    }
+                    
+                    /* Images */
                     .ProseMirror img { 
                       max-width: 100%; 
                       height: auto; 
                       border-radius: 0.5rem; 
-                      margin: 1rem 0; 
+                      margin: 1.5rem 0;
+                      border: 1px solid #e2e8f0;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                    }
+                    
+                    .dark .ProseMirror img {
+                      border-color: #334155;
+                    }
+                    
+                    .ProseMirror img:hover {
+                      transform: scale(1.02);
+                      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                    }
+                    
+                    .dark .ProseMirror img:hover {
+                      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+                    }
+                    
+                    /* Placeholder */
+                    .ProseMirror p.is-editor-empty:first-child::before {
+                      content: attr(data-placeholder);
+                      float: left;
+                      color: #94a3b8;
+                      pointer-events: none;
+                      height: 0;
+                    }
+                    
+                    .dark .ProseMirror p.is-editor-empty:first-child::before {
+                      color: #64748b;
+                    }
+                    
+                    /* Selection */
+                    .ProseMirror ::selection {
+                      background: #dbeafe;
+                    }
+                    
+                    .dark .ProseMirror ::selection {
+                      background: #1e3a8a;
                     }
                   `
                 }} />
@@ -954,6 +1173,172 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
           onCancel={() => setImageToCrop(null)}
           aspectRatio={1}
         />
+      )}
+
+      {/* Image Viewer Modal */}
+      {imageModalOpen && selectedImage && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+          onClick={() => setImageModalOpen(false)}
+        >
+          <div className="relative max-w-7xl max-h-[90vh] w-full">
+            {/* Close Button */}
+            <button
+              onClick={() => setImageModalOpen(false)}
+              className="absolute -top-12 right-0 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              aria-label="Close image"
+            >
+              <HiOutlineX className="w-6 h-6" />
+            </button>
+
+            {/* Image */}
+            <div className="flex items-center justify-center">
+              <img
+                src={selectedImage}
+                alt="Full size preview"
+                className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+
+            {/* Image Info */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 rounded-b-lg">
+              <p className="text-white text-sm text-center">Click outside or press ESC to close</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Link Insert Modal */}
+      {linkModalOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          onClick={() => {
+            setLinkModalOpen(false);
+            setLinkUrl("");
+          }}
+        >
+          <div 
+            className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl p-6 w-full max-w-md border border-gray-200 dark:border-gray-700"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Insert Link</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Enter URL:
+                </label>
+                <input
+                  type="url"
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && linkUrl.trim()) {
+                      editor?.chain().focus().setLink({ href: linkUrl }).run();
+                      setLinkModalOpen(false);
+                      setLinkUrl("");
+                    }
+                  }}
+                  placeholder="https://example.com"
+                  className="w-full h-11 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => {
+                    setLinkModalOpen(false);
+                    setLinkUrl("");
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    if (linkUrl.trim() && editor) {
+                      editor.chain().focus().setLink({ href: linkUrl }).run();
+                      setLinkModalOpen(false);
+                      setLinkUrl("");
+                    }
+                  }}
+                  disabled={!linkUrl.trim()}
+                  className="px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Insert Link
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Insert Modal */}
+      {insertImageModalOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          onClick={() => {
+            setInsertImageModalOpen(false);
+            setInsertImageUrl("");
+          }}
+        >
+          <div 
+            className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl p-6 w-full max-w-md border border-gray-200 dark:border-gray-700"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Insert Image</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Enter image URL:
+                </label>
+                <input
+                  type="url"
+                  value={insertImageUrl}
+                  onChange={(e) => setInsertImageUrl(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && insertImageUrl.trim()) {
+                      editor?.chain().focus().setImage({ src: insertImageUrl }).run();
+                      setInsertImageModalOpen(false);
+                      setInsertImageUrl("");
+                    }
+                  }}
+                  placeholder="https://example.com/image.jpg"
+                  className="w-full h-11 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => {
+                    setInsertImageModalOpen(false);
+                    setInsertImageUrl("");
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    if (insertImageUrl.trim() && editor) {
+                      editor.chain().focus().setImage({ src: insertImageUrl }).run();
+                      setInsertImageModalOpen(false);
+                      setInsertImageUrl("");
+                    }
+                  }}
+                  disabled={!insertImageUrl.trim()}
+                  className="px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Insert Image
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
