@@ -37,6 +37,10 @@ export class EmailService {
     host: process.env.SMTP_HOST || 'smtp.hostinger.com',
     port: parseInt(process.env.SMTP_PORT || '465'),
     secure: process.env.SMTP_SECURE === 'true' || true, // SSL
+    tls: {
+      rejectUnauthorized: false, // Allow self-signed certificates
+      minVersion: 'TLSv1.2', // Minimum TLS version
+    },
   };
 
   constructor(private readonly prisma: PrismaService) {
@@ -58,6 +62,7 @@ export class EmailService {
         user: config.email,
         pass: config.password,
       },
+      tls: this.smtpConfig.tls,
       pool: true, // Enable connection pooling
       maxConnections: 5, // Max concurrent connections
       maxMessages: 100, // Max messages per connection

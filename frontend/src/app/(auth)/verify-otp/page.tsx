@@ -39,7 +39,7 @@ const VerifyOTPContent = () => {
   const [otp, setOtp] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [timer, setTimer] = useState(10) // 5 minutes = 300 seconds
+  const [timer, setTimer] = useState(300) // 5 minutes = 300 seconds
   const [canResend, setCanResend] = useState(false)
   const leftBgColor = useColorModeValue('#4d7c0f', '#365314')
   const rightBgColor = useColorModeValue('white', 'gray.800')
