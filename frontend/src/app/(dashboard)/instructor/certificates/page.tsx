@@ -527,7 +527,7 @@ export default function InstructorCertificatesPage() {
                       </TableCell>
                       <TableCell className="px-3 sm:px-4 py-3 text-center">
                         {cert.verificationCode ? (
-                          <code className="rounded bg-gray-200 px-2 py-0.5 text-xs font-mono dark:bg-white-700">
+                          <code className="rounded bg-gray-500 px-2 py-0.5 text-xs font-mono dark:bg-white-700">
                             {cert.verificationCode}
                           </code>
                         ) : (
