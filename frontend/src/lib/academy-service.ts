@@ -264,19 +264,6 @@ class AcademyService {
   }
 
   /**
-   * Get enrolled course IDs for current student
-   */
-  async getEnrolledCourseIds(): Promise<string[]> {
-    try {
-      const response = await api.get('/student/enrolled-course-ids');
-      return response.data;
-    } catch (error: any) {
-      console.error('Error getting enrolled course IDs:', error);
-      return [];
-    }
-  }
-
-  /**
    * Initiate payment with SSLCommerz
    */
   async initiatePayment(paymentData: {
