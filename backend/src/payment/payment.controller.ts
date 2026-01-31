@@ -26,11 +26,12 @@ export class PaymentController {
 
   /**
    * Initiate payment for course or product
+   * Works for both authenticated and guest users
    */
   @Post('initiate')
-  @UseGuards(JwtAuthGuard)
   async initiatePayment(@Request() req, @Body() body: InitiatePaymentDto) {
-    return this.paymentService.initiatePayment(req.user.userId, body);
+    const userId = req.user?.userId; // Optional for guest checkout
+    return this.paymentService.initiatePayment(userId, body);
   }
 
   /**

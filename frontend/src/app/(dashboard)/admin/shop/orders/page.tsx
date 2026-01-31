@@ -15,6 +15,7 @@ import {
   HiOutlineChevronLeft,
   HiOutlineChevronRight,
   HiOutlineCurrencyDollar,
+  HiOutlineCreditCard,
   HiOutlineChevronDoubleLeft,
   HiOutlineChevronDoubleRight,
   HiOutlineExclamationCircle,
@@ -629,6 +630,35 @@ export default function AdminOrdersPage() {
                         </p>
                       </div>
                     </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-500/15 shrink-0">
+                        <HiOutlineCurrencyDollar className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Payment Method</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {selectedOrder.paymentMethod === 'CASH_ON_DELIVERY' ? 'Cash on Delivery (COD)' : 'Online Payment'}
+                        </p>
+                        <div className="mt-1">
+                          <Badge color={getPaymentStatusBadgeColor(selectedOrder.paymentStatus)} variant="light">
+                            {selectedOrder.paymentStatus === 'COMPLETED' ? 'Paid' : selectedOrder.paymentStatus}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    {selectedOrder.transactionId && selectedOrder.paymentMethod !== 'CASH_ON_DELIVERY' && (
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-500/15 shrink-0">
+                          <HiOutlineCreditCard className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Transaction ID</p>
+                          <p className="text-sm font-mono font-medium text-gray-900 dark:text-white">{selectedOrder.transactionId}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -716,20 +746,54 @@ export default function AdminOrdersPage() {
                         </select>
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Tracking Number
-                        </label>
-                        <input
-                          type="text"
-                          value={statusUpdate.trackingNumber}
-                          onChange={(e) => setStatusUpdate({ ...statusUpdate, trackingNumber: e.target.value })}
-                          className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                          placeholder="Enter tracking number"
-                          disabled={isSubmitting}
-                        />
-                      </div>
+                      {selectedOrder.transactionId && selectedOrder.paymentMethod !== 'CASH_ON_DELIVERY' && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Transaction ID
+                          </label>
+                          <div className="w-full h-10 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm text-gray-900 transition-colors dark:border-gray-700 dark:bg-gray-800/50 dark:text-white flex items-center">
+                            <span className="font-mono">{selectedOrder.transactionId}</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
+
+                    {/* Payment Status for COD */}
+                    {selectedOrder.paymentMethod === 'CASH_ON_DELIVERY' && selectedOrder.paymentStatus === 'PENDING' && (
+                      <div className="p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-900/30">
+                        <div className="flex items-start gap-2">
+                          <HiOutlineExclamationCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-500 shrink-0 mt-0.5" />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-yellow-800 dark:text-yellow-300 mb-1">
+                              Cash on Delivery Payment Pending
+                            </p>
+                            <p className="text-xs text-yellow-700 dark:text-yellow-400 mb-2">
+                              When customer pays for this order, mark it as paid below. This helps track revenue accurately.
+                            </p>
+                            <label className="inline-flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={statusUpdate.status === 'DELIVERED'}
+                                onChange={(e) => {
+                                  if (e.target.checked && selectedOrder.paymentStatus === 'PENDING') {
+                                    const confirmPaid = window.confirm(
+                                      'Marking as DELIVERED will automatically set payment status to COMPLETED for COD orders. Have you received the payment?'
+                                    );
+                                    if (confirmPaid) {
+                                      setStatusUpdate({ ...statusUpdate, status: 'DELIVERED' });
+                                    }
+                                  }
+                                }}
+                                className="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+                              />
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Payment received (will mark as COMPLETED when delivered)
+                              </span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

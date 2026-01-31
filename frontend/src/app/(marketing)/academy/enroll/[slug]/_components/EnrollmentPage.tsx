@@ -490,7 +490,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                         </HStack>
 
                         <VStack spacing="5" align="stretch">
-                          <Alert status="info" borderRadius="lg">
+                          {/* <Alert status="info" borderRadius="lg">
                             <AlertIcon />
                             <Box>
                               <Text fontWeight="semibold">Secure Payment Gateway</Text>
@@ -499,7 +499,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                                 Multiple payment options available including cards, mobile banking, and internet banking.
                               </Text>
                             </Box>
-                          </Alert>
+                          </Alert> */}
 
                           <Box 
                             p="6" 
@@ -540,7 +540,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                           >
                             <Icon as={FiShield} color="green.500" boxSize="5" />
                             <Text fontSize="sm" color="muted">
-                              Your payment is secured with SSL encryption and PCI-DSS compliance
+                              Your payment is secured with SSLCommerz encryption
                             </Text>
                           </HStack>
                         </VStack>

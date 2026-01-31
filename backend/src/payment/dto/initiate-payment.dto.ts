@@ -1,4 +1,18 @@
-import { IsString, IsOptional, IsEmail, IsNotEmpty } from 'class-validator';
+import { IsString, IsOptional, IsEmail, IsNotEmpty, IsArray, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class CartItemDto {
+  @IsNotEmpty()
+  @IsString()
+  productId: string;
+
+  @IsNotEmpty()
+  quantity: number;
+
+  @IsOptional()
+  @IsString()
+  voucherCode?: string;
+}
 
 export class InitiatePaymentDto {
   @IsOptional()
@@ -8,6 +22,12 @@ export class InitiatePaymentDto {
   @IsOptional()
   @IsString()
   productId?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CartItemDto)
+  cartItems?: CartItemDto[];
 
   @IsNotEmpty()
   @IsString()
@@ -32,4 +52,21 @@ export class InitiatePaymentDto {
   @IsOptional()
   @IsString()
   customerCountry?: string;
+
+  @IsOptional()
+  @IsString()
+  shippingAddress?: string;
+
+  @IsOptional()
+  @IsString()
+  shippingCity?: string;
+
+  @IsOptional()
+  @IsString()
+  shippingCountry?: string;
+
+  @IsOptional()
+  @IsString()
+  shippingPostalCode?: string;
 }
+

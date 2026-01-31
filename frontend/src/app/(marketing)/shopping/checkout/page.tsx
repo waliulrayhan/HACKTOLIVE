@@ -46,12 +46,13 @@ import { authService } from '@/lib/auth-service'
 import { toast } from '@/components/ui/toast'
 import NextImage from 'next/image'
 import { getFullImageUrl } from '@/lib/image-utils'
+import { academyService } from '@/lib/academy-service'
 
 export default function CheckoutPage() {
   const [cart, setCart] = useState<Cart | null>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState('MOBILE_BANKING')
+  const [paymentMethod, setPaymentMethod] = useState('ONLINE_PAYMENT')
   const [formData, setFormData] = useState({
     customerName: '',
     customerEmail: '',
@@ -110,26 +111,63 @@ export default function CheckoutPage() {
     setSubmitting(true)
 
     try {
-      const order = await orderService.createOrder({
-        ...formData,
-        paymentMethod: paymentMethod as any,
-      })
+      // For Cash on Delivery, create order directly
+      if (paymentMethod === 'CASH_ON_DELIVERY') {
+        const order = await orderService.createOrder({
+          ...formData,
+          paymentMethod: paymentMethod as any,
+        })
 
-      // Clear session ID since cart is now empty
-      cartService.clearSessionId()
+        // Clear session ID since cart is now empty
+        cartService.clearSessionId()
 
-      toast.success('Order placed successfully!', {
-        description: `Order number: ${order.orderNumber}`,
-        duration: 5000,
-      })
+        toast.success('Order placed successfully!', {
+          description: `Order number: ${order.orderNumber}. You'll pay when you receive your order.`,
+          duration: 5000,
+        })
 
-      router.push(`/shopping/orders/${order.orderNumber}`)
+        router.push(`/shopping/orders/${order.orderNumber}`)
+        return
+      }
+
+      // For online payment (SSLCommerz), send cart items
+      if (!cart || !cart.items || cart.items.length === 0) {
+        throw new Error('Cart is empty')
+      }
+
+      const cartItems = cart.items.map(item => ({
+        productId: item.product.id,
+        quantity: item.quantity,
+        voucherCode: item.voucherCode || undefined,
+      }))
+
+      // For online payment, use MOBILE_BANKING as default (SSLCommerz will show all options)
+      const payment = await academyService.initiatePayment({
+        cartItems,
+        customerName: formData.customerName,
+        customerEmail: formData.customerEmail,
+        customerPhone: formData.customerPhone,
+        shippingAddress: formData.shippingAddress,
+        shippingCity: formData.shippingCity,
+        shippingCountry: formData.shippingCountry,
+        shippingPostalCode: formData.shippingZip,
+      } as any)
+
+      if (payment.success && payment.gatewayUrl) {
+        // Clear cart session after successful payment initiation
+        cartService.clearSessionId()
+        
+        // Redirect to SSLCommerz payment gateway
+        window.location.href = payment.gatewayUrl
+      } else {
+        throw new Error('Failed to initialize payment')
+      }
     } catch (error: any) {
-      toast.error('Failed to create order', {
-        description: error.response?.data?.message || 'Please try again',
+      console.error('Checkout error:', error)
+      toast.error('Failed to process checkout', {
+        description: error.response?.data?.message || error.message || 'Please try again',
         duration: 5000,
       })
-    } finally {
       setSubmitting(false)
     }
   }
@@ -146,9 +184,10 @@ export default function CheckoutPage() {
     return null
   }
 
-  const tax = cart.subtotal * 0.0
-  const shipping = 0
-  const total = cart.subtotal + tax + shipping
+  // Calculate shipping (100 BDT) - matching backend calculation
+  const tax = 0
+  const shipping = 100
+  const total = cart.subtotal + shipping
 
   return (
     <Box position="relative" overflow="hidden">
@@ -442,57 +481,35 @@ export default function CheckoutPage() {
                             borderWidth="2px"
                             borderRadius="lg"
                             borderColor={
-                              paymentMethod === 'MOBILE_BANKING' ? accentColor : borderColor
+                              paymentMethod === 'ONLINE_PAYMENT' ? accentColor : borderColor
                             }
-                            bg={paymentMethod === 'MOBILE_BANKING' ? iconBg : 'transparent'}
+                            bg={paymentMethod === 'ONLINE_PAYMENT' ? iconBg : 'transparent'}
                             cursor="pointer"
                             transition="all 0.2s"
-                            _hover={{ borderColor: accentColor }}
+                            _hover={{ borderColor: accentColor, transform: 'translateY(-2px)', shadow: 'md' }}
+                            onClick={() => setPaymentMethod('ONLINE_PAYMENT')}
                           >
-                            <Radio value="MOBILE_BANKING" size="lg" colorScheme="primary">
-                              <Text fontWeight="medium">Mobile Banking</Text>
-                              <Text fontSize="sm" color={mutedColor} mt={1}>
-                                bKash, Nagad, Rocket
-                              </Text>
-                            </Radio>
-                          </Box>
-
-                          <Box
-                            p={4}
-                            borderWidth="2px"
-                            borderRadius="lg"
-                            borderColor={paymentMethod === 'CARD' ? accentColor : borderColor}
-                            bg={paymentMethod === 'CARD' ? iconBg : 'transparent'}
-                            cursor="pointer"
-                            transition="all 0.2s"
-                            _hover={{ borderColor: accentColor }}
-                          >
-                            <Radio value="CARD" size="lg" colorScheme="primary">
-                              <Text fontWeight="medium">Credit/Debit Card</Text>
-                              <Text fontSize="sm" color={mutedColor} mt={1}>
-                                Visa, Mastercard, Amex
-                              </Text>
-                            </Radio>
-                          </Box>
-
-                          <Box
-                            p={4}
-                            borderWidth="2px"
-                            borderRadius="lg"
-                            borderColor={
-                              paymentMethod === 'BANK_TRANSFER' ? accentColor : borderColor
-                            }
-                            bg={paymentMethod === 'BANK_TRANSFER' ? iconBg : 'transparent'}
-                            cursor="pointer"
-                            transition="all 0.2s"
-                            _hover={{ borderColor: accentColor }}
-                          >
-                            <Radio value="BANK_TRANSFER" size="lg" colorScheme="primary">
-                              <Text fontWeight="medium">Bank Transfer</Text>
-                              <Text fontSize="sm" color={mutedColor} mt={1}>
-                                Direct bank deposit
-                              </Text>
-                            </Radio>
+                            <HStack spacing={3}>
+                              <Flex
+                                w={8}
+                                h={8}
+                                align="center"
+                                justify="center"
+                                borderRadius="md"
+                                bg={paymentMethod === 'ONLINE_PAYMENT' ? accentColor : borderColor}
+                                color="white"
+                              >
+                                <Icon as={FiCreditCard} boxSize={4} />
+                              </Flex>
+                              <Radio value="ONLINE_PAYMENT" size="lg" colorScheme="primary" flex={1}>
+                                <VStack align="start" spacing={0}>
+                                  <Text fontWeight="semibold">Online Payment (SSLCommerz)</Text>
+                                  <Text fontSize="xs" color={mutedColor}>
+                                    Mobile Banking, Card, Bank Transfer
+                                  </Text>
+                                </VStack>
+                              </Radio>
+                            </HStack>
                           </Box>
 
                           <Box
@@ -505,14 +522,43 @@ export default function CheckoutPage() {
                             bg={paymentMethod === 'CASH_ON_DELIVERY' ? iconBg : 'transparent'}
                             cursor="pointer"
                             transition="all 0.2s"
-                            _hover={{ borderColor: accentColor }}
+                            _hover={{ borderColor: accentColor, transform: 'translateY(-2px)', shadow: 'md' }}
+                            onClick={() => setPaymentMethod('CASH_ON_DELIVERY')}
                           >
-                            <Radio value="CASH_ON_DELIVERY" size="lg" colorScheme="primary">
-                              <Text fontWeight="medium">Cash on Delivery</Text>
-                              <Text fontSize="sm" color={mutedColor} mt={1}>
-                                Pay when you receive
-                              </Text>
-                            </Radio>
+                            <HStack spacing={3}>
+                              <Flex
+                                w={8}
+                                h={8}
+                                align="center"
+                                justify="center"
+                                borderRadius="md"
+                                bg={paymentMethod === 'CASH_ON_DELIVERY' ? 'green.500' : borderColor}
+                                color="white"
+                              >
+                                <Icon as={FiTruck} boxSize={4} />
+                              </Flex>
+                              <Radio value="CASH_ON_DELIVERY" size="lg" colorScheme="primary" flex={1}>
+                                <HStack justify="space-between" width="100%">
+                                  <VStack align="start" spacing={0}>
+                                    <Text fontWeight="semibold">Cash on Delivery</Text>
+                                    <Text fontSize="xs" color={mutedColor}>
+                                      Pay when you receive
+                                    </Text>
+                                  </VStack>
+                                  <Box
+                                    px={2}
+                                    py={1}
+                                    borderRadius="md"
+                                    bg="green.50"
+                                    _dark={{ bg: 'green.900' }}
+                                  >
+                                    <Text fontSize="xs" fontWeight="semibold" color="green.600" _dark={{ color: 'green.400' }}>
+                                      Popular
+                                    </Text>
+                                  </Box>
+                                </HStack>
+                              </Radio>
+                            </HStack>
                           </Box>
                         </Stack>
                       </RadioGroup>
@@ -635,17 +681,8 @@ export default function CheckoutPage() {
                                 Shipping
                               </Text>
                             </HStack>
-                            <Text fontSize="sm" fontWeight="semibold" color="green.500">
-                              FREE
-                            </Text>
-                          </HStack>
-
-                          <HStack justify="space-between" width="100%">
-                            <Text fontSize="sm" color={mutedColor}>
-                              Tax
-                            </Text>
                             <Text fontSize="sm" fontWeight="semibold">
-                              ৳{tax.toLocaleString()}
+                              ৳{shipping.toLocaleString()}
                             </Text>
                           </HStack>
                         </VStack>

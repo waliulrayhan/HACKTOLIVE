@@ -7,12 +7,21 @@ import { CoursePaymentStatus } from '@prisma/client';
 export interface InitiatePaymentDto {
   courseId?: string;
   productId?: string;
+  cartItems?: Array<{
+    productId: string;
+    quantity: number;
+    voucherCode?: string;
+  }>;
   customerName: string;
   customerEmail: string;
   customerPhone: string;
   customerAddress?: string;
   customerCity?: string;
   customerCountry?: string;
+  shippingAddress?: string;
+  shippingCity?: string;
+  shippingCountry?: string;
+  shippingPostalCode?: string;
 }
 
 @Injectable()
@@ -26,13 +35,15 @@ export class PaymentService {
   ) {}
 
   /**
-   * Initiate payment for course enrollment
+   * Initiate payment for course enrollment or shop checkout
+   * @param userId - Optional user ID (for guest checkout)
    */
-  async initiatePayment(userId: string, data: InitiatePaymentDto) {
+  async initiatePayment(userId: string | undefined, data: InitiatePaymentDto) {
     try {
       let amount = 0;
       let productName = '';
       let productCategory = '';
+      let cartData: string | null = null;
 
       // Determine what user is paying for
       if (data.courseId) {
@@ -48,21 +59,82 @@ export class PaymentService {
           throw new BadRequestException('This course is free');
         }
 
-        // Check if already enrolled
-        const existingEnrollment = await this.prisma.enrollment.findFirst({
-          where: {
-            student: { userId },
-            courseId: data.courseId,
-          },
-        });
+        // Check if already enrolled (only for logged-in users)
+        if (userId) {
+          const existingEnrollment = await this.prisma.enrollment.findFirst({
+            where: {
+              student: { userId },
+              courseId: data.courseId,
+            },
+          });
 
-        if (existingEnrollment) {
-          throw new BadRequestException('Already enrolled in this course');
+          if (existingEnrollment) {
+            throw new BadRequestException('Already enrolled in this course');
+          }
         }
 
         amount = course.price;
         productName = course.title;
         productCategory = 'Course Enrollment';
+      } else if (data.cartItems && data.cartItems.length > 0) {
+        // Shopping cart checkout
+        let subtotal = 0;
+        const items: Array<{
+          productId: string;
+          productName: string;
+          productImage?: string | null;
+          quantity: number;
+          price: number;
+          total: number;
+          voucherCode?: string;
+        }> = [];
+
+        for (const item of data.cartItems) {
+          const product = await this.prisma.product.findUnique({
+            where: { id: item.productId },
+          });
+
+          if (!product) {
+            throw new NotFoundException(`Product not found: ${item.productId}`);
+          }
+
+          // Check stock
+          if (product.stockQuantity < item.quantity) {
+            throw new BadRequestException(`Insufficient stock for ${product.name}`);
+          }
+
+          const itemTotal = product.price * item.quantity;
+          subtotal += itemTotal;
+
+          items.push({
+            productId: product.id,
+            productName: product.name,
+            productImage: product.thumbnail || (product.images ? JSON.parse(product.images)[0] : null),
+            quantity: item.quantity,
+            price: product.price,
+            total: itemTotal,
+            voucherCode: item.voucherCode,
+          });
+        }
+
+        // Calculate shipping (no tax, flat 100 BDT shipping)
+        const tax = 0;
+        const shippingCharge = 100;
+        
+        amount = subtotal + shippingCharge;
+        productName = items.length === 1 ? items[0].productName : `Shopping Cart (${items.length} items)`;
+        productCategory = 'Product Purchase';
+        cartData = JSON.stringify({
+          items,
+          subtotal,
+          tax,
+          shippingCharge,
+          total: amount,
+          shippingAddress: data.shippingAddress,
+          shippingCity: data.shippingCity,
+          shippingCountry: data.shippingCountry,
+          shippingZip: data.shippingPostalCode,
+        });
       } else if (data.productId) {
         const product = await this.prisma.product.findUnique({
           where: { id: data.productId },
@@ -76,7 +148,7 @@ export class PaymentService {
         productName = product.name;
         productCategory = 'Product Purchase';
       } else {
-        throw new BadRequestException('Either courseId or productId must be provided');
+        throw new BadRequestException('Either courseId, productId, or cartItems must be provided');
       }
 
       // Generate unique transaction ID
@@ -97,6 +169,7 @@ export class PaymentService {
           customerCountry: data.customerCountry,
           courseId: data.courseId,
           productId: data.productId,
+          metadata: cartData, // Store cart data for later order creation
         },
       });
 
@@ -342,18 +415,18 @@ export class PaymentService {
         throw new BadRequestException(`Payment has risk level ${payment.riskLevel}. Manual review required.`);
       }
 
-      // Get user by email
+      // Get user by email (optional for guest checkout)
       const user = await this.prisma.user.findUnique({
         where: { email: payment.customerEmail },
         include: { student: true },
       });
 
-      if (!user || !user.student) {
-        throw new NotFoundException('Student not found');
-      }
-
-      // Handle course enrollment
+      // Handle course enrollment (requires user account)
       if (payment.courseId) {
+        if (!user || !user.student) {
+          throw new NotFoundException('Student account required for course enrollment. Please sign up first.');
+        }
+
         const enrollment = await this.prisma.enrollment.create({
           data: {
             studentId: user.student.id,
@@ -425,6 +498,78 @@ export class PaymentService {
         this.logger.log(`Enrollment created: ${enrollment.id} for payment: ${paymentId}`);
       }
 
+      // Handle shop order from cart
+      if (payment.metadata) {
+        try {
+          const cartData = JSON.parse(payment.metadata);
+          
+          // Create order
+          const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+          
+          const order = await this.prisma.order.create({
+            data: {
+              orderNumber,
+              userId: user?.id, // Optional - guest checkout allowed
+              customerName: payment.customerName,
+              customerEmail: payment.customerEmail,
+              customerPhone: payment.customerPhone || '',
+              shippingAddress: cartData.shippingAddress || payment.customerAddress || '',
+              shippingCity: cartData.shippingCity || payment.customerCity || '',
+              shippingCountry: cartData.shippingCountry || payment.customerCountry || '',
+              shippingZip: cartData.shippingZip || '',
+              paymentMethod: payment.paymentMethod as any || 'CARD',
+              paymentStatus: 'COMPLETED',
+              status: 'PENDING',
+              transactionId: payment.transactionId, // Store SSLCommerz transaction ID
+              subtotal: cartData.subtotal,
+              tax: cartData.tax,
+              shippingCost: cartData.shippingCharge,
+              total: cartData.total,
+              items: {
+                create: cartData.items.map((item: any) => ({
+                  productId: item.productId,
+                  productName: item.productName,
+                  productImage: item.productImage,
+                  quantity: item.quantity,
+                  price: item.price,
+                  total: item.total,
+                  voucherCode: item.voucherCode,
+                })),
+              },
+            },
+            include: {
+              items: {
+                include: {
+                  product: true,
+                },
+              },
+            },
+          });
+
+          // Update product stock
+          for (const item of cartData.items) {
+            await this.prisma.product.update({
+              where: { id: item.productId },
+              data: {
+                stockQuantity: { decrement: item.quantity },
+              },
+            });
+          }
+
+          // Send order confirmation email
+          if (payment.customerEmail) {
+            this.logger.log(`📧 Sending order confirmation email to ${payment.customerEmail}`);
+            // TODO: Implement order confirmation email
+            // this.emailService.sendOrderConfirmation(...)
+          }
+
+          this.logger.log(`Shop order created: ${order.id} from payment: ${paymentId}`);
+        } catch (error) {
+          this.logger.error(`Error creating shop order: ${error.message}`, error.stack);
+          throw new BadRequestException(`Failed to create order: ${error.message}`);
+        }
+      }
+
       // Update payment status
       await this.prisma.coursePayment.update({
         where: { id: paymentId },
@@ -432,12 +577,14 @@ export class PaymentService {
       });
 
       // Send payment receipt email (non-blocking)
-      if (user.email) {
-        this.logger.log(`📧 Sending payment receipt to ${user.email}`);
+      const receiptEmail = payment.customerEmail;
+      if (receiptEmail) {
+        this.logger.log(`📧 Sending payment receipt to ${receiptEmail}`);
         const courseName = payment.course?.title || payment.product?.name || 'Product/Service';
+        const customerName = payment.customerName;
         this.emailService.sendPaymentReceipt(
-          user.email,
-          user.name || payment.customerName,
+          receiptEmail,
+          customerName,
           payment.transactionId,
           payment.amount,
           payment.currency,
@@ -448,9 +595,9 @@ export class PaymentService {
           payment.bankTransactionId || undefined,
         ).then((sent) => {
           if (sent) {
-            this.logger.log(`✅ Payment receipt sent successfully to ${user.email}`);
+            this.logger.log(`✅ Payment receipt sent successfully to ${receiptEmail}`);
           } else {
-            this.logger.error(`❌ Failed to send payment receipt to ${user.email}`);
+            this.logger.error(`❌ Failed to send payment receipt to ${receiptEmail}`);
           }
         }).catch(error => {
           this.logger.error('❌ Error sending payment receipt:', error);

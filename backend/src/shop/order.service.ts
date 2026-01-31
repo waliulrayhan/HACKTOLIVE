@@ -261,10 +261,28 @@ export class OrderService {
   async updateOrderStatus(id: string, updateOrderStatusDto: UpdateOrderStatusDto) {
     console.log('📦 updateOrderStatus called:', { id, status: updateOrderStatusDto.status });
     
+    // Fetch order first to check payment method
+    const existingOrder = await this.prisma.order.findUnique({
+      where: { id },
+    });
+
+    if (!existingOrder) {
+      throw new NotFoundException('Order not found');
+    }
+
+    // For COD orders, mark as COMPLETED when delivered
+    const paymentStatus = 
+      existingOrder.paymentMethod === 'CASH_ON_DELIVERY' && 
+      updateOrderStatusDto.status === 'DELIVERED' &&
+      existingOrder.paymentStatus === 'PENDING'
+        ? 'COMPLETED'
+        : existingOrder.paymentStatus;
+
     const order = await this.prisma.order.update({
       where: { id },
       data: {
         status: updateOrderStatusDto.status,
+        paymentStatus,
         trackingNumber: updateOrderStatusDto.trackingNumber,
         notes: updateOrderStatusDto.notes,
         completedAt: updateOrderStatusDto.status === 'DELIVERED' ? new Date() : undefined,

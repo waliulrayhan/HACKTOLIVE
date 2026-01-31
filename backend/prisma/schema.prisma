@@ -910,6 +910,7 @@ model Order {
   status            OrderStatus   @default(PENDING)
   paymentStatus     PaymentStatus @default(PENDING)
   paymentMethod     PaymentMethod?
+  transactionId     String?       @db.VarChar(100) // SSLCommerz transaction ID
   
   notes             String?       @db.Text
   trackingNumber    String?       @db.VarChar(255)

@@ -21,7 +21,7 @@ import {
   VideoIcon,
   UserIcon,
 } from "@/icons/index";
-import { FiShoppingCart, FiDollarSign } from "react-icons/fi";
+import { FiShoppingCart, FiDollarSign, FiBook, FiMail, FiSend, FiBriefcase, FiFileText } from "react-icons/fi";
 
 export default function DashboardLayout({
   children,
@@ -42,7 +42,7 @@ export default function DashboardLayout({
             path: "/student/dashboard",
           },
           {
-            icon: <FileIcon />,
+            icon: <FiBook className="w-5 h-5" />,
             name: "My Courses",
             subItems: [
               { icon: <VideoIcon />, name: "All Courses", path: "/student/courses" },
@@ -61,7 +61,7 @@ export default function DashboardLayout({
             path: "/academy/courses",
           },
           {
-            icon: <DocsIcon />,
+            icon: <FiBook className="w-5 h-5" />,
             name: "Blogs",
             path: "/student/blogs",
           },
@@ -100,10 +100,10 @@ export default function DashboardLayout({
             path: "/admin/courses",
           },
           {
-            icon: <DocsIcon />,
+            icon: <FiBook className="w-5 h-5" />,
             name: "Blogs",
             subItems: [
-              { icon: <DocsIcon />, name: "All Blogs", path: "/admin/blogs" },
+              { icon: <FiBook className="w-5 h-5" />, name: "All Blogs", path: "/admin/blogs" },
               { icon: <CheckCircleIcon />, name: "Pending Approvals", path: "/admin/blogs/pending" },
             ],
           },
@@ -125,34 +125,24 @@ export default function DashboardLayout({
             icon: <BoxIcon />,
             name: "Career Center",
             subItems: [
-              { icon: <FileIcon />, name: "Job Postings", path: "/admin/careers" },
-              { icon: <DocsIcon />, name: "Applications", path: "/admin/applications" },
+              { icon: <FiBriefcase className="w-5 h-5" />, name: "Job Postings", path: "/admin/careers" },
+              { icon: <FiFileText className="w-5 h-5" />, name: "Applications", path: "/admin/applications" },
             ],
           },
           {
-            icon: <DocsIcon />,
+            icon: <FiMail className="w-5 h-5" />,
             name: "Contact Messages",
             path: "/admin/contacts",
           },
           {
-            icon: <FileIcon />,
-            name: "Email Templates",
-            path: "/admin/email-templates",
-          },
-          {
-            icon: <FileIcon />,
+            icon: <FiMail className="w-5 h-5" />,
             name: "Newsletter",
             subItems: [
               { icon: <GridIcon />, name: "Dashboard", path: "/admin/newsletter" },
               { icon: <GroupIcon />, name: "Subscribers", path: "/admin/newsletter/subscribers" },
-              { icon: <DocsIcon />, name: "Campaigns", path: "/admin/newsletter/campaigns" },
+              { icon: <FiSend className="w-5 h-5" />, name: "Campaigns", path: "/admin/newsletter/campaigns" },
             ],
           },
-          // {
-          //   icon: <PieChartIcon />,
-          //   name: "System Analytics",
-          //   path: "/admin/analytics",
-          // },
           {
             icon: <UserCircleIcon />,
             name: "Profile",
@@ -170,7 +160,7 @@ export default function DashboardLayout({
             path: "/instructor/dashboard",
           },
           {
-            icon: <FileIcon />,
+            icon: <FiBook className="w-5 h-5" />,
             name: "My Courses",
             subItems: [
               { icon: <VideoIcon />, name: "All Courses", path: "/instructor/courses" },
@@ -190,7 +180,7 @@ export default function DashboardLayout({
           //   path: "/instructor/analytics",
           // },
           {
-            icon: <DocsIcon />,
+            icon: <FiBook className="w-5 h-5" />,
             name: "Blogs",
             path: "/instructor/blogs",
           },

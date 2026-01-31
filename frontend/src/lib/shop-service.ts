@@ -91,6 +91,7 @@ export interface CartItem {
   product: Product;
   quantity: number;
   price: number;
+  voucherCode?: string;
   selectedOptions?: {
     size?: string;
     color?: string;
@@ -125,6 +126,7 @@ export interface Order {
   status: 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
   paymentStatus: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
   paymentMethod?: 'MOBILE_BANKING' | 'CARD' | 'BANK_TRANSFER' | 'CASH_ON_DELIVERY';
+  transactionId?: string;
   notes?: string;
   trackingNumber?: string;
   items: OrderItem[];

@@ -33,7 +33,10 @@ function PaymentFailedContent() {
         )}
         <VStack spacing="3" pt="4">
           <ButtonLink href="/academy/courses" colorScheme="green" size="lg">
-            Try Again
+            Browse Courses
+          </ButtonLink>
+          <ButtonLink href="/shopping" colorScheme="green" size="lg">
+            Continue Shopping
           </ButtonLink>
           <ButtonLink href="/contact" variant="ghost">
             Contact Support

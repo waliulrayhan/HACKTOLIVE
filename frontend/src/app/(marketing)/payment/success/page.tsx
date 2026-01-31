@@ -24,6 +24,7 @@ function PaymentSuccessContent() {
   
   const [status, setStatus] = useState<'verifying' | 'success' | 'error' | 'pending'>('verifying');
   const [message, setMessage] = useState("Verifying your payment...");
+  const [paymentType, setPaymentType] = useState<'course' | 'product' | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const maxRetries = 3;
 
@@ -43,13 +44,20 @@ function PaymentSuccessContent() {
 
         // Check payment status from response
         const paymentStatus = response.data.status;
+        const isShopOrder = response.data.metadata; // Cart data exists for shop orders
+        
+        setPaymentType(isShopOrder ? 'product' : 'course');
 
         if (paymentStatus === 'COMPLETED') {
           setStatus('success');
-          setMessage("Payment successful! You're now enrolled in the course.");
+          setMessage(isShopOrder 
+            ? "Payment successful! Your order has been confirmed and will be processed shortly."
+            : "Payment successful! You're now enrolled in the course.");
         } else if (paymentStatus === 'VALIDATED') {
           setStatus('success');
-          setMessage("Payment validated! Your enrollment is being processed.");
+          setMessage(isShopOrder
+            ? "Payment validated! Your order is being processed."
+            : "Payment validated! Your enrollment is being processed.");
         } else if (paymentStatus === 'FAILED') {
           // Redirect to failed page
           router.push(`/payment/failed?tran_id=${transactionId}`);
@@ -130,12 +138,25 @@ function PaymentSuccessContent() {
             Transaction ID: <Text as="span" fontWeight="bold">{transactionId}</Text>
           </Text>
           <VStack spacing="3" pt="4">
-            <ButtonLink href="/student/courses" colorScheme="green" size="lg">
-              Go to My Courses
-            </ButtonLink>
-            <ButtonLink href="/academy/courses" variant="ghost">
-              Browse More Courses
-            </ButtonLink>
+            {paymentType === 'product' ? (
+              <>
+                <ButtonLink href="/student/orders" colorScheme="green" size="lg">
+                  View My Orders
+                </ButtonLink>
+                <ButtonLink href="/shopping" variant="ghost">
+                  Continue Shopping
+                </ButtonLink>
+              </>
+            ) : (
+              <>
+                <ButtonLink href="/student/courses" colorScheme="green" size="lg">
+                  Go to My Courses
+                </ButtonLink>
+                <ButtonLink href="/academy/courses" variant="ghost">
+                  Browse More Courses
+                </ButtonLink>
+              </>
+            )}
           </VStack>
         </VStack>
       </Center>

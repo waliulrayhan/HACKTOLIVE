@@ -36,6 +36,8 @@ interface Order {
   createdAt: string;
   status: string;
   paymentStatus: string;
+  paymentMethod?: string;
+  transactionId?: string;
   total: number;
   customerName?: string;
   customerEmail?: string;
@@ -641,6 +643,18 @@ export default function OrderHistoryPage() {
                         </p>
                       </div>
                     </div>
+
+                    {selectedOrder.transactionId && selectedOrder.paymentMethod !== 'CASH_ON_DELIVERY' && (
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-500/15 shrink-0">
+                          <HiOutlineCurrencyDollar className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Transaction ID</p>
+                          <p className="text-sm font-mono font-medium text-gray-900 dark:text-white">{selectedOrder.transactionId}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 

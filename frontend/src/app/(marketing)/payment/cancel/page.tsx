@@ -35,6 +35,9 @@ function PaymentCancelContent() {
           <ButtonLink href="/academy/courses" colorScheme="green" size="lg">
             Browse Courses
           </ButtonLink>
+          <ButtonLink href="/shopping" colorScheme="green" size="lg">
+            Continue Shopping
+          </ButtonLink>
           <ButtonLink href="/student/dashboard" variant="ghost">
             Go to Dashboard
           </ButtonLink>

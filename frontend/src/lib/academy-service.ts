@@ -269,12 +269,21 @@ class AcademyService {
   async initiatePayment(paymentData: {
     courseId?: string;
     productId?: string;
+    cartItems?: Array<{
+      productId: string;
+      quantity: number;
+      voucherCode?: string;
+    }>;
     customerName: string;
     customerEmail: string;
     customerPhone: string;
     customerAddress?: string;
     customerCity?: string;
     customerCountry?: string;
+    shippingAddress?: string;
+    shippingCity?: string;
+    shippingCountry?: string;
+    shippingPostalCode?: string;
   }): Promise<any> {
     try {
       const response = await api.post('/payment/initiate', paymentData);

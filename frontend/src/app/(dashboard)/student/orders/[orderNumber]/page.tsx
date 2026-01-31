@@ -43,6 +43,7 @@ interface Order {
   status: string;
   paymentStatus: string;
   paymentMethod: string;
+  transactionId: string | null;
   customerName: string;
   customerEmail: string;
   customerPhone: string;
@@ -397,7 +398,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
               <div>
                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Payment Method</p>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {order.paymentMethod.replace(/_/g, ' ')}
+                  {order.paymentMethod === 'CASH_ON_DELIVERY' ? 'Cash on Delivery (COD)' : 'Online Payment'}
                 </p>
               </div>
               <div>
@@ -408,6 +409,19 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
                   </Badge>
                 </div>
               </div>
+              {order.transactionId && order.paymentMethod !== 'CASH_ON_DELIVERY' && (
+                <div className="pt-3 border-t border-gray-200 dark:border-white/5">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Transaction ID</p>
+                  <div className="p-3 rounded-lg bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20">
+                    <div className="flex items-center gap-2">
+                      <HiOutlineCreditCard className="h-4 w-4 text-purple-600 dark:text-purple-400 shrink-0" />
+                      <p className="text-sm font-mono font-semibold text-purple-700 dark:text-purple-400 break-all">
+                        {order.transactionId}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               {order.trackingNumber && (
                 <div className="pt-3 border-t border-gray-200 dark:border-white/5">
                   <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Tracking Number</p>
