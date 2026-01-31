@@ -877,6 +877,100 @@ async function seedEmailTemplates() {
 </html>`,
     },
     {
+      name: 'Payment Receipt',
+      slug: 'payment-receipt',
+      subject: 'Payment Receipt #{{transactionId}} - HACKTOLIVE',
+      type: 'ORDER_CONFIRMATION' as EmailTemplateType,
+      fromEmail: 'NOREPLY' as EmailSender,
+      variables: JSON.stringify(['customerName', 'transactionId', 'amount', 'currency', 'paymentDate', 'paymentMethod', 'courseName', 'cardType', 'cardIssuer', 'bankTransactionId']),
+      description: 'Payment receipt sent when payment is successfully completed',
+      isActive: true,
+      body: `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>.logo-light{display:block!important}.logo-dark{display:none!important}@media (prefers-color-scheme:dark){.logo-light{display:none!important}.logo-dark{display:block!important}}</style></head>
+<body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:20px 0">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#fff;border-radius:8px;overflow:hidden">
+        <tr><td style="background-color:#84cc16;padding:30px;text-align:center">
+          <h1 style="margin:0;color:#fff;font-size:24px">Payment Successful! ✓</h1>
+        </td></tr>
+        <tr><td style="padding:40px 30px">
+          <p style="margin:0 0 20px;color:#333;font-size:16px">Dear <strong>{{customerName}}</strong>,</p>
+          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Thank you for your payment. This email confirms that we have successfully received your payment for <strong>{{courseName}}</strong>.</p>
+          
+          <div style="background-color:#f0fdf4;border:2px solid #84cc16;border-radius:6px;padding:20px;text-align:center;margin:0 0 25px">
+            <p style="margin:0 0 5px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:1px">Transaction ID</p>
+            <p style="margin:0;color:#84cc16;font-size:20px;font-weight:700;letter-spacing:1px;font-family:monospace">{{transactionId}}</p>
+            <p style="margin:15px 0 5px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:1px">Amount Paid</p>
+            <p style="margin:0;color:#333;font-size:32px;font-weight:700">{{amount}} {{currency}}</p>
+            <p style="margin:10px 0 0;color:#666;font-size:12px">{{paymentDate}}</p>
+          </div>
+
+          <h2 style="margin:0 0 15px;color:#333;font-size:18px;border-bottom:2px solid #84cc16;padding-bottom:10px">Payment Details</h2>
+          
+          <table width="100%" cellpadding="12" cellspacing="0" style="background-color:#f9f9f9;border-radius:6px;margin:0 0 25px;font-size:14px">
+            <tr>
+              <td style="color:#666;width:40%;border-bottom:1px solid #eee"><strong>Course/Product:</strong></td>
+              <td style="color:#333;border-bottom:1px solid #eee">{{courseName}}</td>
+            </tr>
+            <tr>
+              <td style="color:#666;border-bottom:1px solid #eee"><strong>Payment Method:</strong></td>
+              <td style="color:#333;border-bottom:1px solid #eee">{{paymentMethod}}</td>
+            </tr>
+            <tr>
+              <td style="color:#666;border-bottom:1px solid #eee"><strong>Card Type:</strong></td>
+              <td style="color:#333;border-bottom:1px solid #eee">{{cardType}} ({{cardIssuer}})</td>
+            </tr>
+            <tr>
+              <td style="color:#666;border-bottom:1px solid #eee"><strong>Bank Transaction ID:</strong></td>
+              <td style="color:#333;border-bottom:1px solid #eee;font-family:monospace;font-size:12px">{{bankTransactionId}}</td>
+            </tr>
+            <tr>
+              <td style="color:#666;border-bottom:1px solid #eee"><strong>Transaction ID:</strong></td>
+              <td style="color:#333;border-bottom:1px solid #eee;font-family:monospace;font-size:12px">{{transactionId}}</td>
+            </tr>
+            <tr>
+              <td style="color:#666"><strong>Status:</strong></td>
+              <td style="color:#84cc16;font-weight:600">✓ Completed</td>
+            </tr>
+          </table>
+
+          <div style="background-color:#f0fdf4;border-left:4px solid #84cc16;padding:20px;border-radius:4px;margin:0 0 25px">
+            <p style="margin:0 0 10px;color:#333;font-size:14px;font-weight:600">✓ What's Next?</p>
+            <ul style="margin:0;padding-left:20px;color:#666;font-size:13px;line-height:1.8">
+              <li>You will receive a separate email with course access details</li>
+              <li>Your enrollment has been automatically processed</li>
+              <li>Course materials are now available in your student dashboard</li>
+              <li>Keep this email as proof of payment for your records</li>
+            </ul>
+          </div>
+
+          <div style="background-color:#fff9e6;border-left:4px solid #fbbf24;padding:15px 20px;border-radius:4px;margin:0 0 25px">
+            <p style="margin:0;color:#666;font-size:13px;line-height:1.6"><strong>Note:</strong> This is an automated receipt for your records. Please save this email for future reference. If you have any questions about this transaction, please contact our support team with your transaction ID.</p>
+          </div>
+
+          <div style="border-top:1px solid #e5e7eb;padding-top:20px">
+            <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Need Help?</strong></p>
+            <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
+            <p style="margin:0 0 15px;color:#666;font-size:13px">Website: <a href="https://hacktolive.net" style="color:#84cc16;text-decoration:none">www.hacktolive.net</a></p>
+            <p style="margin:0;color:#666;font-size:13px;line-height:1.6">Thank you for choosing HACKTOLIVE Academy!</p>
+          </div>
+        </td></tr>
+        <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
+          <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+          </div>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE Academy. All rights reserved.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+    },
+    {
       name: 'Newsletter Welcome',
       slug: 'newsletter-welcome',
       subject: 'Welcome to HackToLive Newsletter! 🎉',

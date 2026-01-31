@@ -332,6 +332,53 @@ export class EmailService {
   }
 
   /**
+   * Send payment receipt
+   */
+  async sendPaymentReceipt(
+    customerEmail: string,
+    customerName: string,
+    transactionId: string,
+    amount: number,
+    currency: string,
+    courseName: string,
+    paymentMethod: string = 'SSLCommerz',
+    cardType?: string,
+    cardIssuer?: string,
+    bankTransactionId?: string,
+  ): Promise<boolean> {
+    const paymentDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    return this.sendTemplateEmail(
+      'payment-receipt',
+      customerEmail,
+      {
+        customerName,
+        transactionId,
+        amount: amount.toFixed(2),
+        currency,
+        paymentDate,
+        paymentMethod,
+        courseName,
+        cardType: cardType || 'N/A',
+        cardIssuer: cardIssuer || 'N/A',
+        bankTransactionId: bankTransactionId || 'N/A',
+      },
+      customerName,
+      { 
+        type: 'payment_receipt', 
+        transactionId,
+        amount,
+      },
+    );
+  }
+
+  /**
    * Verify SMTP connection
    */
   async verifyConnection(account: 'noreply' | 'support' = 'noreply'): Promise<boolean> {

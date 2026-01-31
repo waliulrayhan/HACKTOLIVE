@@ -66,6 +66,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEnrolled, setIsEnrolled] = useState(false);
 
   // Initialize form data with empty values
   const [formData, setFormData] = useState({
@@ -119,6 +120,24 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
     }
   }, [user]);
 
+  // Check enrollment status
+  useEffect(() => {
+    const checkEnrollment = async () => {
+      if (user && user.role === "STUDENT" && course) {
+        try {
+          const enrolledIds = await academyService.getEnrolledCourseIds();
+          if (enrolledIds.includes(course.id)) {
+            setIsEnrolled(true);
+          }
+        } catch (error) {
+          console.error("Error checking enrollment:", error);
+        }
+      }
+    };
+
+    checkEnrollment();
+  }, [user, course]);
+
   const isFree = course?.price === 0;
   const isLoggedIn = !authLoading && !!user;
 
@@ -136,10 +155,16 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
       return;
     }
 
+    if (!formData.agreeToTerms) {
+      toast.error("Please agree to terms and conditions");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       if (isFree) {
+        // Free course - direct enrollment
         await academyService.enrollInCourse(course.id);
         toast.success("Enrollment Successful! 🎉", {
           description: "You're now enrolled in this free course.",
@@ -147,16 +172,36 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
         });
         setTimeout(() => router.push("/student/courses"), 1500);
       } else {
-        toast.info("Processing Payment...", {
-          description: "Please wait while we process your payment.",
+        // Paid course - initialize SSLCommerz payment
+        toast.info("Initializing payment...", {
+          description: "Please wait while we prepare the payment gateway.",
           duration: 3000,
         });
-        await academyService.processPaymentAndEnroll(course.id, paymentData);
-        toast.success("Payment Successful! 🎉", {
-          description: "You're now enrolled! Check your dashboard for course access.",
-          duration: 5000,
+
+        console.log("Initiating payment with data:", {
+          courseId: course.id,
+          customerName: formData.name,
+          customerEmail: formData.email,
+          customerPhone: formData.phone,
         });
-        setTimeout(() => router.push("/student/courses"), 1500);
+
+        const paymentResponse = await academyService.initiatePayment({
+          courseId: course.id,
+          customerName: formData.name,
+          customerEmail: formData.email,
+          customerPhone: formData.phone,
+        });
+
+        console.log("Payment response:", paymentResponse);
+
+        // Redirect to SSLCommerz payment gateway
+        if (paymentResponse.gatewayUrl) {
+          console.log("Redirecting to gateway:", paymentResponse.gatewayUrl);
+          window.location.href = paymentResponse.gatewayUrl;
+        } else {
+          console.error("No gateway URL in response:", paymentResponse);
+          throw new Error("Failed to get payment gateway URL");
+        }
       }
     } catch (error: any) {
       console.error("Enrollment error:", error);
@@ -173,7 +218,6 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
           duration: 5000,
         });
       }
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -201,6 +245,31 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
             <ButtonLink href="/academy/courses" colorScheme="primary">
               Browse All Courses
             </ButtonLink>
+          </VStack>
+        </Center>
+      </Container>
+    );
+  }
+
+  // Redirect if already enrolled
+  if (!authLoading && isEnrolled) {
+    return (
+      <Container maxW="container.xl" py="20">
+        <Center>
+          <VStack spacing="6" align="center">
+            <Icon as={FiCheckCircle} boxSize="16" color="green.500" />
+            <Heading size="lg">Already Enrolled!</Heading>
+            <Text color="muted" maxW="md" textAlign="center">
+              You're already enrolled in this course. Access your course materials from your dashboard.
+            </Text>
+            <HStack spacing="4">
+              <ButtonLink href="/student/courses" colorScheme="green" size="lg">
+                Go to My Courses
+              </ButtonLink>
+              <ButtonLink href={`/academy/courses/${slug}`} variant="outline" colorScheme="green" size="lg">
+                View Course Details
+              </ButtonLink>
+            </HStack>
           </VStack>
         </Center>
       </Container>
@@ -417,117 +486,61 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                       <VStack spacing="6" align="stretch">
                         <HStack>
                           <Icon as={FiCreditCard} boxSize="5" color="purple.500" />
-                          <Heading size="lg">Payment Details</Heading>
+                          <Heading size="lg">Payment Information</Heading>
                         </HStack>
 
                         <VStack spacing="5" align="stretch">
-                          {/* Payment Method */}
-                          <FormControl>
-                            <FormLabel fontWeight="semibold">Payment Method</FormLabel>
-                            <RadioGroup 
-                              value={paymentData.paymentMethod}
-                              onChange={(value) => setPaymentData({ ...paymentData, paymentMethod: value })}
-                            >
-                              <VStack spacing="3">
-                                <Radio value="card" size="lg">
+                          <Alert status="info" borderRadius="lg">
+                            <AlertIcon />
+                            <Box>
+                              <Text fontWeight="semibold">Secure Payment Gateway</Text>
+                              <Text fontSize="sm" mt="1">
+                                You will be redirected to SSLCommerz secure payment gateway to complete your payment. 
+                                Multiple payment options available including cards, mobile banking, and internet banking.
+                              </Text>
+                            </Box>
+                          </Alert>
+
+                          <Box 
+                            p="6" 
+                            bg={useColorModeValue("gray.50", "gray.700")} 
+                            borderRadius="lg"
+                          >
+                            <VStack spacing="3" align="start">
+                              <Heading size="sm">Accepted Payment Methods:</Heading>
+                              <List spacing="2">
+                                <ListItem>
                                   <HStack>
-                                    <Icon as={FiCreditCard} />
-                                    <Text>Credit / Debit Card</Text>
+                                    <Icon as={FiCheckCircle} color="green.500" />
+                                    <Text>Credit/Debit Cards (Visa, Mastercard, Amex)</Text>
                                   </HStack>
-                                </Radio>
-                                <Radio value="upi" size="lg">
+                                </ListItem>
+                                <ListItem>
                                   <HStack>
-                                    <Icon as={FiZap} />
-                                    <Text>UPI / Net Banking</Text>
+                                    <Icon as={FiCheckCircle} color="green.500" />
+                                    <Text>Mobile Banking (bKash, Nagad, Rocket)</Text>
                                   </HStack>
-                                </Radio>
-                              </VStack>
-                            </RadioGroup>
-                          </FormControl>
-
-                          {paymentData.paymentMethod === "card" && (
-                            <>
-                              <FormControl isRequired>
-                                <FormLabel fontWeight="semibold">Card Number</FormLabel>
-                                <Input
-                                  size="lg"
-                                  placeholder="1234 5678 9012 3456"
-                                  value={paymentData.cardNumber}
-                                  onChange={(e) => setPaymentData({ ...paymentData, cardNumber: e.target.value })}
-                                  borderRadius="lg"
-                                  maxLength={19}
-                                />
-                              </FormControl>
-
-                              <FormControl isRequired>
-                                <FormLabel fontWeight="semibold">Cardholder Name</FormLabel>
-                                <Input
-                                  size="lg"
-                                  placeholder="JOHN DOE"
-                                  value={paymentData.cardName}
-                                  onChange={(e) => setPaymentData({ ...paymentData, cardName: e.target.value })}
-                                  borderRadius="lg"
-                                  textTransform="uppercase"
-                                />
-                              </FormControl>
-
-                              <SimpleGrid columns={2} spacing="4">
-                                <FormControl isRequired>
-                                  <FormLabel fontWeight="semibold">Expiry Date</FormLabel>
-                                  <Input
-                                    size="lg"
-                                    placeholder="MM/YY"
-                                    value={paymentData.expiryDate}
-                                    onChange={(e) => setPaymentData({ ...paymentData, expiryDate: e.target.value })}
-                                    borderRadius="lg"
-                                    maxLength={5}
-                                  />
-                                </FormControl>
-
-                                <FormControl isRequired>
-                                  <FormLabel fontWeight="semibold">CVV</FormLabel>
-                                  <Input
-                                    size="lg"
-                                    type="password"
-                                    placeholder="123"
-                                    value={paymentData.cvv}
-                                    onChange={(e) => setPaymentData({ ...paymentData, cvv: e.target.value })}
-                                    borderRadius="lg"
-                                    maxLength={3}
-                                  />
-                                </FormControl>
-                              </SimpleGrid>
-                            </>
-                          )}
-
-                          {/* Coupon Code */}
-                          <FormControl>
-                            <FormLabel fontWeight="semibold">Coupon Code (Optional)</FormLabel>
-                            <HStack>
-                              <Input
-                                size="lg"
-                                placeholder="Enter coupon code"
-                                value={paymentData.couponCode}
-                                onChange={(e) => setPaymentData({ ...paymentData, couponCode: e.target.value })}
-                                borderRadius="lg"
-                                textTransform="uppercase"
-                              />
-                              <Button colorScheme="green" size="md" px="8">
-                                Apply
-                              </Button>
-                            </HStack>
-                          </FormControl>
+                                </ListItem>
+                                <ListItem>
+                                  <HStack>
+                                    <Icon as={FiCheckCircle} color="green.500" />
+                                    <Text>Internet Banking</Text>
+                                  </HStack>
+                                </ListItem>
+                              </List>
+                            </VStack>
+                          </Box>
 
                           {/* Security Notice */}
                           <HStack 
                             p="4" 
-                            bg={useColorModeValue("gray.50", "gray.700")} 
+                            bg={useColorModeValue("green.50", "green.900")} 
                             borderRadius="lg"
                             spacing="3"
                           >
                             <Icon as={FiShield} color="green.500" boxSize="5" />
                             <Text fontSize="sm" color="muted">
-                              Your payment information is secured with 256-bit SSL encryption
+                              Your payment is secured with SSL encryption and PCI-DSS compliance
                             </Text>
                           </HStack>
                         </VStack>
@@ -568,23 +581,17 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                         fontWeight="bold"
                         leftIcon={isFree ? <FiZap /> : <FiLock />}
                         isLoading={isSubmitting}
-                        loadingText={isFree ? "Enrolling..." : "Processing..."}
+                        loadingText={isFree ? "Enrolling..." : "Redirecting to payment..."}
                         isDisabled={
                           !formData.agreeToTerms || 
                           !formData.name || 
                           !formData.email || 
-                          !formData.phone ||
-                          (!isFree && paymentData.paymentMethod === "card" && (
-                            !paymentData.cardNumber ||
-                            !paymentData.cardName ||
-                            !paymentData.expiryDate ||
-                            !paymentData.cvv
-                          ))
+                          !formData.phone
                         }
                       >
                         {isFree 
                           ? "Start Learning for Free" 
-                          : `Complete Payment - ${course.price.toLocaleString()} Tk`}
+                          : `Proceed to Payment - ${course.price.toLocaleString()} Tk`}
                       </Button>
 
                       {!isFree && (

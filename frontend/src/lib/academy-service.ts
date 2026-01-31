@@ -264,21 +264,65 @@ class AcademyService {
   }
 
   /**
-   * Process payment and enroll (dummy payment for now)
+   * Get enrolled course IDs for current student
+   */
+  async getEnrolledCourseIds(): Promise<string[]> {
+    try {
+      const response = await api.get('/student/enrolled-course-ids');
+      return response.data;
+    } catch (error: any) {
+      console.error('Error getting enrolled course IDs:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Initiate payment with SSLCommerz
+   */
+  async initiatePayment(paymentData: {
+    courseId?: string;
+    productId?: string;
+    customerName: string;
+    customerEmail: string;
+    customerPhone: string;
+    customerAddress?: string;
+    customerCity?: string;
+    customerCountry?: string;
+  }): Promise<any> {
+    try {
+      const response = await api.post('/payment/initiate', paymentData);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error initiating payment:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get payment status
+   */
+  async getPaymentStatus(transactionId: string): Promise<any> {
+    try {
+      const response = await api.get(`/payment/status/${transactionId}`);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error getting payment status:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Process payment and enroll (legacy - kept for backward compatibility)
    */
   async processPaymentAndEnroll(courseId: string, paymentData: any): Promise<any> {
     try {
-      // Simulate payment processing delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // For now, just enroll directly (payment integration to be added later)
-      const enrollResponse = await api.post(`/student/courses/${courseId}/enroll`);
-      
-      return {
-        success: true,
-        enrollment: enrollResponse.data,
-        paymentId: `PAY_${Date.now()}`, // Dummy payment ID
-      };
+      // Redirect to new payment flow
+      return await this.initiatePayment({
+        courseId,
+        customerName: paymentData.customerName,
+        customerEmail: paymentData.customerEmail,
+        customerPhone: paymentData.customerPhone,
+      });
     } catch (error: any) {
       console.error('Error processing payment and enrollment:', error);
       throw error;

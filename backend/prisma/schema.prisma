@@ -109,6 +109,7 @@ model Course {
   modules          CourseModule[]
   enrollments      Enrollment[]
   reviews          Review[]
+  payments         CoursePayment[]
   products         Product[]
 
   @@index([slug])
@@ -181,15 +182,18 @@ model Enrollment {
   progress             Float            @default(0)
   lastAccessedLessonId String?
   completedAt          DateTime?
+  paymentId            String?
   createdAt            DateTime         @default(now())
   updatedAt            DateTime         @updatedAt
   course               Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
   student              Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  payment              CoursePayment?   @relation(fields: [paymentId], references: [id])
 
   @@unique([studentId, courseId])
   @@index([studentId])
   @@index([courseId])
   @@index([status])
+  @@index([paymentId])
 }
 
 model LessonProgress {
@@ -207,6 +211,54 @@ model LessonProgress {
   @@index([studentId])
   @@index([lessonId])
   @@index([completed])
+}
+
+model CoursePayment {
+  id                  String              @id @default(uuid())
+  transactionId       String              @unique // SSLCommerz transaction ID (tran_id)
+  amount              Float
+  currency            String              @default("BDT")
+  status              CoursePaymentStatus @default(PENDING)
+  paymentMethod       String?             // card_type from SSLCommerz
+  cardType            String?             // card_issuer, card_brand
+  bankTransactionId   String?             // bank_tran_id
+  cardIssuer          String?
+  cardBrand           String?
+  cardSubBrand        String?
+  storeAmount         Float?
+  validatedAt         DateTime?
+  
+  // Customer Info
+  customerName        String
+  customerEmail       String
+  customerPhone       String?
+  customerAddress     String?
+  customerCity        String?
+  customerCountry     String?
+  
+  // Course/Product Info
+  courseId            String?
+  productId           String?
+  
+  // IPN & Risk
+  riskLevel           Int                 @default(0)
+  riskTitle           String?
+  
+  // Metadata
+  ipnData             String?             @db.Text // Store full IPN response as JSON
+  metadata            String?             @db.Text // Store additional data as JSON
+  
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  
+  course              Course?             @relation(fields: [courseId], references: [id])
+  product             Product?            @relation(fields: [productId], references: [id])
+  enrollments         Enrollment[]
+
+  @@index([status])
+  @@index([transactionId])
+  @@index([customerEmail])
+  @@index([createdAt])
 }
 
 model Review {
@@ -477,6 +529,16 @@ enum EnrollmentStatus {
   ACTIVE
   COMPLETED
   DROPPED
+}
+
+enum CoursePaymentStatus {
+  PENDING
+  PROCESSING
+  VALIDATED
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
 }
 
 enum QuestionType {
@@ -772,6 +834,7 @@ model Product {
   cartItems        CartItem[]
   orderItems       OrderItem[]
   reviews          ProductReview[]
+  payments         CoursePayment[]
 
   @@index([slug])
   @@index([categoryId])

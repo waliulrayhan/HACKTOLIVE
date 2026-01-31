@@ -21,7 +21,7 @@ import {
   VideoIcon,
   UserIcon,
 } from "@/icons/index";
-import { FiShoppingCart } from "react-icons/fi";
+import { FiShoppingCart, FiDollarSign } from "react-icons/fi";
 
 export default function DashboardLayout({
   children,
@@ -115,6 +115,11 @@ export default function DashboardLayout({
               { icon: <GridIcon />, name: "Categories", path: "/admin/shop/categories" },
               { icon: <BoxIconLine />, name: "Orders", path: "/admin/shop/orders" },
             ],
+          },
+          {
+            icon: <FiDollarSign className="w-5 h-5" />,
+            name: "Payments",
+            path: "/admin/payments",
           },
           {
             icon: <BoxIcon />,
