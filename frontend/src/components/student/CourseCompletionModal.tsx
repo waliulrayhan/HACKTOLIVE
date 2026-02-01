@@ -36,6 +36,9 @@ export default function CourseCompletionModal({
   const router = useRouter();
   const [requestingCertificate, setRequestingCertificate] = useState(false);
   const [certificateRequested, setCertificateRequested] = useState(false);
+  const [showNameInput, setShowNameInput] = useState(false);
+  const [certificateName, setCertificateName] = useState("");
+  const [nameError, setNameError] = useState("");
 
   useEffect(() => {
     console.log('🎊 CourseCompletionModal props:', {
@@ -48,16 +51,32 @@ export default function CourseCompletionModal({
   }, [isOpen, courseId, courseTitle, completedLessons, totalLessons]);
 
   const handleRequestCertificate = async () => {
+    // Validate certificate name
+    if (!certificateName.trim()) {
+      setNameError("Please enter your name for the certificate");
+      return;
+    }
+
+    if (certificateName.trim().length < 2) {
+      setNameError("Name must be at least 2 characters");
+      return;
+    }
+
     try {
       setRequestingCertificate(true);
+      setNameError("");
       const token = localStorage.getItem("token");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/student/courses/${courseId}/request-certificate`,
         {
           method: "POST",
           headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          body: JSON.stringify({
+            certificateName: certificateName.trim(),
+          }),
         }
       );
 
@@ -65,6 +84,7 @@ export default function CourseCompletionModal({
 
       const certificate = await response.json();
       setCertificateRequested(true);
+      setShowNameInput(false);
       
       toast.success("Certificate Requested!", {
         description: "Your instructor will review and issue your certificate soon.",
@@ -169,13 +189,62 @@ export default function CourseCompletionModal({
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={handleRequestCertificate}
-                  disabled={requestingCertificate}
-                  className="w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50 transition-colors"
-                >
-                  {requestingCertificate ? "Requesting..." : "Request Certificate"}
-                </button>
+                
+                {!showNameInput ? (
+                  <button
+                    onClick={() => setShowNameInput(true)}
+                    className="w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 transition-colors"
+                  >
+                    Request Certificate
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <div>
+                      <label htmlFor="certificateName" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Name for Certificate <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        id="certificateName"
+                        type="text"
+                        value={certificateName}
+                        onChange={(e) => {
+                          setCertificateName(e.target.value);
+                          setNameError("");
+                        }}
+                        placeholder="Enter your full name"
+                        className={`w-full rounded-md border ${
+                          nameError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                        } bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500`}
+                        autoFocus
+                      />
+                      {nameError && (
+                        <p className="mt-1 text-xs text-red-500">{nameError}</p>
+                      )}
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        This name will appear on your certificate
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleRequestCertificate}
+                        disabled={requestingCertificate}
+                        className="flex-1 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50 transition-colors"
+                      >
+                        {requestingCertificate ? "Requesting..." : "Submit Request"}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowNameInput(false);
+                          setCertificateName("");
+                          setNameError("");
+                        }}
+                        className="rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="rounded-lg border border-success-200 bg-success-50 p-4 dark:border-success-800/50 dark:bg-success-900/20">

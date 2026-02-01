@@ -53,8 +53,16 @@ export class StudentController {
 
   @Post('courses/:courseId/request-certificate')
   @ApiOperation({ summary: 'Request certificate for completed course' })
-  requestCertificate(@Request() req: any, @Param('courseId') courseId: string) {
-    return this.studentService.requestCertificate(req.user.id, courseId);
+  requestCertificate(
+    @Request() req: any,
+    @Param('courseId') courseId: string,
+    @Body() data: { certificateName: string },
+  ) {
+    return this.studentService.requestCertificate(
+      req.user.id,
+      courseId,
+      data.certificateName,
+    );
   }
 
   @Post('courses/:courseId/review')

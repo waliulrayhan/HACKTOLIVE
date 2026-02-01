@@ -341,8 +341,11 @@ export class CertificatesService {
       throw new NotFoundException('Certificate not yet issued');
     }
 
+    // Use certificateName if available, otherwise fallback to user name
+    const studentName = certificate.certificateName || certificate.student?.user?.name || 'Student';
+
     const certificateData = {
-      studentName: certificate.student?.user?.name || 'Student',
+      studentName: studentName,
       courseName: certificate.course?.title || 'Course',
       instructorName: certificate.course?.instructor?.user?.name || 'Instructor',
       completionDate: certificate.issuedAt || new Date(),

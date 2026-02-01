@@ -48,6 +48,7 @@ interface Certificate {
   id: string;
   studentId: string;
   courseId: string;
+  certificateName?: string;
   status: 'PENDING' | 'ISSUED' | 'REJECTED';
   requestedAt: string;
   issuedAt?: string;
@@ -348,6 +349,11 @@ export default function CertificateIssuancePage() {
                       <p className="text-xs text-gray-600 dark:text-gray-400">
                         {cert.student?.user?.email || 'No email'}
                       </p>
+                      {cert.certificateName && (
+                        <p className="text-xs text-brand-600 dark:text-brand-400 font-medium mt-0.5">
+                          Certificate Name: {cert.certificateName}
+                        </p>
+                      )}
                       <div className="flex items-center gap-2 mt-1">
                         <Badge color="warning" size="sm">
                           <HiOutlineClock className="h-3 w-3 mr-1" />
@@ -400,6 +406,11 @@ export default function CertificateIssuancePage() {
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {cert.student?.user?.name}
                       </p>
+                      {cert.certificateName && (
+                        <p className="text-xs text-brand-600 dark:text-brand-400 font-medium">
+                          Certificate Name: {cert.certificateName}
+                        </p>
+                      )}
                       <p className="text-xs text-gray-600 dark:text-gray-400">
                         Verification: <span className="font-mono">{cert.verificationCode}</span>
                       </p>
@@ -526,6 +537,11 @@ export default function CertificateIssuancePage() {
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {certificate.student?.user?.name}
                       </p>
+                      {certificate.certificateName && (
+                        <p className="text-xs text-brand-600 dark:text-brand-400 font-medium">
+                          Certificate Name: {certificate.certificateName}
+                        </p>
+                      )}
                       <p className="text-xs text-gray-600 dark:text-gray-400">
                         Verification: <span className="font-mono">{certificate.verificationCode}</span>
                       </p>

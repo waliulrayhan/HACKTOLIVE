@@ -282,6 +282,7 @@ model Certificate {
   studentId        String
   courseId         String
   instructorId     String
+  certificateName  String?           @db.VarChar(255)
   status           CertificateStatus @default(PENDING)
   requestedAt      DateTime          @default(now())
   issuedAt         DateTime?

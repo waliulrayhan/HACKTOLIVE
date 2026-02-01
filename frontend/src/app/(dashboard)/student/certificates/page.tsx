@@ -27,6 +27,7 @@ interface Certificate {
       email: string;
     };
   };
+  certificateName?: string;
   status: "PENDING" | "ISSUED" | "REJECTED";
   requestedAt: string;
   issuedAt?: string;
@@ -53,6 +54,11 @@ export default function CertificatesPage() {
   const router = useRouter();
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reRequestingId, setReRequestingId] = useState<string | null>(null);
+  const [showNameModal, setShowNameModal] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+  const [certificateName, setCertificateName] = useState("");
+  const [nameError, setNameError] = useState("");
 
   useEffect(() => {
     document.title = "My Certificates - HACKTOLIVE Academy";
@@ -107,6 +113,59 @@ export default function CertificatesPage() {
     // Copy to clipboard
     navigator.clipboard.writeText(verificationCode);
     toast.success("Verification code copied to clipboard!");
+  };
+
+  const handleReRequestCertificate = async () => {
+    if (!selectedCourseId) return;
+
+    // Validate certificate name
+    if (!certificateName.trim()) {
+      setNameError("Please enter your name for the certificate");
+      return;
+    }
+
+    if (certificateName.trim().length < 2) {
+      setNameError("Name must be at least 2 characters");
+      return;
+    }
+
+    try {
+      setReRequestingId(selectedCourseId);
+      setNameError("");
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/student/courses/${selectedCourseId}/request-certificate`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            certificateName: certificateName.trim(),
+          }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to re-request certificate");
+
+      toast.success("Certificate Re-Requested!", {
+        description: "Your instructor will review your new request.",
+      });
+
+      // Close modal and refresh
+      setShowNameModal(false);
+      setCertificateName("");
+      setSelectedCourseId(null);
+      fetchCertificates();
+    } catch (error: any) {
+      console.error("Error re-requesting certificate:", error);
+      toast.error("Failed to re-request certificate", {
+        description: error.message || "Please try again",
+      });
+    } finally {
+      setReRequestingId(null);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -261,7 +320,7 @@ export default function CertificatesPage() {
                       {certificate.status === "ISSUED" ? "Certificate of Completion" : "Certificate Request"}
                     </h3>
                     <p className="mt-1 text-xs sm:text-sm opacity-90 line-clamp-1">
-                      {certificate.student?.user?.name || 'Student'}
+                      {certificate.certificateName || certificate.student?.user?.name || 'Student'}
                     </p>
                   </div>
                 </div>
@@ -329,9 +388,18 @@ export default function CertificatesPage() {
 
                 {certificate.status === "REJECTED" && (
                   <div className="mb-3 sm:mb-4 rounded-md bg-red-50 p-3 dark:bg-red-950/30">
-                    <p className="text-xs sm:text-sm text-red-800 dark:text-red-200">
-                      Your certificate request was not approved. Please contact your instructor.
+                    <p className="text-xs sm:text-sm text-red-800 dark:text-red-200 mb-2">
+                      Your certificate request was not approved. You can request again with a different name.
                     </p>
+                    <button
+                      onClick={() => {
+                        setSelectedCourseId(certificate.course.id);
+                        setShowNameModal(true);
+                      }}
+                      className="w-full rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 transition-colors"
+                    >
+                      Request Again
+                    </button>
                   </div>
                 )}
 
@@ -385,6 +453,64 @@ export default function CertificatesPage() {
                 authenticity of your certificates. Each code is unique and can be verified
                 through our platform.
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Re-Request Name Input Modal */}
+      {showNameModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-md p-6">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+              Re-Request Certificate
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="reRequestName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Name for Certificate <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="reRequestName"
+                  type="text"
+                  value={certificateName}
+                  onChange={(e) => {
+                    setCertificateName(e.target.value);
+                    setNameError("");
+                  }}
+                  placeholder="Enter your full name"
+                  className={`w-full rounded-md border ${
+                    nameError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                  } bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-500 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500`}
+                  autoFocus
+                />
+                {nameError && (
+                  <p className="mt-1 text-xs text-red-500">{nameError}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  This name will appear on your certificate
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleReRequestCertificate}
+                  disabled={!!reRequestingId}
+                  className="flex-1 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50 transition-colors"
+                >
+                  {reRequestingId ? "Requesting..." : "Submit Request"}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowNameModal(false);
+                    setCertificateName("");
+                    setNameError("");
+                    setSelectedCourseId(null);
+                  }}
+                  className="rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>

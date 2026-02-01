@@ -1347,7 +1347,11 @@ export class StudentService {
     return review;
   }
 
-  async requestCertificate(userId: string, courseId: string) {
+  async requestCertificate(
+    userId: string,
+    courseId: string,
+    certificateName: string,
+  ) {
     const student = await this.prisma.student.findUnique({
       where: { userId },
       include: {
@@ -1357,6 +1361,11 @@ export class StudentService {
 
     if (!student) {
       throw new NotFoundException('Student profile not found');
+    }
+
+    // Validate certificate name
+    if (!certificateName || certificateName.trim().length === 0) {
+      throw new BadRequestException('Certificate name is required');
     }
 
     // Check if course is completed
@@ -1382,8 +1391,59 @@ export class StudentService {
       },
     });
 
+    // If certificate exists and is REJECTED, allow re-request with updated name
     if (existingCertificate) {
-      return existingCertificate;
+      if (existingCertificate.status === 'REJECTED') {
+        // Update the rejected certificate with new name and reset to PENDING
+        const updatedCertificate = await this.prisma.certificate.update({
+          where: { id: existingCertificate.id },
+          data: {
+            certificateName: certificateName.trim(),
+            status: 'PENDING',
+            requestedAt: new Date(),
+            issuedAt: null,
+            verificationCode: null,
+            certificateUrl: null,
+          },
+          include: {
+            student: {
+              include: {
+                user: true,
+              },
+            },
+            course: {
+              include: {
+                instructor: true,
+              },
+            },
+          },
+        });
+        return updatedCertificate;
+      } else if (existingCertificate.status === 'PENDING') {
+        // Update the pending certificate name if student wants to change it
+        const updatedCertificate = await this.prisma.certificate.update({
+          where: { id: existingCertificate.id },
+          data: {
+            certificateName: certificateName.trim(),
+          },
+          include: {
+            student: {
+              include: {
+                user: true,
+              },
+            },
+            course: {
+              include: {
+                instructor: true,
+              },
+            },
+          },
+        });
+        return updatedCertificate;
+      } else {
+        // Certificate is ISSUED, return existing
+        return existingCertificate;
+      }
     }
 
     // Get course details
@@ -1404,6 +1464,7 @@ export class StudentService {
         student: { connect: { id: student.id } },
         course: { connect: { id: courseId } },
         instructor: { connect: { id: course.instructorId } },
+        certificateName: certificateName.trim(),
         status: 'PENDING',
       },
       include: {
