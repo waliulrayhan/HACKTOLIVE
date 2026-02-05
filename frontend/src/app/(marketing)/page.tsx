@@ -236,7 +236,7 @@ const HeroSection: React.FC = () => {
             <FallInPlace delay={0.2}>
               <Text
                 fontSize={{ base: 'md', sm: 'lg', md: 'xl' }}
-                fontWeight="medium"
+                fontWeight="small"
                 textAlign="justify"
               >
                 HackToLive provides hands-on cybersecurity training and enterprise-grade security services, empowering individuals and organizations to stay secure in a dynamic threat landscape

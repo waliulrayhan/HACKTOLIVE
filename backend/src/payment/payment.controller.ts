@@ -84,11 +84,13 @@ export class PaymentController {
     @Query('page') page: string,
     @Query('limit') limit: string,
     @Query('status') status?: CoursePaymentStatus,
+    @Query('search') search?: string,
   ) {
     return this.paymentService.getAllPayments(
       parseInt(page) || 1,
       parseInt(limit) || 20,
       status,
+      search,
     );
   }
 

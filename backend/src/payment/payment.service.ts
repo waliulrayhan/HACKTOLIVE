@@ -635,17 +635,82 @@ export class PaymentService {
   /**
    * Get all payments (Admin only)
    */
-  async getAllPayments(page = 1, limit = 20, status?: CoursePaymentStatus) {
+  async getAllPayments(page = 1, limit = 20, status?: CoursePaymentStatus, search?: string) {
     const skip = (page - 1) * limit;
 
-    const where = status ? { status } : {};
+    let where: any = {};
+
+    // Add status filter
+    if (status) {
+      where.status = status;
+    }
+
+    // Add search functionality
+    if (search && search.trim()) {
+      const searchTerm = search.trim();
+      where.OR = [
+        { transactionId: { contains: searchTerm } },
+        { bankTransactionId: { contains: searchTerm } },
+        { customerName: { contains: searchTerm } },
+        { customerEmail: { contains: searchTerm } },
+        { customerPhone: { contains: searchTerm } },
+        { course: { title: { contains: searchTerm } } },
+        { product: { name: { contains: searchTerm } } },
+      ];
+    }
 
     const [payments, total] = await Promise.all([
       this.prisma.coursePayment.findMany({
         where,
         include: {
-          course: { select: { id: true, title: true } },
-          product: { select: { id: true, name: true } },
+          course: { 
+            select: { 
+              id: true, 
+              title: true, 
+              slug: true,
+              price: true,
+              instructorId: true,
+              instructor: {
+                select: {
+                  user: {
+                    select: {
+                      name: true,
+                      email: true,
+                    }
+                  }
+                }
+              }
+            } 
+          },
+          product: { 
+            select: { 
+              id: true, 
+              name: true, 
+              slug: true,
+              price: true,
+            } 
+          },
+          enrollments: {
+            include: {
+              student: {
+                include: {
+                  user: {
+                    select: {
+                      name: true,
+                      email: true,
+                    }
+                  }
+                }
+              },
+              course: {
+                select: {
+                  id: true,
+                  title: true,
+                  slug: true,
+                }
+              }
+            }
+          }
         },
         orderBy: { createdAt: 'desc' },
         skip,

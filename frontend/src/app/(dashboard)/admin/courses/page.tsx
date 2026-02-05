@@ -607,7 +607,7 @@ export default function CoursesManagementPage() {
       {/* View Modal */}
       {showModal && selectedCourse && (
         <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
-          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="sticky top-0 bg-white dark:bg-gray-900 px-6 py-5 flex items-center justify-between border-b border-gray-200 dark:border-gray-800">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -638,7 +638,7 @@ export default function CoursesManagementPage() {
                     {selectedCourse.tier}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
                   {selectedCourse.shortDescription}
                 </p>
               </div>
@@ -678,33 +678,33 @@ export default function CoursesManagementPage() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200 dark:border-gray-800">
-                  <div className="flex flex-col items-center gap-2 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-500/10">
+                  <div className="flex flex-row items-center gap-2 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-500/10">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-500/20">
                       <HiOutlineStar className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
                     </div>
-                    <div className="text-center">
+                    <div className="flex-1">
                       <p className="text-xs text-gray-600 dark:text-gray-400">Rating</p>
                       <p className="text-sm font-bold text-gray-900 dark:text-white">
                         {selectedCourse.rating.toFixed(1)}
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-col items-center gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10">
+                  <div className="flex flex-row items-center gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-500/20">
                       <HiOutlineUsers className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <div className="text-center">
+                    <div className="flex-1">
                       <p className="text-xs text-gray-600 dark:text-gray-400">Students</p>
                       <p className="text-sm font-bold text-gray-900 dark:text-white">
                         {selectedCourse.totalStudents}
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-col items-center gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-500/10">
+                  <div className="flex flex-row items-center gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-500/10">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-500/20">
                       <HiOutlineClock className="h-5 w-5 text-green-600 dark:text-green-400" />
                     </div>
-                    <div className="text-center">
+                    <div className="flex-1">
                       <p className="text-xs text-gray-600 dark:text-gray-400">Duration</p>
                       <p className="text-sm font-bold text-gray-900 dark:text-white">
                         {Math.floor(selectedCourse.duration / 60)}h
