@@ -102,8 +102,38 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
   navItems = defaultNavItems, 
   othersItems = defaultOthersItems 
 }) => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleSidebar } = useSidebar();
   const pathname = usePathname();
+  
+  // Resize functionality
+  const [sidebarWidth, setSidebarWidth] = useState(290);
+  const [isResizing, setIsResizing] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(true);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const minWidth = 90;
+  const maxWidth = 300;
+
+  useEffect(() => {
+    const checkDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    checkDesktop();
+    window.addEventListener('resize', checkDesktop);
+    return () => window.removeEventListener('resize', checkDesktop);
+  }, []);
+
+  // Sync sidebarWidth with isExpanded from context
+  useEffect(() => {
+    if (isExpanded) {
+      // If expanding and currently at minimum, set to default width
+      if (sidebarWidth === minWidth) {
+        setSidebarWidth(290);
+      }
+    } else {
+      // If collapsing, set to minimum width
+      setSidebarWidth(minWidth);
+    }
+  }, [isExpanded]);
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -120,7 +150,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
                   ? "menu-item-active"
                   : "menu-item-inactive"
               } cursor-pointer ${
-                !isExpanded && !isHovered
+                sidebarWidth < 150
                   ? "lg:justify-center"
                   : "lg:justify-start"
               }`}
@@ -134,10 +164,10 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
               >
                 {nav.icon}
               </span>
-              {(isExpanded || isHovered || isMobileOpen) && (
+              {(sidebarWidth >= 150 || isMobileOpen) && (
                 <span className={`menu-item-text`}>{nav.name}</span>
               )}
-              {(isExpanded || isHovered || isMobileOpen) && (
+              {(sidebarWidth >= 150 || isMobileOpen) && (
                 <ChevronDownIcon
                   className={`ml-auto w-5 h-5 transition-transform duration-200  ${
                     openSubmenu?.type === menuType &&
@@ -165,13 +195,13 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
                 >
                   {nav.icon}
                 </span>
-                {(isExpanded || isHovered || isMobileOpen) && (
+                {(sidebarWidth >= 150 || isMobileOpen) && (
                   <span className={`menu-item-text`}>{nav.name}</span>
                 )}
               </Link>
             )
           )}
-          {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
+          {nav.subItems && (sidebarWidth >= 150 || isMobileOpen) && (
             <div
               ref={(el) => {
                 subMenuRefs.current[`${menuType}-${index}`] = el;
@@ -300,28 +330,64 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
     });
   };
 
+  // Handle resize drag
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+      
+      const newWidth = e.clientX;
+      if (newWidth >= minWidth && newWidth <= maxWidth) {
+        setSidebarWidth(newWidth);
+        // Update isExpanded state based on width
+        if (newWidth > minWidth && !isExpanded) {
+          toggleSidebar();
+        } else if (newWidth === minWidth && isExpanded) {
+          toggleSidebar();
+        }
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'ew-resize';
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing, isExpanded, toggleSidebar]);
+
   return (
     <aside
-      className={`fixed mt-14 flex flex-col lg:mt-0 top-0 px-4.5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 lg:scale-[0.9] origin-top-left lg:h-[111.111%]
-        ${
-          isExpanded || isMobileOpen
-            ? "w-[290px]"
-            : isHovered
-            ? "w-[290px]"
-            : "w-[90px]"
-        }
+      ref={sidebarRef}
+      style={{
+        width: isDesktop ? `${sidebarWidth}px` : isMobileOpen ? '290px' : '90px'
+      }}
+      className={`fixed mt-14 flex flex-col lg:mt-0 top-0 px-4.5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-none duration-300 ease-in-out z-50 border-r border-gray-200 lg:scale-[0.9] origin-top-left lg:h-[111.111%]
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
-      onMouseEnter={() => !isExpanded && setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       <div
         className={`py-7 hidden lg:flex  ${
-          !isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-center"
+          sidebarWidth < 150 ? "lg:justify-center" : "lg:justify-center"
         }`}
       >
         <Link href="/" className="flex items-center justify-center">
-          {isExpanded || isHovered ? (
+          {sidebarWidth >= 150 ? (
             <>
               <Image
                 src="/logo_black.png"
@@ -357,12 +423,12 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
             <div>
               <h2
                 className={`mb-4 mt-4 lg:mt-0 text-[11px] uppercase flex leading-[18px] text-gray-400 ${
-                  !isExpanded && !isHovered
+                  sidebarWidth < 150
                     ? "lg:justify-center"
                     : "justify-start"
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
+                {sidebarWidth >= 150 || isMobileOpen ? (
                   "Menu"
                 ) : (
                   <HorizontaLDots />
@@ -374,12 +440,12 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
             <div className="">
               <h2
                 className={`mb-4 text-[11px] uppercase flex leading-[18px] text-gray-400 ${
-                  !isExpanded && !isHovered
+                  sidebarWidth < 150
                     ? "lg:justify-center"
                     : "justify-start"
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
+                {sidebarWidth >= 150 || isMobileOpen ? (
                   "Others"
                 ) : (
                   <HorizontaLDots />
@@ -389,6 +455,14 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
             </div>
           </div>
         </nav>
+      </div>
+      
+      {/* Resize Handle - Only visible on desktop */}
+      <div
+        className="hidden lg:block absolute top-0 right-0 w-1 h-full cursor-ew-resize hover:bg-brand-500 transition-colors z-50 group"
+        onMouseDown={handleMouseDown}
+      >
+        <div className="absolute top-1/2 -translate-y-1/2 right-0 w-1 h-20 bg-gray-300 dark:bg-gray-700 group-hover:bg-brand-500 transition-colors"></div>
       </div>
     </aside>
   );
