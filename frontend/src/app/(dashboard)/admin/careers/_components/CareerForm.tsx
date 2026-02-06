@@ -234,7 +234,7 @@ export default function CareerForm({ careerId, initialData }: CareerFormProps) {
               name="salary"
               value={formData.salary}
               onChange={handleChange}
-              placeholder="e.g., ৳80,000 - ৳120,000"
+              placeholder="e.g., 80,000 - 120,000 BDT"
               className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
             />
           </div>

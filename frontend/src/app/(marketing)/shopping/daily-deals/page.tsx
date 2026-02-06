@@ -329,7 +329,7 @@ export default function DailyDealsPage() {
                           <VStack align="start" spacing={0}>
                             <HStack spacing={2}>
                               <Text fontSize="2xl" fontWeight="bold" color="orange.500">
-                                ৳{product.price.toLocaleString()}
+                                {product.price.toLocaleString()} BDT
                               </Text>
                               {product.compareAtPrice && product.compareAtPrice > product.price && (
                                 <Text
@@ -337,12 +337,12 @@ export default function DailyDealsPage() {
                                   color={mutedColor}
                                   textDecoration="line-through"
                                 >
-                                  ৳{product.compareAtPrice.toLocaleString()}
+                                  {product.compareAtPrice.toLocaleString()} BDT
                                 </Text>
                               )}
                             </HStack>
                             <Text fontSize="xs" color="green.500" fontWeight="medium">
-                              Save ৳{product.compareAtPrice ? (product.compareAtPrice - product.price).toLocaleString() : 0}
+                              Save {product.compareAtPrice ? (product.compareAtPrice - product.price).toLocaleString() : 0} BDT
                             </Text>
                           </VStack>
 

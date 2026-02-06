@@ -51,7 +51,7 @@ export default function LessonResourcesPage() {
   });
 
   useEffect(() => {
-    document.title = "Lesson Resources - HACKTOLIVE Academy";
+    document.title = "Lesson Resources - HackToLive Academy";
   }, []);
 
   useEffect(() => {

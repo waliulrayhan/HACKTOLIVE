@@ -100,7 +100,7 @@ export default function CareersManagementPage() {
   const fetchControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    document.title = "Career Management - HACKTOLIVE Academy";
+    document.title = "Career Management - HackToLive Academy";
   }, []);
 
   const fetchCareers = useCallback(async () => {

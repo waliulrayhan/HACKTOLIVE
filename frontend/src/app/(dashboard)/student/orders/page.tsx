@@ -86,7 +86,7 @@ export default function OrderHistoryPage() {
   const fetchControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    document.title = "Order History - HACKTOLIVE Academy";
+    document.title = "Order History - HackToLive Academy";
   }, []);
 
   const fetchOrders = useCallback(async () => {
@@ -427,7 +427,7 @@ export default function OrderHistoryPage() {
                           </TableCell>
                           <TableCell className="px-3 py-2.5 sm:px-4 sm:py-3">
                             <span className="text-xs font-semibold text-gray-900 dark:text-white">
-                              ৳{order.total.toLocaleString()}
+                              {order.total.toLocaleString()} BDT
                             </span>
                           </TableCell>
                           <TableCell className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
@@ -605,7 +605,7 @@ export default function OrderHistoryPage() {
                   {selectedOrder.paymentStatus}
                 </Badge>
                 <span className="ml-auto text-lg font-bold text-brand-600 dark:text-brand-400">
-                  ৳{selectedOrder.total.toLocaleString()}
+                  {selectedOrder.total.toLocaleString()} BDT
                 </span>
               </div>
 
@@ -676,11 +676,11 @@ export default function OrderHistoryPage() {
                           <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                             <span>Qty: {item.quantity}</span>
                             <span>•</span>
-                            <span>৳{item.price.toLocaleString()} each</span>
+                            <span>{item.price.toLocaleString()} BDT each</span>
                           </div>
                         </div>
                         <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                          ৳{(item.price * item.quantity).toLocaleString()}
+                          {(item.price * item.quantity).toLocaleString()} BDT
                         </div>
                       </div>
                     ))}

@@ -67,7 +67,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    document.title = "Order Details - HACKTOLIVE Academy";
+    document.title = "Order Details - HackToLive Academy";
   }, []);
 
   useEffect(() => {
@@ -270,13 +270,13 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
                           {item.productName}
                         </h3>
                         <div className="text-sm sm:text-base font-bold text-gray-900 dark:text-white whitespace-nowrap">
-                          ৳{item.total.toLocaleString()}
+                          {item.total.toLocaleString()} BDT
                         </div>
                       </div>
                       <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                         <span>Qty: {item.quantity}</span>
                         <span>•</span>
-                        <span>৳{item.price.toLocaleString()} each</span>
+                        <span>{item.price.toLocaleString()} BDT each</span>
                       </div>
                       {item.voucherCode && (
                         <div className="mt-2">
@@ -363,23 +363,23 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
             <div className="p-3 sm:p-4 space-y-3">
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                 <span>Subtotal</span>
-                <span className="font-medium text-gray-900 dark:text-white">৳{order.subtotal.toLocaleString()}</span>
+                <span className="font-medium text-gray-900 dark:text-white">{order.subtotal.toLocaleString()} BDT</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                 <span>Tax</span>
-                <span className="font-medium text-gray-900 dark:text-white">৳{order.tax.toLocaleString()}</span>
+                <span className="font-medium text-gray-900 dark:text-white">{order.tax.toLocaleString()} BDT</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                 <span>Shipping</span>
                 <span className="font-medium text-gray-900 dark:text-white">
-                  {order.shippingCost === 0 ? 'FREE' : `৳${order.shippingCost.toLocaleString()}`}
+                  {order.shippingCost === 0 ? 'FREE' : `${order.shippingCost.toLocaleString()} BDT`}
                 </span>
               </div>
               <div className="pt-3 border-t border-gray-200 dark:border-white/5">
                 <div className="flex justify-between">
                   <span className="text-base font-semibold text-gray-900 dark:text-white">Total</span>
                   <span className="text-lg font-bold text-brand-600 dark:text-brand-500">
-                    ৳{order.total.toLocaleString()}
+                    {order.total.toLocaleString()} BDT
                   </span>
                 </div>
               </div>

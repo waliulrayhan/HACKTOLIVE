@@ -1,4 +1,4 @@
-# 🚀 HACKTOLIVE - Cybersecurity Learning Platform
+# 🚀 HackToLive - Cybersecurity Learning Platform
 
 A comprehensive cybersecurity education platform with courses, certificates, quizzes, and interactive learning.
 
@@ -55,7 +55,7 @@ A comprehensive cybersecurity education platform with courses, certificates, qui
 ## � Project Structure
 
 ```
-HACKTOLIVE/
+HackToLive/
 ├── backend/              # NestJS backend application
 │   ├── src/
 │   │   ├── academy/     # Academy features (courses, quizzes, certificates)
@@ -92,8 +92,8 @@ HACKTOLIVE/
 
 **1. Clone the repository**
 ```bash
-git clone https://github.com/YOUR_USERNAME/HACKTOLIVE.git
-cd HACKTOLIVE
+git clone https://github.com/YOUR_USERNAME/HackToLive.git
+cd HackToLive
 ```
 
 **2. Backend Setup**
@@ -187,8 +187,8 @@ The application uses Docker for consistent, production-ready deployment.
 ```bash
 ssh root@72.62.71.250
 cd /root
-git clone https://github.com/YOUR_USERNAME/HACKTOLIVE.git
-cd HACKTOLIVE
+git clone https://github.com/YOUR_USERNAME/HackToLive.git
+cd HackToLive
 chmod +x scripts/setup-server.sh
 ./scripts/setup-server.sh
 ```

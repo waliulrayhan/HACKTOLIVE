@@ -38,7 +38,7 @@ echo ""
 echo -e "${GREEN}Starting clean process...${NC}"
 
 # Navigate to project directory
-cd /root/HACKTOLIVE
+cd /root/HackToLive
 
 # Stop all containers
 echo -e "${YELLOW}1. Stopping all containers...${NC}"

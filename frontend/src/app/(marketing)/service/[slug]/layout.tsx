@@ -12,26 +12,26 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!service) {
     return {
-      title: 'Service Not Found - HACKTOLIVE',
+      title: 'Service Not Found - HackToLive',
       description: 'The service you are looking for could not be found.',
     }
   }
 
   return {
-    title: `${service.title} - HACKTOLIVE Services`,
+    title: `${service.title} - HackToLive Services`,
     description: service.shortDescription,
     keywords: [
       service.title,
-      'HACKTOLIVE service',
+      'HackToLive service',
       'cybersecurity',
       'tech services',
       'consulting',
     ],
     openGraph: {
-      title: `${service.title} - HACKTOLIVE`,
+      title: `${service.title} - HackToLive`,
       description: service.shortDescription,
       url: `https://hacktolive.io/service/${slug}`,
-      siteName: 'HACKTOLIVE',
+      siteName: 'HackToLive',
       images: [
         {
           url: '/logo.svg',
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${service.title} - HACKTOLIVE`,
+      title: `${service.title} - HackToLive`,
       description: service.shortDescription,
       images: ['/logo.svg'],
     },

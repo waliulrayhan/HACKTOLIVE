@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==============================================
-# HACKTOLIVE Deployment Script
+# HackToLive Deployment Script
 # Quick deploy script for manual deployment
 # ==============================================
 
@@ -13,7 +13,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-echo -e "${GREEN}🚀 Deploying HACKTOLIVE...${NC}"
+echo -e "${GREEN}🚀 Deploying HackToLive...${NC}"
 echo "=================================="
 
 # Pull latest changes

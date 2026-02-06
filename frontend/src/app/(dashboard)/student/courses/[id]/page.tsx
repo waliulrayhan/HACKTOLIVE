@@ -54,7 +54,7 @@ export default function CourseDetailPage() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
   useEffect(() => {
-    document.title = "Course Details - HACKTOLIVE Academy";
+    document.title = "Course Details - HackToLive Academy";
   }, []);
 
   // Timer for live sessions

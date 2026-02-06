@@ -258,7 +258,7 @@ export class StudentService {
     });
 
     // Get instructor name
-    let instructorName = 'HACKTOLIVE Instructor';
+    let instructorName = 'HackToLive Instructor';
     if (enrollment.course.instructor) {
       const instructorUser = await this.prisma.user.findUnique({
         where: { id: enrollment.course.instructor.userId },

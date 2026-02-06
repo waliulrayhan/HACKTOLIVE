@@ -77,7 +77,7 @@ const jobOpenings: JobPosition[] = [
     location: 'Dhaka, Bangladesh',
     type: 'Full-time',
     experience: '3-5 years',
-    salary: '৳80,000 - ৳120,000',
+    salary: '80,000 - 120,000 BDT',
     description:
       'Lead penetration testing engagements for web applications, mobile apps, and network infrastructure. Mentor junior team members and contribute to our security methodology.',
     requirements: [
@@ -97,7 +97,7 @@ const jobOpenings: JobPosition[] = [
     location: 'Dhaka, Bangladesh',
     type: 'Full-time',
     experience: '2-4 years',
-    salary: '৳60,000 - ৳90,000',
+    salary: '60,000 - 90,000 BDT',
     description:
       'Deliver high-quality cybersecurity training in Bengali. Develop course content, conduct hands-on labs, and guide students through practical scenarios.',
     requirements: [
@@ -117,7 +117,7 @@ const jobOpenings: JobPosition[] = [
     location: 'Dhaka, Bangladesh',
     type: 'Full-time',
     experience: '1-3 years',
-    salary: '৳50,000 - ৳75,000',
+    salary: '50,000 - 75,000 BDT',
     description:
       'Monitor security events, investigate incidents, and respond to threats. Work with SIEM tools and contribute to improving security operations.',
     requirements: [
@@ -137,7 +137,7 @@ const jobOpenings: JobPosition[] = [
     location: 'Dhaka, Bangladesh',
     type: 'Full-time',
     experience: '2-4 years',
-    salary: '৳60,000 - ৳90,000',
+    salary: '60,000 - 90,000 BDT',
     description:
       'Build and maintain our learning platform and internal tools. Work with modern web technologies to create secure, scalable applications.',
     requirements: [

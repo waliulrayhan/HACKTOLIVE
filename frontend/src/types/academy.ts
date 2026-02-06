@@ -1,4 +1,4 @@
-// Academy Types for HACKTOLIVE
+// Academy Types for HackToLive
 
 export type CourseLevel = "fundamental" | "intermediate" | "advanced";
 export type CourseTier = "free" | "premium";

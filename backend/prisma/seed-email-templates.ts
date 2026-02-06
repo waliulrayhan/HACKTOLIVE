@@ -1,5 +1,5 @@
 // How to Run?
-// C:\Users\Rayhan\Desktop\HACKTOLIVE\backend> npx ts-node prisma/seed-email-templates.ts
+// C:\Users\Rayhan\Desktop\HackToLive\backend> npx ts-node prisma/seed-email-templates.ts
 
 import { PrismaClient, EmailTemplateType, EmailSender } from '@prisma/client';
 
@@ -12,7 +12,7 @@ async function seedEmailTemplates() {
     {
       name: 'Registration OTP',
       slug: 'registration-otp',
-      subject: 'Verify Your Email - HACKTOLIVE',
+      subject: 'Verify Your Email - HackToLive',
       type: 'OTP' as EmailTemplateType,
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name', 'code', 'expiryMinutes']),
@@ -45,7 +45,7 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="padding:40px 30px">
           <p style="margin:0 0 20px;color:#333;font-size:16px">Dear <strong>{{name}}</strong>,</p>
-          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Thank you for registering with HACKTOLIVE. To complete your account setup and ensure the security of your account, please verify your email address.</p>
+          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Thank you for registering with HackToLive. To complete your account setup and ensure the security of your account, please verify your email address.</p>
           <p style="margin:0 0 25px;color:#666;font-size:14px;line-height:1.6">Please use the verification code below to complete your registration process:</p>
           <div style="background-color:#f9f9f9;border:2px dashed #84cc16;border-radius:6px;padding:20px;text-align:center;margin:0 0 25px">
             <p style="margin:0 0 5px;color:#999;font-size:12px;text-transform:uppercase;letter-spacing:1px">Verification Code</p>
@@ -53,20 +53,20 @@ async function seedEmailTemplates() {
             <p style="margin:10px 0 0;color:#999;font-size:12px">Valid for {{expiryMinutes}} minutes</p>
           </div>
           <div style="background-color:#fff9e6;border-left:4px solid #fbbf24;padding:15px 20px;border-radius:4px;margin:0 0 25px">
-            <p style="margin:0;color:#666;font-size:13px;line-height:1.6"><strong>Security Notice:</strong> This code will expire in {{expiryMinutes}} minutes. Do not share this code with anyone. HACKTOLIVE staff will never ask for your verification code.</p>
+            <p style="margin:0;color:#666;font-size:13px;line-height:1.6"><strong>Security Notice:</strong> This code will expire in {{expiryMinutes}} minutes. Do not share this code with anyone. HackToLive staff will never ask for your verification code.</p>
           </div>
           <div style="border-top:1px solid #e5e7eb;padding-top:20px">
-            <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">If you did not attempt to register for a HACKTOLIVE account, please disregard this email. Your email address will not be used without verification.</p>
+            <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">If you did not attempt to register for a HackToLive account, please disregard this email. Your email address will not be used without verification.</p>
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Need Help?</strong></p>
             <p style="margin:0;color:#666;font-size:13px">Contact our support team at <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
           </div>
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
-          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -77,7 +77,7 @@ async function seedEmailTemplates() {
     {
       name: 'Login OTP',
       slug: 'login-otp',
-      subject: 'Your Login Code - HACKTOLIVE',
+      subject: 'Your Login Code - HackToLive',
       type: 'OTP' as EmailTemplateType,
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name', 'code', 'expiryMinutes']),
@@ -95,7 +95,7 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="padding:40px 30px">
           <p style="margin:0 0 20px;color:#333;font-size:16px">Dear <strong>{{name}}</strong>,</p>
-          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">We received a request to sign in to your HACKTOLIVE account. To complete the login process and ensure your account security, please use the verification code provided below.</p>
+          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">We received a request to sign in to your HackToLive account. To complete the login process and ensure your account security, please use the verification code provided below.</p>
           <p style="margin:0 0 25px;color:#666;font-size:14px;line-height:1.6">Enter this code on the login verification page to access your account:</p>
           <div style="background-color:#f9f9f9;border:2px dashed #84cc16;border-radius:6px;padding:20px;text-align:center;margin:0 0 25px">
             <p style="margin:0 0 5px;color:#999;font-size:12px;text-transform:uppercase;letter-spacing:1px">Verification Code</p>
@@ -107,17 +107,17 @@ async function seedEmailTemplates() {
             <p style="margin:0;color:#666;font-size:13px;line-height:1.6">If you did not attempt to log in to your account, please ignore this email and consider changing your password immediately. Someone may be trying to access your account without authorization.</p>
           </div>
           <div style="border-top:1px solid #e5e7eb;padding-top:20px">
-            <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">For your security, this code will expire in {{expiryMinutes}} minutes. Never share your verification code with anyone, including HACKTOLIVE staff.</p>
+            <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">For your security, this code will expire in {{expiryMinutes}} minutes. Never share your verification code with anyone, including HackToLive staff.</p>
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Need Assistance?</strong></p>
             <p style="margin:0;color:#666;font-size:13px">Contact our support team at <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
           </div>
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
-          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -128,7 +128,7 @@ async function seedEmailTemplates() {
     {
       name: 'Password Reset OTP',
       slug: 'password-reset-otp',
-      subject: 'Reset Your Password - HACKTOLIVE',
+      subject: 'Reset Your Password - HackToLive',
       type: 'OTP' as EmailTemplateType,
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name', 'code', 'expiryMinutes']),
@@ -146,7 +146,7 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="padding:40px 30px">
           <p style="margin:0 0 20px;color:#333;font-size:16px">Dear <strong>{{name}}</strong>,</p>
-          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">We received a request to reset the password for your HACKTOLIVE account. To proceed with resetting your password, please use the verification code provided below.</p>
+          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">We received a request to reset the password for your HackToLive account. To proceed with resetting your password, please use the verification code provided below.</p>
           <p style="margin:0 0 25px;color:#666;font-size:14px;line-height:1.6">Enter this code on the password reset page to create a new password:</p>
           <div style="background-color:#f9f9f9;border:2px dashed #84cc16;border-radius:6px;padding:20px;text-align:center;margin:0 0 25px">
             <p style="margin:0 0 5px;color:#999;font-size:12px;text-transform:uppercase;letter-spacing:1px">Reset Code</p>
@@ -174,10 +174,10 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
-          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -188,7 +188,7 @@ async function seedEmailTemplates() {
     {
       name: 'Welcome Email',
       slug: 'welcome-email',
-      subject: 'Welcome to HACKTOLIVE! 🚀',
+      subject: 'Welcome to HackToLive! 🚀',
       type: 'GENERAL' as EmailTemplateType,
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name', 'email']),
@@ -202,11 +202,11 @@ async function seedEmailTemplates() {
     <tr><td align="center">
       <table width="600" cellpadding="0" cellspacing="0" style="background-color:#fff;border-radius:8px;overflow:hidden">
         <tr><td style="background-color:#84cc16;padding:30px;text-align:center">
-          <h1 style="margin:0;color:#fff;font-size:24px">Welcome to HACKTOLIVE</h1>
+          <h1 style="margin:0;color:#fff;font-size:24px">Welcome to HackToLive</h1>
         </td></tr>
         <tr><td style="padding:40px 30px">
           <p style="margin:0 0 20px;color:#333;font-size:16px">Dear <strong>{{name}}</strong>,</p>
-          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Welcome to HACKTOLIVE! We are thrilled to have you join our cybersecurity learning community. Your email address <strong>{{email}}</strong> has been successfully verified, and your account is now fully activated.</p>
+          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Welcome to HackToLive! We are thrilled to have you join our cybersecurity learning community. Your email address <strong>{{email}}</strong> has been successfully verified, and your account is now fully activated.</p>
           <p style="margin:0 0 25px;color:#666;font-size:14px;line-height:1.6">You now have complete access to all features and resources available on our platform.</p>
           
           <div style="background-color:#f0fdf4;border-left:4px solid #84cc16;padding:20px;border-radius:4px;margin:0 0 25px">
@@ -241,10 +241,10 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
-          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -255,7 +255,7 @@ async function seedEmailTemplates() {
     {
       name: 'Career Application Received',
       slug: 'career-application-confirmation',
-      subject: 'Application Received - HACKTOLIVE',
+      subject: 'Application Received - HackToLive',
       type: 'GENERAL' as EmailTemplateType,
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name', 'position']),
@@ -273,7 +273,7 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="padding:40px 30px">
           <p style="margin:0 0 20px;color:#333;font-size:16px">Dear <strong>{{name}}</strong>,</p>
-          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Thank you for your interest in joining the HACKTOLIVE team. We have successfully received your application for the <strong>{{position}}</strong> position.</p>
+          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Thank you for your interest in joining the HackToLive team. We have successfully received your application for the <strong>{{position}}</strong> position.</p>
           <p style="margin:0 0 25px;color:#666;font-size:14px;line-height:1.6">This email confirms that your application has been submitted and is now under review by our recruitment team.</p>
           
           <table width="100%" cellpadding="12" cellspacing="0" style="background-color:#f9f9f9;border-radius:6px;margin:0 0 25px;font-size:14px">
@@ -309,15 +309,15 @@ async function seedEmailTemplates() {
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>HR Contact:</strong></p>
             <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:career@hacktolive.net" style="color:#84cc16;text-decoration:none">career@hacktolive.net</a></p>
             <p style="margin:0 0 15px;color:#666;font-size:13px">Website: <a href="https://hacktolive.net" style="color:#84cc16;text-decoration:none">www.hacktolive.net</a></p>
-            <p style="margin:0;color:#666;font-size:13px;line-height:1.6">We appreciate your interest in HACKTOLIVE and look forward to reviewing your application.</p>
+            <p style="margin:0;color:#666;font-size:13px;line-height:1.6">We appreciate your interest in HackToLive and look forward to reviewing your application.</p>
           </div>
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
-          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -328,7 +328,7 @@ async function seedEmailTemplates() {
     {
       name: 'Contact Message Received',
       slug: 'contact-form-confirmation',
-      subject: 'We Received Your Message - HACKTOLIVE',
+      subject: 'We Received Your Message - HackToLive',
       type: 'GENERAL' as EmailTemplateType,
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name']),
@@ -346,7 +346,7 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="padding:40px 30px">
           <p style="margin:0 0 20px;color:#333;font-size:16px">Dear <strong>{{name}}</strong>,</p>
-          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Thank you for reaching out to HACKTOLIVE. We have successfully received your message and appreciate you taking the time to contact us.</p>
+          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Thank you for reaching out to HackToLive. We have successfully received your message and appreciate you taking the time to contact us.</p>
           <p style="margin:0 0 25px;color:#666;font-size:14px;line-height:1.6">This email serves as confirmation that your inquiry has been submitted to our support team and is now being reviewed.</p>
           
           <div style="background-color:#f0fdf4;border-left:4px solid #84cc16;padding:20px;border-radius:4px;margin:0 0 25px">
@@ -374,15 +374,15 @@ async function seedEmailTemplates() {
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Support Contact:</strong></p>
             <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
             <p style="margin:0 0 15px;color:#666;font-size:13px">Website: <a href="https://hacktolive.net" style="color:#84cc16;text-decoration:none">www.hacktolive.net</a></p>
-            <p style="margin:0;color:#666;font-size:13px;line-height:1.6">Thank you for choosing HACKTOLIVE!</p>
+            <p style="margin:0;color:#666;font-size:13px;line-height:1.6">Thank you for choosing HackToLive!</p>
           </div>
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
-          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -393,7 +393,7 @@ async function seedEmailTemplates() {
     {
       name: 'Application Status Update',
       slug: 'career-application-status',
-      subject: 'Update on Your Application - HACKTOLIVE',
+      subject: 'Update on Your Application - HackToLive',
       type: 'GENERAL' as EmailTemplateType,
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['name', 'position', 'status', 'message']),
@@ -411,7 +411,7 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="padding:40px 30px">
           <p style="margin:0 0 20px;color:#333;font-size:16px">Dear <strong>{{name}}</strong>,</p>
-          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Thank you for your continued interest in joining HACKTOLIVE. We are writing to provide you with an important update regarding your application for the <strong>{{position}}</strong> position.</p>
+          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Thank you for your continued interest in joining HackToLive. We are writing to provide you with an important update regarding your application for the <strong>{{position}}</strong> position.</p>
           <p style="margin:0 0 25px;color:#666;font-size:14px;line-height:1.6">Your application has been reviewed by our hiring team, and we would like to inform you of its current status.</p>
           
           <div style="background-color:#f9f9f9;border:2px solid #84cc16;border-radius:6px;padding:25px;text-align:center;margin:0 0 25px">
@@ -443,15 +443,15 @@ async function seedEmailTemplates() {
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>HR Contact:</strong></p>
             <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
             <p style="margin:0 0 15px;color:#666;font-size:13px">Website: <a href="https://hacktolive.net" style="color:#84cc16;text-decoration:none">www.hacktolive.net</a></p>
-            <p style="margin:0;color:#666;font-size:13px;line-height:1.6">We appreciate your interest in HACKTOLIVE and thank you for your patience throughout this process.</p>
+            <p style="margin:0;color:#666;font-size:13px;line-height:1.6">We appreciate your interest in HackToLive and thank you for your patience throughout this process.</p>
           </div>
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
-          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -462,7 +462,7 @@ async function seedEmailTemplates() {
     {
       name: 'Course Enrollment Confirmation',
       slug: 'course-enrollment-confirmation',
-      subject: 'Welcome to {{courseName}} - HACKTOLIVE Academy',
+      subject: 'Welcome to {{courseName}} - HackToLive Academy',
       type: 'COURSE_ENROLLMENT' as EmailTemplateType,
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['studentName', 'courseName', 'courseSlug', 'enrollmentDate', 'courseUrl', 'instructorName', 'isFree']),
@@ -480,7 +480,7 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="padding:40px 30px">
           <p style="margin:0 0 20px;color:#333;font-size:16px">Dear <strong>{{studentName}}</strong>,</p>
-          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Thank you for enrolling in <strong>{{courseName}}</strong> at HACKTOLIVE Academy. We are pleased to confirm that your enrollment has been successfully processed.</p>
+          <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.6">Thank you for enrolling in <strong>{{courseName}}</strong> at HackToLive Academy. We are pleased to confirm that your enrollment has been successfully processed.</p>
           <p style="margin:0 0 30px;color:#666;font-size:14px;line-height:1.6">This email serves as confirmation of your registration and contains important information about your course.</p>
           
           <table width="100%" cellpadding="12" cellspacing="0" style="background-color:#f9f9f9;border-radius:6px;margin:0 0 25px;font-size:14px">
@@ -547,10 +547,10 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
-          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE Academy. All rights reserved.</p>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive Academy. All rights reserved.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -561,7 +561,7 @@ async function seedEmailTemplates() {
     {
       name: 'Order Confirmation (Customer)',
       slug: 'order-confirmation-customer',
-      subject: 'Order Confirmation #{{orderNumber}} - HACKTOLIVE Shop',
+      subject: 'Order Confirmation #{{orderNumber}} - HackToLive Shop',
       type: 'ORDER_CONFIRMATION' as EmailTemplateType,
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['customerName', 'orderNumber', 'orderDate', 'items', 'subtotal', 'shippingCost', 'tax', 'total', 'shippingAddress', 'orderUrl']),
@@ -637,10 +637,10 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
-          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -651,7 +651,7 @@ async function seedEmailTemplates() {
     {
       name: 'New Order Notification (Admin)',
       slug: 'new-order-admin-notification',
-      subject: 'New Order Received #{{orderNumber}} - HACKTOLIVE Shop',
+      subject: 'New Order Received #{{orderNumber}} - HackToLive Shop',
       type: 'GENERAL' as EmailTemplateType,
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['orderNumber', 'orderDate', 'customerName', 'customerEmail', 'total', 'itemCount', 'orderUrl']),
@@ -668,7 +668,7 @@ async function seedEmailTemplates() {
           <h1 style="margin:0;color:#fff;font-size:24px">🛍️ New Order Received</h1>
         </td></tr>
         <tr><td style="padding:40px 30px">
-          <p style="margin:0 0 20px;color:#333;font-size:16px">A new order has been placed on HACKTOLIVE Shop!</p>
+          <p style="margin:0 0 20px;color:#333;font-size:16px">A new order has been placed on HackToLive Shop!</p>
           
           <div style="background-color:#eff6ff;border:2px solid #1e40af;border-radius:6px;padding:20px;text-align:center;margin:0 0 25px">
             <p style="margin:0 0 5px;color:#999;font-size:12px;text-transform:uppercase;letter-spacing:1px">Order Number</p>
@@ -710,10 +710,10 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
-          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -767,10 +767,10 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
-          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -865,10 +865,10 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
-          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE Academy. All rights reserved.</p>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive Academy. All rights reserved.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -879,7 +879,7 @@ async function seedEmailTemplates() {
     {
       name: 'Payment Receipt',
       slug: 'payment-receipt',
-      subject: 'Payment Receipt #{{transactionId}} - HACKTOLIVE',
+      subject: 'Payment Receipt #{{transactionId}} - HackToLive',
       type: 'ORDER_CONFIRMATION' as EmailTemplateType,
       fromEmail: 'NOREPLY' as EmailSender,
       variables: JSON.stringify(['customerName', 'transactionId', 'amount', 'currency', 'paymentDate', 'paymentMethod', 'courseName', 'cardType', 'cardIssuer', 'bankTransactionId']),
@@ -954,15 +954,15 @@ async function seedEmailTemplates() {
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Need Help?</strong></p>
             <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
             <p style="margin:0 0 15px;color:#666;font-size:13px">Website: <a href="https://hacktolive.net" style="color:#84cc16;text-decoration:none">www.hacktolive.net</a></p>
-            <p style="margin:0;color:#666;font-size:13px;line-height:1.6">Thank you for choosing HACKTOLIVE Academy!</p>
+            <p style="margin:0;color:#666;font-size:13px;line-height:1.6">Thank you for choosing HackToLive Academy!</p>
           </div>
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
-          <p style="margin:0;color:#999;font-size:11px">© 2026 HACKTOLIVE Academy. All rights reserved.</p>
+          <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive Academy. All rights reserved.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -1013,12 +1013,12 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HACKTOLIVE" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HACKTOLIVE" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
           <p style="margin:0 0 5px;color:#999;font-size:11px">You're receiving this email because you subscribed to HackToLive newsletter.</p>
           <p style="margin:0;color:#999;font-size:11px"><a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/newsletter/unsubscribe?email={{email}}" style="color:#4299e1;text-decoration:underline">Unsubscribe</a> from our mailing list.</p>
-          <p style="margin:10px 0 0;color:#999;font-size:11px">© 2026 HACKTOLIVE. All rights reserved.</p>
+          <p style="margin:10px 0 0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
       </table>
     </td></tr>

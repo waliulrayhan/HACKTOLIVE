@@ -49,8 +49,8 @@ async function bootstrap() {
   // Swagger configuration - Only in development
   if (!isProduction) {
     const config = new DocumentBuilder()
-      .setTitle('HACKTOLIVE API')
-      .setDescription('The HACKTOLIVE API documentation')
+      .setTitle('HackToLive API')
+      .setDescription('The HackToLive API documentation')
       .setVersion('1.0')
       .addBearerAuth()
       .addTag('auth')

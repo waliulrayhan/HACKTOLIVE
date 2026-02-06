@@ -217,8 +217,8 @@ export default function ShoppingPage() {
         </Text>
         <VStack spacing={4} align="stretch">
           <HStack justify="space-between">
-            <Text fontSize="sm" color={mutedColor}>৳{minPrice}</Text>
-            <Text fontSize="sm" color={mutedColor}>৳{maxPrice}</Text>
+            <Text fontSize="sm" color={mutedColor}>{minPrice} BDT</Text>
+            <Text fontSize="sm" color={mutedColor}>{maxPrice} BDT</Text>
           </HStack>
           <RangeSlider
             value={[minPrice, maxPrice]}
@@ -690,7 +690,7 @@ export default function ShoppingPage() {
                             <VStack align="start" spacing={0}>
                               <HStack spacing={2}>
                                 <Text fontSize="2xl" fontWeight="bold" color="primary.500">
-                                  ৳{product.price.toLocaleString()}
+                                  {product.price.toLocaleString()} BDT
                                 </Text>
                                 {product.compareAtPrice && product.compareAtPrice > product.price && (
                                   <Text
@@ -698,7 +698,7 @@ export default function ShoppingPage() {
                                     color={mutedColor}
                                     textDecoration="line-through"
                                   >
-                                    ৳{product.compareAtPrice.toLocaleString()}
+                                    {product.compareAtPrice.toLocaleString()} BDT
                                   </Text>
                                 )}
                               </HStack>

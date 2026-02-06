@@ -27,7 +27,7 @@ export class CreateCareerDto {
   @IsNotEmpty()
   experience: string;
 
-  @ApiProperty({ example: '৳80,000 - ৳120,000' })
+  @ApiProperty({ example: '80,000 - 120,000 BDT' })
   @IsString()
   @IsNotEmpty()
   salary: string;

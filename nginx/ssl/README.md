@@ -39,7 +39,7 @@ Let's Encrypt certificates expire every 90 days.
 sudo crontab -e
 
 # Add this line:
-0 0 1 * * certbot renew --quiet && cp /etc/letsencrypt/live/YOUR_DOMAIN/fullchain.pem /root/HACKTOLIVE/nginx/ssl/ && cp /etc/letsencrypt/live/YOUR_DOMAIN/privkey.pem /root/HACKTOLIVE/nginx/ssl/ && docker-compose restart nginx
+0 0 1 * * certbot renew --quiet && cp /etc/letsencrypt/live/YOUR_DOMAIN/fullchain.pem /root/HackToLive/nginx/ssl/ && cp /etc/letsencrypt/live/YOUR_DOMAIN/privkey.pem /root/HackToLive/nginx/ssl/ && docker-compose restart nginx
 ```
 
 ### Manual Renewal

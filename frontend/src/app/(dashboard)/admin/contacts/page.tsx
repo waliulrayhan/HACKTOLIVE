@@ -90,7 +90,7 @@ export default function ContactsPage() {
   const fetchControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    document.title = "Contact Management - HACKTOLIVE Academy";
+    document.title = "Contact Management - HackToLive Academy";
   }, []);
 
 

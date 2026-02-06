@@ -59,7 +59,7 @@ export default function AdminCategoriesPage() {
   const fetchControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    document.title = "Category Management - HACKTOLIVE Academy";
+    document.title = "Category Management - HackToLive Academy";
   }, []);
 
   const fetchCategories = useCallback(async () => {

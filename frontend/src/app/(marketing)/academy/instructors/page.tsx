@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import InstructorsListPage from "./_components/InstructorsListPage";
 
 export const metadata: Metadata = {
-  title: "Our Instructors - HACKTOLIVE Academy",
+  title: "Our Instructors - HackToLive Academy",
   description: "Meet our expert cybersecurity instructors with years of real-world experience. Learn from industry professionals who are passionate about teaching.",
   keywords: [
     "cybersecurity instructors",
@@ -12,17 +12,17 @@ export const metadata: Metadata = {
     "cyber experts",
   ],
   openGraph: {
-    title: "Our Expert Instructors - HACKTOLIVE Academy",
+    title: "Our Expert Instructors - HackToLive Academy",
     description:
       "Meet our expert cybersecurity instructors with years of real-world experience. Learn from passionate industry professionals.",
     url: "https://hacktolive.io/academy/instructors",
-    siteName: "HACKTOLIVE",
+    siteName: "HackToLive",
     images: [
       {
         url: "/logo.svg",
         width: 1200,
         height: 630,
-        alt: "HACKTOLIVE Academy Instructors",
+        alt: "HackToLive Academy Instructors",
       },
     ],
     locale: "en_US",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Our Expert Instructors - HACKTOLIVE Academy",
+    title: "Our Expert Instructors - HackToLive Academy",
     description: "Meet our expert cybersecurity instructors.",
     images: ["/logo.svg"],
   },

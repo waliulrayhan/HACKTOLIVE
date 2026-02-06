@@ -107,7 +107,7 @@ export default function InstructorCoursesPage() {
   const fetchControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    document.title = "My Courses - HACKTOLIVE Academy";
+    document.title = "My Courses - HackToLive Academy";
   }, []);
 
   const fetchCourses = useCallback(async () => {

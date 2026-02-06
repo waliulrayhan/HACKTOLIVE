@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import AllCoursesPage from "./_components/AllCoursesPage";
 
 export const metadata: Metadata = {
-  title: "All Courses - HACKTOLIVE Academy",
+  title: "All Courses - HackToLive Academy",
   description:
     "Browse all cybersecurity courses. Filter by category, level, and price. Learn ethical hacking, web security, network security, and more.",
   keywords: [
@@ -14,17 +14,17 @@ export const metadata: Metadata = {
     "security courses",
   ],
   openGraph: {
-    title: "All Courses - HACKTOLIVE Academy",
+    title: "All Courses - HackToLive Academy",
     description:
       "Browse all cybersecurity courses. Learn ethical hacking, web security, and network security from industry experts.",
     url: "https://hacktolive.io/academy/courses",
-    siteName: "HACKTOLIVE",
+    siteName: "HackToLive",
     images: [
       {
         url: "/logo.svg",
         width: 1200,
         height: 630,
-        alt: "HACKTOLIVE Academy Courses",
+        alt: "HackToLive Academy Courses",
       },
     ],
     locale: "en_US",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "All Courses - HACKTOLIVE Academy",
+    title: "All Courses - HackToLive Academy",
     description: "Browse all cybersecurity courses. Learn from industry experts.",
     images: ["/logo.svg"],
   },

@@ -101,7 +101,7 @@ export default function StudentProgressPage() {
   const [activeTab, setActiveTab] = useState<"lessons" | "quizzes" | "assignments">("lessons");
 
   useEffect(() => {
-    document.title = "Student Progress - HACKTOLIVE Academy";
+    document.title = "Student Progress - HackToLive Academy";
   }, []);
 
   useEffect(() => {

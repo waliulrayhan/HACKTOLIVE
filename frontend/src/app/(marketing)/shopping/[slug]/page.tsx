@@ -276,7 +276,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
                 <HStack spacing={3} align="baseline">
                   <Text fontSize="3xl" fontWeight="bold" color="primary.500">
-                    ৳{product.price.toLocaleString()}
+                    {product.price.toLocaleString()} BDT
                   </Text>
                   {product.compareAtPrice && product.compareAtPrice > product.price && (
                     <VStack spacing={0} align="start">
@@ -285,7 +285,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                         color={mutedColor}
                         textDecoration="line-through"
                       >
-                        ৳{product.compareAtPrice.toLocaleString()}
+                        {product.compareAtPrice.toLocaleString()} BDT
                       </Text>
                       <Badge colorScheme="green" fontSize="xs">
                         {Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}% OFF
@@ -399,7 +399,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                 <VStack spacing={3} align="start">
                   <HStack>
                     <Icon as={FiTruck} color="primary.500" />
-                    <Text fontSize="sm">Free shipping on orders over ৳1000</Text>
+                    <Text fontSize="sm">Free shipping on orders over 1000 BDT</Text>
                   </HStack>
                   <HStack>
                     <Icon as={FiShield} color="primary.500" />

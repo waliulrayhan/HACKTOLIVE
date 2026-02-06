@@ -463,7 +463,7 @@ export class PaymentService {
         }
 
         // Get instructor name for email
-        let instructorName = 'HACKTOLIVE Instructor';
+        let instructorName = 'HackToLive Instructor';
         if (payment.course?.instructorId) {
           const instructor = await this.prisma.instructor.findUnique({
             where: { id: payment.course.instructorId },

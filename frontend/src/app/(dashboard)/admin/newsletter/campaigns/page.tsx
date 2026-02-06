@@ -85,7 +85,7 @@ export default function CampaignsPage() {
   const fetchControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    document.title = "Email Campaigns - HACKTOLIVE Academy";
+    document.title = "Email Campaigns - HackToLive Academy";
   }, []);
 
   const fetchCampaigns = useCallback(async () => {

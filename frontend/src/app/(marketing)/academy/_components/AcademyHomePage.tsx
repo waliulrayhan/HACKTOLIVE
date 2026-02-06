@@ -864,7 +864,7 @@ export default function AcademyHomePage() {
                   Ready to Start Your <Em>Cybersecurity Journey?</Em>
                 </Heading>
                 <Text fontSize={{ base: 'md', md: 'lg' }} color={textMuted} maxW="2xl">
-                  Join HACKTOLIVE Academy today and learn from the best. Get lifetime access to all
+                  Join HackToLive Academy today and learn from the best. Get lifetime access to all
                   course materials and join our thriving community of cyber warriors.
                 </Text>
                 <Flex gap={{ base: '2', sm: '4' }} flexDirection="row" pt="4" width="100%" justify="center">

@@ -1,12 +1,12 @@
 /**
- * Metadata Utilities for HACKTOLIVE
+ * Metadata Utilities for HackToLive
  * 
  * This file contains utility functions and constants for generating
  * consistent metadata across the application.
  */
 
 export const SITE_CONFIG = {
-  name: 'HACKTOLIVE',
+  name: 'HackToLive',
   url: 'https://hacktolive.io',
   description: 'Expert cybersecurity training, web development services, and tech solutions.',
   ogImage: '/logo.svg', // Replace with actual OG image path when available (1200x630)

@@ -1,8 +1,8 @@
-# HACKTOLIVE Academy API Documentation
+# HackToLive Academy API Documentation
 
 ## Overview
 
-The HACKTOLIVE Academy API provides comprehensive endpoints for managing an online cybersecurity education platform. This API supports courses, instructors, enrollments, reviews, certificates, quizzes, and student progress tracking.
+The HackToLive Academy API provides comprehensive endpoints for managing an online cybersecurity education platform. This API supports courses, instructors, enrollments, reviews, certificates, quizzes, and student progress tracking.
 
 ## Database Schema
 

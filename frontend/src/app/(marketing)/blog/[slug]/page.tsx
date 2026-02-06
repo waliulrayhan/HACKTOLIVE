@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const blog = await blogApi.getBlogBySlug(slug);
 
     return {
-      title: `${blog.title} - HACKTOLIVE Blog`,
+      title: `${blog.title} - HackToLive Blog`,
       description: blog.metadata,
       keywords: blog.tags.join(", "),
       authors: [{ name: blog.author.name }],
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: blog.title,
         description: blog.metadata,
         url: `https://hacktolive.io/blog/${slug}`,
-        siteName: "HACKTOLIVE",
+        siteName: "HackToLive",
         type: "article",
         publishedTime: blog.publishDate,
         authors: [blog.author.name],
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   } catch {
     return {
-      title: "Blog Not Found - HACKTOLIVE",
+      title: "Blog Not Found - HackToLive",
       description: "The blog post you're looking for could not be found.",
     };
   }

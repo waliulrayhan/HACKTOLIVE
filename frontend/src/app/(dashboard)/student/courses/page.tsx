@@ -70,7 +70,7 @@ export default function MyCoursesPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   useEffect(() => {
-    document.title = "My Courses - HACKTOLIVE Academy";
+    document.title = "My Courses - HackToLive Academy";
   }, []);
 
   useEffect(() => {

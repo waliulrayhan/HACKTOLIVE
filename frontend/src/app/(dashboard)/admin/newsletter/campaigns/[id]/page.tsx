@@ -50,7 +50,7 @@ export default function CampaignDetailPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    document.title = "Campaign Details - HACKTOLIVE Academy";
+    document.title = "Campaign Details - HackToLive Academy";
     if (campaignId) {
       fetchCampaign();
     }

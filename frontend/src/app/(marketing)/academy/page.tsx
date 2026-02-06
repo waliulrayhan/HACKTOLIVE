@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import AcademyHomePage from "./_components/AcademyHomePage";
 
 export const metadata: Metadata = {
-  title: "HACKTOLIVE Academy - Learn Cybersecurity from Experts",
+  title: "HackToLive Academy - Learn Cybersecurity from Experts",
   description:
     "Master cybersecurity with expert-led courses. Learn ethical hacking, web security, penetration testing, and more. Join live batches and earn certificates.",
   keywords: [
@@ -16,17 +16,17 @@ export const metadata: Metadata = {
     "security certification",
   ],
   openGraph: {
-    title: "HACKTOLIVE Academy - Learn Cybersecurity from Experts",
+    title: "HackToLive Academy - Learn Cybersecurity from Experts",
     description:
       "Master cybersecurity with expert-led courses. Learn ethical hacking, web security, and penetration testing. Join live batches and earn certificates.",
     url: "https://hacktolive.io/academy",
-    siteName: "HACKTOLIVE",
+    siteName: "HackToLive",
     images: [
       {
         url: "/logo.svg",
         width: 1200,
         height: 630,
-        alt: "HACKTOLIVE Academy",
+        alt: "HackToLive Academy",
       },
     ],
     locale: "en_US",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "HACKTOLIVE Academy - Learn Cybersecurity",
+    title: "HackToLive Academy - Learn Cybersecurity",
     description:
       "Master cybersecurity with expert-led courses. Ethical hacking, web security, and penetration testing.",
     images: ["/logo.svg"],

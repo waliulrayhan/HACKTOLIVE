@@ -134,7 +134,7 @@ export default function AdminPaymentsPage() {
   const fetchControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    document.title = "Payment Management - HACKTOLIVE Academy";
+    document.title = "Payment Management - HackToLive Academy";
   }, []);
 
   const fetchPayments = useCallback(async () => {

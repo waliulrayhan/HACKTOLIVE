@@ -321,7 +321,7 @@ export default function VouchersPage() {
                               Total
                             </Text>
                             <Text fontSize="3xl" fontWeight="bold" color={accentGreen}>
-                              ৳{calculateTotal().toLocaleString()}
+                              {calculateTotal().toLocaleString()} BDT
                             </Text>
                           </HStack>
                           <Text color="whiteAlpha.600" fontSize="xs">
@@ -523,7 +523,7 @@ export default function VouchersPage() {
                             <VStack align="start" spacing={0}>
                               <HStack spacing={2}>
                                 <Text fontSize="2xl" fontWeight="bold" color="primary.500">
-                                  ৳{product.price.toLocaleString()}
+                                  {product.price.toLocaleString()} BDT
                                 </Text>
                                 {product.compareAtPrice && product.compareAtPrice > product.price && (
                                   <Text
@@ -531,7 +531,7 @@ export default function VouchersPage() {
                                     color={mutedColor}
                                     textDecoration="line-through"
                                   >
-                                    ৳{product.compareAtPrice.toLocaleString()}
+                                    {product.compareAtPrice.toLocaleString()} BDT
                                   </Text>
                                 )}
                               </HStack>

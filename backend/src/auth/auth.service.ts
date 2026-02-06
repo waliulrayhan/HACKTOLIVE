@@ -118,20 +118,20 @@ export class AuthService {
       // If template doesn't exist, send basic welcome email
       const welcomeBody = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #6366f1;">Welcome to HACKTOLIVE! 🎉</h1>
+          <h1 style="color: #6366f1;">Welcome to HackToLive! 🎉</h1>
           <p>Hello ${user.name || 'User'},</p>
-          <p>Thank you for joining HACKTOLIVE Academy! We're excited to have you as part of our community.</p>
+          <p>Thank you for joining HackToLive Academy! We're excited to have you as part of our community.</p>
           <p>You've taken the first step toward mastering cybersecurity and ethical hacking.</p>
           <p>Your email has been verified successfully. You can now explore all our courses and resources!</p>
           <br>
-          <p>Best regards,<br>HACKTOLIVE Team</p>
+          <p>Best regards,<br>HackToLive Team</p>
         </div>
       `;
       
       await this.emailService.sendEmail({
         from: 'noreply',
         to: user.email,
-        subject: 'Welcome to HACKTOLIVE! 🚀',
+        subject: 'Welcome to HackToLive! 🚀',
         body: welcomeBody,
       });
     }

@@ -85,7 +85,7 @@ export default function PendingBlogsPage() {
   const fetchControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    document.title = "Pending Blogs - Admin - HACKTOLIVE Academy";
+    document.title = "Pending Blogs - Admin - HackToLive Academy";
   }, []);
 
   const fetchPendingBlogs = useCallback(async () => {

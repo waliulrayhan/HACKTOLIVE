@@ -72,7 +72,7 @@ export default function AdminOrdersPage() {
   const fetchControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    document.title = "Order Management - HACKTOLIVE Academy";
+    document.title = "Order Management - HackToLive Academy";
   }, []);
 
   const fetchOrders = useCallback(async () => {
@@ -264,7 +264,7 @@ export default function AdminOrdersPage() {
             <div>
               <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Revenue</p>
               <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">
-                ৳{totalRevenue.toLocaleString()}
+                {totalRevenue.toLocaleString()} BDT
               </p>
             </div>
           </div>
@@ -414,7 +414,7 @@ export default function AdminOrdersPage() {
                     </TableCell>
                     <TableCell className="px-3 py-2.5 sm:px-4 sm:py-3">
                       <span className="text-xs font-semibold text-gray-900 dark:text-white">
-                        ৳{order.total.toLocaleString()}
+                        {order.total.toLocaleString()} BDT
                       </span>
                     </TableCell>
                     <TableCell className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
@@ -593,7 +593,7 @@ export default function AdminOrdersPage() {
                   {selectedOrder.paymentStatus}
                 </Badge>
                 <span className="ml-auto text-lg font-bold text-brand-600 dark:text-brand-400">
-                  ৳{selectedOrder.total.toLocaleString()}
+                  {selectedOrder.total.toLocaleString()} BDT
                 </span>
               </div>
 
@@ -687,9 +687,9 @@ export default function AdminOrdersPage() {
                           </div>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-sm font-bold text-gray-900 dark:text-white">৳{item.total.toLocaleString()}</p>
+                          <p className="text-sm font-bold text-gray-900 dark:text-white">{item.total.toLocaleString()} BDT</p>
                           {item.quantity > 1 && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400">৳{(item.total / item.quantity).toLocaleString()} each</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{(item.total / item.quantity).toLocaleString()} BDT each</p>
                           )}
                         </div>
                       </div>
@@ -701,19 +701,19 @@ export default function AdminOrdersPage() {
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
-                        <span className="font-medium text-gray-900 dark:text-white">৳{selectedOrder.subtotal.toLocaleString()}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{selectedOrder.subtotal.toLocaleString()} BDT</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600 dark:text-gray-400">Shipping</span>
-                        <span className="font-medium text-gray-900 dark:text-white">৳{selectedOrder.shippingCost.toLocaleString()}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{selectedOrder.shippingCost.toLocaleString()} BDT</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600 dark:text-gray-400">Tax</span>
-                        <span className="font-medium text-gray-900 dark:text-white">৳{selectedOrder.tax.toLocaleString()}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{selectedOrder.tax.toLocaleString()} BDT</span>
                       </div>
                       <div className="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-2">
                         <span className="text-base font-semibold text-gray-900 dark:text-white">Total</span>
-                        <span className="text-lg font-bold text-brand-600 dark:text-brand-400">৳{selectedOrder.total.toLocaleString()}</span>
+                        <span className="text-lg font-bold text-brand-600 dark:text-brand-400">{selectedOrder.total.toLocaleString()} BDT</span>
                       </div>
                     </div>
                   </div>

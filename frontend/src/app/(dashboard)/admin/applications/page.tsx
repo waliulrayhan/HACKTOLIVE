@@ -113,7 +113,7 @@ export default function ApplicationsManagementPage() {
   const fetchControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    document.title = "Applications Management - HACKTOLIVE Academy";
+    document.title = "Applications Management - HackToLive Academy";
   }, []);
 
   const fetchApplications = useCallback(async () => {

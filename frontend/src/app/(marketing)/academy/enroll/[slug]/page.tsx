@@ -12,13 +12,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const courseTitle = slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
   return {
-    title: `Enroll in ${courseTitle} - HACKTOLIVE Academy`,
+    title: `Enroll in ${courseTitle} - HackToLive Academy`,
     description: `Enroll in ${courseTitle} to start your cybersecurity journey. Secure your spot and begin learning today.`,
     openGraph: {
-      title: `Enroll in ${courseTitle} - HACKTOLIVE Academy`,
+      title: `Enroll in ${courseTitle} - HackToLive Academy`,
       description: `Start your cybersecurity journey. Enroll in ${courseTitle} today.`,
       url: `https://hacktolive.io/academy/enroll/${slug}`,
-      siteName: "HACKTOLIVE",
+      siteName: "HackToLive",
       images: [
         {
           url: "/logo.svg",

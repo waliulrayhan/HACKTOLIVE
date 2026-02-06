@@ -39,7 +39,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    document.title = "Admin Dashboard - HACKTOLIVE Academy";
+    document.title = "Admin Dashboard - HackToLive Academy";
   }, []);
 
   useEffect(() => {

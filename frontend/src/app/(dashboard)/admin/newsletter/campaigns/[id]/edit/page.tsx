@@ -39,7 +39,7 @@ export default function EditCampaignPage() {
   });
 
   useEffect(() => {
-    document.title = "Edit Email Campaign - HACKTOLIVE Academy";
+    document.title = "Edit Email Campaign - HackToLive Academy";
     if (campaignId) {
       fetchCampaign();
     }

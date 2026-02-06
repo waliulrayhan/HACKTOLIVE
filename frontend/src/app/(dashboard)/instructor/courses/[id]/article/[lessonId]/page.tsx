@@ -49,7 +49,7 @@ export default function ArticleManagementPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    document.title = "Edit Article - HACKTOLIVE Academy";
+    document.title = "Edit Article - HackToLive Academy";
   }, []);
 
   const editor = useEditor({

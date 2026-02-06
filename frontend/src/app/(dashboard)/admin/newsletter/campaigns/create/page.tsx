@@ -28,7 +28,7 @@ export default function CreateCampaignPage() {
   });
 
   useEffect(() => {
-    document.title = "Create Email Campaign - HACKTOLIVE Academy";
+    document.title = "Create Email Campaign - HackToLive Academy";
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

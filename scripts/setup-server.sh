@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # ==============================================
-# Server Setup Script for HACKTOLIVE
+# Server Setup Script for HackToLive
 # Run this script once on your production server
 # ==============================================
 
 set -e
 
-echo "🚀 HACKTOLIVE Server Setup Script"
+echo "🚀 HackToLive Server Setup Script"
 echo "=================================="
 
 # Colors for output
@@ -82,11 +82,11 @@ echo "y" | ufw enable
 echo -e "${GREEN}✅ Firewall configured${NC}"
 
 echo -e "${GREEN}Step 6: Setting up project directory...${NC}"
-mkdir -p /root/HACKTOLIVE
-cd /root/HACKTOLIVE
+mkdir -p /root/HackToLive
+cd /root/HackToLive
 
 # Ask for GitHub repository URL
-echo -e "${YELLOW}Enter your GitHub repository URL (e.g., https://github.com/username/HACKTOLIVE.git):${NC}"
+echo -e "${YELLOW}Enter your GitHub repository URL (e.g., https://github.com/username/HackToLive.git):${NC}"
 read -r REPO_URL
 
 if [ -d ".git" ]; then

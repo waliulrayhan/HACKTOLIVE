@@ -12,20 +12,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const productTitle = slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 
   return {
-    title: `${productTitle} - HACKTOLIVE Shop`,
-    description: `Buy ${productTitle} from HACKTOLIVE. Quality tech products with secure checkout and fast delivery.`,
+    title: `${productTitle} - HackToLive Shop`,
+    description: `Buy ${productTitle} from HackToLive. Quality tech products with secure checkout and fast delivery.`,
     keywords: [
       productTitle,
       'buy tech product',
       'cybersecurity tools',
       'tech equipment',
-      'HACKTOLIVE shop',
+      'HackToLive shop',
     ],
     openGraph: {
-      title: `${productTitle} - HACKTOLIVE Shop`,
-      description: `Buy ${productTitle} from HACKTOLIVE. Quality products with secure checkout and fast delivery.`,
+      title: `${productTitle} - HackToLive Shop`,
+      description: `Buy ${productTitle} from HackToLive. Quality products with secure checkout and fast delivery.`,
       url: `https://hacktolive.io/shopping/${slug}`,
-      siteName: 'HACKTOLIVE',
+      siteName: 'HackToLive',
       images: [
         {
           url: '/logo.svg',
@@ -39,8 +39,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${productTitle} - HACKTOLIVE Shop`,
-      description: `Buy ${productTitle} from HACKTOLIVE.`,
+      title: `${productTitle} - HackToLive Shop`,
+      description: `Buy ${productTitle} from HackToLive.`,
       images: ['/logo.svg'],
     },
   }

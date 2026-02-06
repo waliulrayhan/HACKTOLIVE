@@ -8,7 +8,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const courseTitle = slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   
   return {
-    title: `${courseTitle} - HACKTOLIVE Academy`,
+    title: `${courseTitle} - HackToLive Academy`,
     description: `Learn ${courseTitle} with expert-led cybersecurity training. Hands-on labs, live sessions, and industry-recognized certification.`,
     keywords: [
       courseTitle,
@@ -18,10 +18,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       "hands-on learning",
     ],
     openGraph: {
-      title: `${courseTitle} - HACKTOLIVE Academy`,
+      title: `${courseTitle} - HackToLive Academy`,
       description: `Master ${courseTitle} with expert-led training, hands-on labs, and live sessions. Earn your certification.`,
       url: `https://hacktolive.io/academy/courses/${slug}`,
-      siteName: "HACKTOLIVE",
+      siteName: "HackToLive",
       images: [
         {
           url: "/logo.svg",
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: {
       card: "summary_large_image",
-      title: `${courseTitle} - HACKTOLIVE Academy`,
+      title: `${courseTitle} - HackToLive Academy`,
       description: `Master ${courseTitle} with expert-led training and hands-on labs.`,
       images: ["/logo.svg"],
     },

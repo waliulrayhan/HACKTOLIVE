@@ -381,7 +381,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
                           )}
                         </VStack>
                         <Text fontWeight="bold" fontSize="lg" color={accentColor}>
-                          ৳{item.total.toLocaleString()}
+                          {item.total.toLocaleString()} BDT
                         </Text>
                       </HStack>
                     ))}
@@ -394,7 +394,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
                       <Text fontSize="sm" color={mutedColor}>
                         Subtotal
                       </Text>
-                      <Text fontWeight="semibold">৳{order.subtotal.toLocaleString()}</Text>
+                      <Text fontWeight="semibold">{order.subtotal.toLocaleString()} BDT</Text>
                     </HStack>
                     <HStack justify="space-between" width="100%">
                       <HStack spacing={2}>
@@ -409,14 +409,14 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
                       >
                         {order.shippingCost === 0
                           ? 'FREE'
-                          : `৳${order.shippingCost.toLocaleString()}`}
+                          : `${order.shippingCost.toLocaleString()} BDT`}
                       </Text>
                     </HStack>
                     <HStack justify="space-between" width="100%">
                       <Text fontSize="sm" color={mutedColor}>
                         Tax
                       </Text>
-                      <Text fontWeight="semibold">৳{order.tax.toLocaleString()}</Text>
+                      <Text fontWeight="semibold">{order.tax.toLocaleString()} BDT</Text>
                     </HStack>
                     <Divider />
                     <HStack justify="space-between" width="100%" pt={2}>
@@ -424,7 +424,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
                         Total
                       </Text>
                       <Text fontSize="2xl" fontWeight="bold" color={accentColor}>
-                        ৳{order.total.toLocaleString()}
+                        {order.total.toLocaleString()} BDT
                       </Text>
                     </HStack>
                   </VStack>

@@ -76,7 +76,7 @@ export default function EditProductPage() {
     });
 
     useEffect(() => {
-        document.title = "Edit Product - HACKTOLIVE Academy";
+        document.title = "Edit Product - HackToLive Academy";
         fetchCategories();
         fetchCourses();
         fetchProduct();
@@ -488,7 +488,7 @@ export default function EditProductPage() {
                                                 ? 'border-red-500 focus:border-red-500'
                                                 : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
                                             }`}
-                                        placeholder="e.g., HACKTOLIVE Premium T-Shirt"
+                                        placeholder="e.g., HackToLive Premium T-Shirt"
                                     />
                                     {errors.name && <p className="mt-1.5 text-xs text-red-500">{errors.name}</p>}
                                 </div>
@@ -674,7 +674,7 @@ export default function EditProductPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Price (৳) <span className="text-red-500">*</span>
+                                        Price (BDT) <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="number"
@@ -693,7 +693,7 @@ export default function EditProductPage() {
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Compare At Price (৳)
+                                        Compare At Price (BDT)
                                     </label>
                                     <input
                                         type="number"
@@ -915,7 +915,7 @@ export default function EditProductPage() {
                                         value={formData.seoTitle}
                                         onChange={handleInputChange}
                                         className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                                        placeholder="Product name - HACKTOLIVE Academy"
+                                        placeholder="Product name - HackToLive Academy"
                                     />
                                 </div>
 
@@ -988,7 +988,7 @@ export default function EditProductPage() {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     <div>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">Price</p>
-                                        <p className="text-base font-semibold text-gray-900 dark:text-white">৳{formData.price.toLocaleString()}</p>
+                                        <p className="text-base font-semibold text-gray-900 dark:text-white">{formData.price.toLocaleString()} BDT</p>
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">Stock</p>

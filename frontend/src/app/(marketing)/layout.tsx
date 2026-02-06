@@ -4,8 +4,8 @@ import { CartProvider } from '@/context/CartContext'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'HACKTOLIVE - Cybersecurity, Development & Tech Solutions',
-  description: 'HACKTOLIVE offers expert cybersecurity training, web development services, software solutions, and tech consultancy. Learn from industry experts, build secure applications, and grow your career in technology.',
+  title: 'HackToLive - Cybersecurity, Development & Tech Solutions',
+  description: 'HackToLive offers expert cybersecurity training, web development services, software solutions, and tech consultancy. Learn from industry experts, build secure applications, and grow your career in technology.',
   keywords: [
     'cybersecurity',
     'ethical hacking',
@@ -16,20 +16,20 @@ export const metadata: Metadata = {
     'security consulting',
     'online courses',
     'IT services',
-    'HACKTOLIVE'
+    'HackToLive'
   ],
-  authors: [{ name: 'HACKTOLIVE' }],
+  authors: [{ name: 'HackToLive' }],
   openGraph: {
-    title: 'HACKTOLIVE - Cybersecurity, Development & Tech Solutions',
+    title: 'HackToLive - Cybersecurity, Development & Tech Solutions',
     description: 'Expert cybersecurity training, web development services, and tech solutions. Learn from industry professionals and advance your tech career.',
     url: 'https://hacktolive.io',
-    siteName: 'HACKTOLIVE',
+    siteName: 'HackToLive',
     images: [
       {
         url: '/logo.svg',
         width: 1200,
         height: 630,
-        alt: 'HACKTOLIVE Logo',
+        alt: 'HackToLive Logo',
       },
     ],
     locale: 'en_US',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'HACKTOLIVE - Cybersecurity, Development & Tech Solutions',
+    title: 'HackToLive - Cybersecurity, Development & Tech Solutions',
     description: 'Expert cybersecurity training, web development services, and tech solutions.',
     images: ['/logo.svg'],
   },

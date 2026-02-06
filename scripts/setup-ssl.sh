@@ -29,16 +29,16 @@ certbot certonly --standalone \
 
 # Copy certificates to nginx ssl directory
 echo "Copying certificates to nginx directory..."
-mkdir -p /root/HACKTOLIVE/nginx/ssl
-cp /etc/letsencrypt/live/hacktolive.io/fullchain.pem /root/HACKTOLIVE/nginx/ssl/
-cp /etc/letsencrypt/live/hacktolive.io/privkey.pem /root/HACKTOLIVE/nginx/ssl/
+mkdir -p /root/HackToLive/nginx/ssl
+cp /etc/letsencrypt/live/hacktolive.io/fullchain.pem /root/HackToLive/nginx/ssl/
+cp /etc/letsencrypt/live/hacktolive.io/privkey.pem /root/HackToLive/nginx/ssl/
 
 # Set proper permissions
-chmod 644 /root/HACKTOLIVE/nginx/ssl/fullchain.pem
-chmod 600 /root/HACKTOLIVE/nginx/ssl/privkey.pem
+chmod 644 /root/HackToLive/nginx/ssl/fullchain.pem
+chmod 600 /root/HackToLive/nginx/ssl/privkey.pem
 
 # Restart nginx
-cd /root/HACKTOLIVE
+cd /root/HackToLive
 docker-compose up -d nginx
 
 echo "✅ SSL certificates installed successfully!"

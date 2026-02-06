@@ -61,7 +61,7 @@ export default function CertificatesPage() {
   const [nameError, setNameError] = useState("");
 
   useEffect(() => {
-    document.title = "My Certificates - HACKTOLIVE Academy";
+    document.title = "My Certificates - HackToLive Academy";
   }, []);
 
   useEffect(() => {

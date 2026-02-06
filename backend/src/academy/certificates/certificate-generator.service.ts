@@ -168,7 +168,7 @@ export class CertificateGeneratorService {
       .fontSize(28)
       .font('Helvetica-Bold')
       .fillColor('#6366f1')
-      .text('HACKTOLIVE', 0, 60, {
+      .text('HackToLive', 0, 60, {
         align: 'center',
         width: doc.page.width,
       });

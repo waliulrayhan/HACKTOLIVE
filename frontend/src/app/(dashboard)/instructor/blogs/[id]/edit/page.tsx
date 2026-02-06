@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import BlogForm from "../../_components/BlogForm";
 
 export const metadata: Metadata = {
-  title: "Edit Blog Post - HACKTOLIVE Academy",
+  title: "Edit Blog Post - HackToLive Academy",
   description:
     "Edit and update your blog post content, images, and metadata.",
 };

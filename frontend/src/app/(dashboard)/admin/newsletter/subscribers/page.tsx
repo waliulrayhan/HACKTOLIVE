@@ -71,7 +71,7 @@ export default function SubscribersPage() {
   const fetchControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    document.title = "Newsletter Subscribers - HACKTOLIVE Academy";
+    document.title = "Newsletter Subscribers - HackToLive Academy";
   }, []);
 
   const fetchSubscribers = useCallback(async () => {

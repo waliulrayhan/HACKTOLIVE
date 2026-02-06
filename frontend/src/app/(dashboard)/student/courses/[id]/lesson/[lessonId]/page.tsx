@@ -206,7 +206,7 @@ export default function StudentLessonPage() {
   }, [quizStarted, timeRemaining]);
 
   useEffect(() => {
-    document.title = "Lesson - HACKTOLIVE Academy";
+    document.title = "Lesson - HackToLive Academy";
   }, []);
 
   const fetchLesson = async () => {

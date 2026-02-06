@@ -285,7 +285,7 @@ export default function CartPage() {
                               )}
 
                               <Text fontSize="xl" fontWeight="bold" color={accentColor}>
-                                ৳{item.price.toLocaleString()}
+                                {item.price.toLocaleString()} BDT
                               </Text>
 
                               {/* Quantity Controls */}
@@ -347,7 +347,7 @@ export default function CartPage() {
                             {/* Item Total */}
                             <VStack align="end" justify="space-between" minW="100px">
                               <Text fontSize="lg" fontWeight="bold">
-                                ৳{(item.price * item.quantity).toLocaleString()}
+                                {(item.price * item.quantity).toLocaleString()} BDT
                               </Text>
                             </VStack>
                           </Flex>
@@ -379,21 +379,21 @@ export default function CartPage() {
                           <HStack justify="space-between">
                             <Text color={mutedColor}>Subtotal</Text>
                             <Text fontWeight="semibold">
-                              ৳{cart.subtotal.toLocaleString()}
+                              {cart.subtotal.toLocaleString()} BDT
                             </Text>
                           </HStack>
 
                           <HStack justify="space-between">
                             <Text color={mutedColor}>Shipping</Text>
                             <Text fontWeight="semibold" color="green.500">
-                              {shipping === 0 ? 'FREE' : `৳${shipping.toLocaleString()}`}
+                              {shipping === 0 ? 'FREE' : `${shipping.toLocaleString()} BDT`}
                             </Text>
                           </HStack>
 
                           <HStack justify="space-between">
                             <Text color={mutedColor}>Tax</Text>
                             <Text fontWeight="semibold">
-                              ৳{tax.toLocaleString()}
+                              {tax.toLocaleString()} BDT
                             </Text>
                           </HStack>
                         </VStack>
@@ -405,7 +405,7 @@ export default function CartPage() {
                             Total
                           </Text>
                           <Text fontSize="2xl" fontWeight="bold" color={accentColor}>
-                            ৳{total.toLocaleString()}
+                            {total.toLocaleString()} BDT
                           </Text>
                         </HStack>
 

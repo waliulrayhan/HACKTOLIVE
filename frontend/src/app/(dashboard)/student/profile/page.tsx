@@ -7,7 +7,7 @@ import { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "My Profile - HACKTOLIVE Academy",
+  title: "My Profile - HackToLive Academy",
   description:
     "Manage your student profile, update personal information, contact details, and account settings.",
 };

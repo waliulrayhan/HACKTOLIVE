@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Order Details - HACKTOLIVE Shop',
+  title: 'Order Details - HackToLive Shop',
   description: 'View your order details, shipping information, and order status.',
   robots: {
     index: false,

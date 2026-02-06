@@ -656,7 +656,7 @@ export default function CheckoutPage() {
                                 </Text>
                               </VStack>
                               <Text fontSize="sm" fontWeight="bold" color={accentColor}>
-                                ৳{(item.price * item.quantity).toLocaleString()}
+                                {(item.price * item.quantity).toLocaleString()} BDT
                               </Text>
                             </HStack>
                           ))}
@@ -670,7 +670,7 @@ export default function CheckoutPage() {
                               Subtotal
                             </Text>
                             <Text fontSize="sm" fontWeight="semibold">
-                              ৳{cart.subtotal.toLocaleString()}
+                              {cart.subtotal.toLocaleString()} BDT
                             </Text>
                           </HStack>
 
@@ -682,7 +682,7 @@ export default function CheckoutPage() {
                               </Text>
                             </HStack>
                             <Text fontSize="sm" fontWeight="semibold">
-                              ৳{shipping.toLocaleString()}
+                              {shipping.toLocaleString()} BDT
                             </Text>
                           </HStack>
                         </VStack>
@@ -694,7 +694,7 @@ export default function CheckoutPage() {
                             Total
                           </Text>
                           <Text fontSize="2xl" fontWeight="bold" color={accentColor}>
-                            ৳{total.toLocaleString()}
+                            {total.toLocaleString()} BDT
                           </Text>
                         </HStack>
 

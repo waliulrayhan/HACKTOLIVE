@@ -110,7 +110,7 @@ export default function CourseCompletionModal({
   };
 
   const handleShareAchievement = () => {
-    const shareText = `I just completed "${courseTitle}" on HACKTOLIVE! 🎉`;
+    const shareText = `I just completed "${courseTitle}" on HackToLive! 🎉`;
     if (navigator.share) {
       navigator
         .share({

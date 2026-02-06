@@ -164,11 +164,11 @@ export function QuotationForm({ serviceName }: QuotationFormProps) {
                   onChange={handleChange}
                   placeholder="Select budget range"
                 >
-                  <option value="under-50k">Under ৳50,000</option>
-                  <option value="50k-100k">৳50,000 - ৳100,000</option>
-                  <option value="100k-200k">৳100,000 - ৳200,000</option>
-                  <option value="200k-500k">৳200,000 - ৳500,000</option>
-                  <option value="500k-plus">৳500,000+</option>
+                  <option value="under-50k">Under 50,000 BDT</option>
+                  <option value="50k-100k">50,000 - 100,000 BDT</option>
+                  <option value="100k-200k">100,000 - 200,000 BDT</option>
+                  <option value="200k-500k">200,000 - 500,000 BDT</option>
+                  <option value="500k-plus">500,000+ BDT</option>
                 </Select>
               </FormControl>
 

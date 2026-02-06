@@ -32,7 +32,7 @@ function GoogleCallbackContent() {
         setUser(user)
 
         toast.success('Login successful!', {
-          description: 'Welcome to HACKTOLIVE',
+          description: 'Welcome to HackToLive',
           duration: 2000,
         })
 

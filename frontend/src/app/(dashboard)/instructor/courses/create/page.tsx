@@ -89,7 +89,7 @@ export default function CreateCoursePage() {
   const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null);
 
   useEffect(() => {
-    document.title = "Create Course - HACKTOLIVE Academy";
+    document.title = "Create Course - HackToLive Academy";
   }, []);
 
   const steps = [

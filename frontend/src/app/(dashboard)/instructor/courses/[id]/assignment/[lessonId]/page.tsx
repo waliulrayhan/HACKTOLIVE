@@ -57,7 +57,7 @@ export default function AssignmentManagementPage() {
   });
 
   useEffect(() => {
-    document.title = "Edit Assignment - HACKTOLIVE Academy";
+    document.title = "Edit Assignment - HackToLive Academy";
   }, []);
 
   useEffect(() => {

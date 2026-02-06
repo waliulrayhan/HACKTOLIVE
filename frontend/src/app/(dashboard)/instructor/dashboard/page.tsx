@@ -33,7 +33,7 @@ export default function InstructorDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    document.title = "Instructor Dashboard - HACKTOLIVE Academy";
+    document.title = "Instructor Dashboard - HackToLive Academy";
   }, []);
 
   useEffect(() => {

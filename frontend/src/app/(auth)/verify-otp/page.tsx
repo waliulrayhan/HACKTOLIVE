@@ -89,7 +89,7 @@ if (!userId) {
       await verifyOtp(userId, otp, type)
       
       toast.success('Verification successful!', {
-        description: type === 'registration' ? 'Welcome to HACKTOLIVE!' : 'Welcome back!',
+        description: type === 'registration' ? 'Welcome to HackToLive!' : 'Welcome back!',
         duration: 2000,
       })
       // Redirect is handled in AuthContext

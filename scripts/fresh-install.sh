@@ -36,14 +36,14 @@ cd /var/www
 chmod -R 777 hacktolive 2>/dev/null || true
 rm -rf hacktolive
 cd /root
-chmod -R 777 HACKTOLIVE 2>/dev/null || true
-rm -rf HACKTOLIVE
+chmod -R 777 HackToLive 2>/dev/null || true
+rm -rf HackToLive
 
 # 6. Clone fresh repository
 echo -e "${YELLOW}6. Cloning fresh repository...${NC}"
 cd /root
-git clone https://github.com/YOUR_USERNAME/HACKTOLIVE.git
-cd HACKTOLIVE
+git clone https://github.com/YOUR_USERNAME/HackToLive.git
+cd HackToLive
 
 # 7. Make scripts executable
 echo -e "${YELLOW}7. Making scripts executable...${NC}"

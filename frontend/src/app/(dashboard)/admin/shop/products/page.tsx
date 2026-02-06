@@ -66,7 +66,7 @@ export default function AdminProductsPage() {
   const fetchControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    document.title = "Product Management - HACKTOLIVE Academy";
+    document.title = "Product Management - HackToLive Academy";
   }, []);
 
   const fetchProducts = useCallback(async () => {
@@ -413,7 +413,7 @@ export default function AdminProductsPage() {
                       </TableCell>
                       <TableCell className="px-3 py-2.5 sm:px-4 sm:py-3">
                         <span className="text-xs font-semibold text-gray-900 dark:text-white">
-                          ৳{product.price.toLocaleString()}
+                          {product.price.toLocaleString()} BDT
                         </span>
                       </TableCell>
                       <TableCell className="px-3 py-2.5 text-center sm:px-4 sm:py-3">

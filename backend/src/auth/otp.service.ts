@@ -64,19 +64,19 @@ export class OtpService {
     switch (type) {
       case 'REGISTRATION':
         templateSlug = 'registration-otp';
-        subject = 'Verify Your Email - HACKTOLIVE';
+        subject = 'Verify Your Email - HackToLive';
         break;
       case 'LOGIN':
         templateSlug = 'login-otp';
-        subject = 'Your Login OTP - HACKTOLIVE';
+        subject = 'Your Login OTP - HackToLive';
         break;
       case 'PASSWORD_RESET':
         templateSlug = 'password-reset-otp';
-        subject = 'Reset Your Password - HACKTOLIVE';
+        subject = 'Reset Your Password - HackToLive';
         break;
       default:
         templateSlug = 'generic-otp';
-        subject = 'Your OTP Code - HACKTOLIVE';
+        subject = 'Your OTP Code - HackToLive';
     }
 
     // Try to send using template, fallback to direct email if template not found
@@ -91,7 +91,7 @@ export class OtpService {
           <p>This code will expire in 5 minutes.</p>
           <p>If you didn't request this, please ignore this email.</p>
           <br>
-          <p>Best regards,<br>HACKTOLIVE Team</p>
+          <p>Best regards,<br>HackToLive Team</p>
         </div>
       `;
 

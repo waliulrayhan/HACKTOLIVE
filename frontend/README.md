@@ -1,4 +1,4 @@
-# HACKTOLIVE (H4K2LIV3)
+# HackToLive (H4K2LIV3)
 
 **HackToLive** is a comprehensive cybersecurity and ethical hacking platform built with Next.js. This unified web application serves as the digital hub for HackToLive's cybersecurity services, educational academy, and administrative operations.
 
@@ -12,7 +12,7 @@ To empower individuals and organizations with world-class cybersecurity expertis
 ## Project Structure
 
 ```
-HACKTOLIVE/
+HackToLive/
 ├── app/
 │   ├── (marketing)/          # Landing page (Chakra UI)
 │   │   ├── layout.tsx
@@ -96,7 +96,7 @@ HACKTOLIVE/
 
 1. **Clone or navigate to the repository:**
    ```powershell
-   cd C:\Users\Rayhan\Desktop\HACKTOLIVE
+   cd C:\Users\Rayhan\Desktop\HackToLive
    ```
 
 2. **Install dependencies:**

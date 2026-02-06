@@ -15,12 +15,12 @@ const outfit = Outfit({
 export const metadata = {
   metadataBase: new URL('https://hacktolive.io'),
   title: {
-    default: 'HACKTOLIVE - Cybersecurity, Development & Tech Solutions',
-    template: '%s | HACKTOLIVE',
+    default: 'HackToLive - Cybersecurity, Development & Tech Solutions',
+    template: '%s | HackToLive',
   },
-  description: 'HACKTOLIVE offers expert cybersecurity training, web development services, software solutions, and tech consultancy. Learn from industry experts and grow your tech career.',
+  description: 'HackToLive offers expert cybersecurity training, web development services, software solutions, and tech consultancy. Learn from industry experts and grow your tech career.',
   keywords: [
-    'HACKTOLIVE',
+    'HackToLive',
     'cybersecurity',
     'ethical hacking',
     'web development',
@@ -29,9 +29,9 @@ export const metadata = {
     'IT services',
     'online courses',
   ],
-  authors: [{ name: 'HACKTOLIVE' }],
-  creator: 'HACKTOLIVE',
-  publisher: 'HACKTOLIVE',
+  authors: [{ name: 'HackToLive' }],
+  creator: 'HackToLive',
+  publisher: 'HackToLive',
   formatDetection: {
     email: false,
     address: false,
@@ -42,16 +42,16 @@ export const metadata = {
     apple: '/logo.svg',
   },
   openGraph: {
-    title: 'HACKTOLIVE - Cybersecurity, Development & Tech Solutions',
+    title: 'HackToLive - Cybersecurity, Development & Tech Solutions',
     description: 'Expert cybersecurity training, web development services, and tech solutions. Learn from industry professionals.',
     url: 'https://hacktolive.io',
-    siteName: 'HACKTOLIVE',
+    siteName: 'HackToLive',
     images: [
       {
         url: '/logo.svg',
         width: 1200,
         height: 630,
-        alt: 'HACKTOLIVE Logo',
+        alt: 'HackToLive Logo',
       },
     ],
     locale: 'en_US',
@@ -59,7 +59,7 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'HACKTOLIVE - Cybersecurity, Development & Tech Solutions',
+    title: 'HackToLive - Cybersecurity, Development & Tech Solutions',
     description: 'Expert cybersecurity training, web development services, and tech solutions.',
     images: ['/logo.svg'],
   },

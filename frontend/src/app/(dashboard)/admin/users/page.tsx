@@ -141,7 +141,7 @@ export default function UsersManagementPage() {
   const fetchControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    document.title = "User Management - HACKTOLIVE Academy";
+    document.title = "User Management - HackToLive Academy";
   }, []);
 
   // Debounced fetch function

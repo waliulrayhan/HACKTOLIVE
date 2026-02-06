@@ -33,7 +33,7 @@ export default function NewsletterDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    document.title = "Newsletter Management - HACKTOLIVE Academy";
+    document.title = "Newsletter Management - HackToLive Academy";
   }, []);
 
   useEffect(() => {

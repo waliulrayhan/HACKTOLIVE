@@ -39,7 +39,7 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    document.title = "Student Dashboard - HACKTOLIVE Academy";
+    document.title = "Student Dashboard - HackToLive Academy";
   }, []);
 
   useEffect(() => {

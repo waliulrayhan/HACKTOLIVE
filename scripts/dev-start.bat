@@ -1,10 +1,10 @@
 @echo off
 REM ==============================================
-REM HACKTOLIVE - Local Development with Docker
+REM HackToLive - Local Development with Docker
 REM ==============================================
 
 echo ========================================
-echo HACKTOLIVE - Starting Development
+echo HackToLive - Starting Development
 echo ========================================
 
 REM Check if Docker is running
