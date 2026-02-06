@@ -43,9 +43,22 @@ export function transformStudent(student: any) {
 export function transformCourse(course: any) {
   if (!course) return null;
   
+  // Calculate totalModules and totalLessons from modules array if present
+  let totalModules = course.totalModules || 0;
+  let totalLessons = course.totalLessons || 0;
+  
+  if (course.modules && Array.isArray(course.modules)) {
+    totalModules = course.modules.length;
+    totalLessons = course.modules.reduce((total: number, module: any) => {
+      return total + (module.lessons?.length || 0);
+    }, 0);
+  }
+  
   return {
     ...course,
     instructor: transformInstructor(course.instructor),
+    totalModules,
+    totalLessons,
   };
 }
 

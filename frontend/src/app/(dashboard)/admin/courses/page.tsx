@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
+import Image from "next/image";
 import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
@@ -21,6 +22,11 @@ import {
   HiOutlineExclamationCircle,
   HiOutlineTag,
   HiOutlineBookOpen,
+  HiOutlineCalendar,
+  HiOutlineVideoCamera,
+  HiOutlineDocumentText,
+  HiOutlineClipboardList,
+  HiOutlineClipboardCheck,
 } from "react-icons/hi";
 import {
   Table,
@@ -35,6 +41,7 @@ interface Course {
   title: string;
   slug: string;
   shortDescription: string;
+  description: string;
   category: string;
   level: string;
   tier: string;
@@ -43,8 +50,22 @@ interface Course {
   status: string;
   rating: number;
   totalStudents: number;
+  totalRatings: number;
   duration: number;
+  totalLessons: number;
+  totalModules: number;
+  learningOutcomes: string;
+  requirements: string;
+  tags: string;
+  thumbnail?: string;
+  liveSchedule?: string;
+  startDate?: string;
+  endDate?: string;
+  maxStudents?: number;
+  enrolledStudents?: number;
+  meetingLink?: string;
   createdAt: string;
+  updatedAt: string;
   instructor: {
     id: string;
     name: string;
@@ -54,6 +75,18 @@ interface Course {
     enrollments: number;
     reviews: number;
   };
+  modules?: Array<{
+    id: string;
+    title: string;
+    description: string;
+    order: number;
+    lessons: Array<{
+      id: string;
+      title: string;
+      type: string;
+      duration: number;
+    }>;
+  }>;
 }
 
 interface PaginationData {
@@ -82,7 +115,11 @@ export default function CoursesManagementPage() {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [courseToReject, setCourseToReject] = useState<{ id: string; title: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
 
   const fetchControllerRef = useRef<AbortController | null>(null);
 
@@ -163,6 +200,7 @@ export default function CoursesManagementPage() {
 
   const handleApproveCourse = async (courseId: string, courseTitle: string) => {
     try {
+      setIsApproving(true);
       const token = localStorage.getItem('token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/courses/${courseId}/approve`, {
         method: 'POST',
@@ -182,15 +220,23 @@ export default function CoursesManagementPage() {
       toast.error('Failed to approve course', {
         description: 'Please try again',
       });
+    } finally {
+      setIsApproving(false);
     }
   };
 
-  const handleRejectCourse = async (courseId: string, courseTitle: string) => {
-    if (!confirm(`Are you sure you want to reject "${courseTitle}"?`)) return;
+  const openRejectModal = (courseId: string, courseTitle: string) => {
+    setCourseToReject({ id: courseId, title: courseTitle });
+    setShowRejectModal(true);
+  };
+
+  const handleRejectCourse = async () => {
+    if (!courseToReject) return;
 
     try {
+      setIsRejecting(true);
       const token = localStorage.getItem('token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/courses/${courseId}/reject`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/courses/${courseToReject.id}/reject`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -200,14 +246,18 @@ export default function CoursesManagementPage() {
       if (!response.ok) throw new Error('Failed to reject course');
       
       toast.success('Course rejected', {
-        description: `${courseTitle} has been archived`,
+        description: `${courseToReject.title} has been archived`,
       });
+      setShowRejectModal(false);
+      setCourseToReject(null);
       fetchCourses();
     } catch (error) {
       console.error('Error rejecting course:', error);
       toast.error('Failed to reject course', {
         description: 'Please try again',
       });
+    } finally {
+      setIsRejecting(false);
     }
   };
 
@@ -245,9 +295,38 @@ export default function CoursesManagementPage() {
     }
   };
 
-  const openViewModal = (course: Course) => {
-    setSelectedCourse(course);
-    setShowModal(true);
+  const openViewModal = async (course: Course) => {
+    try {
+      // Fetch full course details with modules from admin endpoint
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/courses/${course.id}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error('Failed to fetch course details');
+      
+      const fullCourseData = await response.json();
+      
+      // Calculate totals from modules array if not provided
+      if (fullCourseData.modules && Array.isArray(fullCourseData.modules)) {
+        fullCourseData.totalModules = fullCourseData.modules.length;
+        fullCourseData.totalLessons = fullCourseData.modules.reduce(
+          (total: number, module: any) => total + (module.lessons?.length || 0),
+          0
+        );
+      }
+      
+      setSelectedCourse(fullCourseData);
+      setShowModal(true);
+    } catch (error) {
+      console.error('Error fetching course details:', error);
+      toast.error('Failed to load course details');
+    }
   };
 
   const getStatusBadgeClass = (status: string) => {
@@ -476,14 +555,23 @@ export default function CoursesManagementPage() {
                           <>
                             <button
                               onClick={() => handleApproveCourse(course.id, course.title)}
-                              className="inline-flex items-center justify-center rounded-lg p-1.5 text-success-600 transition-colors hover:bg-success-100 dark:text-success-500 dark:hover:bg-success-500/10"
+                              disabled={isApproving}
+                              className="inline-flex items-center justify-center rounded-lg p-1.5 text-success-600 transition-colors hover:bg-success-100 dark:text-success-500 dark:hover:bg-success-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Approve"
                             >
-                              <HiOutlineCheck className="h-4 w-4" />
+                              {isApproving ? (
+                                <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                </svg>
+                              ) : (
+                                <HiOutlineCheck className="h-4 w-4" />
+                              )}
                             </button>
                             <button
-                              onClick={() => handleRejectCourse(course.id, course.title)}
-                              className="inline-flex items-center justify-center rounded-lg p-1.5 text-yellow-600 transition-colors hover:bg-yellow-100 dark:text-yellow-500 dark:hover:bg-yellow-500/10"
+                              onClick={() => openRejectModal(course.id, course.title)}
+                              disabled={isRejecting}
+                              className="inline-flex items-center justify-center rounded-lg p-1.5 text-yellow-600 transition-colors hover:bg-yellow-100 dark:text-yellow-500 dark:hover:bg-yellow-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Reject"
                             >
                               <HiOutlineX className="h-4 w-4" />
@@ -607,11 +695,11 @@ export default function CoursesManagementPage() {
       {/* View Modal */}
       {showModal && selectedCourse && (
         <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
-          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="sticky top-0 bg-white dark:bg-gray-900 px-6 py-5 flex items-center justify-between border-b border-gray-200 dark:border-gray-800">
+            <div className="sticky top-0 bg-white dark:bg-gray-900 px-6 py-5 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 z-10">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Course Details
+                Course Details - Full Review
               </h3>
               <button
                 onClick={() => setShowModal(false)}
@@ -621,12 +709,24 @@ export default function CoursesManagementPage() {
               </button>
             </div>
 
-            {/* Body */}
-            <div className="px-6 pb-6">
-              {/* Course Title and Status */}
-              <div className="pb-5 border-b border-gray-200 dark:border-gray-800">
+            {/* Body - Scrollable */}
+            <div className="flex-1 overflow-y-auto px-6 pb-6">
+              {/* Course Header Section */}
+              <div className="pb-5 border-b border-gray-200 dark:border-gray-800 mt-4">
+                {selectedCourse.thumbnail && (
+                  <div className="mb-4 rounded-lg overflow-hidden">
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_API_URL}${selectedCourse.thumbnail}`}
+                      alt={selectedCourse.title}
+                      width={800}
+                      height={400}
+                      className="w-full h-48 object-cover"
+                      unoptimized
+                    />
+                  </div>
+                )}
                 <div className="flex items-start gap-2 mb-2">
-                  <h4 className="text-lg font-bold text-gray-900 dark:text-white flex-1">
+                  <h4 className="text-xl font-bold text-gray-900 dark:text-white flex-1">
                     {selectedCourse.title}
                   </h4>
                 </div>
@@ -637,92 +737,426 @@ export default function CoursesManagementPage() {
                   <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getTierBadgeClass(selectedCourse.tier)}`}>
                     {selectedCourse.tier}
                   </span>
+                  <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    {selectedCourse.deliveryMode}
+                  </span>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 whitespace-pre-wrap">
                   {selectedCourse.shortDescription}
                 </p>
+                <div className="text-xs text-gray-500 dark:text-gray-500">
+                  Slug: <span className="font-mono text-gray-700 dark:text-gray-300">{selectedCourse.slug}</span>
+                </div>
               </div>
 
-              {/* Course Details */}
-              <div className="space-y-4 pt-5">
-                <div className="flex items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
-                    <HiOutlineAcademicCap className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              {/* Key Stats Grid */}
+              <div className="grid grid-cols-3 gap-4 pt-5 pb-5 border-b border-gray-200 dark:border-gray-800">
+                <div className="flex flex-row items-center gap-2 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-500/10">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-500/20">
+                    <HiOutlineStar className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Instructor</p>
-                    <p className="text-sm text-gray-900 dark:text-white">{selectedCourse.instructor.name}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
-                    <HiOutlineBookOpen className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Category & Level</p>
-                    <p className="text-sm text-gray-900 dark:text-white">{selectedCourse.category} • {selectedCourse.level}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
-                    <HiOutlineTag className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Price</p>
-                    <p className="text-sm text-gray-900 dark:text-white">
-                      {selectedCourse.price > 0 ? `$${selectedCourse.price}` : 'Free'}
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Rating</p>
+                    <p className="text-sm font-bold text-gray-900 dark:text-white">
+                      {selectedCourse.rating.toFixed(1)} ({selectedCourse.totalRatings || 0} reviews)
                     </p>
                   </div>
                 </div>
+                <div className="flex flex-row items-center gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-500/20">
+                    <HiOutlineUsers className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Students</p>
+                    <p className="text-sm font-bold text-gray-900 dark:text-white">
+                      {selectedCourse.totalStudents}
+                      {selectedCourse.deliveryMode === 'LIVE' && selectedCourse.maxStudents && (
+                        <span className="text-xs font-normal text-gray-500"> / {selectedCourse.maxStudents}</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-row items-center gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-500/10">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-500/20">
+                    <HiOutlineClock className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Duration</p>
+                    <p className="text-sm font-bold text-gray-900 dark:text-white">
+                      {Math.floor(selectedCourse.duration / 60)}h {selectedCourse.duration % 60}m
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-                <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200 dark:border-gray-800">
-                  <div className="flex flex-row items-center gap-2 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-500/10">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-500/20">
-                      <HiOutlineStar className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+              {/* Course Information */}
+              <div className="space-y-4 pt-5 pb-5 border-b border-gray-200 dark:border-gray-800">
+                <h5 className="text-sm font-semibold text-gray-900 dark:text-white">Course Information</h5>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                      <HiOutlineAcademicCap className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                     </div>
-                    <div className="flex-1">
-                      <p className="text-xs text-gray-600 dark:text-gray-400">Rating</p>
-                      <p className="text-sm font-bold text-gray-900 dark:text-white">
-                        {selectedCourse.rating.toFixed(1)}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Instructor</p>
+                      <p className="text-sm text-gray-900 dark:text-white">{selectedCourse.instructor.name}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                      <HiOutlineBookOpen className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Category</p>
+                      <p className="text-sm text-gray-900 dark:text-white">{selectedCourse.category}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                      <HiOutlineTag className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Level</p>
+                      <p className="text-sm text-gray-900 dark:text-white">{selectedCourse.level}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                      <HiOutlineTag className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Price</p>
+                      <p className="text-sm text-gray-900 dark:text-white">
+                        {selectedCourse.price > 0 ? `${selectedCourse.price} Tk` : 'Free'}
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-row items-center gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-500/20">
-                      <HiOutlineUsers className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                      <HiOutlineBookOpen className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                     </div>
-                    <div className="flex-1">
-                      <p className="text-xs text-gray-600 dark:text-gray-400">Students</p>
-                      <p className="text-sm font-bold text-gray-900 dark:text-white">
-                        {selectedCourse.totalStudents}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Content</p>
+                      <p className="text-sm text-gray-900 dark:text-white">
+                        {selectedCourse.totalModules || 0} Modules • {selectedCourse.totalLessons || 0} Lessons
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-row items-center gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-500/10">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-500/20">
-                      <HiOutlineClock className="h-5 w-5 text-green-600 dark:text-green-400" />
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                      <HiOutlineClock className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                     </div>
-                    <div className="flex-1">
-                      <p className="text-xs text-gray-600 dark:text-gray-400">Duration</p>
-                      <p className="text-sm font-bold text-gray-900 dark:text-white">
-                        {Math.floor(selectedCourse.duration / 60)}h
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Created</p>
+                      <p className="text-sm text-gray-900 dark:text-white">
+                        {new Date(selectedCourse.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Footer Actions */}
-              <div className="flex justify-end gap-3 mt-6 pt-5 border-t border-gray-200 dark:border-gray-800">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
-                >
-                  Close
-                </button>
+              {/* Live Course Details */}
+              {selectedCourse.deliveryMode === 'LIVE' && (
+                <div className="pt-5 pb-5 border-b border-gray-200 dark:border-gray-800">
+                  <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <HiOutlineCalendar className="h-4 w-4 text-brand-500" />
+                    Live Course Schedule
+                  </h5>
+                  <div className="grid grid-cols-2 gap-4">
+                    {selectedCourse.liveSchedule && (
+                      <div className="col-span-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10">
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Schedule</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedCourse.liveSchedule}</p>
+                      </div>
+                    )}
+                    {selectedCourse.startDate && (
+                      <div className="p-3 rounded-lg bg-green-50 dark:bg-green-500/10">
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Start Date</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {new Date(selectedCourse.startDate).toLocaleDateString()}
+                        </p>
+                      </div>
+                    )}
+                    {selectedCourse.endDate && (
+                      <div className="p-3 rounded-lg bg-red-50 dark:bg-red-500/10">
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">End Date</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {new Date(selectedCourse.endDate).toLocaleDateString()}
+                        </p>
+                      </div>
+                    )}
+                    {selectedCourse.meetingLink && (
+                      <div className="col-span-2 p-3 rounded-lg bg-purple-50 dark:bg-purple-500/10">
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Meeting Link</p>
+                        <a 
+                          href={selectedCourse.meetingLink} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-sm font-medium text-brand-600 dark:text-brand-400 hover:underline break-all"
+                        >
+                          {selectedCourse.meetingLink}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Full Description */}
+              <div className="pt-5 pb-5 border-b border-gray-200 dark:border-gray-800">
+                <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Full Description</h5>
+                <div className="prose prose-sm max-w-none dark:prose-invert">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+                    {selectedCourse.description}
+                  </p>
+                </div>
               </div>
+
+              {/* Learning Outcomes */}
+              {selectedCourse.learningOutcomes && (
+                <div className="pt-5 pb-5 border-b border-gray-200 dark:border-gray-800">
+                  <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <HiOutlineCheckCircle className="h-4 w-4 text-green-500" />
+                    What You'll Learn
+                  </h5>
+                  <div className="space-y-2">
+                    {selectedCourse.learningOutcomes.split('\n').filter(line => line.trim()).map((outcome, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <HiOutlineCheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{outcome.trim()}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Requirements */}
+              {selectedCourse.requirements && (
+                <div className="pt-5 pb-5 border-b border-gray-200 dark:border-gray-800">
+                  <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <HiOutlineExclamationCircle className="h-4 w-4 text-orange-500" />
+                    Requirements
+                  </h5>
+                  <div className="space-y-2">
+                    {selectedCourse.requirements.split('\n').filter(line => line.trim()).map((requirement, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <span className="text-orange-500 mt-0.5">•</span>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{requirement.trim()}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Tags */}
+              {selectedCourse.tags && (
+                <div className="pt-5 pb-5 border-b border-gray-200 dark:border-gray-800">
+                  <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <HiOutlineTag className="h-4 w-4 text-brand-500" />
+                    Tags
+                  </h5>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedCourse.tags.split(',').map((tag, index) => (
+                      <span 
+                        key={index}
+                        className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                      >
+                        {tag.trim()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Course Curriculum */}
+              {selectedCourse.modules && selectedCourse.modules.length > 0 && (
+                <div className="pt-5">
+                  <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <HiOutlineBookOpen className="h-4 w-4 text-brand-500" />
+                    Course Curriculum ({selectedCourse.modules.length} Modules, {selectedCourse.totalLessons || 0} Lessons)
+                  </h5>
+                  <div className="space-y-3">
+                    {selectedCourse.modules.map((module, moduleIndex) => (
+                      <div 
+                        key={module.id} 
+                        className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
+                      >
+                        <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1">
+                              <h6 className="text-sm font-semibold text-gray-900 dark:text-white">
+                                Module {moduleIndex + 1}: {module.title}
+                              </h6>
+                              {module.description && (
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                  {module.description}
+                                </p>
+                              )}
+                            </div>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
+                              {module.lessons?.length || 0} lessons
+                            </span>
+                          </div>
+                        </div>
+                        {module.lessons && module.lessons.length > 0 && (
+                          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                            {module.lessons.map((lesson, lessonIndex) => (
+                              <div key={lesson.id} className="px-4 py-3 flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-3 flex-1">
+                                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
+                                    {lesson.type === 'VIDEO' && <HiOutlineVideoCamera className="h-4 w-4 text-gray-600 dark:text-gray-300" />}
+                                    {lesson.type === 'ARTICLE' && <HiOutlineDocumentText className="h-4 w-4 text-gray-600 dark:text-gray-300" />}
+                                    {lesson.type === 'QUIZ' && <HiOutlineClipboardList className="h-4 w-4 text-gray-600 dark:text-gray-300" />}
+                                    {lesson.type === 'ASSIGNMENT' && <HiOutlineClipboardCheck className="h-4 w-4 text-gray-600 dark:text-gray-300" />}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                      {lessonIndex + 1}. {lesson.title}
+                                    </p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                      {lesson.type}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <HiOutlineClock className="h-3.5 w-3.5 text-gray-400" />
+                                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                                    {lesson.duration} min
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer Actions */}
+            <div className="sticky bottom-0 flex justify-between gap-3 px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-800">
+              <div className="flex gap-2">
+                {selectedCourse.status === 'DRAFT' && (
+                  <>
+                    <button
+                      onClick={() => {
+                        setShowModal(false);
+                        handleApproveCourse(selectedCourse.id, selectedCourse.title);
+                      }}
+                      disabled={isApproving}
+                      className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-4 text-sm bg-success-600 text-white hover:bg-success-700 shadow-lg shadow-success-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isApproving ? (
+                        <>
+                          <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          Approving...
+                        </>
+                      ) : (
+                        <>
+                          <HiOutlineCheck className="h-4 w-4" />
+                          Approve Course
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowModal(false);
+                        openRejectModal(selectedCourse.id, selectedCourse.title);
+                      }}
+                      disabled={isRejecting}
+                      className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-4 text-sm bg-yellow-600 text-white hover:bg-yellow-700 shadow-lg shadow-yellow-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <HiOutlineX className="h-4 w-4" />
+                      Reject Course
+                    </button>
+                  </>
+                )}
+              </div>
+              <button
+                onClick={() => setShowModal(false)}
+                className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reject Confirmation Modal */}
+      {showRejectModal && courseToReject && (
+        <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-md">
+            {/* Header */}
+            <div className="px-6 py-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-800">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-500/15">
+                  <HiOutlineExclamationCircle className="h-6 w-6 text-yellow-600 dark:text-yellow-500" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Reject Course
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowRejectModal(false)}
+                disabled={isRejecting}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors disabled:opacity-50"
+              >
+                <HiOutlineX className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Are you sure you want to reject <span className="font-semibold text-gray-900 dark:text-white">{courseToReject.title}</span>?
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                This will archive the course and the instructor will need to resubmit it for approval.
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl flex justify-end gap-3">
+              <button
+                onClick={() => setShowRejectModal(false)}
+                disabled={isRejecting}
+                className="h-10 inline-flex items-center justify-center font-medium rounded-lg transition px-4 text-sm bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRejectCourse}
+                disabled={isRejecting}
+                className="h-10 inline-flex items-center justify-center gap-2 font-medium rounded-lg transition px-5 text-sm bg-yellow-600 text-white hover:bg-yellow-700 shadow-lg shadow-yellow-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isRejecting ? (
+                  <>
+                    <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Rejecting...
+                  </>
+                ) : (
+                  <>
+                    <HiOutlineX className="h-4 w-4" />
+                    Reject Course
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

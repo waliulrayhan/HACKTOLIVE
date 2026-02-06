@@ -51,7 +51,8 @@ import {
   FiZap,
   FiGift,
   FiLock,
-  FiUser
+  FiUser,
+  FiDollarSign
 } from "react-icons/fi";
 import academyService from "@/lib/academy-service";
 import { useAuth } from "@/context/AuthContext";
@@ -641,14 +642,14 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                       alignItems="center"
                       justifyContent="center"
                     >
-                      <VStack spacing="2">
+                      {/* <VStack spacing="2">
                         <Text color="white" fontSize="sm" fontWeight="semibold">
                           {isFree ? "FREE COURSE" : "PREMIUM COURSE"}
                         </Text>
                         <Text color="white" fontSize="3xl" fontWeight="bold">
                           {isFree ? "0 Tk" : `${course.price.toLocaleString()} Tk`}
                         </Text>
-                      </VStack>
+                      </VStack> */}
                     </Box>
                   </Box>
                   
@@ -667,6 +668,16 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
 
                     {/* Course Features */}
                     <VStack spacing="3" align="stretch" fontSize="sm">
+                      <HStack justify="space-between">
+                        <HStack spacing="2" color="muted">
+                          <Icon as={FiDollarSign} />
+                          <Text>{isFree ? "FREE COURSE" : "PREMIUM COURSE"}</Text>
+                        </HStack>
+                        <Text fontWeight="semibold">
+                          {isFree ? "0 Tk" : `${course.price.toLocaleString()} Tk`}
+                        </Text>
+                      </HStack>
+
                       <HStack justify="space-between">
                         <HStack spacing="2" color="muted">
                           <Icon as={FiClock} />

@@ -84,6 +84,11 @@ export class AdminController {
     });
   }
 
+  @Get('courses/:courseId')
+  getCourse(@Param('courseId') courseId: string) {
+    return this.adminService.getCourse(courseId);
+  }
+
   @Post('courses/:courseId/approve')
   approveCourse(@Param('courseId') courseId: string) {
     return this.adminService.approveCourse(courseId);

@@ -680,25 +680,25 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
               {/* Live Class Info (if applicable) */}
               {course.deliveryMode === "live" && course.liveSchedule && (
                 <FallInPlace delay={0.3}>
-                  <Box p="6" bg="red.50" _dark={{ bg: "red.900" }} borderRadius="2xl" borderWidth="2px" borderColor="red.500">
+                  <Box p="6" bg="orange.50" _dark={{ bg: "orange.900" }} borderRadius="2xl" borderWidth="2px" borderColor="orange.500">
                     <VStack spacing="4" align="stretch">
                       <HStack spacing="2">
-                        <Icon as={FiVideo} color="red.500" boxSize="5" />
-                        <Heading size="md" color="red.600" _dark={{ color: "red.400" }}>
+                        <Icon as={FiVideo} color="orange.500" boxSize="5" />
+                        <Heading size="md" color="orange.600" _dark={{ color: "orange.400" }}>
                           Live Classes
                         </Heading>
                       </HStack>
                       
                       <VStack spacing="3" align="start" fontSize="sm">
                         <HStack>
-                          <Icon as={FiCalendar} color="red.500" />
+                          <Icon as={FiCalendar} color="orange.500" />
                           <Text fontWeight="semibold">Schedule:</Text>
                           <Text>{course.liveSchedule}</Text>
                         </HStack>
                         
                         {course.startDate && (
                           <HStack>
-                            <Icon as={FiClock} color="red.500" />
+                            <Icon as={FiClock} color="orange.500" />
                             <Text fontWeight="semibold">Starts:</Text>
                             <Text>{new Date(course.startDate).toLocaleDateString()}</Text>
                           </HStack>
@@ -714,12 +714,12 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                             </HStack>
                             <Progress 
                               value={(course.enrolledStudents / course.maxStudents) * 100} 
-                              colorScheme="red" 
+                              colorScheme="orange" 
                               borderRadius="full"
                               size="sm"
                             />
                             {course.enrolledStudents >= course.maxStudents && (
-                              <Badge colorScheme="red" mt="2" fontSize="xs">
+                              <Badge colorScheme="orange" mt="2" fontSize="xs">
                                 FULLY BOOKED
                               </Badge>
                             )}

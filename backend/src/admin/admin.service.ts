@@ -268,6 +268,62 @@ export class AdminService {
     };
   }
 
+  async getCourse(courseId: string) {
+    return this.prisma.course.findUnique({
+      where: { id: courseId },
+      include: {
+        instructor: {
+          include: instructorInclude,
+        },
+        modules: {
+          include: {
+            lessons: {
+              include: {
+                resources: true,
+                quizzes: {
+                  include: {
+                    questions: true,
+                  },
+                },
+                assignments: true,
+              },
+              orderBy: {
+                order: 'asc',
+              },
+            },
+          },
+          orderBy: {
+            order: 'asc',
+          },
+        },
+        enrollments: {
+          include: {
+            student: {
+              include: studentInclude,
+            },
+          },
+        },
+        reviews: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+                avatar: true,
+              },
+            },
+          },
+        },
+        _count: {
+          select: {
+            enrollments: true,
+            reviews: true,
+          },
+        },
+      },
+    }).then(course => course ? transformCourse(course) : null);
+  }
+
   async approveCourse(courseId: string) {
     return this.prisma.course.update({
       where: { id: courseId },
