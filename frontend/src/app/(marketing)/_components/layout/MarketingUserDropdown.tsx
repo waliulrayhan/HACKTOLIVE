@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Dropdown } from "@/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
 import { toast } from "@/components/ui/toast";
@@ -13,12 +14,33 @@ import { getFullImageUrl } from "@/lib/image-utils";
 export default function MarketingUserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const router = useRouter();
   const { logout } = useAuth();
 
   useEffect(() => {
+    setMounted(true);
     const currentUser = authService.getUser();
     setUser(currentUser);
+
+    // Check for dark mode
+    const checkDarkMode = () => {
+      setIsDarkMode(document.documentElement.classList.contains('dark'));
+    };
+    
+    checkDarkMode();
+    
+    // Watch for dark mode changes
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   // Get role-based profile path
@@ -70,11 +92,16 @@ export default function MarketingUserDropdown() {
     setIsOpen(false);
   }
 
-  function handleSignOut(e: React.MouseEvent<HTMLAnchorElement>) {
+  function openLogoutModal(e: React.MouseEvent<HTMLAnchorElement>) {
     e.preventDefault();
     closeDropdown();
+    setShowLogoutModal(true);
+  }
+
+  function handleSignOut() {
+    setIsLoggingOut(true);
     logout();
-    
+
     // Show success toast
     toast.success('Signed out successfully!', {
       description: 'You have been logged out of your account.',
@@ -85,7 +112,7 @@ export default function MarketingUserDropdown() {
   return (
     <div className="relative hidden md:block">
       <button
-        onClick={toggleDropdown} 
+        onClick={toggleDropdown}
         className="flex items-center text-gray-700 dark:text-gray-400 dropdown-toggle"
       >
         <span className="mr-2 overflow-hidden rounded-full h-9 w-9 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -110,9 +137,8 @@ export default function MarketingUserDropdown() {
         </span>
 
         <svg
-          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+            }`}
           width="16"
           height="18"
           viewBox="0 0 18 20"
@@ -136,21 +162,26 @@ export default function MarketingUserDropdown() {
       >
         <div className="flex items-center justify-between gap-2 mb-2">
           <div>
-            <span className="block font-medium text-gray-700 text-xs dark:text-gray-400">
+            {/* <span className="block font-medium text-gray-700 text-xs dark:text-gray-400">
               {user?.name || 'Guest User'}
-            </span>
+            </span> */}
             <span className="mt-0.5 block text-[11px] text-gray-500 dark:text-gray-400">
               {user?.email || 'No email'}
             </span>
+            {user?.role && (
+                <span className="inline-block mt-2 px-2.5 py-1 text-xs font-medium rounded-md bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                {user.role.charAt(0) + user.role.slice(1).toLowerCase()}
+              </span>
+            )}
           </div>
 
-          {user?.role && (
+          {/* {user?.role && (
             <div className="flex items-center justify-center">
               <span className="inline-block px-1.5 py-0.5 text-[11px] font-medium rounded-full bg-brand-50 text-brand-700 dark:bg-brand-900/20 dark:text-brand-400">
                 {user.role.charAt(0) + user.role.slice(1).toLowerCase()}
               </span>
             </div>
-          )}
+          )} */}
         </div>
 
         <ul className="flex flex-col gap-0.5 pt-2 pb-2 border-b border-gray-200 dark:border-gray-800">
@@ -208,28 +239,200 @@ export default function MarketingUserDropdown() {
         <div className="pt-2 mt-0 border-t border-gray-200 dark:border-gray-800">
           <Link
             href="/login"
-            onClick={handleSignOut}
+            onClick={openLogoutModal}
             className="flex items-center gap-2 px-2.5 py-1.5 font-medium text-gray-700 rounded-md group text-xs hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
           >
             <svg
               className="fill-gray-500 group-hover:fill-gray-700 dark:group-hover:fill-gray-300"
               width="18"
               height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M15.1007 19.247C14.6865 19.247 14.3507 18.9112 14.3507 18.497L14.3507 14.245H12.8507V18.497C12.8507 19.7396 13.8581 20.747 15.1007 20.747H18.5007C19.7434 20.747 20.7507 19.7396 20.7507 18.497L20.7507 5.49609C20.7507 4.25345 19.7433 3.24609 18.5007 3.24609H15.1007C13.8581 3.24609 12.8507 4.25345 12.8507 5.49609V9.74501L14.3507 9.74501V5.49609C14.3507 5.08188 14.6865 4.74609 15.1007 4.74609L18.5007 4.74609C18.9149 4.74609 19.2507 5.08188 19.2507 5.49609L19.2507 18.497C19.2507 18.9112 18.9149 19.247 18.5007 19.247H15.1007ZM3.25073 11.9984C3.25073 12.2144 3.34204 12.4091 3.48817 12.546L8.09483 17.1556C8.38763 17.4485 8.86251 17.4487 9.15549 17.1559C9.44848 16.8631 9.44863 16.3882 9.15583 16.0952L5.81116 12.7484L16.0007 12.7484C16.4149 12.7484 16.7507 12.4127 16.7507 11.9984C16.7507 11.5842 16.4149 11.2484 16.0007 11.2484L5.81528 11.2484L9.15585 7.90554C9.44864 7.61255 9.44847 7.13767 9.15547 6.84488C8.86248 6.55209 8.3876 6.55226 8.09481 6.84525L3.52309 11.4202C3.35673 11.5577 3.25073 11.7657 3.25073 11.9984Z"
-              fill=""
-            />
-          </svg>
-          Sign out
-        </Link>
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M15.1007 19.247C14.6865 19.247 14.3507 18.9112 14.3507 18.497L14.3507 14.245H12.8507V18.497C12.8507 19.7396 13.8581 20.747 15.1007 20.747H18.5007C19.7434 20.747 20.7507 19.7396 20.7507 18.497L20.7507 5.49609C20.7507 4.25345 19.7433 3.24609 18.5007 3.24609H15.1007C13.8581 3.24609 12.8507 4.25345 12.8507 5.49609V9.74501L14.3507 9.74501V5.49609C14.3507 5.08188 14.6865 4.74609 15.1007 4.74609L18.5007 4.74609C18.9149 4.74609 19.2507 5.08188 19.2507 5.49609L19.2507 18.497C19.2507 18.9112 18.9149 19.247 18.5007 19.247H15.1007ZM3.25073 11.9984C3.25073 12.2144 3.34204 12.4091 3.48817 12.546L8.09483 17.1556C8.38763 17.4485 8.86251 17.4487 9.15549 17.1559C9.44848 16.8631 9.44863 16.3882 9.15583 16.0952L5.81116 12.7484L16.0007 12.7484C16.4149 12.7484 16.7507 12.4127 16.7507 11.9984C16.7507 11.5842 16.4149 11.2484 16.0007 11.2484L5.81528 11.2484L9.15585 7.90554C9.44864 7.61255 9.44847 7.13767 9.15547 6.84488C8.86248 6.55209 8.3876 6.55226 8.09481 6.84525L3.52309 11.4202C3.35673 11.5577 3.25073 11.7657 3.25073 11.9984Z"
+                fill=""
+              />
+            </svg>
+            Sign out
+          </Link>
         </div>
       </Dropdown>
+
+      {/* Logout Confirmation Modal - Rendered via Portal */}
+      {mounted && showLogoutModal && createPortal(
+        <div 
+          style={{ 
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 999999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(4px)'
+          }}
+          onClick={() => setShowLogoutModal(false)}
+        >
+          <div 
+            style={{
+              position: 'relative',
+              backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+              borderRadius: '0.75rem',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              width: '100%',
+              maxWidth: '28rem'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: isDarkMode ? '1px solid #374151' : '1px solid #e5e7eb' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', width: '2rem', height: '2rem', alignItems: 'center', justifyContent: 'center', borderRadius: '9999px', backgroundColor: isDarkMode ? '#451a03' : '#fef3c7' }}>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    style={{ color: '#d97706', width: '1.25rem', height: '1.25rem' }}
+                  >
+                    <path
+                      d="M12 9V13M12 17H12.01M5.07183 19H18.9282C20.4678 19 21.4301 17.3333 20.6603 16L13.7321 4C12.9623 2.66667 11.0377 2.66667 10.2679 4L3.33975 16C2.56995 17.3333 3.53223 19 5.07183 19Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <h3 style={{ fontSize: '1rem', fontWeight: 600, color: isDarkMode ? '#f9fafb' : '#111827' }}>
+                  Sign Out
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                style={{ color: isDarkMode ? '#6b7280' : '#9ca3af', cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  style={{ width: '1.25rem', height: '1.25rem' }}
+                >
+                  <path
+                    d="M15 5L5 15M5 5L15 15"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: '1.25rem' }}>
+              <p style={{ fontSize: '0.875rem', color: isDarkMode ? '#d1d5db' : '#4b5563', lineHeight: '1.4', marginBottom: '0.375rem' }}>
+                Are you sure you want to sign out of your account?
+              </p>
+              <p style={{ fontSize: '0.875rem', color: isDarkMode ? '#d1d5db' : '#4b5563', lineHeight: '1.4' }}>
+                You will need to sign in again to access your account.
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div style={{ padding: '0.875rem 1.25rem', backgroundColor: isDarkMode ? '#111827' : '#f9fafb', borderBottomLeftRadius: '0.75rem', borderBottomRightRadius: '0.75rem', display: 'flex', gap: '0.625rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                disabled={isLoggingOut}
+                style={{ 
+                  height: '2.25rem', 
+                  padding: '0 0.875rem',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  backgroundColor: isDarkMode ? '#374151' : '#ffffff',
+                  color: isDarkMode ? '#f9fafb' : '#374151',
+                  border: isDarkMode ? '1px solid #4b5563' : '1px solid #d1d5db',
+                  borderRadius: '0.5rem',
+                  cursor: isLoggingOut ? 'not-allowed' : 'pointer',
+                  opacity: isLoggingOut ? 0.5 : 1
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSignOut}
+                disabled={isLoggingOut}
+                style={{ 
+                  height: '2.25rem', 
+                  padding: '0 1rem',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  backgroundColor: '#dc2626',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.375rem',
+                  cursor: isLoggingOut ? 'not-allowed' : 'pointer',
+                  opacity: isLoggingOut ? 0.5 : 1
+                }}
+              >
+                {isLoggingOut ? (
+                  <>
+                    <svg style={{ width: '1rem', height: '1rem', animation: 'spin 1s linear infinite' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle style={{ opacity: 0.25 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path style={{ opacity: 0.75 }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Signing out...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      style={{ width: '1rem', height: '1rem' }}
+                    >
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M15.1007 19.247C14.6865 19.247 14.3507 18.9112 14.3507 18.497L14.3507 14.245H12.8507V18.497C12.8507 19.7396 13.8581 20.747 15.1007 20.747H18.5007C19.7434 20.747 20.7507 19.7396 20.7507 18.497L20.7507 5.49609C20.7507 4.25345 19.7433 3.24609 18.5007 3.24609H15.1007C13.8581 3.24609 12.8507 4.25345 12.8507 5.49609V9.74501L14.3507 9.74501V5.49609C14.3507 5.08188 14.6865 4.74609 15.1007 4.74609L18.5007 4.74609C18.9149 4.74609 19.2507 5.08188 19.2507 5.49609L19.2507 18.497C19.2507 18.9112 18.9149 19.247 18.5007 19.247H15.1007ZM3.25073 11.9984C3.25073 12.2144 3.34204 12.4091 3.48817 12.546L8.09483 17.1556C8.38763 17.4485 8.86251 17.4487 9.15549 17.1559C9.44848 16.8631 9.44863 16.3882 9.15583 16.0952L5.81116 12.7484L16.0007 12.7484C16.4149 12.7484 16.7507 12.4127 16.7507 11.9984C16.7507 11.5842 16.4149 11.2484 16.0007 11.2484L5.81528 11.2484L9.15585 7.90554C9.44864 7.61255 9.44847 7.13767 9.15547 6.84488C8.86248 6.55209 8.3876 6.55226 8.09481 6.84525L3.52309 11.4202C3.35673 11.5577 3.25073 11.7657 3.25073 11.9984Z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                    <span>Sign Out</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+          <style jsx>{`
+            @keyframes spin {
+              from {
+                transform: rotate(0deg);
+              }
+              to {
+                transform: rotate(360deg);
+              }
+            }
+          `}</style>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
