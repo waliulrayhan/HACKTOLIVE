@@ -91,6 +91,21 @@ export default function NativeYouTubePlayer({ url }: NativeYouTubePlayerProps) {
     };
   }, [playing, showControls]);
 
+  // ── Keyboard shortcuts: arrow left/right to skip 10s ─────────────
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        handleSkipBackward();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        handleSkipForward();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // ── Event handlers ───────────────────────────────────────────────
   const handleMouseMove = useCallback(() => {
     setShowControls(true);
@@ -175,6 +190,20 @@ export default function NativeYouTubePlayer({ url }: NativeYouTubePlayerProps) {
     setMuted((prev) => !prev);
   }, []);
 
+  const handleSkipBackward = useCallback(() => {
+    const el = playerRef.current;
+    if (el && el.duration) {
+      el.currentTime = Math.max(0, el.currentTime - 10);
+    }
+  }, []);
+
+  const handleSkipForward = useCallback(() => {
+    const el = playerRef.current;
+    if (el && el.duration) {
+      el.currentTime = Math.min(el.duration, el.currentTime + 10);
+    }
+  }, []);
+
   const handleFullscreen = useCallback(() => {
     if (!containerRef.current) return;
     if (document.fullscreenElement) {
@@ -205,10 +234,18 @@ export default function NativeYouTubePlayer({ url }: NativeYouTubePlayerProps) {
   return (
     <div
       ref={containerRef}
-      className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl group"
+      className="native-yt-container relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl group"
       onMouseMove={handleMouseMove}
       onMouseLeave={() => playing && setShowControls(false)}
     >
+      {/* Hide YouTube native UI — block pointer events */}
+      <style>{`
+        .native-yt-container iframe,
+        .native-yt-container youtube-video {
+          pointer-events: none;
+        }
+      `}</style>
+
       {/* ── React Player (YouTube via youtube-video-element) ───── */}
       {PlayerComponent && (
         <PlayerComponent
@@ -315,7 +352,7 @@ export default function NativeYouTubePlayer({ url }: NativeYouTubePlayerProps) {
             <div className="flex items-center gap-2 group/volume">
               <button
                 onClick={handleToggleMute}
-                className="text-white hover:text-green-400 transition-colors"
+                className="text-white hover:text-green-400 transition-colors flex items-center"
                 aria-label={muted ? "Unmute" : "Mute"}
               >
                 {muted || volume === 0 ? (
@@ -324,21 +361,35 @@ export default function NativeYouTubePlayer({ url }: NativeYouTubePlayerProps) {
                   <HiOutlineVolumeUp className="w-6 h-6" />
                 )}
               </button>
-              <div className="w-0 opacity-0 group-hover/volume:w-20 group-hover/volume:opacity-100 transition-all overflow-hidden">
-                <input
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  value={muted ? 0 : volume}
-                  onChange={handleVolumeChange}
-                  className="w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer"
-                />
+              <div className="w-0 opacity-0 group-hover/volume:w-24 group-hover/volume:opacity-100 transition-all overflow-hidden flex items-center">
+                <div className="relative w-full h-4 flex items-center">
+                  {/* Volume track background */}
+                  <div className="absolute left-0 right-0 h-1 bg-white/20 rounded-full" />
+                  {/* Volume filled track */}
+                  <div
+                    className="absolute left-0 h-1 bg-green-500 rounded-full"
+                    style={{ width: `${(muted ? 0 : volume) * 100}%` }}
+                  />
+                  {/* Volume dot */}
+                  <div
+                    className="absolute w-3 h-3 bg-white rounded-full shadow-lg"
+                    style={{ left: `${(muted ? 0 : volume) * 100}%`, marginLeft: "-6px" }}
+                  />
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    value={muted ? 0 : volume}
+                    onChange={handleVolumeChange}
+                    className="absolute inset-0 w-full opacity-0 cursor-pointer"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Time */}
-            <div className="text-white text-sm font-medium">
+            <div className="text-white text-sm font-medium leading-none">
               {formatTime(played * duration)} / {formatTime(duration)}
             </div>
           </div>
