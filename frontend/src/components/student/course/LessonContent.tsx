@@ -4,6 +4,7 @@ import React from "react";
 import {
   HiOutlineBookOpen,
 } from "react-icons/hi";
+import NativeYouTubePlayer from "./NativeYouTubePlayer";
 
 interface LessonContentProps {
   type: "VIDEO" | "ARTICLE";
@@ -38,17 +39,11 @@ export default function LessonContent({ type, videoUrl, articleContent }: Lesson
     <div className="space-y-6">
       {/* Video Content */}
       {hasVideoContent && (
-        <div className="overflow-hidden rounded-xl bg-black shadow-2xl">
-          <div className="aspect-video w-full">
-            {isYouTubeUrl(videoUrl!) ? (
-              <iframe
-                src={`https://www.youtube.com/embed/${getYouTubeVideoId(videoUrl!)}?rel=0`}
-                title="Lesson Video"
-                className="h-full w-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            ) : (
+        <div className="overflow-hidden rounded-xl shadow-2xl">
+          {isYouTubeUrl(videoUrl!) ? (
+            <NativeYouTubePlayer url={videoUrl!} />
+          ) : (
+            <div className="aspect-video w-full bg-black rounded-xl overflow-hidden">
               <video
                 src={videoUrl!}
                 title="Lesson Video"
@@ -56,8 +51,8 @@ export default function LessonContent({ type, videoUrl, articleContent }: Lesson
                 controls
                 controlsList="nodownload"
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -104,7 +99,7 @@ export default function LessonContent({ type, videoUrl, articleContent }: Lesson
 
       {/* No Content Message */}
       {!hasVideoContent && !hasArticleContent && (
-        <div className="flex flex-col items-center justify-center rounded-md border-2 border-dashed border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/[0.03] p-12 text-center">
+        <div className="flex flex-col items-center justify-center rounded-md border-2 border-dashed border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/3 p-12 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-white/5 mb-4">
             <HiOutlineBookOpen className="h-8 w-8 text-gray-400 dark:text-gray-500" />
           </div>
