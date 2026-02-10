@@ -31,6 +31,7 @@ import NextLink from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { toast } from '@/components/ui/toast'
+import ResendTimer from './_components/ResendTimer'
 
 const VerifyOTPContent = () => {
   const router = useRouter()
@@ -39,8 +40,6 @@ const VerifyOTPContent = () => {
   const [otp, setOtp] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [timer, setTimer] = useState(300) // 5 minutes = 300 seconds
-  const [canResend, setCanResend] = useState(false)
   const leftBgColor = useColorModeValue('#4d7c0f', '#365314')
   const rightBgColor = useColorModeValue('white', 'gray.800')
   const { colorMode, toggleColorMode } = useColorMode()
@@ -48,23 +47,6 @@ const VerifyOTPContent = () => {
   const userId = searchParams?.get('userId') || ''
   const email = searchParams?.get('email') || 'your email'
   const type = (searchParams?.get('type') || 'login') as 'registration' | 'login'
-
-  useEffect(() => {
-    if (timer > 0) {
-      const interval = setInterval(() => {
-        setTimer(prev => prev - 1)
-      }, 1000)
-      return () => clearInterval(interval)
-    } else {
-      setCanResend(true)
-    }
-  }, [timer])
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
 
   const handleOtpChange = (value: string) => {
     setOtp(value)
@@ -106,8 +88,6 @@ if (!userId) {
   }
 
   const handleResendCode = async () => {
-    if (!canResend) return
-    
     if (!userId) {
       setError('Invalid verification session. Please try again.')
       return
@@ -124,10 +104,6 @@ if (!userId) {
         description: 'Please check your email for the new verification code.',
         duration: 3000,
       })
-      
-      // Reset timer
-      setTimer(300)
-      setCanResend(false)
     } catch (err: any) {
       const errorMsg = err.response?.data?.message || 'Failed to resend code. Please try again.'
       setError(errorMsg)
@@ -374,25 +350,6 @@ email
                       )}
                     </FormControl>
 
-                    <Text
-                      fontSize={{ base: 'xs', md: 'sm' }}
-                      color="muted"
-                      textAlign="center"
-                    >
-                      {canResend ? (
-                        <Text as="span" color="red.500" fontWeight="medium">
-                          Code expired
-                        </Text>
-                      ) : (
-                        <>
-                          Code expires in{' '}
-                          <Text as="span" fontWeight="bold" color="blue.500">
-                            {formatTime(timer)}
-                          </Text>
-                        </>
-                      )}
-                    </Text>
-
                     <Button
                       type="submit"
                       colorScheme="primary"
@@ -404,25 +361,11 @@ email
                       Verify Code
                     </Button>
 
-                    <Text 
-                      textAlign="center" 
-                      fontSize={{ base: 'xs', md: 'sm' }} 
-                      color="muted"
-                      px={{ base: 2, md: 0 }}
-                    >
-                      Didn't receive the code?{' '}
-                      <Button
-                        variant="link"
-                        colorScheme="blue"
-                        size="sm"
-                        onClick={handleResendCode}
-                        isDisabled={!canResend || isLoading}
-                        fontWeight="semibold"
-                        fontSize={{ base: 'xs', md: 'sm' }}
-                      >
-                        Resend Code
-                      </Button>
-                    </Text>
+                    <ResendTimer
+                      initialTime={300}
+                      onResend={handleResendCode}
+                      isLoading={isLoading}
+                    />
 
                     <Button
                       as={NextLink}

@@ -10,9 +10,10 @@ interface LessonContentProps {
   type: "VIDEO" | "ARTICLE";
   videoUrl?: string;
   articleContent?: string;
+  onWatchTimeUpdate?: (watchedSeconds: number, totalDuration: number) => void;
 }
 
-export default function LessonContent({ type, videoUrl, articleContent }: LessonContentProps) {
+export default function LessonContent({ type, videoUrl, articleContent, onWatchTimeUpdate }: LessonContentProps) {
   const isYouTubeUrl = (url: string) => {
     return /(?:youtube\.com|youtu\.be)/.test(url);
   };
@@ -39,20 +40,22 @@ export default function LessonContent({ type, videoUrl, articleContent }: Lesson
     <div className="space-y-6">
       {/* Video Content */}
       {hasVideoContent && (
-        <div className="overflow-hidden rounded-xl shadow-2xl">
-          {isYouTubeUrl(videoUrl!) ? (
-            <NativeYouTubePlayer url={videoUrl!} />
-          ) : (
-            <div className="aspect-video w-full bg-black rounded-xl overflow-hidden">
-              <video
-                src={videoUrl!}
-                title="Lesson Video"
-                className="h-full w-full"
-                controls
-                controlsList="nodownload"
-              />
-            </div>
-          )}
+        <div className="flex justify-center">
+          <div className="w-full max-w-4xl overflow-hidden rounded-xl shadow-2xl">
+            {isYouTubeUrl(videoUrl!) ? (
+              <NativeYouTubePlayer url={videoUrl!} onWatchTimeUpdate={onWatchTimeUpdate} />
+            ) : (
+              <div className="aspect-video w-full bg-black rounded-xl overflow-hidden">
+                <video
+                  src={videoUrl!}
+                  title="Lesson Video"
+                  className="h-full w-full"
+                  controls
+                  controlsList="nodownload"
+                />
+              </div>
+            )}
+          </div>
         </div>
       )}
 

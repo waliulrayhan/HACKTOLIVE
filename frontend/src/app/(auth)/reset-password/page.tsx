@@ -30,6 +30,7 @@ import { BackgroundGradient } from '@/components/shared/gradients/background-gra
 import { PageTransition } from '@/components/shared/motion/page-transition'
 import { Header } from '../../(marketing)/_components/layout/header'
 import OTPInput from '@/app/(auth)/verify-otp/_components/OTPInput'
+import ResendTimer from '@/app/(auth)/verify-otp/_components/ResendTimer'
 import { NextPage } from 'next'
 import { FaArrowLeft, FaEye, FaEyeSlash, FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
 import { useState, useMemo } from 'react'
@@ -42,6 +43,7 @@ const ResetPassword: NextPage = () => {
   const router = useRouter()
   const [step, setStep] = useState<'email' | 'otp' | 'password'>('email')
   const [email, setEmail] = useState('')
+  const [userId, setUserId] = useState('')
   const [otp, setOtp] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -86,6 +88,7 @@ const ResetPassword: NextPage = () => {
     try {
       // Check if user exists and send OTP
       const response = await authService.forgotPassword(email)
+      setUserId(response.userId) // Store the userId
       toast.success('OTP sent!', {
         description: 'A 6-digit verification code has been sent to your email.',
         duration: 3000,
@@ -111,7 +114,36 @@ const ResetPassword: NextPage = () => {
       setIsLoading(false)
     }
   }
+  const handleResendOtp = async () => {
+    if (!userId) {
+      toast.error('Session expired', {
+        description: 'Please start the password reset process again.',
+        duration: 4000,
+      })
+      setStep('email')
+      return
+    }
 
+    setIsLoading(true)
+    setOtp('')
+    setErrors({ email: '', otp: '', password: '', confirmPassword: '' })
+
+    try {
+      await authService.resendOtp(userId, 'PASSWORD_RESET')
+      toast.success('Code resent successfully!', {
+        description: 'Please check your email for the new verification code.',
+        duration: 3000,
+      })
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to resend OTP. Please try again.'
+      toast.error('Failed to resend code', {
+        description: errorMessage,
+        duration: 5000,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrors({ email: '', otp: '', password: '', confirmPassword: '' })
@@ -427,6 +459,12 @@ const ResetPassword: NextPage = () => {
                           >
                             Verify code
                           </Button>
+
+                          <ResendTimer
+                            initialTime={300}
+                            onResend={handleResendOtp}
+                            isLoading={isLoading}
+                          />
                         </VStack>
                       </form>
 

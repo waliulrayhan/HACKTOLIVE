@@ -11,6 +11,7 @@ import {
 
 interface NativeYouTubePlayerProps {
   url: string;
+  onWatchTimeUpdate?: (watchedSeconds: number, totalDuration: number) => void;
 }
 
 /**
@@ -23,11 +24,12 @@ interface NativeYouTubePlayerProps {
  *  - native HTML-video events (onTimeUpdate, onDurationChange …)
  *  - `playing`, `volume`, `muted` props are still handled by v3's Player wrapper
  */
-export default function NativeYouTubePlayer({ url }: NativeYouTubePlayerProps) {
+export default function NativeYouTubePlayer({ url, onWatchTimeUpdate }: NativeYouTubePlayerProps) {
   const playerRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const watchTimeRef = useRef(0); // Track cumulative watch time in seconds
 
   // Dynamically imported ReactPlayer (client-only, avoids SSR issues)
   const [PlayerComponent, setPlayerComponent] =
@@ -43,6 +45,8 @@ export default function NativeYouTubePlayer({ url }: NativeYouTubePlayerProps) {
   const [seeking, setSeeking] = useState(false);
   const [buffered, setBuffered] = useState(0); // 0 – 1
   const [hasError, setHasError] = useState(false);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const [showSpeedMenu, setShowSpeedMenu] = useState(false);
 
   // ── Load react-player on the client ──────────────────────────────
   useEffect(() => {
@@ -90,6 +94,20 @@ export default function NativeYouTubePlayer({ url }: NativeYouTubePlayerProps) {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
     };
   }, [playing, showControls]);
+
+  // ── Track cumulative watch time ──────────────────────────────────
+  useEffect(() => {
+    if (!playing || !ready) return;
+
+    const interval = setInterval(() => {
+      watchTimeRef.current += 1;
+      if (onWatchTimeUpdate && duration > 0) {
+        onWatchTimeUpdate(watchTimeRef.current, duration);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [playing, ready, duration, onWatchTimeUpdate]);
 
   // ── Keyboard shortcuts: arrow left/right to skip 10s ─────────────
   useEffect(() => {
@@ -204,6 +222,11 @@ export default function NativeYouTubePlayer({ url }: NativeYouTubePlayerProps) {
     }
   }, []);
 
+  const handleSpeedChange = (speed: number) => {
+    setPlaybackRate(speed);
+    setShowSpeedMenu(false);
+  };
+
   const handleFullscreen = useCallback(() => {
     if (!containerRef.current) return;
     if (document.fullscreenElement) {
@@ -256,6 +279,7 @@ export default function NativeYouTubePlayer({ url }: NativeYouTubePlayerProps) {
           playing={playing}
           volume={volume}
           muted={muted}
+          playbackRate={playbackRate}
           width="100%"
           height="100%"
           onReady={handleReady}
@@ -395,6 +419,34 @@ export default function NativeYouTubePlayer({ url }: NativeYouTubePlayerProps) {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Playback Speed */}
+            <div className="relative">
+              <button
+                onClick={() => setShowSpeedMenu(!showSpeedMenu)}
+                className="text-white hover:text-green-400 transition-colors text-sm font-medium px-2 py-1 rounded hover:bg-white/10"
+                aria-label="Playback speed"
+              >
+                {playbackRate}x
+              </button>
+              {showSpeedMenu && (
+                <div className="absolute bottom-full right-0 mb-2 bg-black/95 rounded-lg shadow-xl overflow-hidden border border-white/10">
+                  {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((speed) => (
+                    <button
+                      key={speed}
+                      onClick={() => handleSpeedChange(speed)}
+                      className={`block w-full px-4 py-2 text-left text-sm transition-colors ${
+                        playbackRate === speed
+                          ? "bg-green-500/20 text-green-400"
+                          : "text-white hover:bg-white/10"
+                      }`}
+                    >
+                      {speed === 1 ? "Normal" : `${speed}x`}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            
             {/* Fullscreen */}
             <button
               onClick={handleFullscreen}

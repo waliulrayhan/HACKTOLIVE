@@ -140,6 +140,10 @@ export default function StudentLessonPage() {
   const [showAssignmentModal, setShowAssignmentModal] = useState(false);
   const [showResourcesModal, setShowResourcesModal] = useState(false);
   const [previousSidebarState, setPreviousSidebarState] = useState<boolean | null>(null);
+  
+  // Watch time tracking for video lessons
+  const [watchedSeconds, setWatchedSeconds] = useState(0);
+  const [videoDuration, setVideoDuration] = useState(0);
 
   // Quiz state
   const [quizAttempts, setQuizAttempts] = useState<QuizAttempt[]>([]);
@@ -157,6 +161,12 @@ export default function StudentLessonPage() {
   const [showSubmissionConfirm, setShowSubmissionConfirm] = useState(false);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+  // Handle watch time updates from video player
+  const handleWatchTimeUpdate = useCallback((watchedSecs: number, totalDuration: number) => {
+    setWatchedSeconds(watchedSecs);
+    setVideoDuration(totalDuration);
+  }, []);
 
   // Auto-minimize main AppSidebar on lesson page for more content space
   useEffect(() => {
@@ -644,6 +654,11 @@ export default function StudentLessonPage() {
   const hasResources = lesson.resources && lesson.resources.length > 0;
   const hasVideoContent = lesson.type === "VIDEO" && lesson.videoUrl;
   const hasArticleContent = lesson.type === "ARTICLE" && lesson.articleContent;
+  
+  // Calculate if user has watched enough of the video (25% minimum)
+  const requiredWatchTime = videoDuration * 0.25;
+  const watchProgress = videoDuration > 0 ? Math.round((watchedSeconds / videoDuration) * 100) : 0;
+  const hasWatchedEnough = !hasVideoContent || watchProgress >= 25;
 
   // Count resources, quizzes and assignments
   const quizCount = lesson.quizzes?.length || 0;
@@ -757,15 +772,30 @@ export default function StudentLessonPage() {
                   Complete
                 </Badge>
               ) : (
-                <Button
-                  onClick={markAsComplete}
-                  disabled={completing}
-                  variant="primary"
-                  size="sm"
-                  startIcon={<HiOutlineCheckCircle className="h-4 w-4" />}
-                >
-                  {completing ? "Marking..." : "Mark As Complete"}
-                </Button>
+                <div className="flex items-center gap-3">
+                  {hasVideoContent && videoDuration > 0 && (
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-linear-to-t from-brand-500 to-brand-400 transition-all duration-300"
+                          style={{ width: `${Math.min(100, (watchProgress / 25) * 100)}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                        {watchProgress} / 100
+                      </span>
+                    </div>
+                  )}
+                  <Button
+                    onClick={markAsComplete}
+                    disabled={completing || !hasWatchedEnough}
+                    variant="primary"
+                    size="sm"
+                    startIcon={<HiOutlineCheckCircle className="h-4 w-4" />}
+                  >
+                    {completing ? "Marking..." : "Mark As Complete"}
+                  </Button>
+                </div>
               )}
             </div>
           </div>
@@ -779,6 +809,7 @@ export default function StudentLessonPage() {
               type={lesson.type as "VIDEO" | "ARTICLE"}
               videoUrl={lesson.videoUrl}
               articleContent={lesson.articleContent}
+              onWatchTimeUpdate={handleWatchTimeUpdate}
             />
 
             {/* Action Cards Grid */}

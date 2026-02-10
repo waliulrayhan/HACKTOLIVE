@@ -1,7 +1,7 @@
 'use client'
 
 import { Box, Button, Text, useColorModeValue } from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 interface ResendTimerProps {
   initialTime?: number // in seconds
@@ -16,17 +16,43 @@ export default function ResendTimer({
 }: ResendTimerProps) {
   const [timer, setTimer] = useState(initialTime)
   const [canResend, setCanResend] = useState(false)
+  const endTimeRef = useRef<number | null>(null)
+
+  // Initialize or reset the timer with timestamp-based calculation
+  const resetTimer = () => {
+    const now = Date.now()
+    endTimeRef.current = now + initialTime * 1000
+    setTimer(initialTime)
+    setCanResend(false)
+  }
 
   useEffect(() => {
-    if (timer > 0) {
-      const interval = setInterval(() => {
-        setTimer((prev) => prev - 1)
-      }, 1000)
-      return () => clearInterval(interval)
-    } else {
-      setCanResend(true)
+    // Initialize timer on mount
+    resetTimer()
+  }, [initialTime])
+
+  useEffect(() => {
+    if (!endTimeRef.current) return
+
+    const updateTimer = () => {
+      const now = Date.now()
+      const remaining = Math.max(0, Math.ceil((endTimeRef.current! - now) / 1000))
+      
+      setTimer(remaining)
+      
+      if (remaining === 0) {
+        setCanResend(true)
+      }
     }
-  }, [timer])
+
+    // Update immediately
+    updateTimer()
+
+    // Then update every second
+    const interval = setInterval(updateTimer, 1000)
+    
+    return () => clearInterval(interval)
+  }, [endTimeRef.current])
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -35,8 +61,7 @@ export default function ResendTimer({
   }
 
   const handleResend = () => {
-    setTimer(initialTime)
-    setCanResend(false)
+    resetTimer()
     onResend()
   }
 
