@@ -271,7 +271,7 @@ const BlogPage = () => {
 
       <Box py={{ base: "10", md: "12", lg: "16" }} bg={bgColor}>
         <Container maxW="container.xl">
-          <Grid templateColumns={isDesktop ? "280px 1fr" : "1fr"} gap={{ base: "8", lg: "10" }}>
+          <Grid templateColumns={isDesktop ? "220px 1fr" : "1fr"} gap={{ base: "8", lg: "10" }}>
             {isDesktop && (
               <GridItem>
                 <VStack spacing="4" align="stretch" position="sticky" top="24">

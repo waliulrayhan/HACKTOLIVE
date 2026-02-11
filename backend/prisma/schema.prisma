@@ -795,7 +795,7 @@ model Product {
   description      String          @db.Text
   shortDescription String?         @db.VarChar(500)
   categoryId       String
-  type             ProductType
+  type             ProductType?
   price            Float
   compareAtPrice   Float?
   cost             Float?
@@ -1040,7 +1040,6 @@ model ProductReview {
 enum ProductType {
   COURSE_VOUCHER
   DAILY_SPECIAL
-  MERCHANDISE
   TRAINING_BUNDLE
 }
 

@@ -161,7 +161,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
       <Container maxW="container.xl" pb={{ base: "20", md: "24" }}>
         <SimpleGrid columns={{ base: 1, lg: 12 }} spacing={{ base: "8", lg: "10" }}>
           {/* Sidebar */}
-          <Box gridColumn={{ base: "span 1", lg: "span 4" }} order={{ base: 2, lg: 1 }}>
+          <Box gridColumn={{ base: "span 1", lg: "span 3" }} order={{ base: 2, lg: 1 }}>
             <VStack spacing="6" align="stretch" position="sticky" top="100px">
               {/* Categories */}
               <CategoriesSidebar />
@@ -179,7 +179,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
           </Box>
 
           {/* Main Content */}
-          <Box gridColumn={{ base: "span 1", lg: "span 8" }} order={{ base: 1, lg: 2 }}>
+          <Box gridColumn={{ base: "span 1", lg: "span 9" }} order={{ base: 1, lg: 2 }}>
             <Card
               bg={cardBg}
               borderWidth="1px"
@@ -540,45 +540,6 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                       {blog.content ? (
                         <Box
                           className="blog-content"
-                          fontSize="md"
-                          lineHeight="1.8"
-                          sx={{
-                            '& h1': { fontSize: '2xl', fontWeight: 'bold', mt: 6, mb: 4 },
-                            '& h2': { fontSize: 'xl', fontWeight: 'bold', mt: 6, mb: 3 },
-                            '& h3': { fontSize: 'lg', fontWeight: 'semibold', mt: 5, mb: 3 },
-                            '& p': { mb: 4 },
-                            '& ul, & ol': { pl: 6, mb: 4 },
-                            '& li': { mb: 2 },
-                            '& blockquote': {
-                              borderLeft: '4px solid',
-                              borderColor: accentColor,
-                              pl: 6,
-                              py: 4,
-                              fontStyle: 'italic',
-                              color: mutedColor,
-                              bg: useColorModeValue('gray.50', 'gray.900'),
-                              borderRadius: 'md',
-                              my: 6
-                            },
-                            '& strong': { fontWeight: 'bold' },
-                            '& em': { fontStyle: 'italic' },
-                            '& u': { textDecoration: 'underline' },
-                            '& a': { color: accentColor, textDecoration: 'underline' },
-                            '& code': {
-                              bg: useColorModeValue('gray.100', 'gray.700'),
-                              px: 2,
-                              py: 1,
-                              borderRadius: 'sm',
-                              fontSize: 'sm'
-                            },
-                            '& pre': {
-                              bg: useColorModeValue('gray.100', 'gray.700'),
-                              p: 4,
-                              borderRadius: 'md',
-                              overflowX: 'auto',
-                              my: 4
-                            }
-                          }}
                           dangerouslySetInnerHTML={{ __html: blog.content }}
                         />
                       ) : (

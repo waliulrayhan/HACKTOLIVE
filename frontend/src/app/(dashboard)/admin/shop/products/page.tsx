@@ -183,11 +183,10 @@ export default function AdminProductsPage() {
     }
   };
 
-  const getTypeBadgeColor = (type: string) => {
+  const getTypeBadgeColor = (type?: string) => {
     switch (type) {
       case 'COURSE_VOUCHER': return 'info';
       case 'DAILY_SPECIAL': return 'success';
-      case 'MERCHANDISE': return 'warning';
       case 'TRAINING_BUNDLE': return 'error';
       default: return 'light';
     }
@@ -331,9 +330,9 @@ export default function AdminProductsPage() {
                 className="h-9 sm:h-10 rounded-lg border border-gray-300 bg-white px-3 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
               >
                 <option value="ALL">All Types</option>
+                <option value="">General Product</option>
                 <option value="COURSE_VOUCHER">Course Voucher</option>
                 <option value="DAILY_SPECIAL">Daily Special</option>
-                <option value="MERCHANDISE">Merchandise</option>
                 <option value="TRAINING_BUNDLE">Training Bundle</option>
               </select>
             </div>
@@ -406,12 +405,12 @@ export default function AdminProductsPage() {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="px-3 py-2.5 sm:px-4 sm:py-3">
+                      <TableCell className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
                         <Badge color={getTypeBadgeColor(product.type)} variant="light">
-                          {product.type.replace('_', ' ')}
+                          {product.type ? product.type.replace('_', ' ') : 'General'}
                         </Badge>
                       </TableCell>
-                      <TableCell className="px-3 py-2.5 sm:px-4 sm:py-3">
+                      <TableCell className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
                         <span className="text-xs font-semibold text-gray-900 dark:text-white">
                           {product.price.toLocaleString()} BDT
                         </span>

@@ -795,12 +795,8 @@ export default function BlogsManagementPage() {
               {/* Blog Content */}
               <div className="prose prose-lg dark:prose-invert max-w-none mb-8">
                 <div
-                  className="text-gray-700 dark:text-gray-300 leading-relaxed [&_p]:mb-4 [&_p:last-child]:mb-0"
+                  className="blog-content text-gray-700 dark:text-gray-300"
                   dangerouslySetInnerHTML={{ __html: selectedBlog.content }}
-                  style={{
-                    lineHeight: '1.8',
-                    whiteSpace: 'pre-wrap',
-                  }}
                 />
               </div>
 

@@ -282,12 +282,6 @@ export const megaMenuData: MegaMenuData = {
             href: '/shopping?type=TRAINING_BUNDLE',
             icon: FiBookOpen,
           },
-          {
-            title: 'Merchandise',
-            description: 'Exclusive HackToLive gear',
-            href: '/shopping?type=MERCHANDISE',
-            icon: FiShoppingCart,
-          },
         ],
       },
       {

@@ -78,7 +78,6 @@ export default function ShoppingPage() {
   const productTypes = [
     { value: 'COURSE_VOUCHER', label: 'Course Vouchers' },
     { value: 'DAILY_SPECIAL', label: 'Daily Specials' },
-    { value: 'MERCHANDISE', label: 'Merchandise' },
     { value: 'TRAINING_BUNDLE', label: 'Training Bundles' },
   ]
 
@@ -674,9 +673,11 @@ export default function ShoppingPage() {
 
                       <CardBody>
                         <VStack spacing={3} align="start">
-                          <Badge colorScheme="purple" size="sm" fontSize="xs">
-                            {product.type.replace(/_/g, ' ')}
-                          </Badge>
+                          {product.type && (
+                            <Badge colorScheme="purple" size="sm" fontSize="xs">
+                              {product.type.replace(/_/g, ' ')}
+                            </Badge>
+                          )}
 
                           <Heading size="sm" noOfLines={2} lineHeight="1.4">
                             {product.name}

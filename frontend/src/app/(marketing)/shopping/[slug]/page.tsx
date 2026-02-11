@@ -250,9 +250,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             {/* Product Info */}
             <VStack spacing={6} align="start">
               <VStack spacing={3} align="start" width="100%">
-                <Badge colorScheme="purple" fontSize="sm">
-                  {product.type.replace('_', ' ')}
-                </Badge>
+                {product.type && (
+                  <Badge colorScheme="purple" fontSize="sm">
+                    {product.type.replace('_', ' ')}
+                  </Badge>
+                )}
 
                 <Heading size="xl">{product.name}</Heading>
 

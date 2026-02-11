@@ -19,7 +19,8 @@ export class CreateProductDto {
   categoryId: string;
 
   @IsEnum(ProductType)
-  type: ProductType;
+  @IsOptional()
+  type?: ProductType;
 
   @IsNumber()
   @Min(0)

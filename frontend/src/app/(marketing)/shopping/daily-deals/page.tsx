@@ -313,9 +313,11 @@ export default function DailyDealsPage() {
 
                     <CardBody>
                       <VStack spacing={3} align="start">
-                        <Badge colorScheme="purple" size="sm" fontSize="xs">
-                          {product.type.replace(/_/g, ' ')}
-                        </Badge>
+                        {product.type && (
+                          <Badge colorScheme="purple" size="sm" fontSize="xs">
+                            {product.type.replace(/_/g, ' ')}
+                          </Badge>
+                        )}
 
                         <Heading size="sm" noOfLines={2} lineHeight="1.4">
                           {product.name}

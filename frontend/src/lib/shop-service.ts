@@ -8,7 +8,7 @@ export interface Product {
   shortDescription?: string;
   categoryId: string;
   category?: ProductCategory;
-  type: 'COURSE_VOUCHER' | 'DAILY_SPECIAL' | 'MERCHANDISE' | 'TRAINING_BUNDLE';
+  type?: 'COURSE_VOUCHER' | 'DAILY_SPECIAL' | 'TRAINING_BUNDLE';
   price: number;
   compareAtPrice?: number;
   sku?: string;

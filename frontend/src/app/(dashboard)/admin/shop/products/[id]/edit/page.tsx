@@ -51,7 +51,7 @@ export default function EditProductPage() {
         description: "",
         shortDescription: "",
         categoryId: "",
-        type: "MERCHANDISE" as 'COURSE_VOUCHER' | 'DAILY_SPECIAL' | 'MERCHANDISE' | 'TRAINING_BUNDLE',
+        type: "" as '' | 'COURSE_VOUCHER' | 'DAILY_SPECIAL' | 'TRAINING_BUNDLE',
         price: 0,
         compareAtPrice: 0,
         sku: "",
@@ -112,7 +112,7 @@ export default function EditProductPage() {
                 description: product.description,
                 shortDescription: product.shortDescription || "",
                 categoryId: product.categoryId,
-                type: product.type,
+                type: product.type || "",
                 price: product.price,
                 compareAtPrice: product.compareAtPrice || 0,
                 sku: product.sku || "",
@@ -271,12 +271,26 @@ export default function EditProductPage() {
             if (!formData.slug.trim()) newErrors.slug = "Slug is required";
             if (!formData.description.trim()) newErrors.description = "Description is required";
             if (!formData.categoryId) newErrors.categoryId = "Category is required";
-            if (!formData.type) newErrors.type = "Type is required";
+            // Type is now optional
         }
 
         if (step === 2) {
             if (formData.price < 0) newErrors.price = "Price must be 0 or greater";
             if (formData.stockQuantity < 0) newErrors.stockQuantity = "Stock quantity must be 0 or greater";
+            
+            // Validate type-specific fields
+            if (formData.type === 'DAILY_SPECIAL') {
+                if (formData.sizes.length === 0) newErrors.sizes = "At least one size is required for Daily Special products";
+                if (formData.colors.length === 0) newErrors.colors = "At least one color is required for Daily Special products";
+            }
+            
+            if (formData.type === 'TRAINING_BUNDLE') {
+                if (formData.bundleProducts.length === 0) newErrors.bundleProducts = "At least one product ID is required for Training Bundle";
+            }
+            
+            if (formData.type === 'COURSE_VOUCHER') {
+                if (!formData.voucherDuration || formData.voucherDuration < 1) newErrors.voucherDuration = "Voucher duration must be at least 1 month";
+            }
         }
 
         setErrors(newErrors);
@@ -300,10 +314,11 @@ export default function EditProductPage() {
         try {
             const productData = {
                 ...formData,
+                type: formData.type || undefined, // Send undefined if empty string
                 tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : [],
-                sizes: formData.type === 'DAILY_SPECIAL' || formData.type === 'MERCHANDISE' ? formData.sizes : undefined,
-                colors: formData.type === 'DAILY_SPECIAL' || formData.type === 'MERCHANDISE' ? formData.colors : undefined,
-                material: formData.type === 'DAILY_SPECIAL' || formData.type === 'MERCHANDISE' ? formData.material : undefined,
+                sizes: formData.type === 'DAILY_SPECIAL' ? formData.sizes : undefined,
+                colors: formData.type === 'DAILY_SPECIAL' ? formData.colors : undefined,
+                material: formData.type === 'DAILY_SPECIAL' ? formData.material : undefined,
                 courseId: formData.type === 'COURSE_VOUCHER' ? (formData.courseId || undefined) : undefined,
                 voucherDuration: formData.type === 'COURSE_VOUCHER' ? (formData.voucherDuration * 30) : undefined, // Convert months to days
                 bundleProducts: formData.type === 'TRAINING_BUNDLE' ? formData.bundleProducts : undefined,
@@ -539,23 +554,22 @@ export default function EditProductPage() {
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Product Type <span className="text-red-500">*</span>
+                                        Product Type <span className="text-xs text-gray-500">(Optional)</span>
                                     </label>
                                     <select
                                         name="type"
                                         value={formData.type}
                                         onChange={handleInputChange}
-                                        className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white ${errors.type
-                                                ? 'border-red-500 focus:border-red-500'
-                                                : 'border-gray-300 focus:border-brand-500 dark:border-gray-600'
-                                            }`}
+                                        className="w-full h-10 rounded-lg border border-gray-300 focus:border-brand-500 dark:border-gray-600 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white"
                                     >
-                                        <option value="MERCHANDISE">Merchandise</option>
-                                        <option value="DAILY_SPECIAL">Daily Special</option>
+                                        <option value="">General Product</option>
                                         <option value="COURSE_VOUCHER">Course Voucher</option>
+                                        <option value="DAILY_SPECIAL">Daily Special</option>
                                         <option value="TRAINING_BUNDLE">Training Bundle</option>
                                     </select>
-                                    {errors.type && <p className="mt-1.5 text-xs text-red-500">{errors.type}</p>}
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        💡 Leave as "General Product" for standard cybersecurity tools, courses, or services
+                                    </p>
                                 </div>
 
                                 <div className="md:col-span-2">
@@ -629,6 +643,7 @@ export default function EditProductPage() {
                                         name="tags"
                                         value={formData.tags}
                                         onChange={handleInputChange}
+                                        autoComplete="off"
                                         className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                                         placeholder="cybersecurity, merchandise, limited-edition"
                                     />
@@ -795,7 +810,7 @@ export default function EditProductPage() {
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Voucher Duration (months)
+                                            Voucher Duration (months) <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             type="number"
@@ -804,9 +819,14 @@ export default function EditProductPage() {
                                             onChange={handleInputChange}
                                             min="1"
                                             max="12"
-                                            className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                            className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                                                errors.voucherDuration
+                                                    ? 'border-red-500 focus:border-red-500'
+                                                    : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                                            }`}
                                             placeholder="e.g., 1, 3, 6, 12"
                                         />
+                                        {errors.voucherDuration && <p className="mt-1.5 text-xs text-red-500">{errors.voucherDuration}</p>}
                                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                             Duration in months (1-12 months)
                                         </p>
@@ -815,44 +835,80 @@ export default function EditProductPage() {
                             </div>
                         )}
 
-                        {(formData.type === 'MERCHANDISE' || formData.type === 'DAILY_SPECIAL') && (
+                        {formData.type === 'DAILY_SPECIAL' && (
                             <div className="rounded-xl border border-gray-200 bg-linear-to-br from-purple-50 to-white p-5 dark:border-white/5 dark:from-purple-900/20 dark:to-gray-900/50">
                                 <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                                     <HiOutlineTag className="h-4 w-4 text-purple-500" />
-                                    Merchandise Options
+                                    Daily Special Options
                                 </h4>
                                 
                                 <div className="space-y-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Available Sizes (comma-separated)
+                                            Available Sizes (comma-separated) <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             type="text"
                                             value={formData.sizes.join(', ')}
                                             onChange={(e) => {
-                                                const sizes = e.target.value.split(',').map(s => s.trim()).filter(s => s);
+                                                const value = e.target.value;
+                                                const sizes = value.split(',').map(s => s.trim());
+                                                setFormData(prev => ({ ...prev, sizes }));
+                                                // Clear error when user types
+                                                if (errors.sizes) {
+                                                    const newErrors = { ...errors };
+                                                    delete newErrors.sizes;
+                                                    setErrors(newErrors);
+                                                }
+                                            }}
+                                            onBlur={(e) => {
+                                                // Clean up empty entries on blur
+                                                const sizes = formData.sizes.filter(s => s);
                                                 setFormData(prev => ({ ...prev, sizes }));
                                             }}
-                                            className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                            autoComplete="off"
+                                            className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                                                errors.sizes
+                                                    ? 'border-red-500 focus:border-red-500'
+                                                    : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                                            }`}
                                             placeholder="XS, S, M, L, XL, XXL"
                                         />
+                                        {errors.sizes && <p className="mt-1.5 text-xs text-red-500">{errors.sizes}</p>}
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Available Colors (comma-separated)
+                                            Available Colors (comma-separated) <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             type="text"
                                             value={formData.colors.join(', ')}
                                             onChange={(e) => {
-                                                const colors = e.target.value.split(',').map(c => c.trim()).filter(c => c);
+                                                const value = e.target.value;
+                                                const colors = value.split(',').map(c => c.trim());
+                                                setFormData(prev => ({ ...prev, colors }));
+                                                // Clear error when user types
+                                                if (errors.colors) {
+                                                    const newErrors = { ...errors };
+                                                    delete newErrors.colors;
+                                                    setErrors(newErrors);
+                                                }
+                                            }}
+                                            onBlur={(e) => {
+                                                // Clean up empty entries on blur
+                                                const colors = formData.colors.filter(c => c);
                                                 setFormData(prev => ({ ...prev, colors }));
                                             }}
-                                            className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                            autoComplete="off"
+                                            className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                                                errors.colors
+                                                    ? 'border-red-500 focus:border-red-500'
+                                                    : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                                            }`}
                                             placeholder="Black, White, Red, Blue"
                                         />
+                                        {errors.colors && <p className="mt-1.5 text-xs text-red-500">{errors.colors}</p>}
                                     </div>
 
                                     <div>
@@ -881,18 +937,36 @@ export default function EditProductPage() {
                                 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Bundle Product IDs (comma-separated)
+                                        Bundle Product IDs (comma-separated) <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
                                         value={formData.bundleProducts.join(', ')}
                                         onChange={(e) => {
-                                            const bundleProducts = e.target.value.split(',').map(p => p.trim()).filter(p => p);
+                                            const value = e.target.value;
+                                            const bundleProducts = value.split(',').map(p => p.trim());
+                                            setFormData(prev => ({ ...prev, bundleProducts }));
+                                            // Clear error when user types
+                                            if (errors.bundleProducts) {
+                                                const newErrors = { ...errors };
+                                                delete newErrors.bundleProducts;
+                                                setErrors(newErrors);
+                                            }
+                                        }}
+                                        onBlur={(e) => {
+                                            // Clean up empty entries on blur
+                                            const bundleProducts = formData.bundleProducts.filter(p => p);
                                             setFormData(prev => ({ ...prev, bundleProducts }));
                                         }}
-                                        className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                        autoComplete="off"
+                                        className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                                            errors.bundleProducts
+                                                ? 'border-red-500 focus:border-red-500'
+                                                : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                                        }`}
                                         placeholder="product-id-1, product-id-2, product-id-3"
                                     />
+                                    {errors.bundleProducts && <p className="mt-1.5 text-xs text-red-500">{errors.bundleProducts}</p>}
                                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                         Enter product IDs that are included in this bundle
                                     </p>
@@ -976,7 +1050,7 @@ export default function EditProductPage() {
                                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 whitespace-pre-wrap">{formData.shortDescription}</p>
                                         <div className="flex gap-2 mt-2">
                                             <span className="px-2 py-1 text-xs rounded bg-brand-100 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400">
-                                                {formData.type.replace('_', ' ')}
+                                                {formData.type ? formData.type.replace('_', ' ') : 'General Product'}
                                             </span>
                                             <span className="px-2 py-1 text-xs rounded bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-400">
                                                 {categories.find(c => c.id === formData.categoryId)?.name || 'No Category'}
