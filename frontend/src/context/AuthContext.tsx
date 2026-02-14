@@ -8,8 +8,8 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ userId?: string; email?: string; requiresOtp: boolean; user?: User; token?: string }>;
-  signup: (name: string, email: string, password: string, role?: string) => Promise<{ userId: string; email: string; requiresOtp: boolean }>;
+  login: (email: string, password: string, turnstileToken: string) => Promise<{ userId?: string; email?: string; requiresOtp: boolean; user?: User; token?: string }>;
+  signup: (name: string, email: string, password: string, turnstileToken: string, role?: string) => Promise<{ userId: string; email: string; requiresOtp: boolean }>;
   verifyOtp: (userId: string, code: string, type: 'registration' | 'login') => Promise<void>;
   resendOtp: (userId: string, type: 'registration' | 'login') => Promise<void>;
   logout: () => void;
@@ -47,9 +47,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, turnstileToken: string) => {
     try {
-      const data = await authService.login(email, password);
+      const data = await authService.login(email, password, turnstileToken);
       
       // Check if OTP is required or if it's a direct login (for students)
       if (data.requiresOtp) {
@@ -82,9 +82,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signup = async (name: string, email: string, password: string, role?: string) => {
+  const signup = async (name: string, email: string, password: string, turnstileToken: string, role?: string) => {
     try {
-      const data = await authService.signup(name, email, password, role);
+      const data = await authService.signup(name, email, password, turnstileToken, role);
       // Return OTP response for verification
       return {
         userId: data.userId,

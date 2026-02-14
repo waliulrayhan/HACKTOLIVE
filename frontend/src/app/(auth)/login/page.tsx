@@ -30,8 +30,8 @@ import { PageTransition } from '@/components/shared/motion/page-transition'
 import { Header } from '../../(marketing)/_components/layout/header'
 import { NextPage } from 'next'
 import { FaGoogle, FaEye, FaEyeSlash, FaMoon, FaSun, FaHome } from 'react-icons/fa'
-import { useState, useRef } from 'react'
-import ReCAPTCHA from 'react-google-recaptcha'
+import { useState } from 'react'
+import { Turnstile } from '@marsidev/react-turnstile'
 import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
@@ -49,22 +49,19 @@ const Login: NextPage = () => {
   const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [keepSignedIn, setKeepSignedIn] = useState(false)
-  const [captchaValue, setCaptchaValue] = useState<string | null>(null)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [errors, setErrors] = useState({ email: '', password: '', captcha: '' })
-  const recaptchaRef = useRef<ReCAPTCHA>(null)
-  const captchaTheme = useColorModeValue('light', 'dark')
+  const [errors, setErrors] = useState({ email: '', password: '', turnstile: '' })
+  const turnstileTheme = useColorModeValue('light', 'dark')
   const leftBgColor = useColorModeValue('#4d7c0f', '#365314')
   const rightBgColor = useColorModeValue('white', 'gray.800')
   const { colorMode, toggleColorMode } = useColorMode()
 
-  const handleCaptchaChange = (value: string | null) => {
-    setCaptchaValue(value)
-    if (value) {
-      setErrors(prev => ({ ...prev, captcha: '' }))
-    }
+  const handleTurnstileVerify = (token: string) => {
+    setTurnstileToken(token)
+    setErrors(prev => ({ ...prev, turnstile: '' }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,11 +69,11 @@ const Login: NextPage = () => {
     e.stopPropagation()
     
     // Reset errors
-    setErrors({ email: '', password: '', captcha: '' })
+    setErrors({ email: '', password: '', turnstile: '' })
 
     // Validation
     let hasError = false
-    const newErrors = { email: '', password: '', captcha: '' }
+    const newErrors = { email: '', password: '', turnstile: '' }
 
     if (!email) {
       newErrors.email = 'Email is required'
@@ -93,7 +90,10 @@ const Login: NextPage = () => {
       newErrors.password = 'Password must be at least 6 characters'
       hasError = true
     }
-
+    if (!turnstileToken) {
+      newErrors.turnstile = 'Please complete the security verification'
+      hasError = true
+    }
     if (hasError) {
       setErrors(newErrors)
       return
@@ -102,7 +102,7 @@ const Login: NextPage = () => {
     setIsLoading(true)
     
     try {
-      const result = await login(email, password)
+      const result = await login(email, password, turnstileToken!)
       
       if (result.requiresOtp) {
         // For INSTRUCTOR and ADMIN - show success and redirect to OTP
@@ -369,18 +369,17 @@ const Login: NextPage = () => {
                       </Link>
                     </HStack>
 
-                    {/* reCAPTCHA */}
-                    {/* <FormControl isInvalid={!!errors.captcha}>
+                    {/* Cloudflare Turnstile */}
+                    <FormControl isInvalid={!!errors.turnstile}>
                       <Box display="flex" justifyContent="center" my={2}>
-                        <ReCAPTCHA
-                          ref={recaptchaRef}
-                          sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
-                          onChange={handleCaptchaChange}
-                          theme={captchaTheme}
+                        <Turnstile
+                          siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                          onSuccess={handleTurnstileVerify}
+                          options={{ theme: turnstileTheme as 'light' | 'dark' }}
                         />
                       </Box>
-                      <FormErrorMessage justifyContent="center">{errors.captcha}</FormErrorMessage>
-                    </FormControl> */}
+                      <FormErrorMessage justifyContent="center">{errors.turnstile}</FormErrorMessage>
+                    </FormControl>
 
                     {/* Login Button */}
                     <Button

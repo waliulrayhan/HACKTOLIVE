@@ -9,4 +9,11 @@ export class LoginDto {
   @ApiProperty({ example: 'password123' })
   @IsString()
   password: string;
+
+  @ApiProperty({ 
+    example: 'turnstile-token-here',
+    description: 'Cloudflare Turnstile verification token'
+  })
+  @IsString()
+  turnstileToken: string;
 }

@@ -36,12 +36,13 @@ export interface OtpResponse {
 export type LoginResponse = OtpResponse | (AuthResponse & { requiresOtp: false });
 
 export const authService = {
-  async signup(name: string, email: string, password: string, role?: string) {
+  async signup(name: string, email: string, password: string, turnstileToken: string, role?: string) {
     const response = await api.post<OtpResponse>('/auth/signup', {
       email,
       password,
       name,
       role: role || 'STUDENT',
+      turnstileToken,
     });
     return response.data;
   },
@@ -54,10 +55,11 @@ export const authService = {
     return response.data;
   },
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string, turnstileToken: string) {
     const response = await api.post<LoginResponse>('/auth/login', {
       email,
       password,
+      turnstileToken,
     });
     return response.data;
   },

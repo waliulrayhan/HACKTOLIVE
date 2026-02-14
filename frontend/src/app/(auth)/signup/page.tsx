@@ -31,8 +31,8 @@ import { PageTransition } from '@/components/shared/motion/page-transition'
 import { Header } from '../../(marketing)/_components/layout/header'
 import { NextPage } from 'next'
 import { FaGoogle, FaEye, FaEyeSlash, FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
-import { useState, useRef, useMemo } from 'react'
-import ReCAPTCHA from 'react-google-recaptcha'
+import { useState, useMemo } from 'react'
+import { Turnstile } from '@marsidev/react-turnstile'
 import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
@@ -44,7 +44,7 @@ const Signup: NextPage = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [agreeToTerms, setAgreeToTerms] = useState(false)
-  const [captchaValue, setCaptchaValue] = useState<string | null>(null)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const passwordBoxBg = useColorModeValue('gray.50', 'gray.700')
   const [formData, setFormData] = useState({
@@ -58,11 +58,10 @@ const Signup: NextPage = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    captcha: '',
+    turnstile: '',
     terms: '',
   })
-  const recaptchaRef = useRef<ReCAPTCHA>(null)
-  const captchaTheme = useColorModeValue('light', 'dark')
+  const turnstileTheme = useColorModeValue('light', 'dark')
   const leftBgColor = useColorModeValue('#4d7c0f', '#365314')
   const rightBgColor = useColorModeValue('white', 'gray.800')
   const { colorMode, toggleColorMode } = useColorMode()
@@ -82,11 +81,9 @@ const Signup: NextPage = () => {
     return Object.values(passwordRequirements).every(req => req)
   }, [passwordRequirements])
 
-  const handleCaptchaChange = (value: string | null) => {
-    setCaptchaValue(value)
-    if (value) {
-      setErrors(prev => ({ ...prev, captcha: '' }))
-    }
+  const handleTurnstileVerify = (token: string) => {
+    setTurnstileToken(token)
+    setErrors(prev => ({ ...prev, turnstile: '' }))
   }
 
   const handleInputChange = (field: string, value: string) => {
@@ -106,7 +103,7 @@ const Signup: NextPage = () => {
       email: '',
       password: '',
       confirmPassword: '',
-      captcha: '',
+      turnstile: '',
       terms: '',
     })
 
@@ -117,7 +114,7 @@ const Signup: NextPage = () => {
       email: '',
       password: '',
       confirmPassword: '',
-      captcha: '',
+      turnstile: '',
       terms: '',
     }
 
@@ -154,7 +151,10 @@ const Signup: NextPage = () => {
       newErrors.terms = 'You must agree to the terms'
       hasError = true
     }
-
+    if (!turnstileToken) {
+      newErrors.turnstile = 'Please complete the security verification'
+      hasError = true
+    }
     if (hasError) {
       setErrors(newErrors)
       return
@@ -164,7 +164,7 @@ const Signup: NextPage = () => {
     
     try {
       // Signup is only for students
-      const result = await signup(formData.name, formData.email, formData.password)
+      const result = await signup(formData.name, formData.email, formData.password, turnstileToken!)
       
       if (result.requiresOtp) {
         toast.success('Account created! Please verify your email', {
@@ -527,6 +527,18 @@ const Signup: NextPage = () => {
                           </Text>
                         </Checkbox>
                         <FormErrorMessage>{errors.terms}</FormErrorMessage>
+                      </FormControl>
+
+                      {/* Cloudflare Turnstile */}
+                      <FormControl isInvalid={!!errors.turnstile}>
+                        <Box display="flex" justifyContent="center" my={2}>
+                          <Turnstile
+                            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                            onSuccess={handleTurnstileVerify}
+                            options={{ theme: turnstileTheme as 'light' | 'dark' }}
+                          />
+                        </Box>
+                        <FormErrorMessage justifyContent="center">{errors.turnstile}</FormErrorMessage>
                       </FormControl>
 
                       {/* Signup Button */}

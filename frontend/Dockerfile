@@ -20,6 +20,9 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy source code
 COPY . .
 
+# Copy production env for build-time NEXT_PUBLIC_ variables
+COPY .env.production .env.production
+
 # Set build-time environment variable
 ENV NEXT_TELEMETRY_DISABLED=1
 

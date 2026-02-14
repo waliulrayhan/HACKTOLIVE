@@ -26,4 +26,11 @@ export class SignupDto {
   @IsOptional()
   @IsEnum(UserRole)
   role?: UserRole;
+
+  @ApiProperty({ 
+    example: 'turnstile-token-here',
+    description: 'Cloudflare Turnstile verification token'
+  })
+  @IsString()
+  turnstileToken: string;
 }

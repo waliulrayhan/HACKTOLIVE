@@ -28,8 +28,55 @@ export class AuthService {
     private emailService: EmailService,
   ) {}
 
+  /**
+   * Verify Cloudflare Turnstile token
+   * @param token - Turnstile token from frontend
+   * @param remoteip - Optional: User's IP address
+   * @returns Promise<boolean> - True if verification successful
+   */
+  async verifyTurnstile(token: string, remoteip?: string): Promise<boolean> {
+    const secretKey = process.env.TURNSTILE_SECRET_KEY;
+
+    if (!secretKey) {
+      console.error('TURNSTILE_SECRET_KEY is not configured');
+      throw new BadRequestException('Turnstile verification is not configured');
+    }
+
+    try {
+      const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          secret: secretKey,
+          response: token,
+          remoteip: remoteip,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        console.error('Turnstile verification failed:', data['error-codes']);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error verifying Turnstile token:', error);
+      return false;
+    }
+  }
+
   async signup(signupDto: SignupDto) {
-    const { email, password, name, role } = signupDto;
+    const { email, password, name, role, turnstileToken } = signupDto;
+
+    // Verify Turnstile token first
+    const isTurnstileValid = await this.verifyTurnstile(turnstileToken);
+    if (!isTurnstileValid) {
+      throw new UnauthorizedException('Security verification failed. Please try again.');
+    }
 
     // Check if user already exists
     const existingUser = await this.prisma.user.findUnique({
@@ -147,7 +194,13 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const { email, password } = loginDto;
+    const { email, password, turnstileToken } = loginDto;
+
+    // Verify Turnstile token first
+    const isTurnstileValid = await this.verifyTurnstile(turnstileToken);
+    if (!isTurnstileValid) {
+      throw new UnauthorizedException('Security verification failed. Please try again.');
+    }
 
     // Find user by email
     const user = await this.prisma.user.findUnique({
