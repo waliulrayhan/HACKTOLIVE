@@ -7,10 +7,13 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ReviewsService } from './reviews.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { RolesGuard, Roles } from '../../auth/roles.guard';
 
 @ApiTags('academy')
 @Controller('academy/reviews')
@@ -18,6 +21,8 @@ export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   create(@Body() createReviewDto: Prisma.ReviewCreateInput) {
     return this.reviewsService.create(createReviewDto);
   }
@@ -52,6 +57,8 @@ export class ReviewsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   update(
     @Param('id') id: string,
     @Body() updateReviewDto: Prisma.ReviewUpdateInput,
@@ -60,6 +67,8 @@ export class ReviewsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   remove(@Param('id') id: string) {
     return this.reviewsService.remove(id);
   }

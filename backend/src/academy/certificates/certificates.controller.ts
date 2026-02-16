@@ -9,12 +9,15 @@ import {
   Query,
   Res,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CertificatesService } from './certificates.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
 import type { Response } from 'express';
 import * as fs from 'fs';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { RolesGuard, Roles } from '../../auth/roles.guard';
 
 @ApiTags('academy')
 @Controller('academy/certificates')
@@ -22,11 +25,17 @@ export class CertificatesController {
   constructor(private readonly certificatesService: CertificatesService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR)
+  @ApiBearerAuth()
   create(@Body() createCertificateDto: Prisma.CertificateCreateInput) {
     return this.certificatesService.create(createCertificateDto);
   }
 
   @Post('issue')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR)
+  @ApiBearerAuth()
   issueCertificate(
     @Body('studentId') studentId: string,
     @Body('courseId') courseId: string,
@@ -35,6 +44,8 @@ export class CertificatesController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   findAll(@Query('skip') skip?: string, @Query('take') take?: string) {
     return this.certificatesService.findAll({
       skip: skip ? parseInt(skip) : undefined,
@@ -86,6 +97,9 @@ export class CertificatesController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR)
+  @ApiBearerAuth()
   update(
     @Param('id') id: string,
     @Body() updateCertificateDto: Prisma.CertificateUpdateInput,
@@ -94,6 +108,9 @@ export class CertificatesController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
   remove(@Param('id') id: string) {
     return this.certificatesService.remove(id);
   }

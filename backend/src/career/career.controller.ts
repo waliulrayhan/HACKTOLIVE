@@ -26,7 +26,8 @@ import {
   FilterApplicationDto,
 } from './dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
+import { RolesGuard, Roles } from '../auth/roles.guard';
+import { UserRole } from '@prisma/client';
 
 @ApiTags('career')
 @Controller('career')
@@ -36,6 +37,7 @@ export class CareerController {
   // Career Endpoints
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new career position (Admin only)' })
   @ApiResponse({ status: 201, description: 'Career created successfully' })
@@ -53,6 +55,7 @@ export class CareerController {
 
   @Get('stats')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get career statistics (Admin only)' })
   @ApiResponse({ status: 200, description: 'Returns career statistics' })
@@ -70,6 +73,7 @@ export class CareerController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update career position (Admin only)' })
   @ApiResponse({ status: 200, description: 'Career updated successfully' })
@@ -83,6 +87,7 @@ export class CareerController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete career position (Admin only)' })
   @ApiResponse({ status: 204, description: 'Career deleted successfully' })
@@ -122,6 +127,7 @@ export class CareerController {
 
   @Get('applications/list')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all applications with filters (Admin only)' })
   @ApiResponse({ status: 200, description: 'Returns all applications' })
@@ -131,6 +137,7 @@ export class CareerController {
 
   @Get('applications/stats')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get application statistics (Admin only)' })
   @ApiResponse({ status: 200, description: 'Returns application statistics' })
@@ -140,6 +147,7 @@ export class CareerController {
 
   @Get('applications/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get application by ID (Admin only)' })
   @ApiResponse({ status: 200, description: 'Returns application' })
@@ -150,6 +158,7 @@ export class CareerController {
 
   @Patch('applications/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update application status (Admin only)' })
   @ApiResponse({ status: 200, description: 'Application updated successfully' })
@@ -169,6 +178,7 @@ export class CareerController {
 
   @Delete('applications/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete application (Admin only)' })
   @ApiResponse({ status: 204, description: 'Application deleted successfully' })

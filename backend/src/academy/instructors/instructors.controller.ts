@@ -7,10 +7,13 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { InstructorsService } from './instructors.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { RolesGuard, Roles } from '../../auth/roles.guard';
 
 @ApiTags('academy')
 @Controller('academy/instructors')
@@ -18,6 +21,9 @@ export class InstructorsController {
   constructor(private readonly instructorsService: InstructorsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
   create(@Body() createInstructorDto: Prisma.InstructorCreateInput) {
     return this.instructorsService.create(createInstructorDto);
   }
@@ -49,6 +55,9 @@ export class InstructorsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR)
+  @ApiBearerAuth()
   update(
     @Param('id') id: string,
     @Body() updateInstructorDto: Prisma.InstructorUpdateInput,
@@ -57,11 +66,17 @@ export class InstructorsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
   remove(@Param('id') id: string) {
     return this.instructorsService.remove(id);
   }
 
   @Post(':id/stats')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR)
+  @ApiBearerAuth()
   updateStats(@Param('id') id: string) {
     return this.instructorsService.updateInstructorStats(id);
   }

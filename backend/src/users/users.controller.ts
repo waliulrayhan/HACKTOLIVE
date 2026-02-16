@@ -14,6 +14,8 @@ import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth } from '@ne
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto, UpdateProfileDto, UpdateSocialLinksDto } from './user.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard, Roles } from '../auth/roles.guard';
+import { UserRole } from '@prisma/client';
 
 @ApiTags('users')
 @Controller('users')
@@ -21,6 +23,9 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({ status: 201, description: 'User created successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
@@ -29,6 +34,9 @@ export class UsersController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all users or a specific user by ID' })
   @ApiQuery({ name: 'id', description: 'User ID', required: false, type: String })
   @ApiResponse({ status: 200, description: 'Returns all users or a specific user' })
@@ -51,6 +59,9 @@ export class UsersController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiResponse({ status: 200, description: 'Returns user by ID' })
   @ApiResponse({ status: 404, description: 'User not found' })
@@ -59,6 +70,9 @@ export class UsersController {
   }
 
   @Patch()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a user' })
   @ApiQuery({ name: 'id', description: 'User ID', required: true, type: String })
   @ApiResponse({ status: 200, description: 'User updated successfully' })
@@ -97,6 +111,9 @@ export class UsersController {
   }
 
   @Delete()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a user' })
   @ApiQuery({ name: 'id', description: 'User ID', required: true, type: String })
   @ApiResponse({ status: 200, description: 'User deleted successfully' })

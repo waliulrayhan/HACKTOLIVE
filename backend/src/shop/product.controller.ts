@@ -15,7 +15,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
+import { RolesGuard, Roles } from '../auth/roles.guard';
+import { UserRole } from '@prisma/client';
 
 @Controller('shop/products')
 export class ProductController {
@@ -38,18 +39,21 @@ export class ProductController {
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   create(@Body() createProductDto: CreateProductDto) {
     return this.productService.createProduct(createProductDto);
   }
 
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.updateProduct(id, updateProductDto);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   remove(@Param('id') id: string) {
     return this.productService.deleteProduct(id);
   }
@@ -71,18 +75,21 @@ export class CategoryController {
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.productService.createCategory(createCategoryDto);
   }
 
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
     return this.productService.updateCategory(id, updateCategoryDto);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   remove(@Param('id') id: string) {
     return this.productService.deleteCategory(id);
   }

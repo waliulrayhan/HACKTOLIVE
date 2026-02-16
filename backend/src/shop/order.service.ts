@@ -237,7 +237,7 @@ export class OrderService {
     return this.formatOrder(order);
   }
 
-  async findOrderByNumber(orderNumber: string) {
+  async findOrderByNumber(orderNumber: string, userId?: string) {
     const order = await this.prisma.order.findUnique({
       where: { orderNumber },
       include: {
@@ -253,6 +253,11 @@ export class OrderService {
 
     if (!order) {
       throw new NotFoundException('Order not found');
+    }
+
+    // If userId is provided, verify ownership
+    if (userId && order.userId !== userId) {
+      throw new BadRequestException('Unauthorized');
     }
 
     return this.formatOrder(order);

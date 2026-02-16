@@ -7,10 +7,13 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { QuizzesService } from './quizzes.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { RolesGuard, Roles } from '../../auth/roles.guard';
 
 @ApiTags('academy')
 @Controller('academy/quizzes')
@@ -18,11 +21,16 @@ export class QuizzesController {
   constructor(private readonly quizzesService: QuizzesService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR)
+  @ApiBearerAuth()
   createQuiz(@Body() createQuizDto: Prisma.QuizCreateInput) {
     return this.quizzesService.createQuiz(createQuizDto);
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   findAll(@Query('skip') skip?: string, @Query('take') take?: string) {
     return this.quizzesService.findAllQuizzes({
       skip: skip ? parseInt(skip) : undefined,
@@ -41,6 +49,9 @@ export class QuizzesController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR)
+  @ApiBearerAuth()
   update(
     @Param('id') id: string,
     @Body() updateQuizDto: Prisma.QuizUpdateInput,
@@ -49,12 +60,17 @@ export class QuizzesController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR)
+  @ApiBearerAuth()
   remove(@Param('id') id: string) {
     return this.quizzesService.removeQuiz(id);
   }
 
   // Quiz Attempts
   @Post(':quizId/attempt')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   submitAttempt(
     @Param('quizId') quizId: string,
     @Body('studentId') studentId: string,

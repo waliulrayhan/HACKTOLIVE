@@ -12,7 +12,8 @@ import {
 import { OrderService } from './order.service';
 import { CreateOrderDto, CreatePaymentDto, UpdateOrderStatusDto } from './dto/order.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
+import { RolesGuard, Roles } from '../auth/roles.guard';
+import { UserRole } from '@prisma/client';
 
 @Controller('shop/orders')
 export class OrderController {
@@ -32,13 +33,16 @@ export class OrderController {
 
   @Get('all')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   async getAllOrders(@Query() query: any) {
     return this.orderService.findAllOrders(query);
   }
 
   @Get('number/:orderNumber')
-  async getOrderByNumber(@Param('orderNumber') orderNumber: string) {
-    return this.orderService.findOrderByNumber(orderNumber);
+  @UseGuards(JwtAuthGuard)
+  async getOrderByNumber(@Param('orderNumber') orderNumber: string, @Request() req: any) {
+    const userId = req.user?.userId;
+    return this.orderService.findOrderByNumber(orderNumber, userId);
   }
 
   @Get(':id')
@@ -49,13 +53,15 @@ export class OrderController {
 
   @Put(':id/status')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   async updateOrderStatus(@Param('id') id: string, @Body() updateOrderStatusDto: UpdateOrderStatusDto) {
     return this.orderService.updateOrderStatus(id, updateOrderStatusDto);
   }
 
   @Put(':id/cancel')
+  @UseGuards(JwtAuthGuard)
   async cancelOrder(@Param('id') id: string, @Request() req: any) {
-    const userId = req.user?.userId;
+    const userId = req.user.userId;
     return this.orderService.cancelOrder(id, userId);
   }
 
@@ -71,6 +77,7 @@ export class OrderController {
 
   @Post(':id/invoice')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   async generateInvoice(@Param('id') id: string) {
     return this.orderService.generateInvoice(id);
   }

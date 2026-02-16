@@ -7,10 +7,13 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { EnrollmentsService } from './enrollments.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { RolesGuard, Roles } from '../../auth/roles.guard';
 
 @ApiTags('academy')
 @Controller('academy/enrollments')
@@ -18,11 +21,15 @@ export class EnrollmentsController {
   constructor(private readonly enrollmentsService: EnrollmentsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   create(@Body() createEnrollmentDto: Prisma.EnrollmentCreateInput) {
     return this.enrollmentsService.create(createEnrollmentDto);
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   findAll(
     @Query('skip') skip?: string,
     @Query('take') take?: string,
@@ -60,6 +67,8 @@ export class EnrollmentsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   update(
     @Param('id') id: string,
     @Body() updateEnrollmentDto: Prisma.EnrollmentUpdateInput,
@@ -68,6 +77,8 @@ export class EnrollmentsController {
   }
 
   @Patch(':id/progress')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   updateProgress(
     @Param('id') id: string,
     @Body('progress') progress: number,
@@ -76,6 +87,9 @@ export class EnrollmentsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
   remove(@Param('id') id: string) {
     return this.enrollmentsService.remove(id);
   }

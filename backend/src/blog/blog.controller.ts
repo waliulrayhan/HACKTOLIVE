@@ -15,14 +15,15 @@ import {
 import { BlogService } from './blog.service';
 import { CreateBlogDto, UpdateBlogDto, FilterBlogDto, CreateCommentDto, CreateCommentReplyDto, CreateLikeDto, ToggleCommentLikeDto } from './dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
+import { RolesGuard, Roles } from '../auth/roles.guard';
+import { UserRole } from '@prisma/client';
 
 @Controller('blog')
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createBlogDto: CreateBlogDto, @Request() req) {
     return this.blogService.create(createBlogDto, req.user);
@@ -35,6 +36,7 @@ export class BlogController {
 
   @Get('stats')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   getStats() {
     return this.blogService.getBlogStats();
   }
@@ -61,12 +63,14 @@ export class BlogController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR)
   update(@Param('id') id: string, @Body() updateBlogDto: UpdateBlogDto) {
     return this.blogService.update(id, updateBlogDto);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
     return this.blogService.remove(id);
@@ -90,6 +94,7 @@ export class BlogController {
 
   @Delete('comments/:commentId')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteComment(@Param('commentId') commentId: string) {
     return this.blogService.deleteComment(commentId);
