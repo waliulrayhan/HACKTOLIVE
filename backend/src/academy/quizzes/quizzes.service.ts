@@ -126,7 +126,31 @@ export class QuizzesService {
 
     quiz.questions.forEach((question) => {
       const studentAnswer = answers[question.id];
-      if (studentAnswer === question.correctAnswer) {
+      
+      // Helper function to compare answers - handles MULTIPLE_SELECT order-independence
+      const isCorrect = () => {
+        if (!studentAnswer) return false;
+        
+        // For MULTIPLE_SELECT questions, compare as sorted arrays
+        if (question.type === 'MULTIPLE_SELECT') {
+          const studentOptions = studentAnswer
+            .split(',')
+            .map(opt => opt.trim())
+            .sort()
+            .join(',');
+          const correctOptions = question.correctAnswer
+            .split(',')
+            .map(opt => opt.trim())
+            .sort()
+            .join(',');
+          return studentOptions === correctOptions;
+        }
+        
+        // For MCQ and TRUE_FALSE, direct string comparison
+        return studentAnswer === question.correctAnswer;
+      };
+      
+      if (isCorrect()) {
         correctAnswers++;
       }
     });

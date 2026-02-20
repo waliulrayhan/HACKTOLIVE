@@ -459,10 +459,24 @@ export default function QuizModal({
                   Question Review
                 </h4>
                 {sortedQuestions.map((question, index) => {
-                  const studentAnswer = result.attempt?.answers
+                  const rawStudentAnswer = result.attempt?.answers
                     ? JSON.parse(result.attempt.answers)[question.id]
                     : answers[question.id];
-                  const isCorrect = studentAnswer === question.correctAnswer;
+                  
+                  // Format answer for display (handle arrays from local state)
+                  const studentAnswer = Array.isArray(rawStudentAnswer) 
+                    ? rawStudentAnswer.join(", ") 
+                    : rawStudentAnswer;
+                  
+                  // For comparison, also format for MULTIPLE_SELECT questions
+                  const normalizeAnswer = (ans: string | string[]) => {
+                    if (!ans) return "";
+                    const ansStr = Array.isArray(ans) ? ans.join(", ") : ans;
+                    // Sort comma-separated values for comparison
+                    return ansStr.split(',').map(s => s.trim()).sort().join(', ');
+                  };
+                  
+                  const isCorrect = normalizeAnswer(rawStudentAnswer) === normalizeAnswer(question.correctAnswer);
 
                   return (
                     <div
