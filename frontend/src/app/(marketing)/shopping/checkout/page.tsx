@@ -130,7 +130,7 @@ export default function CheckoutPage() {
         return
       }
 
-      // For online payment (SSLCommerz), send cart items
+      // For online payment, send cart items
       if (!cart || !cart.items || cart.items.length === 0) {
         throw new Error('Cart is empty')
       }
@@ -141,7 +141,7 @@ export default function CheckoutPage() {
         voucherCode: item.voucherCode || undefined,
       }))
 
-      // For online payment, use MOBILE_BANKING as default (SSLCommerz will show all options)
+      // For online payment, use MOBILE_BANKING as default (payment gateway will show all options)
       const payment = await academyService.initiatePayment({
         cartItems,
         customerName: formData.customerName,
@@ -157,7 +157,7 @@ export default function CheckoutPage() {
         // Clear cart session after successful payment initiation
         cartService.clearSessionId()
         
-        // Redirect to SSLCommerz payment gateway
+        // Redirect to secure payment gateway
         window.location.href = payment.gatewayUrl
       } else {
         throw new Error('Failed to initialize payment')
@@ -489,27 +489,50 @@ export default function CheckoutPage() {
                             _hover={{ borderColor: accentColor, transform: 'translateY(-2px)', shadow: 'md' }}
                             onClick={() => setPaymentMethod('ONLINE_PAYMENT')}
                           >
-                            <HStack spacing={3}>
-                              <Flex
-                                w={8}
-                                h={8}
-                                align="center"
-                                justify="center"
-                                borderRadius="md"
-                                bg={paymentMethod === 'ONLINE_PAYMENT' ? accentColor : borderColor}
-                                color="white"
-                              >
-                                <Icon as={FiCreditCard} boxSize={4} />
-                              </Flex>
-                              <Radio value="ONLINE_PAYMENT" size="lg" colorScheme="primary" flex={1}>
-                                <VStack align="start" spacing={0}>
-                                  <Text fontWeight="semibold">Online Payment (SSLCommerz)</Text>
-                                  <Text fontSize="xs" color={mutedColor}>
-                                    Mobile Banking, Card, Bank Transfer
-                                  </Text>
-                                </VStack>
-                              </Radio>
-                            </HStack>
+                            <VStack spacing={3} align="stretch">
+                              <HStack spacing={3}>
+                                <Flex
+                                  w={8}
+                                  h={8}
+                                  align="center"
+                                  justify="center"
+                                  borderRadius="md"
+                                  bg={paymentMethod === 'ONLINE_PAYMENT' ? accentColor : borderColor}
+                                  color="white"
+                                >
+                                  <Icon as={FiCreditCard} boxSize={4} />
+                                </Flex>
+                                <Radio value="ONLINE_PAYMENT" size="lg" colorScheme="primary" flex={1}>
+                                  <VStack align="start" spacing={0}>
+                                    <Text fontWeight="semibold">Online Payment</Text>
+                                    <Text fontSize="xs" color={mutedColor}>
+                                      Multiple payment options available
+                                    </Text>
+                                  </VStack>
+                                </Radio>
+                              </HStack>
+                              {paymentMethod === 'ONLINE_PAYMENT' && (
+                                <Box 
+                                  mt={2}
+                                  p={3}
+                                  borderRadius="md"
+                                  bg={useColorModeValue('white', 'gray.700')}
+                                  borderWidth="1px"
+                                  borderColor={borderColor}
+                                >
+                                  <NextImage
+                                    src={useColorModeValue(
+                                      '/images/payment/Footer-Mobile-Light-Version.png',
+                                      '/images/payment/Footer-Mobile-Dark-Version.png'
+                                    )}
+                                    alt="Payment Methods - Visa, Mastercard, Amex, bKash, Nagad, Rocket and more - Verified by EPS"
+                                    width={600}
+                                    height={120}
+                                    style={{ width: '100%', height: 'auto' }}
+                                  />
+                                </Box>
+                              )}
+                            </VStack>
                           </Box>
 
                           <Box
@@ -545,7 +568,7 @@ export default function CheckoutPage() {
                                       Pay when you receive
                                     </Text>
                                   </VStack>
-                                  <Box
+                                  {/* <Box
                                     px={2}
                                     py={1}
                                     borderRadius="md"
@@ -555,7 +578,7 @@ export default function CheckoutPage() {
                                     <Text fontSize="xs" fontWeight="semibold" color="green.600" _dark={{ color: 'green.400' }}>
                                       Popular
                                     </Text>
-                                  </Box>
+                                  </Box> */}
                                 </HStack>
                               </Radio>
                             </HStack>

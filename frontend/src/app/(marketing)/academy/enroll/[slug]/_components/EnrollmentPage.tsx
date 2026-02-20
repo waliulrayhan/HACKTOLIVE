@@ -173,7 +173,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
         });
         setTimeout(() => router.push("/student/courses"), 1500);
       } else {
-        // Paid course - initialize SSLCommerz payment
+        // Paid course - initialize EPS payment
         toast.info("Initializing payment...", {
           description: "Please wait while we prepare the payment gateway.",
           duration: 3000,
@@ -195,7 +195,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
 
         console.log("Payment response:", paymentResponse);
 
-        // Redirect to SSLCommerz payment gateway
+        // Redirect to secure payment gateway
         if (paymentResponse.gatewayUrl) {
           console.log("Redirecting to gateway:", paymentResponse.gatewayUrl);
           window.location.href = paymentResponse.gatewayUrl;
@@ -491,44 +491,34 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                         </HStack>
 
                         <VStack spacing="5" align="stretch">
-                          {/* <Alert status="info" borderRadius="lg">
-                            <AlertIcon />
-                            <Box>
-                              <Text fontWeight="semibold">Secure Payment Gateway</Text>
-                              <Text fontSize="sm" mt="1">
-                                You will be redirected to SSLCommerz secure payment gateway to complete your payment. 
-                                Multiple payment options available including cards, mobile banking, and internet banking.
-                              </Text>
-                            </Box>
-                          </Alert> */}
-
                           <Box 
                             p="6" 
-                            bg={useColorModeValue("gray.50", "gray.700")} 
+                            bg={useColorModeValue("white", "gray.800")} 
                             borderRadius="lg"
+                            borderWidth="1px"
+                            borderColor={borderColor}
                           >
-                            <VStack spacing="3" align="start">
-                              <Heading size="sm">Accepted Payment Methods:</Heading>
-                              <List spacing="2">
-                                <ListItem>
-                                  <HStack>
-                                    <Icon as={FiCheckCircle} color="green.500" />
-                                    <Text>Credit/Debit Cards (Visa, Mastercard, Amex)</Text>
-                                  </HStack>
-                                </ListItem>
-                                <ListItem>
-                                  <HStack>
-                                    <Icon as={FiCheckCircle} color="green.500" />
-                                    <Text>Mobile Banking (bKash, Nagad, Rocket)</Text>
-                                  </HStack>
-                                </ListItem>
-                                <ListItem>
-                                  <HStack>
-                                    <Icon as={FiCheckCircle} color="green.500" />
-                                    <Text>Internet Banking</Text>
-                                  </HStack>
-                                </ListItem>
-                              </List>
+                            <VStack spacing="4" align="center">
+                              <Heading size="sm" textAlign="center">Accepted Payment Methods</Heading>
+                              <Box 
+                                w="full" 
+                                maxW="600px"
+                                borderRadius="md"
+                                overflow="hidden"
+                                bg={useColorModeValue("white", "gray.900")}
+                              >
+                                <Image
+                                  src={useColorModeValue(
+                                    "/images/payment/Footer-Mobile-Light-Version.png",
+                                    "/images/payment/Footer-Mobile-Dark-Version.png"
+                                  )}
+                                  alt="Payment Methods - Visa, Mastercard, Amex, bKash, Nagad, Rocket and more - Verified by EPS"
+                                  width={600}
+                                  height={120}
+                                  style={{ width: "100%", height: "auto" }}
+                                  priority
+                                />
+                              </Box>
                             </VStack>
                           </Box>
 
@@ -541,7 +531,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                           >
                             <Icon as={FiShield} color="green.500" boxSize="5" />
                             <Text fontSize="sm" color="muted">
-                              Your payment is secured with SSLCommerz encryption
+                              Your payment is secured with EPS encryption
                             </Text>
                           </HStack>
                         </VStack>
@@ -597,7 +587,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
 
                       {!isFree && (
                         <Text fontSize="xs" color="muted" textAlign="center">
-                          30-day money-back guarantee • Instant access after payment
+                          Will get notify via email • Instant access after payment
                         </Text>
                       )}
                     </VStack>
