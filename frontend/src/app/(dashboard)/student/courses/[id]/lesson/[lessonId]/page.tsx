@@ -126,7 +126,7 @@ export default function StudentLessonPage() {
   const router = useRouter();
   const courseId = params.id as string;
   const lessonId = params.lessonId as string;
-  const { setExpanded, isExpanded } = useSidebar();
+  const { setIsHidden } = useSidebar();
 
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [loading, setLoading] = useState(true);
@@ -139,7 +139,6 @@ export default function StudentLessonPage() {
   const [showQuizModal, setShowQuizModal] = useState(false);
   const [showAssignmentModal, setShowAssignmentModal] = useState(false);
   const [showResourcesModal, setShowResourcesModal] = useState(false);
-  const [previousSidebarState, setPreviousSidebarState] = useState<boolean | null>(null);
   
   // Watch time tracking for video lessons
   const [watchedSeconds, setWatchedSeconds] = useState(0);
@@ -168,21 +167,16 @@ export default function StudentLessonPage() {
     setVideoDuration(totalDuration);
   }, []);
 
-  // Auto-minimize main AppSidebar on lesson page for more content space
+  // Completely hide main AppSidebar on lesson page for full content display
   useEffect(() => {
-    // Save the current sidebar state on mount
-    setPreviousSidebarState(isExpanded);
-    // Collapse the main sidebar
-    setExpanded(false);
+    // Hide the main sidebar
+    setIsHidden(true);
     
-    // Restore sidebar state when leaving the page
+    // Show sidebar again when leaving the page
     return () => {
-      // Only restore if we saved a state
-      if (previousSidebarState !== null) {
-        setExpanded(previousSidebarState);
-      }
+      setIsHidden(false);
     };
-  }, []);
+  }, []); // Empty deps - only run on mount/unmount
 
   useEffect(() => {
     if (lessonId && courseId) {

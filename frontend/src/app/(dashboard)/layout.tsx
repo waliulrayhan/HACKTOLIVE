@@ -28,7 +28,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isExpanded, isHovered, isMobileOpen } = useSidebar();
+  const { isExpanded, isHovered, isMobileOpen, isHidden } = useSidebar();
   const { user } = useAuth();
 
   // Dynamic sidebar items based on user role
@@ -202,7 +202,9 @@ export default function DashboardLayout({
   }, [user?.role]);
 
   // Dynamic class for main content margin based on sidebar state
-  const mainContentMargin = isMobileOpen
+  const mainContentMargin = isHidden
+    ? "ml-0" 
+    : isMobileOpen
     ? "ml-0"
     : isExpanded || isHovered
       ? "lg:ml-[290px]"
@@ -210,9 +212,13 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen xl:flex">
-      {/* Sidebar and Backdrop */}
-      <AppSidebar navItems={navItems} othersItems={othersItems} />
-      <Backdrop />
+      {/* Sidebar and Backdrop - Hidden on lesson pages */}
+      {!isHidden && (
+        <>
+          <AppSidebar navItems={navItems} othersItems={othersItems} />
+          <Backdrop />
+        </>
+      )}
       {/* Main Content Area */}
       <div
         className={`flex-1 transition-all  duration-300 ease-in-out ${mainContentMargin}`}

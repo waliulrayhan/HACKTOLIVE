@@ -5,6 +5,7 @@ type SidebarContextType = {
   isExpanded: boolean;
   isMobileOpen: boolean;
   isHovered: boolean;
+  isHidden: boolean;
   activeItem: string | null;
   openSubmenu: string | null;
   toggleSidebar: () => void;
@@ -13,6 +14,7 @@ type SidebarContextType = {
   setActiveItem: (item: string | null) => void;
   toggleSubmenu: (item: string) => void;
   setExpanded: (expanded: boolean) => void;
+  setIsHidden: (hidden: boolean) => void;
 };
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -32,6 +34,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const [activeItem, setActiveItem] = useState<string | null>(null);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
@@ -74,6 +77,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
         isExpanded: isMobile ? false : isExpanded,
         isMobileOpen,
         isHovered,
+        isHidden,
         activeItem,
         openSubmenu,
         toggleSidebar,
@@ -82,6 +86,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
         setActiveItem,
         toggleSubmenu,
         setExpanded,
+        setIsHidden,
       }}
     >
       {children}

@@ -125,11 +125,11 @@ export default function CourseSidebar({
   }
 
   return (
-    <div className="w-80 shrink-0 flex h-full flex-col bg-white dark:bg-white/[0.03] border-r border-gray-200 dark:border-white/5">
+    <div className="w-[340px] shrink-0 flex h-full flex-col bg-white dark:bg-white/[0.03] border-r border-gray-200 dark:border-white/5">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white dark:bg-white/[0.03] border-b border-gray-200 dark:border-white/5 p-4">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-1 pr-2">
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white pr-2 leading-snug">
             {course.title}
           </h2>
           <button
@@ -142,7 +142,7 @@ export default function CourseSidebar({
         
         {/* Progress Bar */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center justify-between text-[13px]">
             <span className="text-gray-600 dark:text-gray-400">
               {completedLessons} of {totalLessons} completed
             </span>
@@ -177,15 +177,15 @@ export default function CourseSidebar({
                 className="flex w-full items-center justify-between p-3 text-left hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
               >
                 <div className="flex items-start gap-2.5 flex-1 min-w-0">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-brand-50 dark:bg-brand-900/30 text-[10px] font-bold text-brand-600 dark:text-brand-400">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-brand-50 dark:bg-brand-900/30 text-[11px] font-bold text-brand-600 dark:text-brand-400">
                     {moduleIndex + 1}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-xs font-medium text-gray-900 dark:text-white truncate pr-2">
+                    <h3 className="text-[13px] font-medium text-gray-900 dark:text-white pr-2 leading-snug">
                       {module.title}
                     </h3>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                      <span className="text-[11px] text-gray-500 dark:text-gray-400">
                         {moduleCompleted}/{moduleTotal} lessons
                       </span>
                       {moduleProgress === 100 && (
@@ -251,9 +251,9 @@ export default function CourseSidebar({
 
                         {/* Lesson Info */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-1.5 flex-wrap">
                             <span
-                              className={`text-xs truncate ${
+                              className={`text-[13px] leading-snug ${
                                 isCurrent
                                   ? "font-semibold text-brand-700 dark:text-brand-400"
                                   : isCompleted
@@ -264,15 +264,15 @@ export default function CourseSidebar({
                               {lessonIndex + 1}. {lesson.title}
                             </span>
                             {isLive && (
-                              <span className="inline-flex items-center gap-0.5 rounded-full bg-error-100 dark:bg-error-900/30 px-1.5 py-0.5 text-[9px] font-medium text-error-600 dark:text-error-400">
+                              <span className="inline-flex items-center gap-0.5 rounded-full bg-error-100 dark:bg-error-900/30 px-2 py-0.5 text-[10px] font-medium text-error-600 dark:text-error-400">
                                 <span className="h-1 w-1 rounded-full bg-error-500 animate-pulse" />
                                 LIVE
                               </span>
                             )}
                           </div>
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="text-[10px] text-gray-400 dark:text-gray-500 flex items-center gap-0.5">
-                              <HiOutlineClock className="h-2.5 w-2.5" />
+                            <span className="text-[11px] text-gray-400 dark:text-gray-500 flex items-center gap-0.5">
+                              <HiOutlineClock className="h-3 w-3" />
                               {lesson.duration}m
                             </span>
                             {hasQuiz && (
