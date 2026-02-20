@@ -14,7 +14,7 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Install dependencies
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy source code
 COPY . .
@@ -42,7 +42,7 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Install only production dependencies and generate Prisma Client
-RUN npm ci --only=production && \
+RUN npm ci --only=production --legacy-peer-deps && \
     npx prisma generate && \
     npm cache clean --force
 
