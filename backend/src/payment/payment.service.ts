@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { SslcommerzService } from './sslcommerz.service';
+import { EpsService } from './eps.service';
 import { EmailService } from '../email/email.service';
 import { CoursePaymentStatus } from '@prisma/client';
 
@@ -30,9 +30,11 @@ export class PaymentService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly sslcommerz: SslcommerzService,
+    private readonly eps: EpsService,
     private readonly emailService: EmailService,
-  ) {}
+  ) {
+    this.logger.log('Payment gateway configured: EPS');
+  }
 
   /**
    * Initiate payment for course enrollment or shop checkout
@@ -59,18 +61,31 @@ export class PaymentService {
           throw new BadRequestException('This course is free');
         }
 
-        // Check if already enrolled (only for logged-in users)
-        if (userId) {
-          const existingEnrollment = await this.prisma.enrollment.findFirst({
-            where: {
-              student: { userId },
-              courseId: data.courseId,
-            },
-          });
+        // SECURITY: Course enrollment requires user account - check BEFORE payment
+        if (!userId) {
+          throw new BadRequestException('Please login or signup before purchasing a course. Course enrollment requires an active student account.');
+        }
 
-          if (existingEnrollment) {
-            throw new BadRequestException('Already enrolled in this course');
-          }
+        // Verify user has student account
+        const user = await this.prisma.user.findUnique({
+          where: { id: userId },
+          include: { student: true },
+        });
+
+        if (!user || !user.student) {
+          throw new BadRequestException('Student account required. Please complete your profile registration.');
+        }
+
+        // Check if already enrolled
+        const existingEnrollment = await this.prisma.enrollment.findFirst({
+          where: {
+            studentId: user.student.id,
+            courseId: data.courseId,
+          },
+        });
+
+        if (existingEnrollment) {
+          throw new BadRequestException('Already enrolled in this course');
         }
 
         amount = course.price;
@@ -152,7 +167,7 @@ export class PaymentService {
       }
 
       // Generate unique transaction ID
-      const transactionId = this.sslcommerz.generateTransactionId();
+      const transactionId = this.eps.generateTransactionId();
 
       // Create payment record
       const payment = await this.prisma.coursePayment.create({
@@ -161,6 +176,7 @@ export class PaymentService {
           amount,
           currency: 'BDT',
           status: CoursePaymentStatus.PENDING,
+          paymentMethod: 'EPS',
           customerName: data.customerName,
           customerEmail: data.customerEmail,
           customerPhone: data.customerPhone,
@@ -177,16 +193,18 @@ export class PaymentService {
       const frontendBaseUrl = process.env.FRONTEND_URL?.split(',')[0] || 'http://localhost:3000';
       const backendUrl = process.env.BACKEND_URL || 'http://localhost:4000';
       
-      // Use network IP for callbacks (SSLCommerz sandbox requires publicly accessible URLs)
+      // Use network IP for callbacks (EPS requires accessible URLs)
       const successUrl = process.env.PAYMENT_SUCCESS_URL || `${frontendBaseUrl}/payment/success`;
       const failUrl = process.env.PAYMENT_FAIL_URL || `${frontendBaseUrl}/payment/failed`;
       const cancelUrl = process.env.PAYMENT_CANCEL_URL || `${frontendBaseUrl}/payment/cancel`;
 
-      // Initialize payment with SSLCommerz
-      const paymentInit = await this.sslcommerz.initPayment({
+      // Initialize payment with EPS gateway
+      const customerOrderId = this.eps.generateCustomerOrderId();
+      
+      const paymentInit = await this.eps.initPayment({
         totalAmount: amount,
-        currency: 'BDT',
         transactionId,
+        customerOrderId,
         productName,
         productCategory,
         customerName: data.customerName,
@@ -198,7 +216,14 @@ export class PaymentService {
         successUrl: `${successUrl}?tran_id=${transactionId}`,
         failUrl: `${failUrl}?tran_id=${transactionId}`,
         cancelUrl: `${cancelUrl}?tran_id=${transactionId}`,
-        ipnUrl: `${backendUrl}/payment/ipn`,
+        // Parse cart data and create product list for EPS
+        productList: cartData ? JSON.parse(cartData).items.map((item: any) => ({
+          ProductName: item.productName,
+          NoOfItem: item.quantity.toString(),
+          ProductProfile: 'general',
+          ProductCategory: productCategory,
+          ProductPrice: item.price.toString(),
+        })) : undefined,
       });
 
       if (!paymentInit.success) {
@@ -211,7 +236,7 @@ export class PaymentService {
         throw new BadRequestException(paymentInit.message || 'Failed to initialize payment');
       }
 
-      this.logger.log(`Payment initiated: ${transactionId} for user: ${userId}`);
+      this.logger.log(`Payment initiated: ${transactionId} for user: ${userId} via EPS`);
 
       return {
         success: true,
@@ -220,6 +245,7 @@ export class PaymentService {
         gatewayUrl: paymentInit.gatewayUrl,
         amount,
         currency: 'BDT',
+        gateway: 'eps',
       };
     } catch (error) {
       this.logger.error(`Error initiating payment: ${error.message}`, error.stack);
@@ -228,7 +254,7 @@ export class PaymentService {
   }
 
   /**
-   * Verify and validate payment - Simple version for sandbox
+   * Verify and validate payment with EPS
    */
   async verifyAndValidatePayment(transactionId: string) {
     const payment = await this.prisma.coursePayment.findUnique({
@@ -250,135 +276,72 @@ export class PaymentService {
       return payment;
     }
 
-    // Mark as validated and complete
-    await this.prisma.coursePayment.update({
-      where: { id: payment.id },
-      data: {
-        status: CoursePaymentStatus.VALIDATED,
-        validatedAt: new Date(),
-        riskLevel: 0,
-      },
-    });
-
-    await this.completePayment(payment.id);
-
-    return this.prisma.coursePayment.findUnique({
-      where: { id: payment.id },
-      include: { course: true, product: true },
-    });
-  }
-
-  /**
-   * Handle IPN (Instant Payment Notification) from SSLCommerz
-   */
-  async handleIPN(ipnData: any) {
+    // Validate with EPS
+    let isValid = false;
     try {
-      const transactionId = ipnData.tran_id;
-      
-      this.logger.log(`Received IPN for transaction: ${transactionId}, status: ${ipnData.status}`);
-      this.logger.log(`IPN Data:`, JSON.stringify(ipnData));
+      const validation = await this.eps.validatePayment(transactionId, payment.amount, payment.currency);
+      isValid = validation.isValid;
 
-      // Find payment record
-      const payment = await this.prisma.coursePayment.findUnique({
-        where: { transactionId },
-        include: { course: true, product: true },
-      });
-
-      if (!payment) {
-        this.logger.warn(`Payment not found for transaction: ${transactionId}`);
-        return { success: false, message: 'Payment not found' };
-      }
-
-      // CRITICAL: Check IPN status from SSLCommerz
-      // SSLCommerz sends status in IPN: VALID, FAILED, CANCELLED, UNATTEMPTED, etc.
-      const ipnStatus = ipnData.status?.toUpperCase();
-      
-      // If payment failed or was cancelled, mark it as such immediately
-      if (ipnStatus === 'FAILED' || ipnStatus === 'CANCELLED' || ipnStatus === 'UNATTEMPTED') {
-        this.logger.warn(`Payment ${ipnStatus.toLowerCase()} from SSLCommerz: ${transactionId}`);
-        
+      // Update payment with EPS transaction details
+      if (validation.data) {
         await this.prisma.coursePayment.update({
           where: { id: payment.id },
           data: {
-            status: ipnStatus === 'CANCELLED' ? CoursePaymentStatus.CANCELLED : CoursePaymentStatus.FAILED,
-            bankTransactionId: ipnData.bank_tran_id,
-            cardType: ipnData.card_type,
-            cardIssuer: ipnData.card_issuer,
-            ipnData: JSON.stringify(ipnData),
+            bankTransactionId: validation.epsTransactionId || validation.data.EpsTransactionId,
+            cardType: validation.data.TransactionType,
+            cardIssuer: validation.data.FinancialEntity,
+            ipnData: JSON.stringify(validation.data),
           },
         });
-
-        return { success: false, message: `Payment ${ipnStatus.toLowerCase()}` };
       }
+    } catch (error) {
+      this.logger.error(`EPS validation error: ${error.message}`);
+      isValid = false;
+    }
 
-      // Only proceed with validation if IPN status indicates success
-      if (ipnStatus !== 'VALID' && ipnStatus !== 'VALIDATED') {
-        this.logger.warn(`Unknown IPN status for ${transactionId}: ${ipnStatus}`);
-        
-        await this.prisma.coursePayment.update({
-          where: { id: payment.id },
-          data: {
-            status: CoursePaymentStatus.PROCESSING,
-            ipnData: JSON.stringify(ipnData),
-          },
-        });
-
-        return { success: false, message: 'Unknown payment status' };
-      }
-
-      // Update payment with IPN data
+    if (isValid) {
+      // Mark as validated and complete
       await this.prisma.coursePayment.update({
         where: { id: payment.id },
         data: {
-          status: CoursePaymentStatus.PROCESSING,
-          bankTransactionId: ipnData.bank_tran_id,
-          cardType: ipnData.card_type,
-          cardIssuer: ipnData.card_issuer,
-          cardBrand: ipnData.card_brand,
-          cardSubBrand: ipnData.card_sub_brand,
-          storeAmount: parseFloat(ipnData.store_amount || '0'),
-          ipnData: JSON.stringify(ipnData),
+          status: CoursePaymentStatus.VALIDATED,
+          validatedAt: new Date(),
+          riskLevel: 0,
         },
       });
 
-      // Validate payment with SSLCommerz
-      const validation = await this.sslcommerz.validatePayment(
-        ipnData.val_id || transactionId,
-        payment.amount,
-        payment.currency,
-      );
+      await this.completePayment(payment.id);
 
-      if (validation.isValid) {
-        // Check risk level
-        const riskLevel = parseInt(ipnData.risk_level || '0');
-        
-        await this.prisma.coursePayment.update({
-          where: { id: payment.id },
-          data: {
-            status: CoursePaymentStatus.VALIDATED,
-            validatedAt: new Date(),
-            riskLevel,
-            riskTitle: ipnData.risk_title,
-          },
-        });
+      return this.prisma.coursePayment.findUnique({
+        where: { id: payment.id },
+        include: { course: true, product: true },
+      });
+    } else {
+      // Mark as failed
+      await this.prisma.coursePayment.update({
+        where: { id: payment.id },
+        data: { status: CoursePaymentStatus.FAILED },
+      });
 
-        // If low risk, complete the enrollment/order
-        if (riskLevel === 0) {
-          await this.completePayment(payment.id);
-        } else {
-          this.logger.warn(`High risk payment detected: ${transactionId}, risk level: ${riskLevel}`);
-        }
+      throw new BadRequestException('Payment validation failed');
+    }
+  }
 
-        return { success: true, message: 'Payment validated successfully' };
-      } else {
-        await this.prisma.coursePayment.update({
-          where: { id: payment.id },
-          data: { status: CoursePaymentStatus.FAILED },
-        });
-
-        this.logger.error(`Payment validation failed for: ${transactionId}`);
-        return { success: false, message: 'Payment validation failed' };
-      }
+  /**
+   * Handle IPN (Instant Payment Notification)
+   * Note: EPS does not use IPN, it uses redirect URLs instead
+   * This method is kept for backward compatibility but not actively used
+   */
+  async handleIPN(ipnData: any) {
+    try {
+      this.logger.warn('IPN received but EPS uses redirect URLs, not IPN');
+      this.logger.log(`IPN Data:`, JSON.stringify(ipnData));
+      
+      // EPS doesn't use IPN, so just return success
+      return { 
+        success: true, 
+        message: 'IPN not used with EPS gateway' 
+      };
     } catch (error) {
       this.logger.error(`Error handling IPN: ${error.message}`, error.stack);
       throw error;
@@ -387,126 +350,123 @@ export class PaymentService {
 
   /**
    * Complete payment and create enrollment/order
+   * Uses Prisma transaction to ensure data consistency
    */
   async completePayment(paymentId: string) {
     try {
-      const payment = await this.prisma.coursePayment.findUnique({
-        where: { id: paymentId },
-        include: { course: true, product: true },
-      });
+      // Use Prisma transaction to ensure all-or-nothing atomicity
+      return await this.prisma.$transaction(async (tx) => {
+        // Fetch and lock payment record
+        const payment = await tx.coursePayment.findUnique({
+          where: { id: paymentId },
+          include: { course: true, product: true },
+        });
 
-      if (!payment) {
-        throw new NotFoundException('Payment not found');
-      }
-
-      if (payment.status === CoursePaymentStatus.COMPLETED) {
-        this.logger.log(`Payment already completed: ${paymentId}`);
-        return { success: true, message: 'Payment already completed' };
-      }
-
-      // SECURITY CHECK: Only complete validated payments with low risk
-      if (payment.status !== CoursePaymentStatus.VALIDATED) {
-        this.logger.warn(`Cannot complete payment ${paymentId}: Status is ${payment.status}, expected VALIDATED`);
-        throw new BadRequestException(`Payment is not validated. Current status: ${payment.status}`);
-      }
-
-      if (payment.riskLevel > 0) {
-        this.logger.warn(`Cannot auto-complete high-risk payment ${paymentId}: Risk level ${payment.riskLevel}`);
-        throw new BadRequestException(`Payment has risk level ${payment.riskLevel}. Manual review required.`);
-      }
-
-      // Get user by email (optional for guest checkout)
-      const user = await this.prisma.user.findUnique({
-        where: { email: payment.customerEmail },
-        include: { student: true },
-      });
-
-      // Handle course enrollment (requires user account)
-      if (payment.courseId) {
-        if (!user || !user.student) {
-          throw new NotFoundException('Student account required for course enrollment. Please sign up first.');
+        if (!payment) {
+          throw new NotFoundException('Payment not found');
         }
 
-        const enrollment = await this.prisma.enrollment.create({
-          data: {
-            studentId: user.student.id,
-            courseId: payment.courseId,
-            paymentId: payment.id,
-          },
+        if (payment.status === CoursePaymentStatus.COMPLETED) {
+          this.logger.log(`Payment already completed: ${paymentId}`);
+          return { success: true, message: 'Payment already completed' };
+        }
+
+        // SECURITY CHECK: Only complete validated payments with low risk
+        if (payment.status !== CoursePaymentStatus.VALIDATED) {
+          this.logger.warn(`Cannot complete payment ${paymentId}: Status is ${payment.status}, expected VALIDATED`);
+          throw new BadRequestException(`Payment is not validated. Current status: ${payment.status}`);
+        }
+
+        if (payment.riskLevel > 0) {
+          this.logger.warn(`Cannot auto-complete high-risk payment ${paymentId}: Risk level ${payment.riskLevel}`);
+          throw new BadRequestException(`Payment has risk level ${payment.riskLevel}. Manual review required.`);
+        }
+
+        // Get user by email (optional for guest checkout)
+        const user = await tx.user.findUnique({
+          where: { email: payment.customerEmail },
+          include: { student: true },
         });
 
-        // Update course enrolled students count
-        await this.prisma.course.update({
-          where: { id: payment.courseId },
-          data: {
-            enrolledStudents: { increment: 1 },
-            totalStudents: { increment: 1 },
-          },
-        });
+        // Handle course enrollment (requires user account)
+        if (payment.courseId) {
+          if (!user || !user.student) {
+            throw new NotFoundException('Student account required for course enrollment. Please sign up first.');
+          }
 
-        // Update student stats
-        await this.prisma.student.update({
-          where: { id: user.student.id },
-          data: {
-            enrolledCourses: { increment: 1 },
-          },
-        });
+          // Check for duplicate enrollment (within transaction)
+          const existingEnrollment = await tx.enrollment.findFirst({
+            where: {
+              studentId: user.student.id,
+              courseId: payment.courseId,
+            },
+          });
 
-        // Update instructor stats if instructor exists
-        if (payment.course?.instructorId) {
-          await this.prisma.instructor.update({
-            where: { id: payment.course.instructorId },
+          if (existingEnrollment) {
+            throw new BadRequestException('Already enrolled in this course');
+          }
+
+          const enrollment = await tx.enrollment.create({
             data: {
+              studentId: user.student.id,
+              courseId: payment.courseId,
+              paymentId: payment.id,
+            },
+          });
+
+          // Update course enrolled students count
+          await tx.course.update({
+            where: { id: payment.courseId },
+            data: {
+              enrolledStudents: { increment: 1 },
               totalStudents: { increment: 1 },
             },
           });
-        }
 
-        // Get instructor name for email
-        let instructorName = 'HackToLive Instructor';
-        if (payment.course?.instructorId) {
-          const instructor = await this.prisma.instructor.findUnique({
-            where: { id: payment.course.instructorId },
-            include: { user: true },
+          // Update student stats
+          await tx.student.update({
+            where: { id: user.student.id },
+            data: {
+              enrolledCourses: { increment: 1 },
+            },
           });
-          instructorName = instructor?.user?.name || instructorName;
+
+          // Update instructor stats if instructor exists
+          if (payment.course?.instructorId) {
+            await tx.instructor.update({
+              where: { id: payment.course.instructorId },
+              data: {
+                totalStudents: { increment: 1 },
+              },
+            });
+          }
+
+          this.logger.log(`Enrollment created: ${enrollment.id} for payment: ${paymentId}`);
         }
 
-        // Send enrollment confirmation email (non-blocking)
-        if (user.email && payment.course) {
-          this.logger.log(`📧 Sending enrollment confirmation email to ${user.email} for course: ${payment.course.title}`);
-          this.emailService.sendCourseEnrollmentConfirmation(
-            user.email,
-            user.name || 'Student',
-            payment.course.title,
-            payment.course.slug,
-            instructorName,
-            false, // Paid course
-          ).then((sent) => {
-            if (sent) {
-              this.logger.log(`✅ Enrollment confirmation email sent successfully to ${user.email}`);
-            } else {
-              this.logger.error(`❌ Failed to send enrollment confirmation email to ${user.email}`);
-            }
-          }).catch(error => {
-            this.logger.error('❌ Error sending enrollment confirmation email:', error);
-          });
-        } else {
-          this.logger.warn(`⚠️ No email address found for user ${user.id}, skipping enrollment confirmation email`);
-        }
-
-        this.logger.log(`Enrollment created: ${enrollment.id} for payment: ${paymentId}`);
-      }
-
-      // Handle shop order from cart
-      if (payment.metadata) {
-        try {
+        // Handle shop order from cart
+        if (payment.metadata) {
           const cartData = JSON.parse(payment.metadata);
+          
+          // Validate stock availability for all items (within transaction)
+          for (const item of cartData.items) {
+            const product = await tx.product.findUnique({
+              where: { id: item.productId },
+            });
+
+            if (!product) {
+              throw new NotFoundException(`Product not found: ${item.productId}`);
+            }
+
+            if (product.stockQuantity < item.quantity) {
+              throw new BadRequestException(`Insufficient stock for ${product.name}. Available: ${product.stockQuantity}, Requested: ${item.quantity}`);
+            }
+          }
           
           // Create order
           const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
           
-          const order = await this.prisma.order.create({
+          const order = await tx.order.create({
             data: {
               orderNumber,
               userId: user?.id, // Optional - guest checkout allowed
@@ -520,7 +480,7 @@ export class PaymentService {
               paymentMethod: payment.paymentMethod as any || 'CARD',
               paymentStatus: 'COMPLETED',
               status: 'PENDING',
-              transactionId: payment.transactionId, // Store SSLCommerz transaction ID
+              transactionId: payment.transactionId,
               subtotal: cartData.subtotal,
               tax: cartData.tax,
               shippingCost: cartData.shippingCharge,
@@ -546,9 +506,9 @@ export class PaymentService {
             },
           });
 
-          // Update product stock
+          // Update product stock atomically
           for (const item of cartData.items) {
-            await this.prisma.product.update({
+            await tx.product.update({
               where: { id: item.productId },
               data: {
                 stockQuantity: { decrement: item.quantity },
@@ -556,60 +516,122 @@ export class PaymentService {
             });
           }
 
-          // Send order confirmation email
-          if (payment.customerEmail) {
-            this.logger.log(`📧 Sending order confirmation email to ${payment.customerEmail}`);
-            // TODO: Implement order confirmation email
-            // this.emailService.sendOrderConfirmation(...)
-          }
-
           this.logger.log(`Shop order created: ${order.id} from payment: ${paymentId}`);
-        } catch (error) {
-          this.logger.error(`Error creating shop order: ${error.message}`, error.stack);
-          throw new BadRequestException(`Failed to create order: ${error.message}`);
+        }
+
+        // Update payment status to COMPLETED (within transaction)
+        await tx.coursePayment.update({
+          where: { id: paymentId },
+          data: { status: CoursePaymentStatus.COMPLETED },
+        });
+
+        this.logger.log(`Payment completed: ${paymentId}`);
+
+        return { success: true, message: 'Payment completed successfully', payment };
+      }, {
+        maxWait: 5000, // Maximum time to wait for transaction slot (5 seconds)
+        timeout: 10000, // Maximum time transaction can run (10 seconds)
+      });
+
+      // Send emails AFTER transaction completes successfully (non-blocking)
+      // This is done outside transaction to avoid delays and ensure emails don't block payment completion
+      this.sendPaymentEmails(paymentId).catch(error => {
+        this.logger.error('Error sending payment emails (non-critical):', error);
+      });
+
+    } catch (error) {
+      this.logger.error(`Error completing payment: ${error.message}`, error.stack);
+      throw error;
+    }
+  }
+
+  /**
+   * Send confirmation emails after payment completion (non-blocking)
+   * Private method called after transaction commits
+   */
+  private async sendPaymentEmails(paymentId: string) {
+    try {
+      const payment = await this.prisma.coursePayment.findUnique({
+        where: { id: paymentId },
+        include: { 
+          course: true, 
+          product: true,
+          enrollments: {
+            include: {
+              student: {
+                include: { user: true }
+              }
+            }
+          }
+        },
+      });
+
+      if (!payment) return;
+
+      const user = payment.enrollments[0]?.student?.user;
+
+      // Send enrollment confirmation email for courses
+      if (payment.courseId && payment.course && user?.email) {
+        // Get instructor name for email
+        let instructorName = 'HackToLive Instructor';
+        if (payment.course.instructorId) {
+          const instructor = await this.prisma.instructor.findUnique({
+            where: { id: payment.course.instructorId },
+            include: { user: true },
+          });
+          instructorName = instructor?.user?.name || instructorName;
+        }
+
+        this.logger.log(`📧 Sending enrollment confirmation email to ${user.email} for course: ${payment.course.title}`);
+        const sent = await this.emailService.sendCourseEnrollmentConfirmation(
+          user.email,
+          user.name || 'Student',
+          payment.course.title,
+          payment.course.slug,
+          instructorName,
+          false, // Paid course
+        );
+        
+        if (sent) {
+          this.logger.log(`✅ Enrollment confirmation email sent successfully to ${user.email}`);
+        } else {
+          this.logger.error(`❌ Failed to send enrollment confirmation email to ${user.email}`);
         }
       }
 
-      // Update payment status
-      await this.prisma.coursePayment.update({
-        where: { id: paymentId },
-        data: { status: CoursePaymentStatus.COMPLETED },
-      });
+      // Send order confirmation email for shop orders
+      if (payment.metadata && payment.customerEmail) {
+        this.logger.log(`📧 Order confirmation email needed for ${payment.customerEmail}`);
+        // TODO: Implement order confirmation email
+        // await this.emailService.sendOrderConfirmation(...)
+      }
 
-      // Send payment receipt email (non-blocking)
-      const receiptEmail = payment.customerEmail;
-      if (receiptEmail) {
-        this.logger.log(`📧 Sending payment receipt to ${receiptEmail}`);
+      // Send payment receipt email
+      if (payment.customerEmail) {
+        this.logger.log(`📧 Sending payment receipt to ${payment.customerEmail}`);
         const courseName = payment.course?.title || payment.product?.name || 'Product/Service';
-        const customerName = payment.customerName;
-        this.emailService.sendPaymentReceipt(
-          receiptEmail,
-          customerName,
+        const sent = await this.emailService.sendPaymentReceipt(
+          payment.customerEmail,
+          payment.customerName,
           payment.transactionId,
           payment.amount,
           payment.currency,
           courseName,
-          payment.paymentMethod || 'SSLCommerz',
+          payment.paymentMethod || 'EPS',
           payment.cardType || undefined,
           payment.cardIssuer || undefined,
           payment.bankTransactionId || undefined,
-        ).then((sent) => {
-          if (sent) {
-            this.logger.log(`✅ Payment receipt sent successfully to ${receiptEmail}`);
-          } else {
-            this.logger.error(`❌ Failed to send payment receipt to ${receiptEmail}`);
-          }
-        }).catch(error => {
-          this.logger.error('❌ Error sending payment receipt:', error);
-        });
+        );
+
+        if (sent) {
+          this.logger.log(`✅ Payment receipt sent successfully to ${payment.customerEmail}`);
+        } else {
+          this.logger.error(`❌ Failed to send payment receipt to ${payment.customerEmail}`);
+        }
       }
-
-      this.logger.log(`Payment completed: ${paymentId}`);
-
-      return { success: true, message: 'Payment completed successfully' };
     } catch (error) {
-      this.logger.error(`Error completing payment: ${error.message}`, error.stack);
-      throw error;
+      this.logger.error('Error in sendPaymentEmails:', error);
+      // Don't throw - this is non-critical
     }
   }
 

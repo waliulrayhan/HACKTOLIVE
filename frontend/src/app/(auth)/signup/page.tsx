@@ -151,10 +151,14 @@ const Signup: NextPage = () => {
       newErrors.terms = 'You must agree to the terms'
       hasError = true
     }
-    if (!turnstileToken) {
+    
+    // Skip Turnstile validation in development
+    const isDevelopment = process.env.NODE_ENV === 'development'
+    if (!isDevelopment && !turnstileToken) {
       newErrors.turnstile = 'Please complete the security verification'
       hasError = true
     }
+    
     if (hasError) {
       setErrors(newErrors)
       return
@@ -163,8 +167,10 @@ const Signup: NextPage = () => {
     setIsLoading(true)
     
     try {
+      // Use 'dev-bypass' token in development if no turnstile token
+      const token = turnstileToken || (isDevelopment ? 'dev-bypass' : '')
       // Signup is only for students
-      const result = await signup(formData.name, formData.email, formData.password, turnstileToken!)
+      const result = await signup(formData.name, formData.email, formData.password, token)
       
       if (result.requiresOtp) {
         toast.success('Account created! Please verify your email', {
@@ -529,17 +535,19 @@ const Signup: NextPage = () => {
                         <FormErrorMessage>{errors.terms}</FormErrorMessage>
                       </FormControl>
 
-                      {/* Cloudflare Turnstile */}
-                      <FormControl isInvalid={!!errors.turnstile}>
-                        <Box display="flex" justifyContent="center" my={2}>
-                          <Turnstile
-                            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-                            onSuccess={handleTurnstileVerify}
-                            options={{ theme: turnstileTheme as 'light' | 'dark' }}
-                          />
-                        </Box>
-                        <FormErrorMessage justifyContent="center">{errors.turnstile}</FormErrorMessage>
-                      </FormControl>
+                      {/* Cloudflare Turnstile - Only in Production */}
+                      {process.env.NODE_ENV !== 'development' && (
+                        <FormControl isInvalid={!!errors.turnstile}>
+                          <Box display="flex" justifyContent="center" my={2}>
+                            <Turnstile
+                              siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                              onSuccess={handleTurnstileVerify}
+                              options={{ theme: turnstileTheme as 'light' | 'dark' }}
+                            />
+                          </Box>
+                          <FormErrorMessage justifyContent="center">{errors.turnstile}</FormErrorMessage>
+                        </FormControl>
+                      )}
 
                       {/* Signup Button */}
                       <Button

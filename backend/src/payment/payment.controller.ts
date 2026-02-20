@@ -10,9 +10,12 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
+  SetMetadata,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { PaymentService } from './payment.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.guard';
 import { UserRole, CoursePaymentStatus } from '@prisma/client';
@@ -26,11 +29,13 @@ export class PaymentController {
 
   /**
    * Initiate payment for course or product
-   * Works for both authenticated and guest users
+   * Auth optional - JWT token will be used if present (for courses), guest checkout allowed (for products)
    */
   @Post('initiate')
+  @UseGuards(OptionalJwtAuthGuard)
   async initiatePayment(@Request() req, @Body() body: InitiatePaymentDto) {
-    const userId = req.user?.userId; // Optional for guest checkout
+    const userId = req.user?.id; // JWT strategy returns User object with 'id' property
+    this.logger.log(`Payment initiation - User: ${userId ? userId : 'Guest'}, Type: ${body.courseId ? 'Course' : 'Product'}`);
     return this.paymentService.initiatePayment(userId, body);
   }
 
@@ -47,16 +52,17 @@ export class PaymentController {
 
   /**
    * Verify and complete payment
-   * Called from frontend after redirect from SSLCommerz
-   * No auth required as this is called from SSLCommerz redirect
+   * Called from frontend after redirect from EPS gateway
+   * No auth required but rate limited to prevent abuse
    */
   @Post('verify/:transactionId')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 30, ttl: 60000 } }) // Max 30 verification attempts per minute per IP
   async verifyPayment(@Param('transactionId') transactionId: string, @Body() data?: any) {
     this.logger.log(`Verifying payment: ${transactionId}`);
     
     try {
-      // Always validate with SSLCommerz first - don't trust redirect or IPN alone
+      // Always validate with EPS gateway - don't trust redirect alone
       const payment = await this.paymentService.verifyAndValidatePayment(transactionId);
       return payment;
     } catch (error) {

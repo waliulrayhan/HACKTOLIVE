@@ -90,10 +90,14 @@ const Login: NextPage = () => {
       newErrors.password = 'Password must be at least 6 characters'
       hasError = true
     }
-    if (!turnstileToken) {
+    
+    // Skip Turnstile validation in development
+    const isDevelopment = process.env.NODE_ENV === 'development'
+    if (!isDevelopment && !turnstileToken) {
       newErrors.turnstile = 'Please complete the security verification'
       hasError = true
     }
+    
     if (hasError) {
       setErrors(newErrors)
       return
@@ -102,7 +106,9 @@ const Login: NextPage = () => {
     setIsLoading(true)
     
     try {
-      const result = await login(email, password, turnstileToken!)
+      // Use 'dev-bypass' token in development if no turnstile token
+      const token = turnstileToken || (isDevelopment ? 'dev-bypass' : '')
+      const result = await login(email, password, token)
       
       if (result.requiresOtp) {
         // For INSTRUCTOR and ADMIN - show success and redirect to OTP
@@ -369,17 +375,19 @@ const Login: NextPage = () => {
                       </Link>
                     </HStack>
 
-                    {/* Cloudflare Turnstile */}
-                    <FormControl isInvalid={!!errors.turnstile}>
-                      <Box display="flex" justifyContent="center" my={2}>
-                        <Turnstile
-                          siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-                          onSuccess={handleTurnstileVerify}
-                          options={{ theme: turnstileTheme as 'light' | 'dark' }}
-                        />
-                      </Box>
-                      <FormErrorMessage justifyContent="center">{errors.turnstile}</FormErrorMessage>
-                    </FormControl>
+                    {/* Cloudflare Turnstile - Only in Production */}
+                    {process.env.NODE_ENV !== 'development' && (
+                      <FormControl isInvalid={!!errors.turnstile}>
+                        <Box display="flex" justifyContent="center" my={2}>
+                          <Turnstile
+                            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                            onSuccess={handleTurnstileVerify}
+                            options={{ theme: turnstileTheme as 'light' | 'dark' }}
+                          />
+                        </Box>
+                        <FormErrorMessage justifyContent="center">{errors.turnstile}</FormErrorMessage>
+                      </FormControl>
+                    )}
 
                     {/* Login Button */}
                     <Button

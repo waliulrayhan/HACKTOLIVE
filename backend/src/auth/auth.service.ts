@@ -35,6 +35,12 @@ export class AuthService {
    * @returns Promise<boolean> - True if verification successful
    */
   async verifyTurnstile(token: string, remoteip?: string): Promise<boolean> {
+    // Skip Turnstile verification in development mode
+    if (process.env.NODE_ENV === 'development' && token === 'dev-bypass') {
+      console.log('Turnstile verification bypassed in development mode');
+      return true;
+    }
+
     const secretKey = process.env.TURNSTILE_SECRET_KEY;
 
     if (!secretKey) {
