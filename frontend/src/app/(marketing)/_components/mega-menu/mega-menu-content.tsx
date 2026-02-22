@@ -60,7 +60,6 @@ export const MegaMenuContent = ({
           borderColor={borderColor}
           boxShadow="xl"
           zIndex={50}
-          onMouseLeave={onClose}
         >
           <Container maxW="container.2xl" px={{ base: '8', md: '12', lg: '20' }} py="8">
             <Grid

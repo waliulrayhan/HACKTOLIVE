@@ -21,6 +21,8 @@ export const MegaMenuItem = ({
   return (
     <Box
       position="relative"
+      display="flex"
+      alignItems="center"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
@@ -38,7 +40,10 @@ export const MegaMenu = ({ activeMenu, onMenuChange }: MegaMenuProps) => {
   const menuData = activeMenu ? megaMenuData[activeMenu] : null
 
   return (
-    <>
+    <Box 
+      onMouseEnter={() => activeMenu && onMenuChange(activeMenu)}
+      onMouseLeave={() => onMenuChange(null)}
+    >
       {menuData && (
         <MegaMenuContent
           sections={menuData.sections}
@@ -47,6 +52,6 @@ export const MegaMenu = ({ activeMenu, onMenuChange }: MegaMenuProps) => {
           onClose={() => onMenuChange(null)}
         />
       )}
-    </>
+    </Box>
   )
 }

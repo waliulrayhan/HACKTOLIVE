@@ -63,7 +63,7 @@ const Navigation: React.FC<NavigationProps> = ({
   // If showing only center links
   if (showOnlyLinks) {
     return (
-      <HStack spacing="2" alignItems="center">
+      <HStack spacing="2" alignItems="center" justify="center">
         {siteConfig.header.links.map((link: any, i) => {
           const { href, id, isAction, label, ...props } = link
           
@@ -79,7 +79,7 @@ const Navigation: React.FC<NavigationProps> = ({
               key={i}
               label={label}
               onMouseEnter={() => hasMegaMenu && onMenuChange(label)}
-              onMouseLeave={() => {}}
+              onMouseLeave={() => hasMegaMenu && onMenuChange(null)}
             >
               <NavLink
                 display={['none', null, 'block']}

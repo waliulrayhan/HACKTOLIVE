@@ -22,6 +22,7 @@ export const Header = (props: HeaderProps) => {
   const ref = React.useRef<HTMLHeadingElement>(null)
   const [y, setY] = React.useState(0)
   const [activeMenu, setActiveMenu] = React.useState<string | null>(null)
+  const closeTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
   const { height = 0 } = ref.current?.getBoundingClientRect() ?? {}
   const pathname = usePathname()
 
@@ -29,6 +30,32 @@ export const Header = (props: HeaderProps) => {
   React.useEffect(() => {
     return scrollY.on('change', () => setY(scrollY.get()))
   }, [scrollY])
+
+  // Handle menu change with delay for closing
+  const handleMenuChange = React.useCallback((menu: string | null) => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current)
+      closeTimeoutRef.current = null
+    }
+
+    if (menu === null) {
+      // Add a small delay before closing to prevent accidental dismissals
+      closeTimeoutRef.current = setTimeout(() => {
+        setActiveMenu(null)
+      }, 150)
+    } else {
+      setActiveMenu(menu)
+    }
+  }, [])
+
+  // Cleanup timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current)
+      }
+    }
+  }, [])
 
   // Check if we're on an auth page
   const isAuthPage = pathname?.startsWith('/login') || 
@@ -70,11 +97,11 @@ export const Header = (props: HeaderProps) => {
               }
             }}
           />
-          <Flex position="absolute" left="50%" transform="translateX(-50%)">
+          <Flex position="absolute" left="50%" transform="translateX(-50%)" alignItems="center">
             <Navigation 
               showOnlyLinks 
               activeMenu={activeMenu}
-              onMenuChange={setActiveMenu}
+              onMenuChange={handleMenuChange}
             />
           </Flex>
           <Navigation showOnlyActions />
@@ -82,7 +109,7 @@ export const Header = (props: HeaderProps) => {
       </Container>
       
       {/* Mega Menu */}
-      <MegaMenu activeMenu={activeMenu} onMenuChange={setActiveMenu} />
+      <MegaMenu activeMenu={activeMenu} onMenuChange={handleMenuChange} />
     </Box>
   )
 }
