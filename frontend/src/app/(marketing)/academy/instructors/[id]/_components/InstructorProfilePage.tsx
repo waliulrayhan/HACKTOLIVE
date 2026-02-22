@@ -340,7 +340,8 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
             <FallInPlace>
               <VStack spacing={3} textAlign="center">
                 <Badge
-                  colorScheme="green"
+                  bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')}
                   fontSize="sm"
                   px={4}
                   py={2}

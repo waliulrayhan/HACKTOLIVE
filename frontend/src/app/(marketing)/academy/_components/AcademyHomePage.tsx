@@ -139,7 +139,7 @@ export default function AcademyHomePage() {
           bottom: 0,
           bg: useColorModeValue(
             'linear-gradient(135deg, rgba(26, 32, 44, 0.85) 0%, rgba(45, 55, 72, 0.90) 100%)',
-            'linear-gradient(135deg, rgba(26, 32, 44, 0.70) 0%, rgba(45, 55, 72, 0.75) 100%)'
+            'linear-gradient(135deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.88) 100%)'
           ),
         }}
       >
@@ -147,11 +147,13 @@ export default function AcademyHomePage() {
           <VStack spacing={{ base: "4", md: "6" }} textAlign="center">
             <FallInPlace>
               <Badge
-                colorScheme="green"
+                bg={useColorModeValue('green.200', 'green.700')}
+                color={useColorModeValue('green.900', 'white.900')}
                 fontSize="sm"
                 px={4}
                 py={1}
                 borderRadius="full"
+                fontWeight="semibold"
               >
                 Hack To Live Academy
               </Badge>
@@ -277,7 +279,15 @@ export default function AcademyHomePage() {
           <VStack spacing={{ base: '8', md: '12' }} align="stretch">
             <FallInPlace>
               <VStack spacing="4" textAlign="center">
-                <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+                <Badge
+                  bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')}
+                  fontSize="sm"
+                  px="3"
+                  py="1"
+                  borderRadius="full"
+                  fontWeight="semibold"
+                >
                   Browse by Category
                 </Badge>
                 <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
@@ -289,77 +299,85 @@ export default function AcademyHomePage() {
               </VStack>
             </FallInPlace>
 
-            <SimpleGrid columns={{ base: 2, md: 3, lg: 8 }} spacing={{ base: "4", md: "6" }}>
-              {[
-                { name: "Web Security", icon: FiGlobe, count: courses.filter(c => c.category === "web-security").length, color: "blue" },
-                { name: "Network Security", icon: FiShield, count: courses.filter(c => c.category === "network-security").length, color: "purple" },
-                { name: "Penetration Testing", icon: FiTarget, count: courses.filter(c => c.category === "penetration-testing").length, color: "red" },
-                { name: "Malware Analysis", icon: FiActivity, count: courses.filter(c => c.category === "malware-analysis").length, color: "orange" },
-                { name: "Cloud Security", icon: FiCloud, count: courses.filter(c => c.category === "cloud-security").length, color: "cyan" },
-                { name: "Cryptography", icon: FiLock, count: courses.filter(c => c.category === "cryptography").length, color: "green" },
-                { name: "Security Fundamentals", icon: FiShield, count: courses.filter(c => c.category === "security-fundamentals").length, color: "teal" },
-                { name: "Incident Response", icon: FiActivity, count: courses.filter(c => c.category === "incident-response").length, color: "pink" },
-              ].map((category, index) => (
-                <FallInPlace key={category.name} delay={0.1 * index}>
-                  <Box position="relative" w="100%" h="100%">
+            <Box
+              position="relative"
+              overflow="hidden"
+              sx={{
+                '@keyframes scroll': {
+                  '0%': { transform: 'translateX(0)' },
+                  '100%': { transform: 'translateX(-50%)' },
+                },
+              }}
+            >
+              <Flex
+                gap={{ base: "3", md: "4" }}
+                sx={{
+                  animation: 'scroll 30s linear infinite',
+                  '&:hover': {
+                    animationPlayState: 'paused',
+                  },
+                }}
+              >
+                {[...Array(2)].map((_, dupIndex) => (
+                  [
+                    { name: "Web Security", icon: FiGlobe, count: courses.filter(c => c.category === "web-security").length, color: "blue" },
+                    { name: "Network Security", icon: FiShield, count: courses.filter(c => c.category === "network-security").length, color: "purple" },
+                    { name: "Penetration Testing", icon: FiTarget, count: courses.filter(c => c.category === "penetration-testing").length, color: "red" },
+                    { name: "Malware Analysis", icon: FiActivity, count: courses.filter(c => c.category === "malware-analysis").length, color: "orange" },
+                    { name: "Cloud Security", icon: FiCloud, count: courses.filter(c => c.category === "cloud-security").length, color: "cyan" },
+                    { name: "Cryptography", icon: FiLock, count: courses.filter(c => c.category === "cryptography").length, color: "green" },
+                    { name: "Security Fundamentals", icon: FiShield, count: courses.filter(c => c.category === "security-fundamentals").length, color: "teal" },
+                    { name: "Incident Response", icon: FiActivity, count: courses.filter(c => c.category === "incident-response").length, color: "pink" },
+                  ].map((category, index) => (
                     <ButtonLink
+                      key={`${category.name}-${dupIndex}`}
                       href={`/academy/courses?category=${category.name.toLowerCase().replace(" ", "-")}`}
                       variant="unstyled"
-                      height="100%"
-                      width="100%"
+                      height="auto"
                       display="block"
+                      flexShrink={0}
                     >
-                      <VStack
+                      <Box
                         bg={cardBg}
-                        borderRadius="2xl"
+                        borderRadius="lg"
                         borderWidth="1px"
                         borderColor={borderColor}
-                        transition="all 0.3s"
+                        p={{ base: "3", md: "4" }}
+                        transition="all 0.2s"
                         _hover={{
-                          transform: "translateY(-4px)",
-                          shadow: "xl",
-                          borderColor: `${category.color}.500`,
+                          borderColor: `${category.color}.400`,
+                          bg: useColorModeValue(`${category.color}.50`, 'gray.700'),
                         }}
                         cursor="pointer"
-                        position="relative"
-                        w="100%"
-                        h="100%"
-                        aspectRatio="1"
-                        p={{ base: "4", md: "5" }}
-                        spacing="3"
-                        justify="center"
-                        align="center"
+                        minW={{ base: "200px", md: "240px" }}
                       >
-                        <Flex
-                          width={{ base: "45px", md: "55px" }}
-                          height={{ base: "45px", md: "55px" }}
-                          borderRadius="xl"
-                          bg={`${category.color}.100`}
-                          _dark={{ bg: `${category.color}.900` }}
-                          align="center"
-                          justify="center"
-                          flexShrink={0}
-                        >
-                          <Icon as={category.icon} boxSize={{ base: "5", md: "6" }} color={`${category.color}.500`} />
-                        </Flex>
-                        <Text
-                          fontWeight="bold"
-                          fontSize={{ base: "xs", md: "sm" }}
-                          textAlign="center"
-                          lineHeight="1.3"
-                          px="2"
-                        >
-                          {category.name}
-                        </Text>
-                        <Badge colorScheme={category.color} fontSize={{ base: "2xs", md: "xs" }} flexShrink={0}>
-                          {category.count} {category.count === 1 ? "course" : "courses"}
-                        </Badge>
-                      </VStack>
+                        <HStack spacing="3" align="center">
+                          <Icon 
+                            as={category.icon} 
+                            boxSize={{ base: "6", md: "7" }} 
+                            color={`${category.color}.500`}
+                            flexShrink={0}
+                          />
+                          <VStack spacing="0" align="start" flex="1">
+                            <Text
+                              fontWeight="semibold"
+                              fontSize={{ base: "xs", md: "sm" }}
+                              color={headingColor}
+                              noOfLines={1}
+                            >
+                              {category.name}
+                            </Text>
+                            <Text fontSize="xs" color={textMuted}>
+                              {category.count} {category.count === 1 ? "course" : "courses"}
+                            </Text>
+                          </VStack>
+                        </HStack>
+                      </Box>
                     </ButtonLink>
-                  </Box>
-                </FallInPlace>
-              ))}
-            </SimpleGrid>
+                  ))
+                ))}
+              </Flex>
+            </Box>
           </VStack>
         </Container>
       </Box>
@@ -376,7 +394,15 @@ export default function AcademyHomePage() {
                 gap="4"
               >
                 <VStack align="start" spacing="2">
-                  <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+                  <Badge
+                    bg={useColorModeValue('green.200', 'green.700')}
+                    color={useColorModeValue('green.900', 'white')}
+                    fontSize="sm"
+                    px="3"
+                    py="1"
+                    borderRadius="full"
+                    fontWeight="semibold"
+                  >
                     Free Access
                   </Badge>
                   <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
@@ -433,7 +459,15 @@ export default function AcademyHomePage() {
                 gap="4"
               >
                 <VStack align="start" spacing="2">
-                  <Badge colorScheme="purple" fontSize="sm" px="3" py="1" borderRadius="full">
+                  <Badge
+                    bg={useColorModeValue('blue.200', 'blue.500')}
+                    color={useColorModeValue('blue.900', 'white')}
+                    fontSize="sm"
+                    px="3"
+                    py="1"
+                    borderRadius="full"
+                    fontWeight="semibold"
+                  >
                     Premium Content
                   </Badge>
                   <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
@@ -484,11 +518,19 @@ export default function AcademyHomePage() {
           <VStack spacing={{ base: '8', md: '12' }}>
             <FallInPlace>
               <VStack spacing="4" textAlign="center">
-                <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+                <Badge
+                  bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')}
+                  fontSize="sm"
+                  px="3"
+                  py="1"
+                  borderRadius="full"
+                  fontWeight="semibold"
+                >
                   Simple Process
                 </Badge>
                 <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
-                  How It Works
+                  How It Works?
                 </Heading>
                 <Text fontSize={{ base: 'md', md: 'lg' }} color="muted" maxW="2xl">
                   Start your cybersecurity journey in three simple steps
@@ -496,76 +538,129 @@ export default function AcademyHomePage() {
               </VStack>
             </FallInPlace>
 
-            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: '8', md: '12' }}>
+            <Flex
+              direction={{ base: 'column', md: 'row' }}
+              align="center"
+              justify="center"
+              gap={{ base: '6', md: '4' }}
+              maxW="5xl"
+              mx="auto"
+            >
               <FallInPlace delay={0.1}>
-                <VStack spacing="4" textAlign="center">
-                  <Flex
-                    w="100px"
-                    h="100px"
-                    borderRadius="2xl"
-                    bg="green.100"
-                    _dark={{ bg: "green.900" }}
-                    align="center"
-                    justify="center"
-                  >
-                    <Text fontSize="4xl" fontWeight="bold" color="green.500">
-                      1
-                    </Text>
-                  </Flex>
-                  <Heading size="md">Choose Your Course</Heading>
-                  <Text color={textMuted}>
-                    Browse our extensive catalog and select the course that matches your
-                    goals and skill level.
-                  </Text>
-                </VStack>
+                <Box
+                  bg={cardBg}
+                  p={{ base: '6', md: '8' }}
+                  borderRadius="xl"
+                  borderWidth="1px"
+                  borderColor={borderColor}
+                  w={{ base: 'full', md: '360px' }}
+                  minH={{ base: 'auto', md: '140px' }}
+                >
+                  <HStack spacing="4" align="center" h="full">
+                    <Flex
+                      w="50px"
+                      h="50px"
+                      bg="green.100"
+                      _dark={{ bg: "green.900" }}
+                      borderRadius="lg"
+                      align="center"
+                      justify="center"
+                      flexShrink={0}
+                    >
+                      <Icon as={FiBook} boxSize="6" color="green.500" />
+                    </Flex>
+                    <VStack spacing="2" align="start" flex="1">
+                      <Heading size="sm">Choose Your Course</Heading>
+                      <Text fontSize="sm" color={textMuted}>
+                        Browse and select the course that matches your goals.
+                      </Text>
+                    </VStack>
+                  </HStack>
+                </Box>
               </FallInPlace>
+
+              <Icon
+                as={FiArrowRight}
+                boxSize="6"
+                color="green.500"
+                display={{ base: 'none', md: 'block' }}
+                flexShrink={0}
+              />
 
               <FallInPlace delay={0.2}>
-                <VStack spacing="4" textAlign="center">
-                  <Flex
-                    w="100px"
-                    h="100px"
-                    borderRadius="2xl"
-                    bg="blue.100"
-                    _dark={{ bg: "blue.900" }}
-                    align="center"
-                    justify="center"
-                  >
-                    <Text fontSize="4xl" fontWeight="bold" color="blue.500">
-                      2
-                    </Text>
-                  </Flex>
-                  <Heading size="md">Learn at Your Pace</Heading>
-                  <Text color={textMuted}>
-                    Access high-quality video lectures, hands-on labs, and practical
-                    exercises anytime, anywhere.
-                  </Text>
-                </VStack>
+                <Box
+                  bg={cardBg}
+                  p={{ base: '6', md: '8' }}
+                  borderRadius="xl"
+                  borderWidth="1px"
+                  borderColor={borderColor}
+                  w={{ base: 'full', md: '360px' }}
+                  minH={{ base: 'auto', md: '140px' }}
+                >
+                  <HStack spacing="4" align="center" h="full">
+                    <Flex
+                      w="50px"
+                      h="50px"
+                      bg="blue.100"
+                      _dark={{ bg: "blue.900" }}
+                      borderRadius="lg"
+                      align="center"
+                      justify="center"
+                      flexShrink={0}
+                    >
+                      <Icon as={FiTrendingUp} boxSize="6" color="blue.500" />
+                    </Flex>
+                    <VStack spacing="2" align="start" flex="1">
+                      <Heading size="sm">Learn at Your Pace</Heading>
+                      <Text fontSize="sm" color={textMuted}>
+                        Access video lectures and exercises anytime, anywhere.
+                      </Text>
+                    </VStack>
+                  </HStack>
+                </Box>
               </FallInPlace>
 
+              <Icon
+                as={FiArrowRight}
+                boxSize="6"
+                color="blue.500"
+                display={{ base: 'none', md: 'block' }}
+                flexShrink={0}
+              />
+
               <FallInPlace delay={0.3}>
-                <VStack spacing="4" textAlign="center">
-                  <Flex
-                    w="100px"
-                    h="100px"
-                    borderRadius="2xl"
-                    bg="purple.100"
-                    _dark={{ bg: "purple.900" }}
-                    align="center"
-                    justify="center"
-                  >
-                    <Text fontSize="4xl" fontWeight="bold" color="purple.500">
-                      3
-                    </Text>
-                  </Flex>
-                  <Heading size="md">Get Certified</Heading>
-                  <Text color={textMuted}>
-                    Complete the course, pass the assessments, and earn your industry-recognized
-                    certificate.
-                  </Text>
-                </VStack>
+                <Box
+                  bg={cardBg}
+                  p={{ base: '6', md: '8' }}
+                  borderRadius="xl"
+                  borderWidth="1px"
+                  borderColor={borderColor}
+                  w={{ base: 'full', md: '360px' }}
+                  minH={{ base: 'auto', md: '140px' }}
+                >
+                  <HStack spacing="4" align="center" h="full">
+                    <Flex
+                      w="50px"
+                      h="50px"
+                      bg="purple.100"
+                      _dark={{ bg: "purple.900" }}
+                      borderRadius="lg"
+                      align="center"
+                      justify="center"
+                      flexShrink={0}
+                    >
+                      <Icon as={FiAward} boxSize="6" color="purple.500" />
+                    </Flex>
+                    <VStack spacing="2" align="start" flex="1">
+                      <Heading size="sm">Get Certified</Heading>
+                      <Text fontSize="sm" color={textMuted}>
+                        Pass assessments and earn your certificate.
+                      </Text>
+                    </VStack>
+                  </HStack>
+                </Box>
               </FallInPlace>
-            </SimpleGrid>
+            </Flex>
           </VStack>
         </Container>
       </Box>
@@ -576,7 +671,15 @@ export default function AcademyHomePage() {
           <VStack spacing={{ base: '8', md: '12' }}>
             <FallInPlace>
               <VStack spacing="4" textAlign="center">
-                <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+                <Badge
+                  bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')}
+                  fontSize="sm"
+                  px="3"
+                  py="1"
+                  borderRadius="full"
+                  fontWeight="semibold"
+                >
                   Success Stories
                 </Badge>
                 <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
@@ -650,7 +753,15 @@ export default function AcademyHomePage() {
           <VStack spacing={{ base: '8', md: '12' }}>
             <FallInPlace>
               <VStack spacing="4" textAlign="center">
-                <Badge colorScheme="purple" fontSize="sm" px="3" py="1" borderRadius="full">
+                <Badge
+                  bg={useColorModeValue('blue.200', 'blue.500')}
+                  color={useColorModeValue('blue.900', 'white')}
+                  fontSize="sm"
+                  px="3"
+                  py="1"
+                  borderRadius="full"
+                  fontWeight="semibold"
+                >
                   Learn from the Best
                 </Badge>
                 <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
@@ -748,11 +859,13 @@ export default function AcademyHomePage() {
                             p="4"
                           >
                             <Badge
-                              colorScheme="purple"
+                              bg={useColorModeValue('blue.200', 'blue.500')}
+                              color={useColorModeValue('blue.900', 'white')}
                               fontSize="xs"
                               px="3"
                               py="1"
                               borderRadius="full"
+                              fontWeight="semibold"
                             >
                               Expert Instructor
                             </Badge>
@@ -857,7 +970,15 @@ export default function AcademyHomePage() {
               />
 
               <VStack spacing="6" position="relative" zIndex="1">
-                <Badge colorScheme="green" fontSize="md" px="4" py="2" borderRadius="full">
+                <Badge
+                  bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')}
+                  fontSize="md"
+                  px="4"
+                  py="2"
+                  borderRadius="full"
+                  fontWeight="semibold"
+                >
                   Start Today
                 </Badge>
                 <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }} maxW="3xl">

@@ -65,7 +65,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
           bottom: 0,
           bg: useColorModeValue(
             'linear-gradient(135deg, rgba(26, 32, 44, 0.85) 0%, rgba(45, 55, 72, 0.90) 100%)',
-            'linear-gradient(135deg, rgba(26, 32, 44, 0.70) 0%, rgba(45, 55, 72, 0.75) 100%)'
+            'linear-gradient(135deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.88) 100%)'
           ),
         }}
       >
@@ -83,7 +83,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
                 </Box>
                 {service.badge && (
                   <Badge
-                    colorScheme="green"
+                    bg={useColorModeValue('green.200', 'green.700')}
+                    color={useColorModeValue('green.900', 'white')}
                     fontSize="sm"
                     px={4}
                     py={1}
@@ -91,6 +92,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
                   >
                     {service.badge}
                   </Badge>
+                  
                 )}
               </HStack>
               <Heading

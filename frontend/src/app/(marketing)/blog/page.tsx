@@ -231,7 +231,7 @@ const BlogPage = () => {
           bottom: 0,
           bg: useColorModeValue(
             'linear-gradient(135deg, rgba(26, 32, 44, 0.85) 0%, rgba(45, 55, 72, 0.90) 100%)',
-            'linear-gradient(135deg, rgba(26, 32, 44, 0.70) 0%, rgba(45, 55, 72, 0.75) 100%)'
+            'linear-gradient(135deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.88) 100%)'
           ),
         }}
       >
@@ -239,11 +239,13 @@ const BlogPage = () => {
           <VStack spacing={{ base: "4", md: "6" }} textAlign="center">
             <FallInPlace>
               <Badge
-                colorScheme="green"
+                bg={useColorModeValue('green.200', 'green.700')}
+                color={useColorModeValue('green.900', 'white')}
                 fontSize="sm"
                 px={4}
                 py={1}
                 borderRadius="full"
+                fontWeight="semibold"
               >
                 Knowledge Hub
               </Badge>
@@ -358,7 +360,15 @@ const BlogPage = () => {
                   </Text>
                   <HStack spacing="3">
                     <Text fontSize="sm" color="muted">Sort by:</Text>
-                    <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+                    <Badge
+                      bg={useColorModeValue('green.200', 'green.700')}
+                      color={useColorModeValue('green.900', 'white')}
+                      fontSize="sm"
+                      px="3"
+                      py="1"
+                      borderRadius="full"
+                      fontWeight="semibold"
+                    >
                       Page {currentPage} of {totalPages || 1}
                     </Badge>
                   </HStack>
@@ -462,7 +472,17 @@ const BlogPage = () => {
       <Box py={{ base: "16", md: "20" }} bg={useColorModeValue("green.50", "green.900")} borderTopWidth="1px" borderColor={borderColor}>
         <Container maxW="container.md">
           <VStack spacing="6" textAlign="center">
-            <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">Stay Updated</Badge>
+            <Badge
+              bg={useColorModeValue('green.200', 'green.700')}
+              color={useColorModeValue('green.900', 'white')}
+              fontSize="sm"
+              px="3"
+              py="1"
+              borderRadius="full"
+              fontWeight="semibold"
+            >
+              Stay Updated
+            </Badge>
             <Heading size={{ base: "xl", md: "2xl" }}>Subscribe to Our Newsletter</Heading>
             <Text fontSize="lg" color="muted" maxW="xl">
               Get the latest cybersecurity insights, threat alerts, and tutorials delivered directly to your inbox.

@@ -508,8 +508,9 @@ const ServicesOverviewSection = () => {
           <FallInPlace>
             <VStack spacing="4" textAlign="center">
               <Badge
-                colorScheme="green"
-                fontSize="2xl"
+                bg={useColorModeValue('green.200', 'green.700')}
+                color={useColorModeValue('green.900', 'white')}
+                fontSize="xl"
                 px="3"
                 py="1"
                 borderRadius="full"
@@ -715,8 +716,9 @@ const AcademyProgramsSection = () => {
           <FallInPlace>
             <VStack spacing="4" textAlign="center">
               <Badge
-                colorScheme="green"
-                fontSize="2xl"
+                bg={useColorModeValue('green.200', 'green.700')}
+                color={useColorModeValue('green.900', 'white')}
+                fontSize="xl"
                 px="3"
                 py="1"
                 borderRadius="full"
@@ -820,7 +822,8 @@ const MeetOurExpertsSection = () => {
         <VStack spacing={{ base: '8', md: '12' }}>
           <FallInPlace>
             <VStack spacing="4" textAlign="center">
-              <Badge colorScheme="purple" fontSize="2xl" px="3" py="1" borderRadius="full">
+              <Badge bg={useColorModeValue('blue.200', 'blue.500')}
+                color={useColorModeValue('blue.900', 'white')} fontSize="xl" px="3" py="1" borderRadius="full">
                 Meet Our Expert
               </Badge>
               {/* <Heading fontSize={{ base: '3xl', md: '4xl', lg: '4xl' }}>
@@ -1063,11 +1066,25 @@ const KeyAchievementsSection = () => {
 
   return (
     <Box py={{ base: '16', md: '24' }} bg={bgColor} position="relative" overflow="hidden">
-      {/* Background decoration */}
+      {/* Background decoration - Left */}
       <Box
         position="absolute"
         bottom="-100px"
         left="-100px"
+        width="500px"
+        height="500px"
+        borderRadius="full"
+        bg={accentColor}
+        opacity="0.1"
+        filter="blur(120px)"
+        pointerEvents="none"
+      />
+
+      {/* Background decoration - Right */}
+      <Box
+        position="absolute"
+        top="-100px"
+        right="-100px"
         width="500px"
         height="500px"
         borderRadius="full"
@@ -1109,73 +1126,73 @@ const KeyAchievementsSection = () => {
             </VStack>
           </FallInPlace>
 
-          <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} spacing={{ base: '6', md: '8' }} width="100%">
-            {achievements.map((achievement, index) => (
-              <FallInPlace key={achievement.label} delay={0.1 * index}>
-                <Card
-                  bg={cardBg}
-                  borderWidth="2px"
-                  borderColor={borderColor}
-                  borderRadius="xl"
-                  overflow="hidden"
-                  transition="all 0.3s ease"
+          <Box 
+            position="relative" 
+            width="100%" 
+            overflow="hidden"
+            py="4"
+          >
+            <Flex
+              gap={{ base: '6', md: '8', lg: '12' }}
+              animation="scroll 30s linear infinite"
+              sx={{
+                '@keyframes scroll': {
+                  '0%': { transform: 'translateX(0)' },
+                  '100%': { transform: 'translateX(-50%)' },
+                },
+                '&:hover': {
+                  animationPlayState: 'paused',
+                },
+              }}
+            >
+              {[...achievements, ...achievements].map((achievement, index) => (
+                <VStack 
+                  key={`${achievement.label}-${index}`}
+                  spacing="4" 
+                  textAlign="center"
+                  p={{ base: '6', md: '8' }}
+                  minW={{ base: '200px', md: '240px', lg: '280px' }}
+                  transition="all 0.2s ease"
                   _hover={{
-                    transform: 'scale(1.05)',
-                    borderColor: `${achievement.color}.500`,
-                    shadow: '2xl',
+                    transform: 'translateY(-4px)',
                   }}
-                  height="100%"
                 >
-                  <CardBody p={{ base: '6', md: '8' }} textAlign="center">
-                    <VStack spacing="4">
-                      <Flex
-                        width="70px"
-                        height="70px"
-                        borderRadius="full"
-                        bg={`${achievement.color}.50`}
-                        _dark={{ bg: `${achievement.color}.900` }}
-                        align="center"
-                        justify="center"
-                        mx="auto"
-                      >
-                        <Icon as={achievement.icon} boxSize="8" color={`${achievement.color}.500`} />
-                      </Flex>
-
-                      <VStack spacing="2">
-                        <Text
-                          fontSize={{ base: '3xl', md: '4xl' }}
-                          fontWeight="bold"
-                          color={accentColor}
-                        >
-                          {counts[achievement.key as keyof typeof counts]}{achievement.suffix}
-                        </Text>
-                        <Heading size="sm" fontSize={{ base: 'lg', md: 'xl' }}>
-                          {achievement.label}
-                        </Heading>
-                        <Text color="muted" fontSize="sm">
-                          {achievement.description}
-                        </Text>
-                      </VStack>
-
-                      <Wrap spacing="2" justify="center">
-                        {achievement.details.map((detail) => (
-                          <Tag
-                            key={detail}
-                            size="sm"
-                            colorScheme={achievement.color}
-                            variant="subtle"
-                            borderRadius="full"
-                          >
-                            {detail}
-                          </Tag>
-                        ))}
-                      </Wrap>
-                    </VStack>
-                  </CardBody>
-                </Card>
-              </FallInPlace>
-            ))}
-          </SimpleGrid>
+                  <Icon 
+                    as={achievement.icon} 
+                    boxSize={{ base: '10', md: '12' }} 
+                    color={accentColor}
+                    opacity="0.9"
+                  />
+                  
+                  <VStack spacing="1">
+                    <Text
+                      fontSize={{ base: '4xl', md: '5xl' }}
+                      fontWeight="extrabold"
+                      color={accentColor}
+                      lineHeight="1"
+                    >
+                      {counts[achievement.key as keyof typeof counts]}{achievement.suffix}
+                    </Text>
+                    <Heading 
+                      size="md" 
+                      fontSize={{ base: 'md', md: 'lg' }}
+                      fontWeight="semibold"
+                      whiteSpace="nowrap"
+                    >
+                      {achievement.label}
+                    </Heading>
+                    <Text 
+                      color="muted" 
+                      fontSize={{ base: 'xs', md: 'sm' }}
+                      maxW="220px"
+                    >
+                      {achievement.description}
+                    </Text>
+                  </VStack>
+                </VStack>
+              ))}
+            </Flex>
+          </Box>
         </VStack>
       </Container>
     </Box>
@@ -1220,8 +1237,9 @@ const VideoShowcaseSection = () => {
           <FallInPlace>
             <VStack spacing="4" textAlign="center">
               <Badge
-                colorScheme="green"
-                fontSize="2xl"
+                bg={useColorModeValue('green.200', 'green.700')}
+                color={useColorModeValue('green.900', 'white')}
+                fontSize="xl"
                 px="3"
                 py="1"
                 borderRadius="full"
@@ -1388,7 +1406,7 @@ const PhotoGallerySection = () => {
         <VStack spacing={{ base: '10', md: '14' }}>
           <FallInPlace>
             <VStack spacing="3" textAlign="center">
-              <Badge colorScheme="green" fontSize="2xl" px="3" py="1" borderRadius="full" fontWeight="medium">
+              <Badge bg={useColorModeValue('green.200', 'green.700')} color={useColorModeValue('green.900', 'white')} fontSize="xl" px="3" py="1" borderRadius="full" fontWeight="medium">
                 Gallery
               </Badge>
               {/* <Heading fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }} fontWeight="bold">
@@ -1741,8 +1759,9 @@ const BlogSection = () => {
           <FallInPlace>
             <VStack spacing="4" textAlign="center">
               <Badge
-                colorScheme="green"
-                fontSize="2xl"
+                bg={useColorModeValue('green.200', 'green.700')}
+                color={useColorModeValue('green.900', 'white')}
+                fontSize="xl"
                 px="3"
                 py="1"
                 borderRadius="full"
@@ -1883,16 +1902,16 @@ const TrustedBySection = () => {
 
   // Sample partners/clients - duplicated for infinite scroll
   const partners = [
-    { name: 'Government of Bangladesh', category: 'Public Sector', logo: '/images/country/country-01.svg' },
-    { name: 'BRAC Bank', category: 'Financial', logo: '/images/brand/brand-01.svg' },
-    { name: 'Robi Axiata', category: 'Telecom', logo: '/images/brand/brand-02.svg' },
-    { name: 'Daraz Bangladesh', category: 'E-commerce', logo: '/images/brand/brand-03.svg' },
-    { name: 'BUET', category: 'Education', logo: '/images/brand/brand-04.svg' },
-    { name: 'City Bank', category: 'Financial', logo: '/images/brand/brand-05.svg' },
-    { name: 'Grameenphone', category: 'Telecom', logo: '/images/brand/brand-06.svg' },
-    { name: 'Pathao', category: 'Tech', logo: '/images/brand/brand-07.svg' },
-    { name: 'bKash', category: 'FinTech', logo: '/images/brand/brand-08.svg' },
-    { name: 'Nagad', category: 'FinTech', logo: '/images/brand/brand-09.svg' },
+    { name: 'Government of Bangladesh', category: 'Public Sector', logo: '/images/grid-image/image-01.png' },
+    { name: 'BRAC Bank', category: 'Financial', logo: '/images/grid-image/image-02.png' },
+    { name: 'Robi Axiata', category: 'Telecom', logo: '/images/grid-image/image-03.png' },
+    { name: 'Daraz Bangladesh', category: 'E-commerce', logo: '/images/grid-image/image-04.png' },
+    { name: 'BUET', category: 'Education', logo: '/images/carousel/carousel-01.png' },
+    { name: 'City Bank', category: 'Financial', logo: '/images/carousel/carousel-02.png' },
+    { name: 'Grameenphone', category: 'Telecom', logo: '/images/cards/card-01.jpg' },
+    { name: 'Pathao', category: 'Tech', logo: '/images/cards/card-02.jpg' },
+    { name: 'bKash', category: 'FinTech', logo: '/images/cards/card-03.jpg' },
+    { name: 'Nagad', category: 'FinTech', logo: '/images/cards/card-04.jpg' },
   ]
 
   // Duplicate for seamless loop
@@ -1918,74 +1937,61 @@ const TrustedBySection = () => {
             width="100%"
             overflow="hidden"
             position="relative"
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
-            py="4"
+            py="8"
           >
             <Flex
-              gap="8"
-              animation={isPaused ? 'none' : 'scroll 40s linear infinite'}
+              gap={{ base: '12', md: '16', lg: '20' }}
+              align="center"
+              animation="scroll 40s linear infinite"
               sx={{
                 '@keyframes scroll': {
                   '0%': { transform: 'translateX(0)' },
                   '100%': { transform: 'translateX(-50%)' },
                 },
+                '&:hover': {
+                  animationPlayState: 'paused',
+                },
               }}
             >
               {allPartners.map((partner, index) => (
-                <Card
+                <VStack
                   key={`${partner.name}-${index}`}
-                  variant="outline"
-                  borderRadius="xl"
-                  minW="280px"
-                  transition="all 0.3s ease"
-                  cursor="pointer"
-                  position="relative"
-                  overflow="hidden"
-                  bg={bgColor}
+                  spacing="0"
+                  minW={{ base: '120px', md: '160px' }}
+                  transition="all 0.2s ease"
+                  opacity="0.9"
                   _hover={{
-                    transform: 'translateY(-8px)',
-                    shadow: 'xl',
-                    borderColor: 'green.500',
+                    opacity: 1,
+                    transform: 'scale(1.05)',
                   }}
                 >
-                  <CardBody p="6">
-                    <VStack spacing="4">
-                      <Flex
-                        width="100px"
-                        height="100px"
-                        borderRadius="xl"
-                        bg="gray.50"
-                        _dark={{ bg: 'gray.700' }}
-                        align="center"
-                        justify="center"
-                        position="relative"
-                        overflow="hidden"
-                      >
-                        <Box
-                          position="relative"
-                          width="70px"
-                          height="70px"
-                        >
-                          <Image
-                            src={partner.logo}
-                            alt={partner.name}
-                            fill
-                            style={{ objectFit: 'contain' }}
-                          />
-                        </Box>
-                      </Flex>
-                      <VStack spacing="1">
-                        <Text fontWeight="bold" fontSize="md" textAlign="center" noOfLines={2}>
-                          {partner.name}
-                        </Text>
-                        <Badge colorScheme="green" fontSize="xs">
-                          {partner.category}
-                        </Badge>
-                      </VStack>
-                    </VStack>
-                  </CardBody>
-                </Card>
+                  <Box
+                    width={{ base: '80px', md: '100px' }}
+                    height={{ base: '80px', md: '100px' }}
+                    transition="all 0.2s ease"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Box
+                      as="img"
+                      src={partner.logo}
+                      alt={partner.name}
+                      maxW="100%"
+                      maxH="100%"
+                      objectFit="contain"
+                    />
+                  </Box>
+                  <Text
+                    fontSize={{ base: 'xs', md: 'sm' }}
+                    fontWeight="medium"
+                    textAlign="center"
+                    color="muted"
+                    noOfLines={2}
+                  >
+                    {partner.name}
+                  </Text>
+                </VStack>
               ))}
             </Flex>
           </Box>

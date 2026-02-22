@@ -20,15 +20,16 @@ const NewsletterSection = () => {
   const accentColor = useColorModeValue("green.500", "green.400");
 
   return (
-    <Box 
-      py={{ base: "16", md: "20" }} 
+    <Box
+      py={{ base: "16", md: "20" }}
       bg={useColorModeValue("green.50", "green.900")}
       borderTopWidth="1px"
       borderColor={borderColor}
     >
       <Container maxW="container.md">
         <VStack spacing="6" textAlign="center">
-          <Badge colorScheme="green" fontSize="sm" px="3" py="1" borderRadius="full">
+          <Badge bg={useColorModeValue('green.200', 'green.700')}
+            color={useColorModeValue('green.900', 'white')} fontSize="sm" px="3" py="1" borderRadius="full">
             Stay Updated
           </Badge>
           <Heading size={{ base: "xl", md: "2xl" }}>
@@ -37,10 +38,10 @@ const NewsletterSection = () => {
           <Text fontSize="lg" color="muted" maxW="xl">
             Get the latest cybersecurity insights, threat alerts, and tutorials delivered directly to your inbox.
           </Text>
-          <Stack 
-            as="form" 
-            w="full" 
-            maxW="md" 
+          <Stack
+            as="form"
+            w="full"
+            maxW="md"
             spacing="3"
             direction={{ base: "column", md: "row" }}
             px={{ base: "4", md: "0" }}

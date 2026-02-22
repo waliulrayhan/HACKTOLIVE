@@ -307,7 +307,7 @@ export default function AllCoursesPage() {
           bottom: 0,
           bg: useColorModeValue(
             'linear-gradient(135deg, rgba(26, 32, 44, 0.88) 0%, rgba(45, 55, 72, 0.92) 100%)',
-            'linear-gradient(135deg, rgba(0, 0, 0, 0.75) 0%, rgba(26, 32, 44, 0.85) 100%)'
+            'linear-gradient(135deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.88) 100%)'
           ),
         }}
       >
@@ -316,11 +316,13 @@ export default function AllCoursesPage() {
             <VStack spacing={{ base: 4, md: 6 }} textAlign="center" maxW="4xl" mx="auto">
               <FallInPlace>
                 <Badge
-                  colorScheme="green"
+                  bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')}
                   fontSize="sm"
                   px={4}
                   py={1}
                   borderRadius="full"
+                  fontWeight="semibold"
                 >
                   Browse All Courses
                 </Badge>

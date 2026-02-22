@@ -343,7 +343,7 @@ export default function CareerPage() {
           bottom: 0,
           bg: useColorModeValue(
             'linear-gradient(135deg, rgba(26, 32, 44, 0.85) 0%, rgba(45, 55, 72, 0.90) 100%)',
-            'linear-gradient(135deg, rgba(26, 32, 44, 0.70) 0%, rgba(45, 55, 72, 0.75) 100%)'
+            'linear-gradient(135deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.88) 100%)'
           ),
         }}
       >
@@ -758,7 +758,7 @@ export default function CareerPage() {
                             alignItems="center"
                             gap={1}
                           >
-                            <Icon as={FiDollarSign} boxSize={3} />
+                            <Text fontSize="sm" fontWeight="bold">৳</Text>
                             {job.salary}
                           </Badge>
                         )}

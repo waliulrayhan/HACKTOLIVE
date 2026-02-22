@@ -40,7 +40,7 @@ export default function ServicesPage() {
           bottom: 0,
           bg: useColorModeValue(
             'linear-gradient(135deg, rgba(26, 32, 44, 0.85) 0%, rgba(45, 55, 72, 0.90) 100%)',
-            'linear-gradient(135deg, rgba(26, 32, 44, 0.70) 0%, rgba(45, 55, 72, 0.75) 100%)'
+            'linear-gradient(135deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.88) 100%)'
           ),
         }}
       >
@@ -48,14 +48,16 @@ export default function ServicesPage() {
           <FallInPlace>
             <VStack spacing={6} textAlign="center" maxW="4xl" mx="auto">
               <Badge
-                colorScheme="green"
-                fontSize="sm"
-                px={4}
-                py={1}
-                borderRadius="full"
-              >
-                Professional Cybersecurity Services
-              </Badge>
+                  bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')}
+                  fontSize="sm"
+                  px={4}
+                  py={1}
+                  borderRadius="full"
+                  fontWeight="semibold"
+                >
+                  Professional Cybersecurity Services
+                </Badge>
               <Heading
                 as="h1"
                 fontSize={{ base: '4xl', md: '5xl', lg: '6xl' }}

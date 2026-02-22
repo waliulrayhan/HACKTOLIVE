@@ -65,7 +65,8 @@ export default function InstructorsListPage() {
           <VStack spacing={6} textAlign="center">
             <FallInPlace>
               <Badge
-                colorScheme="green"
+                bg={useColorModeValue('green.200', 'green.700')}
+                color={useColorModeValue('green.900', 'white')}
                 fontSize="sm"
                 px={4}
                 py={1}
@@ -200,70 +201,70 @@ export default function InstructorsListPage() {
                       flexDirection="column"
                     >
                       {/* Instructor Image */}
-                    <Box position="relative" h="280px" w="full" overflow="hidden">
-                      {instructor.user?.avatar ? (
-                        <Image
-                          src={getFullImageUrl(instructor.user.avatar, 'avatar')}
-                          alt={instructor.user?.name || 'Instructor'}
-                          fill
-                          style={{ objectFit: "cover" }}
-                        />
-                      ) : (
+                      <Box position="relative" h="280px" w="full" overflow="hidden">
+                        {instructor.user?.avatar ? (
+                          <Image
+                            src={getFullImageUrl(instructor.user.avatar, 'avatar')}
+                            alt={instructor.user?.name || 'Instructor'}
+                            fill
+                            style={{ objectFit: "cover" }}
+                          />
+                        ) : (
+                          <Box
+                            position="absolute"
+                            inset={0}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            bg={useColorModeValue('gray.200', 'gray.700')}
+                          >
+                            <Icon as={FiUser} boxSize="80px" color={useColorModeValue('gray.500', 'gray.400')} />
+                          </Box>
+                        )}
                         <Box
                           position="absolute"
-                          inset={0}
-                          display="flex"
-                          alignItems="center"
-                          justifyContent="center"
-                          bg={useColorModeValue('gray.200', 'gray.700')}
+                          top={4}
+                          right={4}
+                          bg="blackAlpha.700"
+                          backdropFilter="blur(10px)"
+                          px={3}
+                          py={1}
+                          borderRadius="full"
                         >
-                          <Icon as={FiUser} boxSize="80px" color={useColorModeValue('gray.500', 'gray.400')} />
+                          <HStack spacing={1}>
+                            <Icon as={FiStar} color="yellow.400" boxSize={4} />
+                            <Text color="white" fontWeight="bold" fontSize="sm">
+                              {instructor.rating}
+                            </Text>
+                          </HStack>
                         </Box>
-                      )}
-                      <Box
-                        position="absolute"
-                        top={4}
-                        right={4}
-                        bg="blackAlpha.700"
-                        backdropFilter="blur(10px)"
-                        px={3}
-                        py={1}
-                        borderRadius="full"
-                      >
-                        <HStack spacing={1}>
-                          <Icon as={FiStar} color="yellow.400" boxSize={4} />
-                          <Text color="white" fontWeight="bold" fontSize="sm">
-                            {instructor.rating}
-                          </Text>
-                        </HStack>
-                      </Box>
-                    </Box>
-
-                    {/* Instructor Info */}
-                    <VStack p={6} spacing={4} align="stretch" flex="1">
-                      {/* Name & Badge */}
-                      <Box>
-                        <Heading size="md" mb={2}>
-                          {instructor.user?.name || 'Instructor'}
-                        </Heading>
-                        {instructor.user?.bio && (
-                          <Badge
-                            colorScheme="green"
-                            fontSize="xs"
-                            px={3}
-                            py={1}
-                            borderRadius="full"
-                            fontWeight="semibold"
-                          >
-                            {instructor.user.bio}
-                          </Badge>
-                        )}
                       </Box>
 
-                      {/* Additional Info - Location and Email if available */}
-                      {(instructor.user?.city || instructor.user?.country || instructor.user?.email) && (
-                        <VStack spacing={2} align="stretch">
-                          {/* {(instructor.user?.city || instructor.user?.country) && (
+                      {/* Instructor Info */}
+                      <VStack p={6} spacing={4} align="stretch" flex="1">
+                        {/* Name & Badge */}
+                        <Box>
+                          <Heading size="md" mb={2}>
+                            {instructor.user?.name || 'Instructor'}
+                          </Heading>
+                          {instructor.user?.bio && (
+                            <Badge
+                              colorScheme="green"
+                              fontSize="xs"
+                              px={3}
+                              py={1}
+                              borderRadius="full"
+                              fontWeight="semibold"
+                            >
+                              {instructor.user.bio}
+                            </Badge>
+                          )}
+                        </Box>
+
+                        {/* Additional Info - Location and Email if available */}
+                        {(instructor.user?.city || instructor.user?.country || instructor.user?.email) && (
+                          <VStack spacing={2} align="stretch">
+                            {/* {(instructor.user?.city || instructor.user?.country) && (
                             <HStack spacing={2}>
                               <Icon as={FiMapPin} color={textMuted} boxSize={4} />
                               <Text fontSize="xs" color={textMuted} noOfLines={1}>
@@ -273,108 +274,108 @@ export default function InstructorsListPage() {
                               </Text>
                             </HStack>
                           )} */}
-                          {instructor.user?.email && (
-                            <HStack spacing={2}>
-                              <Icon as={FiMail} color={textMuted} boxSize={4} />
-                              <Text fontSize="xs" color={textMuted} noOfLines={1}>
-                                {instructor.user.email}
-                              </Text>
-                            </HStack>
-                          )}
-                        </VStack>
-                      )}
+                            {instructor.user?.email && (
+                              <HStack spacing={2}>
+                                <Icon as={FiMail} color={textMuted} boxSize={4} />
+                                <Text fontSize="xs" color={textMuted} noOfLines={1}>
+                                  {instructor.user.email}
+                                </Text>
+                              </HStack>
+                            )}
+                          </VStack>
+                        )}
 
-                      {/* Divider */}
-                      <Divider borderColor={borderColor} />
+                        {/* Divider */}
+                        <Divider borderColor={borderColor} />
 
-                      {/* Stats Grid */}
-                      <SimpleGrid columns={3} spacing={4}>
-                        <VStack spacing={1}>
-                          <Flex
-                            w="40px"
-                            h="40px"
-                            borderRadius="lg"
-                            bg={useColorModeValue("blue.50", "blue.900")}
-                            align="center"
-                            justify="center"
-                          >
-                            <Icon
-                              as={FiBook}
-                              color={useColorModeValue("blue.500", "blue.300")}
-                              boxSize={5}
-                            />
-                          </Flex>
-                          <Text fontWeight="bold" fontSize="lg">
-                            {instructor.totalCourses}
-                          </Text>
-                          <Text fontSize="xs" color={textMuted}>
-                            Courses
-                          </Text>
-                        </VStack>
+                        {/* Stats Grid */}
+                        <SimpleGrid columns={3} spacing={4}>
+                          <VStack spacing={1}>
+                            <Flex
+                              w="40px"
+                              h="40px"
+                              borderRadius="lg"
+                              bg={useColorModeValue("blue.50", "blue.900")}
+                              align="center"
+                              justify="center"
+                            >
+                              <Icon
+                                as={FiBook}
+                                color={useColorModeValue("blue.500", "blue.300")}
+                                boxSize={5}
+                              />
+                            </Flex>
+                            <Text fontWeight="bold" fontSize="lg">
+                              {instructor.totalCourses}
+                            </Text>
+                            <Text fontSize="xs" color={textMuted}>
+                              Courses
+                            </Text>
+                          </VStack>
 
-                        <VStack spacing={1}>
-                          <Flex
-                            w="40px"
-                            h="40px"
-                            borderRadius="lg"
-                            bg={useColorModeValue("green.50", "green.900")}
-                            align="center"
-                            justify="center"
-                          >
-                            <Icon
-                              as={FiUsers}
-                              color={useColorModeValue("green.500", "green.300")}
-                              boxSize={5}
-                            />
-                          </Flex>
-                          <Text fontWeight="bold" fontSize="lg">
-                            {(instructor.totalStudents / 1000).toFixed(0)}K
-                          </Text>
-                          <Text fontSize="xs" color={textMuted}>
-                            Students
-                          </Text>
-                        </VStack>
+                          <VStack spacing={1}>
+                            <Flex
+                              w="40px"
+                              h="40px"
+                              borderRadius="lg"
+                              bg={useColorModeValue("green.50", "green.900")}
+                              align="center"
+                              justify="center"
+                            >
+                              <Icon
+                                as={FiUsers}
+                                color={useColorModeValue("green.500", "green.300")}
+                                boxSize={5}
+                              />
+                            </Flex>
+                            <Text fontWeight="bold" fontSize="lg">
+                              {(instructor.totalStudents / 1000).toFixed(0)}K
+                            </Text>
+                            <Text fontSize="xs" color={textMuted}>
+                              Students
+                            </Text>
+                          </VStack>
 
-                        <VStack spacing={1}>
-                          <Flex
-                            w="40px"
-                            h="40px"
-                            borderRadius="lg"
-                            bg={useColorModeValue("purple.50", "purple.900")}
-                            align="center"
-                            justify="center"
-                          >
-                            <Icon
-                              as={FiAward}
-                              color={useColorModeValue("purple.500", "purple.300")}
-                              boxSize={5}
-                            />
-                          </Flex>
-                          <Text fontWeight="bold" fontSize="lg">
-                            {instructor.rating}
-                          </Text>
-                          <Text fontSize="xs" color={textMuted}>
-                            Rating
-                          </Text>
-                        </VStack>
-                      </SimpleGrid>
+                          <VStack spacing={1}>
+                            <Flex
+                              w="40px"
+                              h="40px"
+                              borderRadius="lg"
+                              bg={useColorModeValue("purple.50", "purple.900")}
+                              align="center"
+                              justify="center"
+                            >
+                              <Icon
+                                as={FiAward}
+                                color={useColorModeValue("purple.500", "purple.300")}
+                                boxSize={5}
+                              />
+                            </Flex>
+                            <Text fontWeight="bold" fontSize="lg">
+                              {instructor.rating}
+                            </Text>
+                            <Text fontSize="xs" color={textMuted}>
+                              Rating
+                            </Text>
+                          </VStack>
+                        </SimpleGrid>
 
-                      {/* CTA Button */}
-                      <ButtonLink
-                        href={`/academy/instructors/${instructor.id}`}
-                        colorScheme="green"
-                        size="md"
-                        width="full"
-                        mt={2}
-                      >
-                        View Profile
-                      </ButtonLink>
-                    </VStack>
-                  </Box>
-                </FallInPlace>
-              );
-            })}
-          </SimpleGrid>
+                        {/* CTA Button */}
+                        <ButtonLink
+                          href={`/academy/instructors/${instructor.id}`}
+                          colorScheme="green"
+                          size="md"
+                          width="full"
+                          mt={2}
+                        >
+                          View Profile
+                        </ButtonLink>
+                      </VStack>
+                    </Box>
+                  </FallInPlace>
+                );
+              })}
+            </SimpleGrid>
           ) : (
             <Center py="20">
               <Text color={textMuted}>No instructors found.</Text>
@@ -389,7 +390,8 @@ export default function InstructorsListPage() {
           <VStack spacing={{ base: 10, md: 14 }}>
             {/* Section Header */}
             <VStack spacing={4} textAlign="center">
-              <Badge colorScheme="green" fontSize="sm" px={4} py={2} borderRadius="full">
+              <Badge bg={useColorModeValue('green.200', 'green.700')}
+                color={useColorModeValue('green.900', 'white')} fontSize="sm" px={4} py={2} borderRadius="full">
                 Our Advantage
               </Badge>
               <Heading fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}>

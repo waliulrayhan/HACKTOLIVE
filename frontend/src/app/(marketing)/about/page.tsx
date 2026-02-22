@@ -297,7 +297,7 @@ export default function AboutPage() {
           bottom: 0,
           bg: useColorModeValue(
             'linear-gradient(135deg, rgba(26, 32, 44, 0.85) 0%, rgba(45, 55, 72, 0.90) 100%)',
-            'linear-gradient(135deg, rgba(26, 32, 44, 0.70) 0%, rgba(45, 55, 72, 0.75) 100%)'
+            'linear-gradient(135deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.88) 100%)'
           ),
         }}
       >
@@ -305,13 +305,14 @@ export default function AboutPage() {
           <FallInPlace>
             <VStack spacing={6} textAlign="center" maxW="4xl" mx="auto">
               <Badge
-                colorScheme="green"
+                bg={useColorModeValue('green.200', 'green.700')}
+                color={useColorModeValue('green.900', 'white')}
                 fontSize="sm"
                 px={4}
                 py={1}
                 borderRadius="full"
               >
-                About HackToLive (H4K2LIV3)
+                About HackToLive
               </Badge>
               <Heading
                 as="h1"
@@ -350,27 +351,28 @@ export default function AboutPage() {
                 transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
               >
                 <VStack align="start" spacing={6}>
-                  <Badge colorScheme="green" fontSize="sm" px={4} py={1} borderRadius="full">
+                  <Badge bg={useColorModeValue('green.200', 'green.700')}
+                    color={useColorModeValue('green.900', 'white')} fontSize="sm" px={4} py={1} borderRadius="full">
                     Company Overview
                   </Badge>
                   <Heading as="h2" fontSize={{ base: '3xl', md: '4xl' }}>
                     Leading the Cybersecurity Revolution in Bangladesh
                   </Heading>
                   <Text fontSize="lg" color={mutedColor} lineHeight="tall">
-                    Founded in 2019, HackToLive (H4K2LIV3) has emerged as Bangladesh's most 
-                    trusted cybersecurity platform. We bridge the gap between traditional education 
-                    and industry needs by providing world-class security training in Bengali, making 
+                    Founded in 2019, HackToLive (H4K2LIV3) has emerged as Bangladesh's most
+                    trusted cybersecurity platform. We bridge the gap between traditional education
+                    and industry needs by providing world-class security training in Bengali, making
                     cybersecurity accessible to millions.
                   </Text>
                   <Text fontSize="lg" color={mutedColor} lineHeight="tall">
-                    Our comprehensive approach combines professional security services, hands-on 
-                    training programs, and a vibrant community of ethical hackers. We've trained 
-                    over 5,000 professionals and conducted 500+ successful security audits for 
+                    Our comprehensive approach combines professional security services, hands-on
+                    training programs, and a vibrant community of ethical hackers. We've trained
+                    over 5,000 professionals and conducted 500+ successful security audits for
                     leading organizations across South Asia.
                   </Text>
                   <Text fontSize="lg" color={mutedColor} lineHeight="tall">
-                    What sets us apart is our commitment to quality education in Bengali, practical 
-                    hands-on training, and real-world experience through CTF challenges and live projects. 
+                    What sets us apart is our commitment to quality education in Bengali, practical
+                    hands-on training, and real-world experience through CTF challenges and live projects.
                     We're not just teaching cybersecurity – we're building Bangladesh's digital defense force.
                   </Text>
                 </VStack>
@@ -668,7 +670,8 @@ export default function AboutPage() {
           <VStack spacing={12}>
             <VStack spacing={4} textAlign="center">
               <FallInPlace>
-                <Badge colorScheme="green" fontSize="sm" px={4} py={1} borderRadius="full">
+                <Badge bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')} fontSize="sm" px={4} py={1} borderRadius="full">
                   Our Core Values
                 </Badge>
               </FallInPlace>
@@ -743,7 +746,8 @@ export default function AboutPage() {
           <VStack spacing={12}>
             <VStack spacing={4} textAlign="center">
               <FallInPlace>
-                <Badge colorScheme="green" fontSize="sm" px={4} py={1} borderRadius="full">
+                <Badge bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')} fontSize="sm" px={4} py={1} borderRadius="full">
                   Our Journey
                 </Badge>
               </FallInPlace>
@@ -850,7 +854,8 @@ export default function AboutPage() {
           <VStack spacing={12}>
             <VStack spacing={4} textAlign="center">
               <FallInPlace>
-                <Badge colorScheme="green" fontSize="sm" px={4} py={1} borderRadius="full">
+                <Badge bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')} fontSize="sm" px={4} py={1} borderRadius="full">
                   Leadership Team
                 </Badge>
               </FallInPlace>
@@ -894,8 +899,8 @@ export default function AboutPage() {
                       bg={cardBg}
                       borderWidth="1px"
                       borderColor={borderColor}
-                      _hover={{ 
-                        transform: 'translateY(-8px) scale(1.02)', 
+                      _hover={{
+                        transform: 'translateY(-8px) scale(1.02)',
                         shadow: '2xl',
                         borderColor: iconColor,
                       }}
@@ -904,9 +909,9 @@ export default function AboutPage() {
                     >
                       <CardBody>
                         <VStack spacing={4}>
-                          <Avatar 
-                            size="2xl" 
-                            src={member.avatar} 
+                          <Avatar
+                            size="2xl"
+                            src={member.avatar}
                             name={member.name}
                             transition="all 0.3s"
                             _hover={{ transform: 'scale(1.1)' }}
@@ -928,7 +933,7 @@ export default function AboutPage() {
                   </Box>
                 ))}
               </Flex>
-              
+
               {/* Gradient overlays for visual effect */}
               <Box
                 position="absolute"
@@ -965,7 +970,8 @@ export default function AboutPage() {
           <VStack spacing={12}>
             <VStack spacing={4} textAlign="center">
               <FallInPlace>
-                <Badge colorScheme="green" fontSize="sm" px={4} py={1} borderRadius="full">
+                <Badge bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')} fontSize="sm" px={4} py={1} borderRadius="full">
                   Certifications
                 </Badge>
               </FallInPlace>
@@ -1064,7 +1070,8 @@ export default function AboutPage() {
                 transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
               >
                 <VStack align="start" spacing={6}>
-                  <Badge colorScheme="green" fontSize="sm" px={4} py={1} borderRadius="full">
+                  <Badge bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')} fontSize="sm" px={4} py={1} borderRadius="full">
                     Our Achievements
                   </Badge>
                   <Heading as="h2" fontSize={{ base: '3xl', md: '4xl' }}>
@@ -1101,8 +1108,8 @@ export default function AboutPage() {
                     bg={cardBg}
                     borderWidth="1px"
                     borderColor={borderColor}
-                    _hover={{ 
-                      transform: 'scale(1.1) rotate(2deg)', 
+                    _hover={{
+                      transform: 'scale(1.1) rotate(2deg)',
                       shadow: 'xl',
                       borderColor: iconColor,
                     }}
@@ -1111,9 +1118,9 @@ export default function AboutPage() {
                   >
                     <CardBody textAlign="center">
                       <VStack spacing={2}>
-                        <Icon 
-                          as={FiAward} 
-                          boxSize={10} 
+                        <Icon
+                          as={FiAward}
+                          boxSize={10}
                           color={iconColor}
                           transition="all 0.3s"
                           _groupHover={{ transform: 'scale(1.2)' }}
@@ -1132,8 +1139,8 @@ export default function AboutPage() {
                     bg={cardBg}
                     borderWidth="1px"
                     borderColor={borderColor}
-                    _hover={{ 
-                      transform: 'scale(1.1) rotate(-2deg)', 
+                    _hover={{
+                      transform: 'scale(1.1) rotate(-2deg)',
                       shadow: 'xl',
                       borderColor: iconColor,
                     }}
@@ -1142,9 +1149,9 @@ export default function AboutPage() {
                   >
                     <CardBody textAlign="center">
                       <VStack spacing={2}>
-                        <Icon 
-                          as={FiCode} 
-                          boxSize={10} 
+                        <Icon
+                          as={FiCode}
+                          boxSize={10}
                           color={iconColor}
                           transition="all 0.3s"
                           _groupHover={{ transform: 'scale(1.2)' }}
@@ -1163,8 +1170,8 @@ export default function AboutPage() {
                     bg={cardBg}
                     borderWidth="1px"
                     borderColor={borderColor}
-                    _hover={{ 
-                      transform: 'scale(1.1) rotate(2deg)', 
+                    _hover={{
+                      transform: 'scale(1.1) rotate(2deg)',
                       shadow: 'xl',
                       borderColor: iconColor,
                     }}
@@ -1173,9 +1180,9 @@ export default function AboutPage() {
                   >
                     <CardBody textAlign="center">
                       <VStack spacing={2}>
-                        <Icon 
-                          as={FiGlobe} 
-                          boxSize={10} 
+                        <Icon
+                          as={FiGlobe}
+                          boxSize={10}
                           color={iconColor}
                           transition="all 0.3s"
                           _groupHover={{ transform: 'scale(1.2)' }}
@@ -1194,8 +1201,8 @@ export default function AboutPage() {
                     bg={cardBg}
                     borderWidth="1px"
                     borderColor={borderColor}
-                    _hover={{ 
-                      transform: 'scale(1.1) rotate(-2deg)', 
+                    _hover={{
+                      transform: 'scale(1.1) rotate(-2deg)',
                       shadow: 'xl',
                       borderColor: iconColor,
                     }}
@@ -1204,9 +1211,9 @@ export default function AboutPage() {
                   >
                     <CardBody textAlign="center">
                       <VStack spacing={2}>
-                        <Icon 
-                          as={FiStar} 
-                          boxSize={10} 
+                        <Icon
+                          as={FiStar}
+                          boxSize={10}
                           color={iconColor}
                           transition="all 0.3s"
                           _groupHover={{ transform: 'scale(1.2)' }}
@@ -1233,7 +1240,8 @@ export default function AboutPage() {
           <VStack spacing={12}>
             <VStack spacing={4} textAlign="center">
               <FallInPlace>
-                <Badge colorScheme="green" fontSize="sm" px={4} py={1} borderRadius="full">
+                <Badge bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')} fontSize="sm" px={4} py={1} borderRadius="full">
                   Why Choose Us
                 </Badge>
               </FallInPlace>
