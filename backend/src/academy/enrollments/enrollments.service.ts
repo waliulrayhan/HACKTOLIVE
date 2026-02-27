@@ -86,8 +86,11 @@ export class EnrollmentsService {
             instructor: true,
             modules: {
               include: {
-                lessons: true,
+                lessons: {
+                  orderBy: { order: 'asc' },
+                },
               },
+              orderBy: { order: 'asc' },
             },
           },
         },

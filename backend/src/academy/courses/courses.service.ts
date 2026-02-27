@@ -41,8 +41,11 @@ export class CoursesService {
       include: {
         modules: {
           include: {
-            lessons: true,
+            lessons: {
+              orderBy: { order: 'asc' },
+            },
           },
+          orderBy: { order: 'asc' },
         },
       },
     });
@@ -171,8 +174,11 @@ export class CoursesService {
         },
         modules: {
           include: {
-            lessons: true,
+            lessons: {
+              orderBy: { order: 'asc' },
+            },
           },
+          orderBy: { order: 'asc' },
         },
       },
     });
@@ -202,6 +208,9 @@ export class CoursesService {
                 resources: true,
                 quizzes: true,
                 assignments: true,
+              },
+              orderBy: {
+                order: 'asc',
               },
             },
           },
@@ -269,6 +278,9 @@ export class CoursesService {
               include: {
                 resources: true,
               },
+              orderBy: {
+                order: 'asc',
+              },
             },
           },
           orderBy: {
@@ -330,8 +342,11 @@ export class CoursesService {
         },
         modules: {
           include: {
-            lessons: true,
+            lessons: {
+              orderBy: { order: 'asc' },
+            },
           },
+          orderBy: { order: 'asc' },
         },
       },
     });
@@ -355,8 +370,11 @@ export class CoursesService {
         },
         modules: {
           include: {
-            lessons: true,
+            lessons: {
+              orderBy: { order: 'asc' },
+            },
           },
+          orderBy: { order: 'asc' },
         },
       },
     });
@@ -380,8 +398,11 @@ export class CoursesService {
         },
         modules: {
           include: {
-            lessons: true,
+            lessons: {
+              orderBy: { order: 'asc' },
+            },
           },
+          orderBy: { order: 'asc' },
         },
       },
     });
@@ -405,8 +426,11 @@ export class CoursesService {
         },
         modules: {
           include: {
-            lessons: true,
+            lessons: {
+              orderBy: { order: 'asc' },
+            },
           },
+          orderBy: { order: 'asc' },
         },
       },
     });
@@ -436,8 +460,11 @@ export class CoursesService {
         },
         modules: {
           include: {
-            lessons: true,
+            lessons: {
+              orderBy: { order: 'asc' },
+            },
           },
+          orderBy: { order: 'asc' },
         },
       },
     });
@@ -468,8 +495,11 @@ export class CoursesService {
         },
         modules: {
           include: {
-            lessons: true,
+            lessons: {
+              orderBy: { order: 'asc' },
+            },
           },
+          orderBy: { order: 'asc' },
         },
       },
     });
@@ -502,8 +532,11 @@ export class CoursesService {
         },
         modules: {
           include: {
-            lessons: true,
+            lessons: {
+              orderBy: { order: 'asc' },
+            },
           },
+          orderBy: { order: 'asc' },
         },
       },
     });
@@ -539,8 +572,11 @@ export class CoursesService {
       include: {
         modules: {
           include: {
-            lessons: true,
+            lessons: {
+              orderBy: { order: 'asc' },
+            },
           },
+          orderBy: { order: 'asc' },
         },
       },
     });

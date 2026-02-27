@@ -23,8 +23,11 @@ export class StudentService {
                 },
                 modules: {
                   include: {
-                    lessons: true,
+                    lessons: {
+                      orderBy: { order: 'asc' },
+                    },
                   },
+                  orderBy: { order: 'asc' },
                 },
               },
             },
@@ -218,8 +221,11 @@ export class StudentService {
             },
             modules: {
               include: {
-                lessons: true,
+                lessons: {
+                  orderBy: { order: 'asc' },
+                },
               },
+              orderBy: { order: 'asc' },
             },
           },
         },
@@ -312,8 +318,11 @@ export class StudentService {
             },
             modules: {
               include: {
-                lessons: true,
+                lessons: {
+                  orderBy: { order: 'asc' },
+                },
               },
+              orderBy: { order: 'asc' },
             },
             _count: {
               select: {
@@ -489,7 +498,9 @@ export class StudentService {
           include: {
             modules: {
               include: {
-                lessons: true,
+                lessons: {
+                  orderBy: { order: 'asc' },
+                },
               },
               orderBy: {
                 order: 'asc',
@@ -1195,8 +1206,11 @@ export class StudentService {
               include: {
                 modules: {
                   include: {
-                    lessons: true,
+                    lessons: {
+                      orderBy: { order: 'asc' },
+                    },
                   },
+                  orderBy: { order: 'asc' },
                 },
               },
             },

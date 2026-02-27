@@ -329,8 +329,11 @@ export class InstructorController {
       include: {
         modules: {
           include: {
-            lessons: true,
+            lessons: {
+              orderBy: { order: 'asc' },
+            },
           },
+          orderBy: { order: 'asc' },
         },
       },
     });
@@ -421,8 +424,11 @@ export class InstructorController {
       include: {
         modules: {
           include: {
-            lessons: true,
+            lessons: {
+              orderBy: { order: 'asc' },
+            },
           },
+          orderBy: { order: 'asc' },
         },
       },
     });
@@ -453,8 +459,11 @@ export class InstructorController {
       include: {
         modules: {
           include: {
-            lessons: true,
+            lessons: {
+              orderBy: { order: 'asc' },
+            },
           },
+          orderBy: { order: 'asc' },
         },
       },
     });
@@ -589,7 +598,9 @@ export class InstructorController {
         courseId,
       },
       include: {
-        lessons: true,
+        lessons: {
+          orderBy: { order: 'asc' },
+        },
       },
     });
 
@@ -633,7 +644,9 @@ export class InstructorController {
       where: { id: moduleId },
       data,
       include: {
-        lessons: true,
+        lessons: {
+          orderBy: { order: 'asc' },
+        },
       },
     });
   }
