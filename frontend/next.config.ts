@@ -19,6 +19,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'api.hacktolive.net',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'api.hacktolive.io',
         pathname: '/uploads/**',
       },

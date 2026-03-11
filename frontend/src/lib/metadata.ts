@@ -7,7 +7,7 @@
 
 export const SITE_CONFIG = {
   name: 'HackToLive',
-  url: 'https://hacktolive.io',
+  url: 'https://hacktolive.net',
   description: 'Expert cybersecurity training, web development services, and tech solutions.',
   ogImage: '/logo.svg', // Replace with actual OG image path when available (1200x630)
   links: {
