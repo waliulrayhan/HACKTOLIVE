@@ -10,6 +10,10 @@ log()  { echo -e "${GREEN}[$(date '+%H:%M:%S')] $*${NC}"; }
 warn() { echo -e "${YELLOW}[WARN] $*${NC}"; }
 die()  { echo -e "${RED}[ERROR] $*${NC}"; exit 1; }
 
+# Always restart nginx on exit (even on error) so the site stays up
+_nginx_restart() { docker compose -f /root/HACKTOLIVE/docker-compose.yml up -d nginx 2>/dev/null || true; }
+trap _nginx_restart EXIT
+
 # ── 1. Verify DNS resolves ────────────────────────────────────────────────────
 log "Checking DNS for n8n.hacktolive.net..."
 RESOLVED=$(dig +short n8n.hacktolive.net A 2>/dev/null | head -1)
@@ -41,7 +45,7 @@ git stash && git pull origin main && git stash drop
 
 # ── 5. Test and start nginx ──────────────────────────────────────────────
 log "Starting nginx and testing config..."
-docker start hacktolive-nginx
+docker compose -f /root/HACKTOLIVE/docker-compose.yml up -d nginx
 sleep 2
 docker exec hacktolive-nginx nginx -t || die "nginx config test failed"
 docker exec hacktolive-nginx nginx -s reload
