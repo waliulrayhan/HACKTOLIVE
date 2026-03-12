@@ -41,7 +41,7 @@ log "Certs installed."
 
 # ── 4. Pull latest nginx config from git ─────────────────────────────────
 log "Pulling latest nginx config..."
-git stash && git pull origin main && git stash drop
+git stash ; git pull origin main ; git stash drop || true
 
 # ── 5. Test and start nginx ──────────────────────────────────────────────
 log "Starting nginx and testing config..."
