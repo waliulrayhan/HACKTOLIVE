@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     openGraph: {
       title: `${productTitle} - HackToLive Shop`,
       description: `Buy ${productTitle} from HackToLive. Quality products with secure checkout and fast delivery.`,
-      url: `https://hacktolive.io/shopping/${slug}`,
+      url: `https://hacktolive.net/shopping/${slug}`,
       siteName: 'HackToLive',
       images: [
         {

@@ -4,9 +4,9 @@ A comprehensive cybersecurity education platform with courses, certificates, qui
 
 ## 🎯 Live Application
 
-- **Website**: https://hacktolive.io
-- **API**: https://api.hacktolive.io
-- **API Documentation**: https://api.hacktolive.io/api
+- **Website**: https://hacktolive.net
+- **API**: https://api.hacktolive.net
+- **API Documentation**: https://api.hacktolive.net/api
 
 ## 📋 Table of Contents
 
@@ -236,15 +236,15 @@ ssh root@72.62.71.250
 ```env
 DATABASE_URL="mysql://root:password@localhost:3306/hacktolive"
 JWT_SECRET="your-super-secret-jwt-key"
-FRONTEND_URL="https://hacktolive.io"
+FRONTEND_URL="https://hacktolive.net"
 PORT=4000
 NODE_ENV=production
 ```
 
 ### Frontend (.env)
 ```env
-NEXT_PUBLIC_API_URL=https://api.hacktolive.io
-NEXT_PUBLIC_SITE_URL=https://hacktolive.io
+NEXT_PUBLIC_API_URL=https://api.hacktolive.net
+NEXT_PUBLIC_SITE_URL=https://hacktolive.net
 ```
 
 See [.env.example](.env.example) for complete list.
@@ -276,7 +276,7 @@ Built and maintained by a solo developer
 
 ---
 
-**Live Application**: https://hacktolive.io  
+**Live Application**: https://hacktolive.net  
 **Need Help?** Check the documentation or open an issue.
 
 # Server Configuration

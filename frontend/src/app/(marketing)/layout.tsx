@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'HackToLive - Cybersecurity, Development & Tech Solutions',
     description: 'Expert cybersecurity training, web development services, and tech solutions. Learn from industry professionals and advance your tech career.',
-    url: 'https://hacktolive.io',
+    url: 'https://hacktolive.net',
     siteName: 'HackToLive',
     images: [
       {

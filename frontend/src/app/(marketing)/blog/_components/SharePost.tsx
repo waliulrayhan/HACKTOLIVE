@@ -22,7 +22,7 @@ const SharePost = ({ title = "Check out this article", url }: SharePostProps) =>
   // Get the full absolute URL that will work in both development and production
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // In production: NEXT_PUBLIC_SITE_URL = https://hacktolive.io
+      // In production: NEXT_PUBLIC_SITE_URL = https://hacktolive.net
       // In development: falls back to window.location.origin (http://localhost:3000)
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
       const fullUrl = url ? (url.startsWith('http') ? url : `${siteUrl}${url}`) : window.location.href;

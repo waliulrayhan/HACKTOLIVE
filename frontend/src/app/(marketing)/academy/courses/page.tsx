@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     title: "All Courses - HackToLive Academy",
     description:
       "Browse all cybersecurity courses. Learn ethical hacking, web security, and network security from industry experts.",
-    url: "https://hacktolive.io/academy/courses",
+    url: "https://hacktolive.net/academy/courses",
     siteName: "HackToLive",
     images: [
       {

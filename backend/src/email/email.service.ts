@@ -308,7 +308,7 @@ export class EmailService {
       day: 'numeric',
     });
     
-    const courseUrl = `${process.env.FRONTEND_URL || 'https://hacktolive.io'}/student/courses/${courseSlug}`;
+    const courseUrl = `${process.env.FRONTEND_URL || 'https://hacktolive.net'}/student/courses/${courseSlug}`;
 
     return this.sendTemplateEmail(
       'course-enrollment-confirmation',

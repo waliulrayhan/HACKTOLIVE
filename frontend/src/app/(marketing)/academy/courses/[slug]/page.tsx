@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     openGraph: {
       title: `${courseTitle} - HackToLive Academy`,
       description: `Master ${courseTitle} with expert-led training, hands-on labs, and live sessions. Earn your certification.`,
-      url: `https://hacktolive.io/academy/courses/${slug}`,
+      url: `https://hacktolive.net/academy/courses/${slug}`,
       siteName: "HackToLive",
       images: [
         {

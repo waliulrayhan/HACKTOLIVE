@@ -389,8 +389,8 @@ export class CertificatesService {
             day: 'numeric' 
           }),
           verificationCode: certificate.verificationCode,
-          certificateUrl: `${process.env.FRONTEND_URL || 'https://hacktolive.io'}/academy/certificates/download/${certificate.id}`,
-          verificationUrl: `${process.env.FRONTEND_URL || 'https://hacktolive.io'}/academy/certificates/verify/${certificate.verificationCode}`,
+          certificateUrl: `${process.env.FRONTEND_URL || 'https://hacktolive.net'}/academy/certificates/download/${certificate.id}`,
+          verificationUrl: `${process.env.FRONTEND_URL || 'https://hacktolive.net'}/academy/certificates/verify/${certificate.verificationCode}`,
         },
         studentName,
       );

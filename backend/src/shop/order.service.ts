@@ -508,7 +508,7 @@ export class OrderService {
           tax: order.tax.toFixed(2),
           total: order.total.toFixed(2),
           shippingAddress: shippingAddress,
-          orderUrl: `${process.env.FRONTEND_URL || 'https://hacktolive.io'}/shop/orders/${order.orderNumber}`,
+          orderUrl: `${process.env.FRONTEND_URL || 'https://hacktolive.net'}/shop/orders/${order.orderNumber}`,
         },
         order.customerName,
       );
@@ -545,7 +545,7 @@ export class OrderService {
             customerEmail: order.customerEmail,
             total: order.total.toFixed(2),
             itemCount: order.items.length.toString(),
-            orderUrl: `${process.env.FRONTEND_URL || 'https://hacktolive.io'}/admin/shop/orders/${order.id}`,
+            orderUrl: `${process.env.FRONTEND_URL || 'https://hacktolive.net'}/admin/shop/orders/${order.id}`,
           },
           admin.name || 'Admin',
         );
@@ -581,7 +581,7 @@ export class OrderService {
           status: status,
           statusMessage: statusMessages[status] || 'Your order status has been updated.',
           trackingNumber: order.trackingNumber || 'Not available yet',
-          orderUrl: `${process.env.FRONTEND_URL || 'https://hacktolive.io'}/shop/orders/${order.orderNumber}`,
+          orderUrl: `${process.env.FRONTEND_URL || 'https://hacktolive.net'}/shop/orders/${order.orderNumber}`,
         },
         order.customerName,
       );

@@ -63,8 +63,8 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
           <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
@@ -114,8 +114,8 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
           <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
@@ -174,8 +174,8 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
           <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
@@ -241,8 +241,8 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
           <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
@@ -314,8 +314,8 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
           <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
@@ -379,8 +379,8 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
           <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
@@ -448,8 +448,8 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
           <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
@@ -547,8 +547,8 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
           <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive Academy. All rights reserved.</p>
         </td></tr>
@@ -637,8 +637,8 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
           <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
@@ -710,8 +710,8 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
           <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
@@ -767,8 +767,8 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
           <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive. All rights reserved.</p>
         </td></tr>
@@ -865,8 +865,8 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
           <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive Academy. All rights reserved.</p>
         </td></tr>
@@ -959,8 +959,8 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px;display:flex;justify-content:center;align-items:center">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
           <p style="margin:0;color:#999;font-size:11px">© 2026 HackToLive Academy. All rights reserved.</p>
         </td></tr>
@@ -1013,8 +1013,8 @@ async function seedEmailTemplates() {
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
           <div style="margin:0 0 10px">
-            <img src="https://api.hacktolive.io/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
-            <img src="https://api.hacktolive.io/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_black.png" alt="HackToLive" class="logo-light" style="display:block;width:120px;height:auto;margin:0 auto">
+            <img src="https://api.hacktolive.net/uploads/images/logo_white.png" alt="HackToLive" class="logo-dark" style="display:none;width:120px;height:auto;margin:0 auto">
           </div>
           <p style="margin:0 0 5px;color:#999;font-size:11px">You're receiving this email because you subscribed to HackToLive newsletter.</p>
           <p style="margin:0;color:#999;font-size:11px"><a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/newsletter/unsubscribe?email={{email}}" style="color:#4299e1;text-decoration:underline">Unsubscribe</a> from our mailing list.</p>

@@ -22,7 +22,7 @@ ssh -L 3307:localhost:3306 root@72.62.71.250
 ### Method 1: Quick Deploy (Recommended)
 ```bash
 # Connect to server and deploy in one command
-ssh root@72.62.71.250 "cd /root/HACKTOLIVE && git pull origin main && docker-compose up -d --force-recreate"
+ssh root@72.62.71.250 "cd /root/HACKTOLIVE && git stash && git pull origin main && git stash drop && chown -R 1000:1000 backend/uploads/ && docker compose up -d --force-recreate"
 ```
 
 ### Method 2: Step-by-Step Deploy
@@ -33,17 +33,20 @@ ssh root@72.62.71.250
 # 2. Navigate to project directory
 cd /root/HACKTOLIVE
 
-# 3. Pull latest code from GitHub
-git pull origin main
+# 3. Stash any local server-only env changes, pull, restore
+git stash && git pull origin main && git stash drop
 
-# 4. Recreate and restart containers (zero-downtime)
-docker-compose up -d --force-recreate
+# 4. Ensure upload directory permissions (backend runs as uid=1000)
+chown -R 1000:1000 backend/uploads/
 
-# 5. Check container status
-docker-compose ps
+# 5. Recreate and restart containers (zero-downtime - no rebuild)
+docker compose up -d --force-recreate
 
-# 6. View logs if needed
-docker-compose logs -f
+# 6. Check container status
+docker compose ps
+
+# 7. View logs if needed
+docker compose logs -f
 ```
 
 ### Method 3: Full Rebuild (Use if major changes)
@@ -52,27 +55,30 @@ docker-compose logs -f
 ssh root@72.62.71.250
 
 # 2. Navigate to project directory
-cd /var/www/HACKTOLIVE
+cd /root/HACKTOLIVE
 
 # 3. Stop all containers
-docker-compose down
+docker compose down
 
-# 4. Pull latest code
-git pull origin main
+# 4. Stash local env changes and pull latest code
+git stash && git pull origin main && git stash drop
 
-# 5. Rebuild images and start
-docker-compose build
-docker-compose up -d
+# 5. Ensure upload directory permissions
+chown -R 1000:1000 backend/uploads/
 
-# 6. Verify everything is running
-docker-compose ps
+# 6. Rebuild images and start
+docker compose build
+docker compose up -d
+
+# 7. Verify everything is running
+docker compose ps
 ```
 
 ## Health Check Commands
 
 ### Check Container Status
 ```bash
-ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker-compose ps"
+ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker compose ps"
 ```
 
 ### Check Specific Container Logs
@@ -90,10 +96,10 @@ ssh root@72.62.71.250 "docker logs hacktolive-nginx --tail 50"
 ### Check Live Logs (Real-time)
 ```bash
 # All containers
-ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker-compose logs -f"
+ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker compose logs -f"
 
 # Specific service
-ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker-compose logs -f backend"
+ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker compose logs -f backend"
 ```
 
 ### Test API Health
@@ -102,8 +108,8 @@ ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker-compose logs -f backend"
 ssh root@72.62.71.250 "curl http://localhost:4000/health"
 
 # From local machine
-curl https://api.hacktolive.io/health
-curl https://hacktolive.io
+curl https://api.hacktolive.net/health
+curl https://hacktolive.net
 ```
 
 ## Troubleshooting Commands
@@ -111,18 +117,19 @@ curl https://hacktolive.io
 ### Restart Specific Service
 ```bash
 # Restart backend only
-ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker-compose restart backend"
+ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker compose restart backend"
 
 # Restart frontend only
-ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker-compose restart frontend"
+ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker compose restart frontend"
 
 # Restart nginx only
-ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker-compose restart nginx"
+ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker compose restart nginx"
 ```
 
 ### Fix Upload Permissions (if needed)
 ```bash
-ssh root@72.62.71.250 "chmod -R 777 /root/HACKTOLIVE/backend/uploads"
+# Backend runs as uid=1000 (node user) — use chown, NOT chmod 777
+ssh root@72.62.71.250 "chown -R 1000:1000 /root/HACKTOLIVE/backend/uploads"
 ```
 
 ### Clean Up Docker Resources
@@ -136,14 +143,14 @@ ssh root@72.62.71.250 "docker system prune -a --volumes"
 
 ### Force Rebuild Everything
 ```bash
-ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker-compose down && docker-compose build --no-cache && docker-compose up -d"
+ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker compose down && git stash && git pull origin main && git stash drop && chown -R 1000:1000 backend/uploads/ && docker compose build --no-cache && docker compose up -d"
 ```
 
 ## Database Commands
 
 ### Run Prisma Migrations Manually
 ```bash
-ssh root@72.62.71.250 "cd /root/HACKTOLIVE/backend && docker exec hacktolive-backend npx prisma migrate deploy"
+ssh root@72.62.71.250 "docker exec hacktolive-backend npx prisma migrate deploy"
 ```
 
 ### Generate Prisma Client
@@ -181,27 +188,30 @@ ssh root@72.62.71.250 "cd /root/HACKTOLIVE && git reset --hard origin/main"
 ssh root@72.62.71.250 "certbot certificates"
 ```
 
-### Renew Certificates
+### Renew hacktolive.net cert (SAN: hacktolive.net + www + api)
 ```bash
-ssh root@72.62.71.250 "certbot renew --nginx"
+# Stop nginx first (standalone mode), renew, restart
+ssh root@72.62.71.250 "docker stop hacktolive-nginx && certbot certonly --standalone -d hacktolive.net -d www.hacktolive.net -d api.hacktolive.net && cp /etc/letsencrypt/live/hacktolive.net/fullchain.pem /root/HACKTOLIVE/nginx/ssl/net-fullchain.pem && cp /etc/letsencrypt/live/hacktolive.net/privkey.pem /root/HACKTOLIVE/nginx/ssl/net-privkey.pem && docker start hacktolive-nginx"
 ```
 
-### Test Auto-renewal
+### Renew hacktolive.io redirect cert (optional — only if browsers visit .io directly)
 ```bash
-ssh root@72.62.71.250 "certbot renew --dry-run"
+ssh root@72.62.71.250 "docker stop hacktolive-nginx && certbot certonly --standalone -d hacktolive.io -d www.hacktolive.io && cp /etc/letsencrypt/live/hacktolive.io/fullchain.pem /root/HACKTOLIVE/nginx/ssl/fullchain.pem && cp /etc/letsencrypt/live/hacktolive.io/privkey.pem /root/HACKTOLIVE/nginx/ssl/privkey.pem && docker start hacktolive-nginx"
 ```
 
 ## Quick Reference
 
 ### Single Command Deploy (After GitHub Push)
 ```bash
-ssh root@72.62.71.250 "cd /root/HACKTOLIVE && git pull origin main && docker-compose up -d --force-recreate && docker-compose ps"
+ssh root@72.62.71.250 "cd /root/HACKTOLIVE && git stash && git pull origin main && git stash drop && chown -R 1000:1000 backend/uploads/ && docker compose up -d --force-recreate && docker compose ps"
 ```
 
 ### Check if Site is Live
 ```bash
+curl -I https://hacktolive.net
+curl -I https://api.hacktolive.net/health
+# .io should 301 redirect to .net:
 curl -I https://hacktolive.io
-curl -I https://api.hacktolive.io/health
 ```
 
 ### Monitor Container Resources
@@ -217,12 +227,17 @@ ssh root@72.62.71.250 "docker stats --no-stream"
 - **Backend Port**: 4000 (internal)
 - **Frontend Port**: 3000 (internal)
 - **Public URLs**: 
-  - https://hacktolive.io
-  - https://api.hacktolive.io
+  - https://hacktolive.net (primary)
+  - https://api.hacktolive.net
+  - https://hacktolive.io → 301 → hacktolive.net (redirect only)
 
 ## Important Notes
 1. Always use `--force-recreate` instead of `down` for zero-downtime deployments
-2. The uploads directory needs 777 permissions to work correctly
+2. Upload directory must be owned by uid=1000: `chown -R 1000:1000 backend/uploads/` — backend runs as the `node` user (uid 1000)
 3. MySQL database is running directly on the host, not in Docker
 4. All containers use host network mode
 5. SSL certificates are in `/root/HACKTOLIVE/nginx/ssl/`
+   - `net-fullchain.pem` / `net-privkey.pem` — hacktolive.net (SAN: www + api)
+   - `fullchain.pem` / `privkey.pem` — hacktolive.io (for redirect only)
+6. Server has local env modifications — always use `git stash && git pull && git stash drop` (never plain `git pull`)
+7. SMTP: port 587 (STARTTLS, NOT 465) — port 465 is blocked by VPS firewall

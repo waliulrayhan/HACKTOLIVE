@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     openGraph: {
       title: `${service.title} - HackToLive`,
       description: service.shortDescription,
-      url: `https://hacktolive.io/service/${slug}`,
+      url: `https://hacktolive.net/service/${slug}`,
       siteName: 'HackToLive',
       images: [
         {

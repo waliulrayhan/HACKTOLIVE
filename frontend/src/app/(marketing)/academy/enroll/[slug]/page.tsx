@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: `Enroll in ${courseTitle} - HackToLive Academy`,
       description: `Start your cybersecurity journey. Enroll in ${courseTitle} today.`,
-      url: `https://hacktolive.io/academy/enroll/${slug}`,
+      url: `https://hacktolive.net/academy/enroll/${slug}`,
       siteName: "HackToLive",
       images: [
         {
