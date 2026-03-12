@@ -19,10 +19,16 @@ ssh -L 3307:localhost:3306 root@72.62.71.250
 
 ## Manual Deployment Process
 
+### Pre-check (Important)
+```bash
+# These deploy methods require /root/HACKTOLIVE to be a Git repo
+ssh root@72.62.71.250 "[ -d /root/HACKTOLIVE/.git ] && echo 'OK: git repo present' || echo 'ERROR: .git missing in /root/HACKTOLIVE'"
+```
+
 ### Method 1: Quick Deploy (Recommended)
 ```bash
 # Connect to server and deploy in one command
-ssh root@72.62.71.250 "cd /root/HACKTOLIVE && git stash && git pull origin main && git stash drop && chown -R 1000:1000 backend/uploads/ && docker compose up -d --force-recreate"
+ssh root@72.62.71.250 "cd /root/HACKTOLIVE && git stash push -u -m deploy-temp || true && git pull origin main && git stash drop || true && chown -R 1000:1000 backend/uploads/ && docker compose up -d --force-recreate"
 ```
 
 ### Method 2: Step-by-Step Deploy
@@ -34,7 +40,9 @@ ssh root@72.62.71.250
 cd /root/HACKTOLIVE
 
 # 3. Stash any local server-only env changes, pull, restore
-git stash && git pull origin main && git stash drop
+git stash push -u -m deploy-temp || true
+git pull origin main
+git stash drop || true
 
 # 4. Ensure upload directory permissions (backend runs as uid=1000)
 chown -R 1000:1000 backend/uploads/
@@ -61,7 +69,9 @@ cd /root/HACKTOLIVE
 docker compose down
 
 # 4. Stash local env changes and pull latest code
-git stash && git pull origin main && git stash drop
+git stash push -u -m deploy-temp || true
+git pull origin main
+git stash drop || true
 
 # 5. Ensure upload directory permissions
 chown -R 1000:1000 backend/uploads/
@@ -143,7 +153,7 @@ ssh root@72.62.71.250 "docker system prune -a --volumes"
 
 ### Force Rebuild Everything
 ```bash
-ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker compose down && git stash && git pull origin main && git stash drop && chown -R 1000:1000 backend/uploads/ && docker compose build --no-cache && docker compose up -d"
+ssh root@72.62.71.250 "cd /root/HACKTOLIVE && docker compose down && git stash push -u -m deploy-temp || true && git pull origin main && git stash drop || true && chown -R 1000:1000 backend/uploads/ && docker compose build --no-cache && docker compose up -d"
 ```
 
 ## Database Commands
@@ -203,7 +213,7 @@ ssh root@72.62.71.250 "docker stop hacktolive-nginx && certbot certonly --standa
 
 ### Single Command Deploy (After GitHub Push)
 ```bash
-ssh root@72.62.71.250 "cd /root/HACKTOLIVE && git stash && git pull origin main && git stash drop && chown -R 1000:1000 backend/uploads/ && docker compose up -d --force-recreate && docker compose ps"
+ssh root@72.62.71.250 "cd /root/HACKTOLIVE && git stash push -u -m deploy-temp || true && git pull origin main && git stash drop || true && chown -R 1000:1000 backend/uploads/ && docker compose up -d --force-recreate && docker compose ps"
 ```
 
 ### Check if Site is Live
@@ -239,5 +249,5 @@ ssh root@72.62.71.250 "docker stats --no-stream"
 5. SSL certificates are in `/root/HACKTOLIVE/nginx/ssl/`
    - `net-fullchain.pem` / `net-privkey.pem` — hacktolive.net (SAN: www + api)
    - `fullchain.pem` / `privkey.pem` — hacktolive.io (for redirect only)
-6. Server has local env modifications — always use `git stash && git pull && git stash drop` (never plain `git pull`)
+6. Server has local env modifications — use `git stash push -u -m deploy-temp || true`, then `git pull`, then `git stash drop || true` (never plain `git pull`)
 7. SMTP: port 587 (STARTTLS, NOT 465) — port 465 is blocked by VPS firewall
