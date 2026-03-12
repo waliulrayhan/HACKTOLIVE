@@ -20,6 +20,11 @@ echo "=================================="
 echo -e "${GREEN}📦 Pulling latest code from GitHub...${NC}"
 git pull origin main || git pull origin master
 
+# Ensure upload directories exist and are writable by the backend container (uid=1000)
+echo -e "${GREEN}📁 Ensuring upload directory permissions...${NC}"
+mkdir -p backend/uploads/{avatars,images,documents,resumes,certificate-templates,certificates}
+chown -R 1000:1000 backend/uploads/
+
 # Build images (without stopping services)
 echo -e "${GREEN}🔨 Building Docker images...${NC}"
 docker-compose build
