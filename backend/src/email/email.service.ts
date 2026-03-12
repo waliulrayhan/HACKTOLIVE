@@ -36,7 +36,7 @@ export class EmailService {
   private readonly smtpConfig = {
     host: process.env.SMTP_HOST || 'smtp.hostinger.com',
     port: parseInt(process.env.SMTP_PORT || '465'),
-    secure: process.env.SMTP_SECURE === 'true' || true, // SSL
+    secure: process.env.SMTP_SECURE === 'true', // true = SSL/TLS (port 465), false = STARTTLS (port 587)
     tls: {
       rejectUnauthorized: false, // Allow self-signed certificates
       minVersion: 'TLSv1.2', // Minimum TLS version
