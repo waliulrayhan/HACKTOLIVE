@@ -60,14 +60,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           requiresOtp: data.requiresOtp,
         };
       } else {
-        // Direct login for STUDENT - set token and user
+        // Direct login (students always, and instructors/admins when OTP is disabled)
         if ('token' in data && 'user' in data && data.token && data.user) {
           authService.setToken(data.token);
           authService.setUser(data.user);
           setUser(data.user);
-          
-          // Redirect to student dashboard
-          router.push('/student/dashboard');
+
+          // Redirect based on role
+          switch (data.user.role) {
+            case 'ADMIN':
+              router.push('/admin/dashboard');
+              break;
+            case 'INSTRUCTOR':
+              router.push('/instructor/dashboard');
+              break;
+            case 'STUDENT':
+            default:
+              router.push('/student/dashboard');
+              break;
+          }
         }
         
         return {

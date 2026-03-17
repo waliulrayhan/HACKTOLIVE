@@ -228,9 +228,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Check if user is STUDENT - skip OTP for students
-    if (user.role === UserRole.STUDENT) {
-      // Generate token directly for students
+    // Check if OTP login is enabled (set LOGIN_OTP_ENABLED=true in .env to require OTP)
+    const loginOtpEnabled = process.env.LOGIN_OTP_ENABLED === 'true';
+
+    // Skip OTP for students always, and for all roles when OTP is disabled
+    if (user.role === UserRole.STUDENT || !loginOtpEnabled) {
+      // Generate token directly
       const token = this.generateToken(user);
 
       return {
@@ -241,7 +244,7 @@ export class AuthService {
       };
     }
 
-    // Send OTP for login verification (INSTRUCTOR and ADMIN only)
+    // Send OTP for login verification (INSTRUCTOR and ADMIN only, when OTP is enabled)
     await this.otpService.createAndSendOtp(
       user.id,
       user.email,
