@@ -197,7 +197,7 @@ export default function CourseCard({ course, variant = "default", isEnrolled = f
             </HStack>
             <HStack spacing="1">
               <Icon as={FiClock} />
-              <Text>{course.duration} hour</Text>
+              <Text>{course.duration}+ hour</Text>
             </HStack>
           </HStack>
         )}

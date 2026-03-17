@@ -674,7 +674,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                           <Text>Duration</Text>
                         </HStack>
                         <Text fontWeight="semibold">
-                          {course.duration} hours
+                          {course.duration}+ hours
                         </Text>
                       </HStack>
                       

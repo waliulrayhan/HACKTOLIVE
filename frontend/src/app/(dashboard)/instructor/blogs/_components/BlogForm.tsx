@@ -523,14 +523,58 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
                     name="category"
                     value={formData.category}
                     onChange={handleInputChange}
-                    className={`w-full h-11 rounded-lg border ${
+                    className={`w-full rounded-lg border ${
                       errors.category ? "border-red-500" : "border-gray-300 dark:border-gray-700"
-                    } bg-white px-4 text-sm text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white`}
+                    } bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:bg-gray-800 dark:text-white`}
+                    size={1}
                   >
-                    <option value="">Select category</option>
-                    <option value="CYBERSECURITY_INSIGHTS">Cybersecurity Insights</option>
-                    <option value="NEWS">News</option>
-                    <option value="TUTORIALS">Tutorials</option>
+                    <option value="">— Select category —</option>
+                    <optgroup label="Fundamentals">
+                      <option value="CYBERSECURITY_BASICS">Cybersecurity Basics</option>
+                      <option value="NETWORKING_AND_NETWORK_SECURITY">Networking &amp; Network Security</option>
+                      <option value="PRIVACY_AND_ONLINE_SAFETY">Privacy &amp; Online Safety</option>
+                      <option value="CRYPTOGRAPHY">Cryptography</option>
+                      <option value="PROGRAMMING_FOR_CYBERSECURITY">Programming for Cybersecurity</option>
+                    </optgroup>
+                    <optgroup label="Offensive Security">
+                      <option value="ETHICAL_HACKING">Ethical Hacking</option>
+                      <option value="PENETRATION_TESTING">Penetration Testing</option>
+                      <option value="RED_TEAMING">Red Teaming</option>
+                      <option value="KALI_LINUX_AND_LINUX_SECURITY">Kali Linux &amp; Linux Security</option>
+                    </optgroup>
+                    <optgroup label="Defensive Security">
+                      <option value="BLUE_TEAMING">Blue Teaming</option>
+                      <option value="INCIDENT_RESPONSE_AND_SOC">Incident Response &amp; SOC</option>
+                      <option value="SECURITY_BEST_PRACTICES">Security Best Practices</option>
+                      <option value="DIGITAL_FORENSICS">Digital Forensics</option>
+                    </optgroup>
+                    <optgroup label="Technical Domains">
+                      <option value="WEB_APPLICATION_SECURITY">Web Application Security</option>
+                      <option value="MOBILE_SECURITY">Mobile Security</option>
+                      <option value="CLOUD_SECURITY">Cloud Security</option>
+                      <option value="IOT_SECURITY">IoT Security</option>
+                      <option value="AI_IN_CYBERSECURITY">AI in Cybersecurity</option>
+                      <option value="CLOUD_AND_DEVSECOPS">Cloud &amp; DevSecOps</option>
+                    </optgroup>
+                    <optgroup label="Threats &amp; Attacks">
+                      <option value="CYBER_THREATS_AND_ATTACKS">Cyber Threats &amp; Attacks</option>
+                      <option value="MALWARE_AND_RANSOMWARE">Malware &amp; Ransomware</option>
+                      <option value="VULNERABILITIES_AND_EXPLOITS">Vulnerabilities &amp; Exploits</option>
+                      <option value="OSINT_OPEN_SOURCE_INTELLIGENCE">OSINT (Open-Source Intelligence)</option>
+                    </optgroup>
+                    <optgroup label="Tools &amp; Resources">
+                      <option value="CYBERSECURITY_TOOLS">Cybersecurity Tools</option>
+                      <option value="SECURITY_TOOLS_TUTORIALS">Security Tools Tutorials</option>
+                    </optgroup>
+                    <optgroup label="Learning &amp; Career">
+                      <option value="SECURITY_CERTIFICATIONS">Security Certifications</option>
+                      <option value="CAREER_GUIDES">Career Guides</option>
+                      <option value="CTF_WALKTHROUGHS_AND_LABS">CTF Walkthroughs &amp; Labs</option>
+                      <option value="GUIDES_AND_STEP_BY_STEP_TUTORIALS">Guides &amp; Step-by-Step Tutorials</option>
+                    </optgroup>
+                    <optgroup label="News &amp; Updates">
+                      <option value="CYBERSECURITY_NEWS_AND_UPDATES">Cybersecurity News &amp; Updates</option>
+                    </optgroup>
                   </select>
                   {errors.category && (
                     <p className="mt-1.5 text-xs text-red-500">{errors.category}</p>

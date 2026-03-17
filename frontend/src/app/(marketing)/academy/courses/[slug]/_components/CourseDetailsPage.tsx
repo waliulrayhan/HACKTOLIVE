@@ -349,7 +349,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   <Icon as={FiClock} boxSize="6" color="green.500" />
                 </Flex>
                 <Text fontSize="xl" fontWeight="bold">
-                  {course.duration}h
+                  {course.duration}+ hours
                 </Text>
                 <Text fontSize="sm" color="muted">
                   Total Duration

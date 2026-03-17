@@ -61,11 +61,39 @@ const BlogPage = () => {
   const accentColor = useColorModeValue("green.500", "green.400");
   const hoverBg = useColorModeValue("gray.50", "gray.700");
 
-  const categories: (BlogCategory | "All")[] = [
-    "All",
-    "Cybersecurity Insights",
-    "News",
-    "Tutorials"
+  const categoryGroups: { label: string; items: BlogCategory[] }[] = [
+    {
+      label: "Fundamentals",
+      items: ["Cybersecurity Basics", "Networking & Network Security", "Privacy & Online Safety", "Cryptography", "Programming for Cybersecurity"],
+    },
+    {
+      label: "Offensive Security",
+      items: ["Ethical Hacking", "Penetration Testing", "Red Teaming", "Kali Linux & Linux Security"],
+    },
+    {
+      label: "Defensive Security",
+      items: ["Blue Teaming", "Incident Response & SOC", "Security Best Practices", "Digital Forensics"],
+    },
+    {
+      label: "Technical Domains",
+      items: ["Web Application Security", "Mobile Security", "Cloud Security", "IoT Security", "AI in Cybersecurity", "Cloud & DevSecOps"],
+    },
+    {
+      label: "Threats & Attacks",
+      items: ["Cyber Threats & Attacks", "Malware & Ransomware", "Vulnerabilities & Exploits", "OSINT (Open-Source Intelligence)"],
+    },
+    {
+      label: "Tools & Resources",
+      items: ["Cybersecurity Tools", "Security Tools Tutorials"],
+    },
+    {
+      label: "Learning & Career",
+      items: ["Security Certifications", "Career Guides", "CTF Walkthroughs & Labs", "Guides & Step-by-Step Tutorials"],
+    },
+    {
+      label: "News & Updates",
+      items: ["Cybersecurity News & Updates"],
+    },
   ];
 
   const blogTypes: (BlogType | "All")[] = [
@@ -83,6 +111,36 @@ const BlogPage = () => {
       setLoading(true);
       try {
         const categoryMap: Record<string, string> = {
+          'Cybersecurity Basics': 'CYBERSECURITY_BASICS',
+          'Ethical Hacking': 'ETHICAL_HACKING',
+          'Penetration Testing': 'PENETRATION_TESTING',
+          'Kali Linux & Linux Security': 'KALI_LINUX_AND_LINUX_SECURITY',
+          'Cybersecurity Tools': 'CYBERSECURITY_TOOLS',
+          'Networking & Network Security': 'NETWORKING_AND_NETWORK_SECURITY',
+          'Web Application Security': 'WEB_APPLICATION_SECURITY',
+          'Mobile Security': 'MOBILE_SECURITY',
+          'Cloud Security': 'CLOUD_SECURITY',
+          'Digital Forensics': 'DIGITAL_FORENSICS',
+          'Cyber Threats & Attacks': 'CYBER_THREATS_AND_ATTACKS',
+          'Malware & Ransomware': 'MALWARE_AND_RANSOMWARE',
+          'Privacy & Online Safety': 'PRIVACY_AND_ONLINE_SAFETY',
+          'Cryptography': 'CRYPTOGRAPHY',
+          'Programming for Cybersecurity': 'PROGRAMMING_FOR_CYBERSECURITY',
+          'Incident Response & SOC': 'INCIDENT_RESPONSE_AND_SOC',
+          'Red Teaming': 'RED_TEAMING',
+          'Blue Teaming': 'BLUE_TEAMING',
+          'Security Certifications': 'SECURITY_CERTIFICATIONS',
+          'Career Guides': 'CAREER_GUIDES',
+          'Cybersecurity News & Updates': 'CYBERSECURITY_NEWS_AND_UPDATES',
+          'Vulnerabilities & Exploits': 'VULNERABILITIES_AND_EXPLOITS',
+          'Security Best Practices': 'SECURITY_BEST_PRACTICES',
+          'OSINT (Open-Source Intelligence)': 'OSINT_OPEN_SOURCE_INTELLIGENCE',
+          'IoT Security': 'IOT_SECURITY',
+          'AI in Cybersecurity': 'AI_IN_CYBERSECURITY',
+          'Cloud & DevSecOps': 'CLOUD_AND_DEVSECOPS',
+          'Security Tools Tutorials': 'SECURITY_TOOLS_TUTORIALS',
+          'CTF Walkthroughs & Labs': 'CTF_WALKTHROUGHS_AND_LABS',
+          'Guides & Step-by-Step Tutorials': 'GUIDES_AND_STEP_BY_STEP_TUTORIALS',
           'Cybersecurity Insights': 'CYBERSECURITY_INSIGHTS',
           'News': 'NEWS',
           'Tutorials': 'TUTORIALS',
@@ -273,35 +331,58 @@ const BlogPage = () => {
 
       <Box py={{ base: "10", md: "12", lg: "16" }} bg={bgColor}>
         <Container maxW="container.xl">
-          <Grid templateColumns={isDesktop ? "220px 1fr" : "1fr"} gap={{ base: "8", lg: "10" }}>
+          <Grid templateColumns={isDesktop ? "240px 1fr" : "1fr"} gap={{ base: "8", lg: "10" }}>
             {isDesktop && (
               <GridItem>
-                <VStack spacing="4" align="stretch" position="sticky" top="24">
+                <VStack spacing="4" align="stretch" position="sticky" top="24" maxH="calc(100vh - 7rem)" overflowY="auto" pr="1"
+                  css={{ '&::-webkit-scrollbar': { width: '4px' }, '&::-webkit-scrollbar-thumb': { background: 'var(--chakra-colors-gray-300)', borderRadius: '4px' } }}
+                >
                   <Box>
-                    <Text fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="wider" mb="3" color="muted">
-                      Categories
-                    </Text>
-                    <Stack spacing="1">
-                      {categories.map((category) => (
-                        <Button
-                          key={category}
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setSelectedCategory(category)}
-                          justifyContent="flex-start"
-                          fontWeight={selectedCategory === category ? "semibold" : "normal"}
-                          color={selectedCategory === category ? accentColor : undefined}
-                          px="2"
-                          _hover={{ bg: hoverBg, pl: "3" }}
-                          transition="all 0.2s"
-                          borderLeftWidth="2px"
-                          borderLeftColor={selectedCategory === category ? accentColor : "transparent"}
-                          borderRadius="0"
-                        >
-                          {category}
-                        </Button>
-                      ))}
-                    </Stack>
+                    <Button
+                      size="sm" variant="ghost" onClick={() => setSelectedCategory("All")}
+                      justifyContent="flex-start"
+                      fontWeight={selectedCategory === "All" ? "semibold" : "normal"}
+                      color={selectedCategory === "All" ? accentColor : undefined}
+                      w="full" px="2"
+                      _hover={{ bg: hoverBg }}
+                      transition="all 0.2s"
+                      borderLeftWidth="2px"
+                      borderLeftColor={selectedCategory === "All" ? accentColor : "transparent"}
+                      borderRadius="0"
+                      mb="2"
+                    >
+                      All Categories
+                    </Button>
+                    {categoryGroups.map((group) => (
+                      <Box key={group.label} mb="3">
+                        <Text fontSize="10px" fontWeight="bold" textTransform="uppercase" letterSpacing="wider" color="muted" px="2" mb="1">
+                          {group.label}
+                        </Text>
+                        <Stack spacing="0">
+                          {group.items.map((category) => (
+                            <Button
+                              key={category}
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setSelectedCategory(category)}
+                              justifyContent="flex-start"
+                              fontWeight={selectedCategory === category ? "semibold" : "normal"}
+                              color={selectedCategory === category ? accentColor : undefined}
+                              px="2"
+                              h="7"
+                              fontSize="xs"
+                              _hover={{ bg: hoverBg, pl: "3" }}
+                              transition="all 0.2s"
+                              borderLeftWidth="2px"
+                              borderLeftColor={selectedCategory === category ? accentColor : "transparent"}
+                              borderRadius="0"
+                            >
+                              {category}
+                            </Button>
+                          ))}
+                        </Stack>
+                      </Box>
+                    ))}
                   </Box>
 
                   <Divider />
@@ -440,16 +521,44 @@ const BlogPage = () => {
           <DrawerBody>
             <VStack spacing="4" align="stretch">
               <Box>
-                <Text fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="wider" mb="3" color="muted">
-                  Categories
-                </Text>
-                <Stack spacing="1">
-                  {categories.map((category) => (
-                    <Button key={category} size="sm" variant="ghost" onClick={() => { setSelectedCategory(category); onClose(); }} justifyContent="flex-start" fontWeight={selectedCategory === category ? "semibold" : "normal"} color={selectedCategory === category ? accentColor : undefined} px="2" _hover={{ bg: hoverBg, pl: "3" }} transition="all 0.2s" borderLeftWidth="2px" borderLeftColor={selectedCategory === category ? accentColor : "transparent"} borderRadius="0">
-                      {category}
-                    </Button>
-                  ))}
-                </Stack>
+                <Button
+                  size="sm" variant="ghost" onClick={() => { setSelectedCategory("All"); onClose(); }}
+                  justifyContent="flex-start"
+                  fontWeight={selectedCategory === "All" ? "semibold" : "normal"}
+                  color={selectedCategory === "All" ? accentColor : undefined}
+                  w="full" px="2" mb="2"
+                  _hover={{ bg: hoverBg }}
+                  transition="all 0.2s"
+                  borderLeftWidth="2px"
+                  borderLeftColor={selectedCategory === "All" ? accentColor : "transparent"}
+                  borderRadius="0"
+                >
+                  All Categories
+                </Button>
+                {categoryGroups.map((group) => (
+                  <Box key={group.label} mb="3">
+                    <Text fontSize="10px" fontWeight="bold" textTransform="uppercase" letterSpacing="wider" color="muted" px="2" mb="1">
+                      {group.label}
+                    </Text>
+                    <Stack spacing="0">
+                      {group.items.map((category) => (
+                        <Button key={category} size="sm" variant="ghost"
+                          onClick={() => { setSelectedCategory(category); onClose(); }}
+                          justifyContent="flex-start"
+                          fontWeight={selectedCategory === category ? "semibold" : "normal"}
+                          color={selectedCategory === category ? accentColor : undefined}
+                          px="2" h="7" fontSize="xs"
+                          _hover={{ bg: hoverBg, pl: "3" }} transition="all 0.2s"
+                          borderLeftWidth="2px"
+                          borderLeftColor={selectedCategory === category ? accentColor : "transparent"}
+                          borderRadius="0"
+                        >
+                          {category}
+                        </Button>
+                      ))}
+                    </Stack>
+                  </Box>
+                ))}
               </Box>
               <Divider />
               <Box>
