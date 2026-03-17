@@ -39,6 +39,7 @@ export default function QuizManagementPage() {
   const router = useRouter();
   const courseId = params.id as string;
   const lessonId = params.lessonId as string;
+  const curriculumEditUrl = `/instructor/courses/${courseId}/edit?tab=curriculum`;
 
   const [quiz, setQuiz] = useState<Quiz>({
     title: "",
@@ -184,7 +185,7 @@ export default function QuizManagementPage() {
 
       toast.success(`Quiz ${existingQuiz ? "updated" : "created"} successfully`);
 
-      router.back();
+      router.push(curriculumEditUrl);
     } catch (error: any) {
       toast.error("Failed to save quiz", {
         description: error.message,
@@ -216,7 +217,7 @@ export default function QuizManagementPage() {
       if (!response.ok) throw new Error("Failed to delete quiz");
 
       toast.success("Quiz deleted successfully");
-      router.push(`/instructor/courses/${courseId}/edit`);
+      router.push(curriculumEditUrl);
     } catch (error: any) {
       toast.error("Failed to delete quiz", {
         description: error.message,
@@ -431,7 +432,7 @@ export default function QuizManagementPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <button
-            onClick={() => router.back()}
+            onClick={() => router.push(curriculumEditUrl)}
             className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
           >
             <HiOutlineArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -449,7 +450,7 @@ export default function QuizManagementPage() {
               </button>
             )}
             <button
-              onClick={() => router.back()}
+              onClick={() => router.push(curriculumEditUrl)}
               className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
             >
               Cancel

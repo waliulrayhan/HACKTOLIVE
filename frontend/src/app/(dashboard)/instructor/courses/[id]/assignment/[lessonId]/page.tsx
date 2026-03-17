@@ -41,6 +41,7 @@ export default function AssignmentManagementPage() {
   const router = useRouter();
   const lessonId = params?.lessonId as string;
   const courseId = params?.id as string;
+  const curriculumEditUrl = `/instructor/courses/${courseId}/edit?tab=curriculum`;
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -300,7 +301,7 @@ export default function AssignmentManagementPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2 sm:gap-3">
           <button
-            onClick={() => router.push(`/instructor/courses/${courseId}/edit`)}
+            onClick={() => router.push(curriculumEditUrl)}
             className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg border border-gray-300 text-gray-700 transition-colors hover:bg-gray-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
           >
             <HiOutlineArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />

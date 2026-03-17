@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "@/components/ui/toast";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
@@ -35,8 +35,17 @@ import {
   HiOutlineClipboardCheck,
   HiOutlinePaperClip,
   HiOutlineArrowLeft,
+  HiOutlineMenuAlt2,
 } from "react-icons/hi";
 import Badge from "@/components/ui/badge/Badge";
+
+type EditTab = "details" | "curriculum" | "settings";
+
+const COURSE_EDIT_TABS: EditTab[] = ["details", "curriculum", "settings"];
+
+const isEditTab = (value: string | null): value is EditTab => {
+  return value !== null && COURSE_EDIT_TABS.includes(value as EditTab);
+};
 
 interface Course {
   id: string;
@@ -88,12 +97,14 @@ interface Lesson {
 
 export default function EditCoursePage() {
   const params = useParams();
+  const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const courseId = params?.id as string;
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState('details');
+  const [activeTab, setActiveTab] = useState<EditTab>('details');
   const [course, setCourse] = useState<Course | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
@@ -141,6 +152,9 @@ export default function EditCoursePage() {
   // Operation loading states
   const [savingModule, setSavingModule] = useState<string | null>(null);
   const [savingLesson, setSavingLesson] = useState<string | null>(null);
+  const [reorderingModules, setReorderingModules] = useState(false);
+  const [draggedModuleId, setDraggedModuleId] = useState<string | null>(null);
+  const [dropTargetModuleId, setDropTargetModuleId] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = "Edit Course - HackToLive Academy";
@@ -151,6 +165,31 @@ export default function EditCoursePage() {
       fetchCourse();
     }
   }, [courseId]);
+
+  useEffect(() => {
+    const requestedTab = searchParams.get("tab");
+    if (isEditTab(requestedTab)) {
+      setActiveTab((currentTab) =>
+        currentTab === requestedTab ? currentTab : requestedTab,
+      );
+      return;
+    }
+
+    setActiveTab((currentTab) => (currentTab === "details" ? currentTab : "details"));
+  }, [searchParams]);
+
+  const buildEditUrl = (tab: EditTab) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tab);
+    const query = params.toString();
+
+    return query ? `${pathname}?${query}` : pathname;
+  };
+
+  const handleTabChange = (tab: EditTab) => {
+    setActiveTab(tab);
+    router.replace(buildEditUrl(tab), { scroll: false });
+  };
 
   const fetchCourse = async () => {
     try {
@@ -477,7 +516,7 @@ export default function EditCoursePage() {
           body: JSON.stringify({
             title: 'New Module',
             description: '',
-            order: modules.length + 1,
+            order: Math.max(0, ...modules.map((module) => module.order)) + 1,
           }),
         }
       );
@@ -494,6 +533,56 @@ export default function EditCoursePage() {
       console.error('Error adding module:', error);
       toast.error('Failed to add module');
     }
+  };
+
+  const normalizeModuleOrder = (nextModules: Module[]) => {
+    return nextModules.map((module, index) => ({
+      ...module,
+      order: index + 1,
+    }));
+  };
+
+  const persistModuleOrder = async (orderedModules: Module[]) => {
+    try {
+      setReorderingModules(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/instructor/courses/${courseId}/modules/reorder`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleIds: orderedModules.map((module) => module.id),
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to save module order');
+      }
+
+      const reorderedModules = await response.json();
+      setModules(reorderedModules);
+
+      toast.success('Module order updated');
+    } catch (error) {
+      console.error('Error reordering modules:', error);
+      toast.error('Failed to reorder modules');
+      fetchCourse();
+    } finally {
+      setReorderingModules(false);
+      setDraggedModuleId(null);
+      setDropTargetModuleId(null);
+    }
+  };
+
+  const applyModuleOrder = async (nextModules: Module[]) => {
+    const normalizedModules = normalizeModuleOrder(nextModules);
+    setModules(normalizedModules);
+    await persistModuleOrder(normalizedModules);
   };
 
   const updateModule = async (moduleId: string, data: Partial<Module>) => {
@@ -548,8 +637,17 @@ export default function EditCoursePage() {
       );
 
       if (!response.ok) throw new Error('Failed to delete module');
-      
-      setModules(modules.filter(m => m.id !== moduleToDelete.id));
+
+      const remainingModules = normalizeModuleOrder(
+        modules.filter((module) => module.id !== moduleToDelete.id),
+      );
+      setModules(remainingModules);
+      setExpandedModuleId((currentModuleId) =>
+        currentModuleId === moduleToDelete.id ? null : currentModuleId,
+      );
+      setEditingModuleId((currentModuleId) =>
+        currentModuleId === moduleToDelete.id ? null : currentModuleId,
+      );
       toast.success('Module deleted successfully');
       setShowDeleteModuleModal(false);
       setModuleToDelete(null);
@@ -562,6 +660,8 @@ export default function EditCoursePage() {
   };
 
   const moveModule = async (moduleId: string, direction: 'up' | 'down') => {
+    if (reorderingModules) return;
+
     const index = modules.findIndex(m => m.id === moduleId);
     if (
       (direction === 'up' && index === 0) ||
@@ -571,36 +671,67 @@ export default function EditCoursePage() {
     const newIndex = direction === 'up' ? index - 1 : index + 1;
     const newModules = [...modules];
     [newModules[index], newModules[newIndex]] = [newModules[newIndex], newModules[index]];
-    
-    // Update orders
-    newModules.forEach((m, i) => {
-      m.order = i + 1;
-    });
-    
-    setModules(newModules);
-    
-    // Save to backend
-    try {
-      const token = localStorage.getItem('token');
-      await Promise.all(
-        newModules.map(m =>
-          fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/instructor/courses/${courseId}/modules/${m.id}`,
-            {
-              method: 'PATCH',
-              headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ order: m.order }),
-            }
-          )
-        )
-      );
-    } catch (error) {
-      console.error('Error reordering modules:', error);
-      toast.error('Failed to reorder modules');
+
+    await applyModuleOrder(newModules);
+  };
+
+  const handleModuleDragStart = (
+    event: React.DragEvent<HTMLDivElement>,
+    moduleId: string,
+  ) => {
+    if (editingModuleId || reorderingModules) {
+      event.preventDefault();
+      return;
     }
+
+    setDraggedModuleId(moduleId);
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', moduleId);
+  };
+
+  const handleModuleDragOver = (
+    event: React.DragEvent<HTMLDivElement>,
+    moduleId: string,
+  ) => {
+    if (!draggedModuleId || draggedModuleId === moduleId) return;
+
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    setDropTargetModuleId(moduleId);
+  };
+
+  const handleModuleDrop = async (
+    event: React.DragEvent<HTMLDivElement>,
+    targetModuleId: string,
+  ) => {
+    event.preventDefault();
+
+    const sourceModuleId = draggedModuleId || event.dataTransfer.getData('text/plain');
+    if (!sourceModuleId || sourceModuleId === targetModuleId) {
+      setDraggedModuleId(null);
+      setDropTargetModuleId(null);
+      return;
+    }
+
+    const currentModules = [...modules];
+    const sourceIndex = currentModules.findIndex((module) => module.id === sourceModuleId);
+    const targetIndex = currentModules.findIndex((module) => module.id === targetModuleId);
+
+    if (sourceIndex === -1 || targetIndex === -1) {
+      setDraggedModuleId(null);
+      setDropTargetModuleId(null);
+      return;
+    }
+
+    const [movedModule] = currentModules.splice(sourceIndex, 1);
+    currentModules.splice(targetIndex, 0, movedModule);
+
+    await applyModuleOrder(currentModules);
+  };
+
+  const handleModuleDragEnd = () => {
+    setDraggedModuleId(null);
+    setDropTargetModuleId(null);
   };
 
   const addLesson = async (moduleId: string) => {
@@ -777,7 +908,7 @@ export default function EditCoursePage() {
     );
   }
 
-  const tabs = [
+  const tabs: { id: EditTab; label: string; icon: typeof HiOutlineInformationCircle }[] = [
     { id: 'details', label: 'Course Details', icon: HiOutlineInformationCircle },
     { id: 'curriculum', label: 'Curriculum', icon: HiOutlineBookOpen },
     { id: 'settings', label: 'Settings', icon: HiOutlineCog },
@@ -862,7 +993,7 @@ export default function EditCoursePage() {
             {tabs.map(tab => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`flex items-center gap-2 px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-brand-50/50 dark:bg-brand-900/10'
@@ -1427,11 +1558,21 @@ export default function EditCoursePage() {
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     Build and manage your course curriculum
                   </p>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Drag modules by the handle to reorder them. Changes save automatically.
+                  </p>
+                  {reorderingModules && (
+                    <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700 ring-1 ring-inset ring-brand-200 dark:bg-brand-500/10 dark:text-brand-300 dark:ring-brand-500/20">
+                      <div className="h-3.5 w-3.5 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                      Saving module order...
+                    </div>
+                  )}
                 </div>
               </div>
               <button
                 onClick={addModule}
-                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-brand-500 bg-brand-500 px-3 py-2 text-xs font-medium text-white transition-all hover:bg-brand-600 hover:border-brand-600 shadow-lg shadow-brand-500/30"
+                disabled={reorderingModules}
+                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-brand-500 bg-brand-500 px-3 py-2 text-xs font-medium text-white transition-all hover:bg-brand-600 hover:border-brand-600 shadow-lg shadow-brand-500/30 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <HiOutlinePlus className="h-4 w-4" />
                 <span className="hidden sm:inline">Add Module</span>
@@ -1440,14 +1581,45 @@ export default function EditCoursePage() {
 
             <h4 className="text-sm font-semibold text-gray-900 dark:text-white">Modules</h4>
 
+            <div className="relative" aria-busy={reorderingModules}>
+              {reorderingModules && (
+                <div className="absolute inset-0 z-10 flex items-start justify-center rounded-xl bg-white/65 pt-6 backdrop-blur-[2px] dark:bg-gray-950/55">
+                  <div className="inline-flex items-center gap-3 rounded-xl border border-brand-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 shadow-lg dark:border-brand-500/20 dark:bg-gray-900 dark:text-white">
+                    <div className="h-4 w-4 rounded-full border-2 border-brand-500 border-t-transparent animate-spin" />
+                    Updating module order. Please wait.
+                  </div>
+                </div>
+              )}
+
             <div className="space-y-3">
               {modules.map((module, moduleIndex) => (
                 <div
                   key={module.id}
-                  className="rounded-lg border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3 overflow-hidden transition-all"
+                  draggable={editingModuleId !== module.id && !reorderingModules}
+                  onDragStart={(event) => handleModuleDragStart(event, module.id)}
+                  onDragOver={(event) => handleModuleDragOver(event, module.id)}
+                  onDrop={(event) => handleModuleDrop(event, module.id)}
+                  onDragEnd={handleModuleDragEnd}
+                  className={`rounded-lg border bg-white dark:bg-white/3 overflow-hidden transition-all ${
+                    draggedModuleId === module.id
+                      ? 'border-brand-400 opacity-70 shadow-lg shadow-brand-500/10'
+                      : dropTargetModuleId === module.id
+                        ? 'border-brand-500 ring-2 ring-brand-500/20'
+                        : 'border-gray-200 dark:border-white/5'
+                  } ${reorderingModules ? 'pointer-events-none' : ''}`}
                 >
                   <div className="bg-gray-50 p-3 sm:p-4 dark:bg-gray-800/50">
                     <div className="flex items-center gap-3">
+                      <div
+                        className="flex h-10 w-10 items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white text-gray-500 dark:border-gray-600 dark:bg-gray-900/40 dark:text-gray-400 shrink-0 cursor-grab active:cursor-grabbing"
+                        title="Drag to reorder module"
+                      >
+                        {reorderingModules && draggedModuleId === module.id ? (
+                          <div className="h-4 w-4 rounded-full border-2 border-brand-500 border-t-transparent animate-spin" />
+                        ) : (
+                          <HiOutlineMenuAlt2 className="h-5 w-5" />
+                        )}
+                      </div>
                       <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-sm sm:text-base font-bold text-white shadow-lg shrink-0">
                         {moduleIndex + 1}
                       </div>
@@ -1547,6 +1719,24 @@ export default function EditCoursePage() {
                               >
                                 <HiOutlinePlus className="h-3.5 w-3.5" />
                                 <span className="hidden sm:inline">Add Lesson</span>
+                              </button>
+                              <button
+                                onClick={() => moveModule(module.id, 'up')}
+                                disabled={moduleIndex === 0 || reorderingModules}
+                                className="inline-flex items-center gap-1 sm:gap-1.5 h-7 sm:h-8 rounded-lg border border-gray-300 bg-white px-2 sm:px-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                                title="Move module up"
+                              >
+                                <HiOutlineChevronUp className="h-3.5 w-3.5" />
+                                <span className="hidden sm:inline">Up</span>
+                              </button>
+                              <button
+                                onClick={() => moveModule(module.id, 'down')}
+                                disabled={moduleIndex === modules.length - 1 || reorderingModules}
+                                className="inline-flex items-center gap-1 sm:gap-1.5 h-7 sm:h-8 rounded-lg border border-gray-300 bg-white px-2 sm:px-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                                title="Move module down"
+                              >
+                                <HiOutlineChevronDown className="h-3.5 w-3.5" />
+                                <span className="hidden sm:inline">Down</span>
                               </button>
                               <button
                                 onClick={() => setExpandedModuleId(
@@ -1862,6 +2052,7 @@ export default function EditCoursePage() {
                   </p>
                 </div>
               )}
+            </div>
             </div>
           </div>
         )}

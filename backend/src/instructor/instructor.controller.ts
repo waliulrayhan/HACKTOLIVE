@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Post,
@@ -616,6 +617,77 @@ export class InstructorController {
     return module;
   }
 
+  @Patch('courses/:courseId/modules/reorder')
+  @ApiOperation({ summary: 'Reorder modules within a course' })
+  async reorderModules(
+    @Request() req: any,
+    @Param('courseId') courseId: string,
+    @Body() data: { moduleIds?: string[] },
+  ) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId: req.user.id },
+    });
+
+    const course = await this.prisma.course.findFirst({
+      where: {
+        id: courseId,
+        instructorId: instructor?.id,
+      },
+    });
+
+    if (!course) {
+      throw new Error('Course not found or access denied');
+    }
+
+    const moduleIds = Array.isArray(data?.moduleIds)
+      ? data.moduleIds.filter((moduleId) => typeof moduleId === 'string')
+      : [];
+
+    if (moduleIds.length === 0) {
+      throw new BadRequestException('moduleIds is required');
+    }
+
+    const existingModules = await this.prisma.courseModule.findMany({
+      where: { courseId },
+      select: { id: true },
+    });
+
+    if (existingModules.length !== moduleIds.length) {
+      throw new BadRequestException(
+        'Module reorder payload must include every course module',
+      );
+    }
+
+    const existingModuleIds = new Set(existingModules.map((module) => module.id));
+    const uniqueModuleIds = new Set(moduleIds);
+
+    if (
+      uniqueModuleIds.size !== moduleIds.length ||
+      moduleIds.some((moduleId) => !existingModuleIds.has(moduleId))
+    ) {
+      throw new BadRequestException('Invalid module ids provided');
+    }
+
+    await this.prisma.$transaction(
+      moduleIds.map((moduleId, index) =>
+        this.prisma.courseModule.update({
+          where: { id: moduleId },
+          data: { order: index + 1 },
+        }),
+      ),
+    );
+
+    return this.prisma.courseModule.findMany({
+      where: { courseId },
+      include: {
+        lessons: {
+          orderBy: { order: 'asc' },
+        },
+      },
+      orderBy: { order: 'asc' },
+    });
+  }
+
   @Patch('courses/:courseId/modules/:moduleId')
   @ApiOperation({ summary: 'Update a module' })
   async updateModule(
@@ -677,6 +749,23 @@ export class InstructorController {
     await this.prisma.courseModule.delete({
       where: { id: moduleId },
     });
+
+    const remainingModules = await this.prisma.courseModule.findMany({
+      where: { courseId },
+      orderBy: { order: 'asc' },
+      select: { id: true },
+    });
+
+    if (remainingModules.length > 0) {
+      await this.prisma.$transaction(
+        remainingModules.map((module, index) =>
+          this.prisma.courseModule.update({
+            where: { id: module.id },
+            data: { order: index + 1 },
+          }),
+        ),
+      );
+    }
 
     // Update course totalModules and totalLessons counts
     const totalModules = await this.prisma.courseModule.count({

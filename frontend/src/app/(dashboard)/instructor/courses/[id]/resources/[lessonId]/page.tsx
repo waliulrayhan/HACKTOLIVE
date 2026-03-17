@@ -38,6 +38,7 @@ export default function LessonResourcesPage() {
   const router = useRouter();
   const courseId = params.id as string;
   const lessonId = params.lessonId as string;
+  const curriculumEditUrl = `/instructor/courses/${courseId}/edit?tab=curriculum`;
 
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
@@ -237,7 +238,7 @@ export default function LessonResourcesPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <button
-            onClick={() => router.back()}
+            onClick={() => router.push(curriculumEditUrl)}
             className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
           >
             <HiOutlineArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />

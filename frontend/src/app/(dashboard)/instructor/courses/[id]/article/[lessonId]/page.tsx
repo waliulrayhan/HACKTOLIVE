@@ -42,6 +42,7 @@ export default function ArticleManagementPage() {
   const router = useRouter();
   const courseId = params.id as string;
   const lessonId = params.lessonId as string;
+  const curriculumEditUrl = `/instructor/courses/${courseId}/edit?tab=curriculum`;
 
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [articleContent, setArticleContent] = useState("");
@@ -188,7 +189,7 @@ export default function ArticleManagementPage() {
         <div className="rounded-md border border-gray-200 bg-white p-8 text-center dark:border-white/5 dark:bg-white/3">
           <p className="text-gray-500">This lesson is not an article type</p>
           <button
-            onClick={() => router.push(`/instructor/courses/${courseId}/edit`)}
+            onClick={() => router.push(curriculumEditUrl)}
             className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
           >
             <HiOutlineArrowLeft className="h-4 w-4" />
@@ -205,7 +206,7 @@ export default function ArticleManagementPage() {
 
       <div>
         <button
-          onClick={() => router.push(`/instructor/courses/${courseId}/edit`)}
+          onClick={() => router.push(curriculumEditUrl)}
           className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
         >
           <HiOutlineArrowLeft className="h-4 w-4" />
