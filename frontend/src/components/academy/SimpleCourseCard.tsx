@@ -3,6 +3,7 @@
 import { Box, Badge, HStack, VStack, Text, Image, useColorModeValue, Flex, Icon } from "@chakra-ui/react";
 import { ButtonLink } from "@/components/shared/button-link/button-link";
 import { Course } from "@/types/academy";
+import { getDiscountPercentage, getFinalPrice, getOriginalPrice, hasDiscount } from "@/lib/course-pricing";
 import { FiStar, FiUsers, FiClock, FiBook, FiArrowRight, FiVideo, FiPlay } from "react-icons/fi";
 
 interface CourseCardProps {
@@ -15,6 +16,10 @@ export default function CourseCard({ course, variant = "default", isEnrolled = f
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const hoverBorderColor = useColorModeValue("green.500", "green.400");
+  const originalPrice = getOriginalPrice(course);
+  const finalPrice = getFinalPrice(course);
+  const discounted = hasDiscount(course);
+  const discountPercentage = Math.round(getDiscountPercentage(course));
   
   const formatDuration = (number) => {
     return `${number}h`;
@@ -204,9 +209,21 @@ export default function CourseCard({ course, variant = "default", isEnrolled = f
 
         {/* Price & CTA */}
         <HStack justify="space-between" align="center" mt="auto" pt="3">
-          <Text fontSize="2xl" fontWeight="bold" color="green.500">
-            {course.price === 0 ? "Free" : `${course.price} Tk`}
-          </Text>
+          <VStack align="start" spacing="0">
+            <Text fontSize="2xl" fontWeight="bold" color="green.500">
+              {finalPrice === 0 ? "Free" : `${finalPrice} Tk`}
+            </Text>
+            {discounted && originalPrice > finalPrice && (
+              <HStack spacing="2">
+                <Text fontSize="sm" color="gray.500" textDecoration="line-through">
+                  {originalPrice} Tk
+                </Text>
+                <Badge colorScheme="red" fontSize="10px">
+                  {discountPercentage}% OFF
+                </Badge>
+              </HStack>
+            )}
+          </VStack>
           {isEnrolled ? (
             <ButtonLink
               href={`/student/courses/${course.id}`}

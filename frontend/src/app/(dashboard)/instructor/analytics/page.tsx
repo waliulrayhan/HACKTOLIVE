@@ -13,6 +13,7 @@ import {
   HiOutlineTrendingUp,
   HiOutlineCheckCircle,
 } from "react-icons/hi";
+import { getFinalPrice } from "@/lib/course-pricing";
 
 interface AnalyticsData {
   instructor: any;
@@ -82,7 +83,7 @@ export default function InstructorAnalyticsPage() {
   ) || 0;
 
   const totalRevenue = analytics?.instructor?.courses?.reduce(
-    (sum: number, course: any) => sum + (course.price * course.totalStudents),
+    (sum: number, course: any) => sum + (getFinalPrice(course) * course.totalStudents),
     0
   ) || 0;
 
@@ -242,10 +243,10 @@ export default function InstructorAnalyticsPage() {
         </div>
         <div className="space-y-3">
           {analytics?.instructor?.courses
-            ?.sort((a: any, b: any) => (b.price * b.totalStudents) - (a.price * a.totalStudents))
+            ?.sort((a: any, b: any) => (getFinalPrice(b) * b.totalStudents) - (getFinalPrice(a) * a.totalStudents))
             .slice(0, 5)
             .map((course: any, index: number) => {
-              const revenue = course.price * course.totalStudents;
+              const revenue = getFinalPrice(course) * course.totalStudents;
               return (
                 <div
                   key={course.id}
@@ -350,7 +351,7 @@ export default function InstructorAnalyticsPage() {
                   </td>
                   <td className="py-3 px-2 text-center">
                     <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      ${(course.price * course.totalStudents).toLocaleString()}
+                      ${(getFinalPrice(course) * course.totalStudents).toLocaleString()}
                     </span>
                   </td>
                   <td className="py-3 px-2 text-center">

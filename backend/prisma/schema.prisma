@@ -85,6 +85,8 @@ model Course {
   tier             CourseTier
   deliveryMode     DeliveryMode
   price            Float          @default(0)
+  discountedPrice  Float?
+  discountPercentage Float        @default(0)
   instructorId     String
   rating           Float          @default(0)
   totalRatings     Int            @default(0)

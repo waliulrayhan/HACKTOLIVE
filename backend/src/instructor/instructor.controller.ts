@@ -16,6 +16,7 @@ import { RolesGuard, Roles } from '../auth/roles.guard';
 import { UserRole, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { InstructorService } from './instructor.service';
+import { getCourseFinalPrice } from '../utils/transform.util';
 
 @ApiTags('instructor')
 @ApiBearerAuth()
@@ -27,6 +28,75 @@ export class InstructorController {
     private prisma: PrismaService,
     private instructorService: InstructorService,
   ) {}
+
+  private normalizeAndValidateCoursePricing(input: any, existingCourse?: any) {
+    const normalized = { ...input };
+
+    if (normalized.price !== undefined) {
+      normalized.price = parseFloat(normalized.price as any) || 0;
+    }
+    if (normalized.discountedPrice !== undefined) {
+      if (normalized.discountedPrice === null || normalized.discountedPrice === '') {
+        normalized.discountedPrice = null;
+      } else {
+        normalized.discountedPrice = parseFloat(normalized.discountedPrice as any);
+      }
+    }
+    if (normalized.discountPercentage !== undefined) {
+      if (normalized.discountPercentage === null || normalized.discountPercentage === '') {
+        normalized.discountPercentage = 0;
+      } else {
+        normalized.discountPercentage = parseFloat(normalized.discountPercentage as any) || 0;
+      }
+    }
+
+    const effectiveTier = (normalized.tier ?? existingCourse?.tier ?? '').toUpperCase();
+    const effectivePrice =
+      normalized.price !== undefined
+        ? normalized.price
+        : Number(existingCourse?.price || 0);
+
+    if (effectiveTier === 'FREE') {
+      normalized.price = 0;
+      normalized.discountedPrice = null;
+      normalized.discountPercentage = 0;
+      return normalized;
+    }
+
+    if (effectivePrice < 0) {
+      throw new BadRequestException('Price cannot be negative');
+    }
+
+    if (effectiveTier === 'PREMIUM' && effectivePrice <= 0) {
+      throw new BadRequestException('Premium courses must have a price greater than 0');
+    }
+
+    const effectiveDiscountPercentage =
+      normalized.discountPercentage !== undefined
+        ? Number(normalized.discountPercentage)
+        : Number(existingCourse?.discountPercentage || 0);
+
+    if (effectiveDiscountPercentage < 0 || effectiveDiscountPercentage > 100) {
+      throw new BadRequestException('Discount percentage must be between 0 and 100');
+    }
+
+    const effectiveDiscountedPrice =
+      normalized.discountedPrice !== undefined
+        ? normalized.discountedPrice
+        : existingCourse?.discountedPrice;
+
+    if (effectiveDiscountedPrice !== null && effectiveDiscountedPrice !== undefined) {
+      const numericDiscountedPrice = Number(effectiveDiscountedPrice);
+      if (!Number.isFinite(numericDiscountedPrice) || numericDiscountedPrice < 0) {
+        throw new BadRequestException('Discounted price must be a valid positive number');
+      }
+      if (numericDiscountedPrice > effectivePrice) {
+        throw new BadRequestException('Discounted price cannot be greater than original price');
+      }
+    }
+
+    return normalized;
+  }
 
   @Get('dashboard')
   async getDashboard(@Request() req: any) {
@@ -283,9 +353,6 @@ export class InstructorController {
     }
 
     // Convert numeric fields to proper types
-    if (courseData.price !== undefined) {
-      courseData.price = parseFloat(courseData.price as any) || 0;
-    }
     if (courseData.duration !== undefined) {
       courseData.duration = parseInt(courseData.duration as any) || 0;
     }
@@ -293,9 +360,11 @@ export class InstructorController {
       courseData.maxStudents = parseInt(courseData.maxStudents as any) || null;
     }
 
+    const normalizedPricingData = this.normalizeAndValidateCoursePricing(courseData);
+
     // Prepare the course creation data with proper nested structure
     const createData: any = {
-      ...courseData,
+      ...normalizedPricingData,
       instructor: {
         connect: { id: instructor.id },
       },
@@ -390,9 +459,6 @@ export class InstructorController {
     }
 
     // Convert numeric fields to proper types
-    if (processedData.price !== undefined) {
-      processedData.price = parseFloat(processedData.price) || 0;
-    }
     if (processedData.duration !== undefined) {
       processedData.duration = parseInt(processedData.duration) || 0;
     }
@@ -400,9 +466,11 @@ export class InstructorController {
       processedData.maxStudents = parseInt(processedData.maxStudents) || null;
     }
 
+    const normalizedPricingData = this.normalizeAndValidateCoursePricing(processedData, course);
+
     return this.prisma.course.update({
       where: { id: courseId },
-      data: processedData,
+      data: normalizedPricingData,
     });
   }
 
@@ -559,7 +627,7 @@ export class InstructorController {
       enrollments: course.enrollments.length,
       rating: course.rating,
       reviews: course.reviews.length,
-      revenue: course.enrollments.length * course.price,
+      revenue: course.enrollments.length * getCourseFinalPrice(course),
     })) || [];
 
     return {

@@ -88,6 +88,12 @@ export interface Course {
   tier: CourseTier; // free or premium
   deliveryMode: DeliveryMode; // recorded or live
   price: number;
+  discountedPrice?: number | null;
+  discountPercentage?: number;
+  originalPrice?: number;
+  finalPrice?: number;
+  hasDiscount?: boolean;
+  discountAmount?: number;
   instructor: Instructor;
   rating: number;
   totalRatings: number;

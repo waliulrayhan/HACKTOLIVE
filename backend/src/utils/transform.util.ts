@@ -37,6 +37,76 @@ export function transformStudent(student: any) {
   return student;
 }
 
+const roundCurrency = (value: number) => Math.round(value * 100) / 100;
+
+const toValidNumber = (value: unknown, fallback = 0): number => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+export function getCoursePricing(course: any) {
+  const originalPrice = Math.max(0, toValidNumber(course?.price));
+  const rawDiscountPercentage = Math.max(0, Math.min(100, toValidNumber(course?.discountPercentage)));
+  const hasExplicitDiscountedPrice =
+    course?.discountedPrice !== null &&
+    course?.discountedPrice !== undefined &&
+    Number(course.discountedPrice) >= 0 &&
+    Number(course.discountedPrice) < originalPrice;
+
+  if (originalPrice <= 0) {
+    return {
+      originalPrice: 0,
+      finalPrice: 0,
+      discountedPrice: null,
+      discountAmount: 0,
+      discountPercentage: 0,
+      hasDiscount: false,
+    };
+  }
+
+  if (hasExplicitDiscountedPrice) {
+    const finalPrice = roundCurrency(Number(course.discountedPrice));
+    const discountAmount = roundCurrency(originalPrice - finalPrice);
+    const discountPercentage = roundCurrency((discountAmount / originalPrice) * 100);
+
+    return {
+      originalPrice,
+      finalPrice,
+      discountedPrice: finalPrice,
+      discountAmount,
+      discountPercentage,
+      hasDiscount: discountAmount > 0,
+    };
+  }
+
+  if (rawDiscountPercentage > 0) {
+    const discountAmount = roundCurrency((originalPrice * rawDiscountPercentage) / 100);
+    const finalPrice = roundCurrency(Math.max(0, originalPrice - discountAmount));
+
+    return {
+      originalPrice,
+      finalPrice,
+      discountedPrice: finalPrice,
+      discountAmount,
+      discountPercentage: roundCurrency(rawDiscountPercentage),
+      hasDiscount: discountAmount > 0,
+    };
+  }
+
+  return {
+    originalPrice,
+    finalPrice: originalPrice,
+    discountedPrice: null,
+    discountAmount: 0,
+    discountPercentage: 0,
+    hasDiscount: false,
+  };
+}
+
+export function getCourseFinalPrice(course: any): number {
+  return getCoursePricing(course).finalPrice;
+}
+
 /**
  * Transform course object to include instructor with user data
  */
@@ -53,9 +123,18 @@ export function transformCourse(course: any) {
       return total + (module.lessons?.length || 0);
     }, 0);
   }
+
+  const pricing = getCoursePricing(course);
   
   return {
     ...course,
+    price: pricing.originalPrice,
+    discountedPrice: pricing.discountedPrice,
+    discountPercentage: pricing.discountPercentage,
+    originalPrice: pricing.originalPrice,
+    finalPrice: pricing.finalPrice,
+    hasDiscount: pricing.hasDiscount,
+    discountAmount: pricing.discountAmount,
     instructor: transformInstructor(course.instructor),
     totalModules,
     totalLessons,

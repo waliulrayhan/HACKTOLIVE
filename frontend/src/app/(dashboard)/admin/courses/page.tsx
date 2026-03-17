@@ -35,6 +35,7 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table";
+import { getDiscountPercentage, getFinalPrice, getOriginalPrice, hasDiscount } from "@/lib/course-pricing";
 
 interface Course {
   id: string;
@@ -47,6 +48,10 @@ interface Course {
   tier: string;
   deliveryMode: string;
   price: number;
+  discountedPrice?: number | null;
+  discountPercentage?: number;
+  finalPrice?: number;
+  hasDiscount?: boolean;
   status: string;
   rating: number;
   totalStudents: number;
@@ -538,9 +543,16 @@ export default function CoursesManagementPage() {
                       </div>
                     </TableCell>
                     <TableCell className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
-                      <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                        {course.price > 0 ? `${course.price} Tk` : 'Free'}
-                      </span>
+                      <div className="flex flex-col items-center">
+                        <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                          {getFinalPrice(course) > 0 ? `${getFinalPrice(course)} Tk` : 'Free'}
+                        </span>
+                        {hasDiscount(course) && getOriginalPrice(course) > getFinalPrice(course) && (
+                          <span className="text-[10px] text-gray-500 line-through">
+                            {getOriginalPrice(course)} Tk ({Math.round(getDiscountPercentage(course))}% OFF)
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="px-3 py-2.5 text-right sm:px-4 sm:py-3">
                       <div className="flex items-center justify-end gap-1">
@@ -831,8 +843,13 @@ export default function CoursesManagementPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-gray-500 dark:text-gray-500 mb-0.5">Price</p>
                       <p className="text-sm text-gray-900 dark:text-white">
-                        {selectedCourse.price > 0 ? `${selectedCourse.price} Tk` : 'Free'}
+                        {getFinalPrice(selectedCourse) > 0 ? `${getFinalPrice(selectedCourse)} Tk` : 'Free'}
                       </p>
+                      {hasDiscount(selectedCourse) && getOriginalPrice(selectedCourse) > getFinalPrice(selectedCourse) && (
+                        <p className="text-xs text-gray-500 line-through">
+                          {getOriginalPrice(selectedCourse)} Tk ({Math.round(getDiscountPercentage(selectedCourse))}% OFF)
+                        </p>
+                      )}
                     </div>
                   </div>
 

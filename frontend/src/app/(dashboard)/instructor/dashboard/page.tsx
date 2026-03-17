@@ -14,6 +14,7 @@ import {
   HiOutlineBookOpen,
   HiOutlineUserGroup,
 } from "react-icons/hi";
+import { getFinalPrice } from "@/lib/course-pricing";
 
 interface DashboardStats {
   instructor: any;
@@ -75,7 +76,7 @@ export default function InstructorDashboard() {
   const publishedCourses = stats?.instructor?.courses?.filter((c: any) => c.status === 'PUBLISHED').length || 0;
   const draftCourses = stats?.instructor?.courses?.filter((c: any) => c.status === 'DRAFT').length || 0;
   const totalRevenue = stats?.instructor?.courses?.reduce((sum: number, course: any) => 
-    sum + (course.price * course.totalStudents), 0
+    sum + (getFinalPrice(course) * course.totalStudents), 0
   ) || 0;
 
   return (

@@ -56,6 +56,7 @@ import {
 } from "react-icons/fi";
 import academyService from "@/lib/academy-service";
 import { useAuth } from "@/context/AuthContext";
+import { getDiscountPercentage, getFinalPrice, getOriginalPrice, hasDiscount } from "@/lib/course-pricing";
 
 interface EnrollmentPageProps {
   slug: string;
@@ -139,7 +140,11 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
     checkEnrollment();
   }, [user, course]);
 
-  const isFree = course?.price === 0;
+  const finalPrice = course ? getFinalPrice(course) : 0;
+  const originalPrice = course ? getOriginalPrice(course) : 0;
+  const discounted = course ? hasDiscount(course) : false;
+  const discountPercentage = course ? Math.round(getDiscountPercentage(course)) : 0;
+  const isFree = finalPrice === 0;
   const isLoggedIn = !authLoading && !!user;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -582,7 +587,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                       >
                         {isFree 
                           ? "Start Learning for Free" 
-                          : `Proceed to Payment - ${course.price.toLocaleString()} Tk`}
+                          : `Proceed to Payment - ${finalPrice.toLocaleString()} Tk`}
                       </Button>
 
                       {!isFree && (
@@ -637,7 +642,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                           {isFree ? "FREE COURSE" : "PREMIUM COURSE"}
                         </Text>
                         <Text color="white" fontSize="3xl" fontWeight="bold">
-                          {isFree ? "0 Tk" : `${course.price.toLocaleString()} Tk`}
+                          {isFree ? "0 Tk" : `${finalPrice.toLocaleString()} Tk`}
                         </Text>
                       </VStack> */}
                     </Box>
@@ -663,9 +668,21 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                           <Icon as={FiDollarSign} />
                           <Text>{isFree ? "FREE COURSE" : "PREMIUM COURSE"}</Text>
                         </HStack>
-                        <Text fontWeight="semibold">
-                          {isFree ? "0 Tk" : `${course.price.toLocaleString()} Tk`}
-                        </Text>
+                        <VStack spacing="0" align="end">
+                          <Text fontWeight="semibold">
+                            {isFree ? "0 Tk" : `${finalPrice.toLocaleString()} Tk`}
+                          </Text>
+                          {discounted && originalPrice > finalPrice && (
+                            <HStack spacing="1">
+                              <Text fontSize="xs" color="muted" textDecoration="line-through">
+                                {originalPrice.toLocaleString()} Tk
+                              </Text>
+                              <Badge colorScheme="red" fontSize="10px">
+                                {discountPercentage}% OFF
+                              </Badge>
+                            </HStack>
+                          )}
+                        </VStack>
                       </HStack>
 
                       <HStack justify="space-between">

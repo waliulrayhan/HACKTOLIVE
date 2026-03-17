@@ -58,6 +58,8 @@ interface Course {
   tier: string;
   deliveryMode: string;
   price: number;
+  discountedPrice?: number | null;
+  discountPercentage?: number;
   duration: number;
   learningOutcomes: string;
   requirements: string;
@@ -123,6 +125,8 @@ export default function EditCoursePage() {
     tier: "",
     deliveryMode: "",
     price: 0,
+    discountedPrice: 0,
+    discountPercentage: 0,
     duration: 0,
     learningOutcomes: "",
     requirements: "",
@@ -218,6 +222,8 @@ export default function EditCoursePage() {
         tier: data.tier,
         deliveryMode: data.deliveryMode,
         price: data.price,
+        discountedPrice: data.discountedPrice || 0,
+        discountPercentage: data.discountPercentage || 0,
         duration: data.duration,
         learningOutcomes: data.learningOutcomes,
         requirements: data.requirements,
@@ -272,10 +278,55 @@ export default function EditCoursePage() {
 
     // Reset price to 0 when tier is FREE
     if (name === 'tier' && value === 'FREE') {
-      setFormData(prev => ({ ...prev, price: 0 }));
+      setFormData(prev => ({ ...prev, price: 0, discountedPrice: 0, discountPercentage: 0 }));
       const newErrors = { ...errors };
       delete newErrors.price;
+      delete newErrors.discountedPrice;
+      delete newErrors.discountPercentage;
       setErrors(newErrors);
+    }
+
+    if (name === 'price' && Number(value) >= 0) {
+      const originalPrice = Number(value) || 0;
+      setFormData(prev => {
+        if (prev.discountPercentage > 0) {
+          const discountedPrice = Number((originalPrice * (1 - prev.discountPercentage / 100)).toFixed(2));
+          return { ...prev, [name]: originalPrice, discountedPrice };
+        }
+        return { ...prev, [name]: originalPrice };
+      });
+      return;
+    }
+
+    if (name === 'discountPercentage') {
+      const discountPercentage = Math.max(0, Math.min(100, Number(value) || 0));
+      setFormData(prev => {
+        const originalPrice = Number(prev.price) || 0;
+        const discountedPrice = Number((originalPrice * (1 - discountPercentage / 100)).toFixed(2));
+        return {
+          ...prev,
+          discountPercentage,
+          discountedPrice,
+        };
+      });
+      return;
+    }
+
+    if (name === 'discountedPrice') {
+      const discountedPrice = Math.max(0, Number(value) || 0);
+      setFormData(prev => {
+        const originalPrice = Number(prev.price) || 0;
+        const discountPercentage =
+          originalPrice > 0
+            ? Number((((originalPrice - discountedPrice) / originalPrice) * 100).toFixed(2))
+            : 0;
+        return {
+          ...prev,
+          discountedPrice,
+          discountPercentage: Math.max(0, Math.min(100, discountPercentage)),
+        };
+      });
+      return;
     }
 
     // Clear specific field error when user starts typing
@@ -413,6 +464,12 @@ export default function EditCoursePage() {
     if (!formData.tier.trim()) newErrors.tier = "Tier is required";
     if (formData.tier === 'PREMIUM' && formData.price <= 0) {
       newErrors.price = "Premium courses must have a price greater than 0";
+    }
+    if (formData.tier === 'PREMIUM' && formData.discountedPrice > formData.price) {
+      newErrors.discountedPrice = "Discounted price cannot be greater than original price";
+    }
+    if (formData.tier === 'PREMIUM' && (formData.discountPercentage < 0 || formData.discountPercentage > 100)) {
+      newErrors.discountPercentage = "Discount percentage must be between 0 and 100";
     }
     
     setErrors(newErrors);
@@ -1463,6 +1520,53 @@ export default function EditCoursePage() {
                       />
                     </div>
                     {errors.price && <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1"><HiOutlineExclamationCircle className="h-3.5 w-3.5" />{errors.price}</p>}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Discounted Price (Tk)
+                    </label>
+                    <input
+                      type="number"
+                      name="discountedPrice"
+                      value={formData.discountedPrice}
+                      onChange={handleInputChange}
+                      min="0"
+                      step="0.01"
+                      disabled={formData.tier === 'FREE' || formData.price <= 0}
+                      className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                        errors.discountedPrice
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      } ${formData.tier === 'FREE' ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-900' : ''}`}
+                      placeholder="e.g., 1999.00"
+                    />
+                    {errors.discountedPrice && <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1"><HiOutlineExclamationCircle className="h-3.5 w-3.5" />{errors.discountedPrice}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Discount Percentage (%)
+                    </label>
+                    <input
+                      type="number"
+                      name="discountPercentage"
+                      value={formData.discountPercentage}
+                      onChange={handleInputChange}
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      disabled={formData.tier === 'FREE' || formData.price <= 0}
+                      className={`w-full h-10 rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/20 ${
+                        errors.discountPercentage
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:border-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+                      } ${formData.tier === 'FREE' ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-900' : ''}`}
+                      placeholder="e.g., 25"
+                    />
+                    {errors.discountPercentage && <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1"><HiOutlineExclamationCircle className="h-3.5 w-3.5" />{errors.discountPercentage}</p>}
                   </div>
                 </div>
               </div>

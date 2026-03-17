@@ -11,6 +11,7 @@ import {
 } from '@prisma/client';
 import {
   transformCourse,
+  getCourseFinalPrice,
   instructorInclude,
 } from '../../utils/transform.util';
 
@@ -117,16 +118,11 @@ export class CoursesService {
       }
     }
     
-    // Price range filter
-    if (minPrice !== undefined || maxPrice !== undefined) {
-      where.price = {};
-      if (minPrice !== undefined) {
-        where.price.gte = minPrice;
-      }
-      if (maxPrice !== undefined) {
-        where.price.lte = maxPrice;
-      }
-    }
+    const shouldApplyFinalPricePostProcessing =
+      minPrice !== undefined ||
+      maxPrice !== undefined ||
+      sortBy === 'price-low' ||
+      sortBy === 'price-high';
     
     // Delivery mode filter (support comma-separated values)
     if (deliveryMode) {
@@ -150,10 +146,10 @@ export class CoursesService {
           orderBy = { rating: 'desc' };
           break;
         case 'price-low':
-          orderBy = { price: 'asc' };
+          orderBy = { createdAt: 'desc' };
           break;
         case 'price-high':
-          orderBy = { price: 'desc' };
+          orderBy = { createdAt: 'desc' };
           break;
         case 'newest':
           orderBy = { createdAt: 'desc' };
@@ -164,8 +160,8 @@ export class CoursesService {
     }
     
     const courses = await this.prisma.course.findMany({
-      skip,
-      take,
+      skip: shouldApplyFinalPricePostProcessing ? undefined : skip,
+      take: shouldApplyFinalPricePostProcessing ? undefined : take,
       where,
       orderBy,
       include: {
@@ -183,8 +179,7 @@ export class CoursesService {
       },
     });
 
-    // Calculate totalModules and totalLessons for each course and transform instructor
-    return courses.map(course => transformCourse({
+    const transformedCourses = courses.map(course => transformCourse({
       ...course,
       totalModules: course.modules?.length || 0,
       totalLessons: course.modules?.reduce(
@@ -192,6 +187,29 @@ export class CoursesService {
         0,
       ) || 0,
     }));
+
+    if (!shouldApplyFinalPricePostProcessing) {
+      return transformedCourses;
+    }
+
+    const filteredCourses = transformedCourses.filter((course) => {
+      const finalPrice = getCourseFinalPrice(course);
+      if (minPrice !== undefined && finalPrice < minPrice) return false;
+      if (maxPrice !== undefined && finalPrice > maxPrice) return false;
+      return true;
+    });
+
+    if (sortBy === 'price-low') {
+      filteredCourses.sort((a, b) => getCourseFinalPrice(a) - getCourseFinalPrice(b));
+    }
+
+    if (sortBy === 'price-high') {
+      filteredCourses.sort((a, b) => getCourseFinalPrice(b) - getCourseFinalPrice(a));
+    }
+
+    const start = skip || 0;
+    const end = take ? start + take : undefined;
+    return filteredCourses.slice(start, end);
   }
 
   async findOne(id: string): Promise<Course | null> {

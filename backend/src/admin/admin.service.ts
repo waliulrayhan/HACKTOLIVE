@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma.service';
 import { UserRole, CourseStatus } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import {
+  getCourseFinalPrice,
   transformEnrollment,
   transformCourse,
   instructorInclude,
@@ -391,7 +392,7 @@ export class AdminService {
     });
 
     const totalRevenue = enrollments.reduce((sum, enrollment) => {
-      return sum + enrollment.course.price;
+      return sum + getCourseFinalPrice(enrollment.course);
     }, 0);
 
     const revenueByMonth = enrollments.reduce((acc, enrollment) => {
@@ -399,7 +400,7 @@ export class AdminService {
       if (!acc[month]) {
         acc[month] = 0;
       }
-      acc[month] += enrollment.course.price;
+      acc[month] += getCourseFinalPrice(enrollment.course);
       return acc;
     }, {} as Record<string, number>);
 
@@ -515,13 +516,15 @@ export class AdminService {
         course: {
           select: {
             price: true,
+            discountedPrice: true,
+            discountPercentage: true,
           },
         },
       },
     });
 
     return enrollments.reduce((sum, enrollment) => {
-      return sum + enrollment.course.price;
+      return sum + getCourseFinalPrice(enrollment.course);
     }, 0);
   }
 

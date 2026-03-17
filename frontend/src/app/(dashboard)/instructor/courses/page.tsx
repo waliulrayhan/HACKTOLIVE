@@ -39,6 +39,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import Badge from "@/components/ui/badge/Badge";
+import { getDiscountPercentage, getFinalPrice, getOriginalPrice, hasDiscount } from "@/lib/course-pricing";
 
 interface Course {
   id: string;
@@ -51,6 +52,10 @@ interface Course {
   tier: string;
   deliveryMode: string;
   price: number;
+  discountedPrice?: number | null;
+  discountPercentage?: number;
+  finalPrice?: number;
+  hasDiscount?: boolean;
   status: string;
   rating: number;
   totalStudents: number;
@@ -819,9 +824,16 @@ export default function InstructorCoursesPage() {
                       </div>
                       <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-white/5">
                         <span className="text-sm text-gray-600 dark:text-gray-400">Price</span>
-                        <span className="text-base font-bold text-brand-600 dark:text-brand-400">
-                          {selectedCourse.price.toFixed(2)} Tk
-                        </span>
+                        <div className="text-right">
+                          <span className="text-base font-bold text-brand-600 dark:text-brand-400">
+                            {getFinalPrice(selectedCourse).toFixed(2)} Tk
+                          </span>
+                          {hasDiscount(selectedCourse) && getOriginalPrice(selectedCourse) > getFinalPrice(selectedCourse) && (
+                            <p className="text-xs text-gray-500 line-through">
+                              {getOriginalPrice(selectedCourse).toFixed(2)} Tk ({Math.round(getDiscountPercentage(selectedCourse))}% OFF)
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

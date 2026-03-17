@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma.service';
 import { EpsService } from './eps.service';
 import { EmailService } from '../email/email.service';
 import { CoursePaymentStatus } from '@prisma/client';
+import { getCourseFinalPrice } from '../utils/transform.util';
 
 export interface InitiatePaymentDto {
   courseId?: string;
@@ -57,7 +58,9 @@ export class PaymentService {
           throw new NotFoundException('Course not found');
         }
 
-        if (course.price === 0) {
+        const finalCoursePrice = getCourseFinalPrice(course);
+
+        if (finalCoursePrice === 0) {
           throw new BadRequestException('This course is free');
         }
 
@@ -88,7 +91,7 @@ export class PaymentService {
           throw new BadRequestException('Already enrolled in this course');
         }
 
-        amount = course.price;
+        amount = finalCoursePrice;
         productName = course.title;
         productCategory = 'Course Enrollment';
       } else if (data.cartItems && data.cartItems.length > 0) {

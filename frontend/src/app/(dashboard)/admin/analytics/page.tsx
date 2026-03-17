@@ -14,6 +14,7 @@ import {
   HiOutlineCheckCircle,
 } from "react-icons/hi";
 import { HiOutlineTrophy } from "react-icons/hi2";
+import { getFinalPrice } from "@/lib/course-pricing";
 
 interface EnrollmentStats {
   byMonth: Record<string, number>;
@@ -32,6 +33,10 @@ interface PopularCourse {
   totalStudents: number;
   rating: number;
   price: number;
+  discountedPrice?: number | null;
+  discountPercentage?: number;
+  finalPrice?: number;
+  hasDiscount?: boolean;
   instructor: {
     name: string;
   };
@@ -290,7 +295,7 @@ export default function AnalyticsPage() {
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
                       <HiOutlineCurrencyDollar className="h-3 w-3" />
-                      {course.price === 0 ? 'Free' : `${course.price.toLocaleString()} Tk`}
+                      {getFinalPrice(course) === 0 ? 'Free' : `${getFinalPrice(course).toLocaleString()} Tk`}
                     </p>
                   </div>
                 </div>
@@ -427,12 +432,12 @@ export default function AnalyticsPage() {
                   </td>
                   <td className="py-3 px-2 text-center">
                     <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      {course.price === 0 ? 'Free' : `${course.price.toLocaleString()} Tk`}
+                      {getFinalPrice(course) === 0 ? 'Free' : `${getFinalPrice(course).toLocaleString()} Tk`}
                     </span>
                   </td>
                   <td className="py-3 px-2 text-center">
                     <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                      {(course.price * course.totalStudents).toLocaleString()} Tk
+                      {(getFinalPrice(course) * course.totalStudents).toLocaleString()} Tk
                     </span>
                   </td>
                 </tr>

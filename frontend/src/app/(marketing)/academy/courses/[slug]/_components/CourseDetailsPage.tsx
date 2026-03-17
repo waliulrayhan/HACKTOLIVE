@@ -57,6 +57,7 @@ import RatingStars from "@/components/academy/RatingStars";
 import { Course, Review } from "@/types/academy";
 import academyService from "@/lib/academy-service";
 import { useAuth } from "@/context/AuthContext";
+import { getFinalPrice } from "@/lib/course-pricing";
 import { BackgroundColor } from "@tiptap/extension-text-style";
 
 interface CourseDetailsPageProps {
@@ -72,6 +73,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
 
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
+  const finalPrice = course ? getFinalPrice(course) : 0;
   
   const { user } = useAuth();
 
@@ -311,7 +313,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                       size={{ base: "md", md: "lg" }}
                       width={{ base: "100%", sm: "auto" }}
                     >
-                      {course.tier === "premium" ? `Enroll Now - ${course.price} Tk` : "Start Free Course"}
+                      {course.tier === "premium" ? `Enroll Now - ${finalPrice} Tk` : "Start Free Course"}
                     </ButtonLink>
                   )}
                   <Button 

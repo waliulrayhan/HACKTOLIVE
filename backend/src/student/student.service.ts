@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { instructorInclude, transformCourse, transformEnrollment } from '../utils/transform.util';
+import { getCourseFinalPrice, instructorInclude, transformCourse, transformEnrollment } from '../utils/transform.util';
 import { EmailService } from '../email/email.service';
 
 @Injectable()
@@ -275,13 +275,14 @@ export class StudentService {
     // Send enrollment confirmation email (non-blocking)
     if (user?.email) {
       console.log(`📧 Sending enrollment confirmation email to ${user.email} for course: ${course.title}`);
+      const finalCoursePrice = getCourseFinalPrice(course);
       this.emailService.sendCourseEnrollmentConfirmation(
         user.email,
         user.name || 'Student',
         course.title,
         course.slug,
         instructorName,
-        course.price === 0,
+        finalCoursePrice === 0,
       ).then((sent) => {
         if (sent) {
           console.log(`✅ Enrollment confirmation email sent successfully to ${user.email}`);
