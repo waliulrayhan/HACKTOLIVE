@@ -285,7 +285,7 @@ NODE_ENV=development
 API_PREFIX=api/v1
 
 # Frontend URL (for CORS)
-FRONTEND_URL=http://localhost:3000,http://10.200.200.169:3000
+FRONTEND_URL=http://localhost:3000,http://192.168.0.166:3000
 ```
 
 ### Frontend (.env.local)

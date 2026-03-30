@@ -60,7 +60,7 @@ export default function AllCoursesPage() {
   const [selectedTiers, setSelectedTiers] = useState<string[]>([]);
   const [selectedDeliveryModes, setSelectedDeliveryModes] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(10000);
+  const [maxPrice, setMaxPrice] = useState(100000);
   const [sortBy, setSortBy] = useState("popular");
   const [currentPage, setCurrentPage] = useState(1);
   const coursesPerPage = 12;
@@ -152,7 +152,7 @@ export default function AllCoursesPage() {
     setSelectedTiers([]);
     setSelectedDeliveryModes([]);
     setMinPrice(0);
-    setMaxPrice(10000);
+    setMaxPrice(100000);
     setSearchQuery("");
     setCurrentPage(1);
   };
@@ -207,11 +207,11 @@ export default function AllCoursesPage() {
                 type="number"
                 value={maxPrice}
                 onChange={(e) => {
-                  const val = parseInt(e.target.value) || 10000;
+                  const val = parseInt(e.target.value) || 100000;
                   setMaxPrice(Math.max(val, minPrice));
                 }}
                 min={minPrice}
-                max={100000}
+                max={1000000000}
                 focusBorderColor="primary.500"
               />
             </InputGroup>
@@ -227,7 +227,7 @@ export default function AllCoursesPage() {
                 setMaxPrice(val[1]);
               }}
               min={0}
-              max={10000}
+              max={100000}
               step={100}
               colorScheme="primary"
             >

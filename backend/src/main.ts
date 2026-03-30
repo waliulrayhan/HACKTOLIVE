@@ -30,7 +30,7 @@ async function bootstrap() {
   // Enable CORS for frontend - support multiple origins
   const allowedOrigins = process.env.FRONTEND_URL 
     ? process.env.FRONTEND_URL.split(',')
-    : ['http://localhost:3000', 'http://10.200.200.169:3000'];
+    : ['http://localhost:3000', 'http://192.168.0.166:3000'];
   
   app.enableCors({
     origin: allowedOrigins,
@@ -72,7 +72,7 @@ async function bootstrap() {
     console.log(`🚀 Application is running on port: ${port}`);
   } else {
     console.log(`🚀 Application is running on: http://localhost:${port}`);
-    console.log(`🌐 Network: http://10.200.200.169:${port}`);
+    console.log(`🌐 Network: http://192.168.0.166:${port}`);
   }
 }
 bootstrap();
