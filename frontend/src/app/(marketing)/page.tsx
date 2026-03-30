@@ -104,6 +104,7 @@ import testimonials from '@/lib/config/data/testimonials'
 import { Course } from '@/types/academy'
 import academyService from '@/lib/academy-service'
 import SimpleCourseCard from '@/components/academy/SimpleCourseCard'
+import { prioritizeCourses } from '@/lib/course-priority'
 import { Blog } from '@/types/blog'
 
 const Home: NextPage = () => {
@@ -690,7 +691,9 @@ const AcademyProgramsSection = () => {
       try {
         // Fetch published courses and limit to 3
         const allCourses = await academyService.getCourses()
-        const publishedCourses = allCourses.filter((c) => c.status === 'published').slice(0, 3)
+        const publishedCourses = prioritizeCourses(
+          allCourses.filter((c) => c.status === 'published')
+        ).slice(0, 3)
         setCourses(publishedCourses)
       } catch (error) {
         console.error('Error fetching courses:', error)
@@ -755,7 +758,7 @@ const AcademyProgramsSection = () => {
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={{ base: '6', md: '6' }} width="100%">
               {courses.map((course, index) => (
                 <FallInPlace key={course.id} delay={0.1 * index}>
-                  <SimpleCourseCard course={course} />
+                  <SimpleCourseCard course={course} showPriorityBadge />
                 </FallInPlace>
               ))}
             </SimpleGrid>

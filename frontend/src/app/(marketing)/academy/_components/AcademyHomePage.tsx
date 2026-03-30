@@ -42,6 +42,7 @@ import {
 import { Course } from "@/types/academy";
 import academyService from "@/lib/academy-service";
 import { getFullImageUrl } from "@/lib/image-utils";
+import { prioritizeCourses } from "@/lib/course-priority";
 import { useAuth } from "@/context/AuthContext";
 
 export default function AcademyHomePage() {
@@ -77,7 +78,9 @@ export default function AcademyHomePage() {
         ]);
 
         // Filter only PUBLISHED courses
-        const publishedCourses = allCourses.filter((c) => c.status === "published");
+        const publishedCourses = prioritizeCourses(
+          allCourses.filter((c) => c.status === "published")
+        );
         setCourses(publishedCourses);
 
         // Filter free and premium courses from published courses only
@@ -434,6 +437,7 @@ export default function AcademyHomePage() {
                     <CourseCard
                       course={course}
                       isEnrolled={enrolledCourseIds.includes(course.id)}
+                      showPriorityBadge
                     />
                   </FallInPlace>
                 ))
@@ -499,6 +503,7 @@ export default function AcademyHomePage() {
                     <CourseCard
                       course={course}
                       isEnrolled={enrolledCourseIds.includes(course.id)}
+                      showPriorityBadge
                     />
                   </FallInPlace>
                 ))

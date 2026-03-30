@@ -4,15 +4,17 @@ import { Box, Badge, HStack, VStack, Text, Image, useColorModeValue, Flex, Icon 
 import { ButtonLink } from "@/components/shared/button-link/button-link";
 import { Course } from "@/types/academy";
 import { getDiscountPercentage, getFinalPrice, getOriginalPrice, hasDiscount } from "@/lib/course-pricing";
+import { getCoursePrioritySerial } from "@/lib/course-priority";
 import { FiStar, FiUsers, FiClock, FiBook, FiArrowRight, FiVideo, FiPlay } from "react-icons/fi";
 
 interface CourseCardProps {
   course: Course;
   variant?: "default" | "compact";
   isEnrolled?: boolean;
+  showPriorityBadge?: boolean;
 }
 
-export default function CourseCard({ course, variant = "default", isEnrolled = false }: CourseCardProps) {
+export default function CourseCard({ course, variant = "default", isEnrolled = false, showPriorityBadge = false }: CourseCardProps) {
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const hoverBorderColor = useColorModeValue("green.500", "green.400");
@@ -20,6 +22,7 @@ export default function CourseCard({ course, variant = "default", isEnrolled = f
   const finalPrice = getFinalPrice(course);
   const discounted = hasDiscount(course);
   const discountPercentage = Math.round(getDiscountPercentage(course));
+  const prioritySerial = showPriorityBadge ? getCoursePrioritySerial(course.title) : null;
   
   const formatDuration = (number) => {
     return `${number}h`;
@@ -93,6 +96,23 @@ export default function CourseCard({ course, variant = "default", isEnrolled = f
         >
           {course.level}
         </Badge>
+
+        {prioritySerial && (
+          <Badge
+            position="absolute"
+            bottom="3"
+            right="3"
+            colorScheme="orange"
+            fontSize="10px"
+            fontWeight="bold"
+            textTransform="uppercase"
+            letterSpacing="wide"
+            px="2"
+            py="1"
+          >
+            Featured #{prioritySerial}
+          </Badge>
+        )}
         
         {/* Delivery Mode Badge */}
         {course.deliveryMode === "live" && (

@@ -48,6 +48,7 @@ import {
 } from "react-icons/fi";
 import academyService from "@/lib/academy-service";
 import { getFullImageUrl } from "@/lib/image-utils";
+import { prioritizeCourses } from "@/lib/course-priority";
 
 interface InstructorProfilePageProps {
   id: string;
@@ -75,8 +76,8 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
 
         // Fetch all courses and filter by instructor
         const allCourses = await academyService.getCourses();
-        const instructorCourses = allCourses.filter(
-          (course) => course.instructor?.id === id
+        const instructorCourses = prioritizeCourses(
+          allCourses.filter((course) => course.instructor?.id === id)
         );
         setCourses(instructorCourses);
 
@@ -361,7 +362,7 @@ export default function InstructorProfilePage({ id }: InstructorProfilePageProps
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
               {courses.map((course, index) => (
                 <FallInPlace key={course.id} delay={0.05 * index}>
-                  <CourseCard course={course} />
+                  <CourseCard course={course} showPriorityBadge />
                 </FallInPlace>
               ))}
             </SimpleGrid>

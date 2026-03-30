@@ -48,6 +48,7 @@ import SearchBar from "@/components/academy/SearchBar";
 import { EmptyState } from "@/components/academy/UIStates";
 import { Course } from "@/types/academy";
 import academyService from "@/lib/academy-service";
+import { prioritizeCourses } from "@/lib/course-priority";
 import { useAuth } from "@/context/AuthContext";
 
 export default function AllCoursesPage() {
@@ -86,7 +87,7 @@ export default function AllCoursesPage() {
           maxPrice: maxPrice,
           sortBy: sortBy,
         });
-        setCourses(allCourses);
+        setCourses(prioritizeCourses(allCourses));
         setCurrentPage(1); // Reset to first page when filters change
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -139,7 +140,7 @@ export default function AllCoursesPage() {
   const filteredCourses = courses;
 
   // Sorting is also handled by backend
-  const sortedCourses = filteredCourses;
+  const sortedCourses = prioritizeCourses(filteredCourses);
 
   // Pagination
   const totalPages = Math.ceil(sortedCourses.length / coursesPerPage);
@@ -548,6 +549,7 @@ export default function AllCoursesPage() {
                           <CourseCard
                             course={course}
                             isEnrolled={enrolledCourseIds.includes(course.id)}
+                            showPriorityBadge
                           />
                         </FallInPlace>
                       ))}

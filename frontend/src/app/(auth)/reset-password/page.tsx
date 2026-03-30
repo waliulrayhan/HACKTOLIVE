@@ -115,21 +115,22 @@ const ResetPassword: NextPage = () => {
     }
   }
   const handleResendOtp = async () => {
-    if (!userId) {
-      toast.error('Session expired', {
-        description: 'Please start the password reset process again.',
-        duration: 4000,
-      })
-      setStep('email')
-      return
-    }
-
     setIsLoading(true)
     setOtp('')
     setErrors({ email: '', otp: '', password: '', confirmPassword: '' })
 
     try {
-      await authService.resendOtp(userId, 'PASSWORD_RESET')
+      if (userId) {
+        await authService.resendOtp(userId, 'PASSWORD_RESET')
+      } else if (email) {
+        const response = await authService.forgotPassword(email)
+        if (response?.userId) {
+          setUserId(response.userId)
+        }
+      } else {
+        throw new Error('Session expired. Please start the password reset process again.')
+      }
+
       toast.success('Code resent successfully!', {
         description: 'Please check your email for the new verification code.',
         duration: 3000,

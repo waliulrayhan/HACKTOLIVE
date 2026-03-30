@@ -307,6 +307,7 @@ export class AuthService {
 
     return {
       message: 'Password reset OTP sent to your email.',
+      userId: user.id,
       email: user.email,
     };
   }
@@ -316,6 +317,7 @@ export class AuthService {
       email,
       code,
       'PASSWORD_RESET',
+      false,
     );
 
     if (!valid || !userId) {

@@ -144,6 +144,7 @@ export class OtpService {
     email: string,
     code: string,
     type: OtpType,
+    consume = true,
   ): Promise<{ valid: boolean; userId?: string }> {
     const user = await this.prisma.user.findUnique({
       where: { email },
@@ -153,7 +154,31 @@ export class OtpService {
       return { valid: false };
     }
 
-    const isValid = await this.verifyOtp(user.id, code, type);
+    const otp = await this.prisma.otp.findFirst({
+      where: {
+        userId: user.id,
+        code,
+        type,
+        used: false,
+        expiresAt: {
+          gte: new Date(),
+        },
+      },
+    });
+
+    if (!otp) {
+      return { valid: false, userId: user.id };
+    }
+
+    if (consume) {
+      // Mark OTP as used only when the caller is executing a terminal action.
+      await this.prisma.otp.update({
+        where: { id: otp.id },
+        data: { used: true },
+      });
+    }
+
+    const isValid = true;
     return { valid: isValid, userId: user.id };
   }
 
