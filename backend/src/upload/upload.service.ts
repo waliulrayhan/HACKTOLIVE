@@ -20,6 +20,8 @@ export class UploadService {
       path.join(this.uploadPath, 'images'),
       path.join(this.uploadPath, 'documents'),
       path.join(this.uploadPath, 'resumes'),
+      path.join(this.uploadPath, 'certificates'),
+      path.join(this.uploadPath, 'certificate-templates'),
     ];
 
     dirs.forEach((dir) => {

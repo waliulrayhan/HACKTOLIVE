@@ -42,18 +42,23 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Install only production dependencies and generate Prisma Client
-RUN npm ci --only=production --legacy-peer-deps && \
+RUN npm ci --omit=dev --legacy-peer-deps && \
     npx prisma generate && \
     npm cache clean --force
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
 
-# Create uploads directory with full permissions
-RUN mkdir -p /app/uploads/avatars /app/uploads/documents /app/uploads/images /app/uploads/resumes /app/uploads/certificates /app/uploads/certificate-templates && \
-    chmod -R 777 /app/uploads && \
-    chown -R node:node /app/uploads && \
-    chown -R node:node /app/node_modules
+# Create upload directories and assign ownership to node user.
+# Avoid recursive chown on node_modules because it makes image builds very slow.
+RUN install -d -o node -g node \
+    /app/uploads \
+    /app/uploads/avatars \
+    /app/uploads/documents \
+    /app/uploads/images \
+    /app/uploads/resumes \
+    /app/uploads/certificates \
+    /app/uploads/certificate-templates
 
 # Use non-root user
 USER node
