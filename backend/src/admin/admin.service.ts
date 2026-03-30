@@ -925,4 +925,108 @@ export class AdminService {
         : '0',
     };
   }
+
+  // Notice Management Methods
+  async getAllNotices() {
+    return this.prisma.notice.findMany({
+      orderBy: [
+        { sortOrder: 'asc' },
+        { createdAt: 'desc' },
+      ],
+    });
+  }
+
+  async getActiveNotices() {
+    return this.prisma.notice.findMany({
+      where: {
+        isActive: true,
+      },
+      orderBy: [
+        { sortOrder: 'asc' },
+        { createdAt: 'desc' },
+      ],
+    });
+  }
+
+  async getLatestActiveNotice() {
+    return this.prisma.notice.findFirst({
+      where: {
+        isActive: true,
+      },
+      orderBy: [
+        { sortOrder: 'asc' },
+        { createdAt: 'desc' },
+      ],
+    });
+  }
+
+  async createNotice(data: {
+    title?: string;
+    message: string;
+    linkUrl?: string;
+    isActive?: boolean;
+    sortOrder?: number;
+  }) {
+    const message = data.message?.trim();
+    if (!message) {
+      throw new Error('Message is required');
+    }
+
+    return this.prisma.notice.create({
+      data: {
+        title: data.title?.trim() || null,
+        message,
+        linkUrl: data.linkUrl?.trim() || null,
+        isActive: data.isActive ?? true,
+        sortOrder: data.sortOrder ?? 0,
+      },
+    });
+  }
+
+  async updateNotice(
+    id: string,
+    data: {
+      title?: string;
+      message?: string;
+      linkUrl?: string;
+      isActive?: boolean;
+      sortOrder?: number;
+    },
+  ) {
+    const updateData: any = {
+      ...data,
+    };
+
+    if (data.title !== undefined) {
+      updateData.title = data.title.trim() || null;
+    }
+
+    if (data.message !== undefined) {
+      const message = data.message.trim();
+      if (!message) {
+        throw new Error('Message cannot be empty');
+      }
+      updateData.message = message;
+    }
+
+    if (data.linkUrl !== undefined) {
+      updateData.linkUrl = data.linkUrl.trim() || null;
+    }
+
+    return this.prisma.notice.update({
+      where: { id },
+      data: updateData,
+    });
+  }
+
+  async deleteNotice(id: string) {
+    await this.prisma.notice.delete({
+      where: { id },
+    });
+
+    return {
+      success: true,
+      message: 'Notice deleted successfully',
+    };
+  }
 }

@@ -106,6 +106,7 @@ import academyService from '@/lib/academy-service'
 import SimpleCourseCard from '@/components/academy/SimpleCourseCard'
 import { prioritizeCourses } from '@/lib/course-priority'
 import { Blog } from '@/types/blog'
+import { MainNoticeTicker } from './_components/notices/MainNoticeTicker'
 
 const Home: NextPage = () => {
   return (
@@ -162,6 +163,10 @@ const HeroSection: React.FC = () => {
       overflow="hidden"
       height="100vh"
     >
+      <Box position="absolute" top="0" left="0" right="0" zIndex="3">
+        <MainNoticeTicker />
+      </Box>
+
       {/* Background Video */}
       <Box
         position="absolute"
@@ -206,7 +211,7 @@ const HeroSection: React.FC = () => {
 
       <Container
         maxW="container.xl"
-        pt={{ base: '80px', md: '140px', lg: '180px' }}
+        pt={{ base: '120px', md: '170px', lg: '210px' }}
         pb={{ base: '60px', md: '80px', lg: '100px' }}
         height="100%"
         display="flex"

@@ -21,7 +21,7 @@ import {
   VideoIcon,
   UserIcon,
 } from "@/icons/index";
-import { FiShoppingCart, FiDollarSign, FiBook, FiMail, FiSend, FiBriefcase, FiFileText } from "react-icons/fi";
+import { FiShoppingCart, FiDollarSign, FiBook, FiMail, FiSend, FiBriefcase, FiFileText, FiBell } from "react-icons/fi";
 
 export default function DashboardLayout({
   children,
@@ -133,6 +133,11 @@ export default function DashboardLayout({
             icon: <FiMail className="w-5 h-5" />,
             name: "Contact Messages",
             path: "/admin/contacts",
+          },
+          {
+            icon: <FiBell className="w-5 h-5" />,
+            name: "Notices",
+            path: "/admin/notices",
           },
           {
             icon: <FiMail className="w-5 h-5" />,

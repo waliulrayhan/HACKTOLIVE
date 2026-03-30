@@ -254,4 +254,48 @@ export class AdminController {
   getNewsletterStats() {
     return this.adminService.getNewsletterStats();
   }
+
+  // Notice Management
+  @Get('notices')
+  @ApiOperation({ summary: 'Get all notices (Admin only)' })
+  getAllNotices() {
+    return this.adminService.getAllNotices();
+  }
+
+  @Post('notices')
+  @ApiOperation({ summary: 'Create a notice (Admin only)' })
+  createNotice(
+    @Body()
+    data: {
+      title?: string;
+      message: string;
+      linkUrl?: string;
+      isActive?: boolean;
+      sortOrder?: number;
+    },
+  ) {
+    return this.adminService.createNotice(data);
+  }
+
+  @Patch('notices/:id')
+  @ApiOperation({ summary: 'Update a notice (Admin only)' })
+  updateNotice(
+    @Param('id') id: string,
+    @Body()
+    data: {
+      title?: string;
+      message?: string;
+      linkUrl?: string;
+      isActive?: boolean;
+      sortOrder?: number;
+    },
+  ) {
+    return this.adminService.updateNotice(id, data);
+  }
+
+  @Delete('notices/:id')
+  @ApiOperation({ summary: 'Delete a notice (Admin only)' })
+  deleteNotice(@Param('id') id: string) {
+    return this.adminService.deleteNotice(id);
+  }
 }

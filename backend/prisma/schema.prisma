@@ -777,6 +777,21 @@ model Contact {
   @@index([createdAt])
 }
 
+model Notice {
+  id        String   @id @default(uuid())
+  title     String?  @db.VarChar(255)
+  message   String   @db.VarChar(1000)
+  linkUrl   String?  @db.VarChar(500)
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([sortOrder])
+  @@index([createdAt])
+}
+
 enum ContactStatus {
   PENDING
   REPLIED
