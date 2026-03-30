@@ -269,21 +269,39 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
     return (
       <Container maxW="container.xl" py="20">
         <Center>
-          <VStack spacing="6" align="center">
-            <Icon as={FiClock} boxSize="16" color="orange.500" />
-            <Heading size="lg">Coming Soon</Heading>
-            <Text color="muted" maxW="md" textAlign="center">
-              Enrollment for this course is not open yet. Please check back later.
-            </Text>
-            <HStack spacing="4">
-              <ButtonLink href={`/academy/courses/${slug}`} colorScheme="primary" size="lg">
+          <Box
+            w="full"
+            maxW="2xl"
+            borderWidth="1px"
+            borderColor={useColorModeValue("orange.200", "orange.700")}
+            bg={useColorModeValue("orange.50", "orange.900")}
+            borderRadius="2xl"
+            px={{ base: "6", md: "10" }}
+            py={{ base: "8", md: "10" }}
+            boxShadow="sm"
+          >
+            <VStack spacing="6" align="center">
+              <Box
+                p="4"
+                borderRadius="full"
+                bg={useColorModeValue("orange.100", "orange.800")}
+              >
+                <Icon as={FiClock} boxSize="10" color={useColorModeValue("orange.700", "orange.200")} />
+              </Box>
+              <Heading size="lg" textAlign="center">Course Enrollment Coming Soon</Heading>
+              <Text color="muted" maxW="lg" textAlign="center">
+                This course is visible for preview, but enrollment is currently closed. You can review all details now and join once registration opens.
+              </Text>
+              <HStack spacing="4" flexWrap="wrap" justify="center">
+                <ButtonLink href={`/academy/courses/${slug}`} colorScheme="orange" size="lg">
                 View Course Details
               </ButtonLink>
-              <ButtonLink href="/academy/courses" variant="outline" colorScheme="primary" size="lg">
+              <ButtonLink href="/academy/courses" variant="outline" colorScheme="orange" size="lg">
                 Browse Courses
               </ButtonLink>
-            </HStack>
-          </VStack>
+              </HStack>
+            </VStack>
+          </Box>
         </Center>
       </Container>
     );

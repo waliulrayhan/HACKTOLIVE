@@ -271,10 +271,16 @@ export default function CourseCard({ course, variant = "default", isEnrolled = f
             </ButtonLink>
           ) : isComingSoon ? (
             <Button
-              colorScheme="gray"
+              colorScheme="orange"
               size={variant === "compact" ? "sm" : "md"}
               rightIcon={<Icon as={FiArrowRight} boxSize="14px" />}
               isDisabled
+              _disabled={{
+                opacity: 1,
+                bg: useColorModeValue("orange.100", "orange.700"),
+                color: useColorModeValue("orange.800", "orange.100"),
+                cursor: "not-allowed",
+              }}
               onClick={(event) => event.stopPropagation()}
             >
               {ctaLabel}

@@ -73,6 +73,9 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
 
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
+  const comingSoonNoticeBg = useColorModeValue("orange.50", "orange.900");
+  const comingSoonNoticeBorder = useColorModeValue("orange.200", "orange.700");
+  const comingSoonNoticeText = useColorModeValue("orange.800", "orange.100");
   const finalPrice = course ? getFinalPrice(course) : 0;
   const isComingSoon = course?.ctaText === "COMING_SOON";
   
@@ -252,6 +255,11 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   <Badge colorScheme="cyan" fontSize="xs" px="2" py="1" borderRadius="md">
                     {course.category}
                   </Badge>
+                  {isComingSoon && (
+                    <Badge colorScheme="orange" fontSize="xs" px="2" py="1" borderRadius="md">
+                      COMING SOON
+                    </Badge>
+                  )}
                 </HStack>
 
                 <Heading 
@@ -310,10 +318,16 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   ) : (
                     isComingSoon ? (
                       <Button
-                        colorScheme="gray"
+                        colorScheme="orange"
                         size={{ base: "md", md: "lg" }}
                         width={{ base: "100%", sm: "auto" }}
                         isDisabled
+                        leftIcon={<Icon as={FiClock} />}
+                        _disabled={{
+                          opacity: 1,
+                          bg: useColorModeValue("orange.100", "orange.700"),
+                          color: useColorModeValue("orange.900", "orange.100"),
+                        }}
                       >
                         Coming Soon
                       </Button>
@@ -338,6 +352,26 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                     View Curriculum
                   </Button>
                 </Flex>
+
+                {isComingSoon && (
+                  <Box
+                    mt="1"
+                    px="4"
+                    py="3"
+                    borderWidth="1px"
+                    borderColor={comingSoonNoticeBorder}
+                    bg={comingSoonNoticeBg}
+                    borderRadius="lg"
+                    width="100%"
+                  >
+                    <HStack spacing="2" color={comingSoonNoticeText}>
+                      <Icon as={FiClock} boxSize="4" />
+                      <Text fontSize="sm" fontWeight="medium">
+                        Enrollment is not open yet. You can still explore full course details and curriculum.
+                      </Text>
+                    </HStack>
+                  </Box>
+                )}
                 </VStack>
               </FallInPlace>
             </Box>
