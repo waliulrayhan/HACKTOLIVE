@@ -1,6 +1,7 @@
 "use client";
 
-import { Box, Badge, HStack, VStack, Text, Image, useColorModeValue, Flex, Icon } from "@chakra-ui/react";
+import { Box, Badge, HStack, VStack, Text, Image, useColorModeValue, Flex, Icon, Button } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
 import { ButtonLink } from "@/components/shared/button-link/button-link";
 import { Course } from "@/types/academy";
 import { getDiscountPercentage, getFinalPrice, getOriginalPrice, hasDiscount } from "@/lib/course-pricing";
@@ -15,6 +16,7 @@ interface CourseCardProps {
 }
 
 export default function CourseCard({ course, variant = "default", isEnrolled = false, showPriorityBadge = false }: CourseCardProps) {
+  const router = useRouter();
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const hoverBorderColor = useColorModeValue("green.500", "green.400");
@@ -23,6 +25,9 @@ export default function CourseCard({ course, variant = "default", isEnrolled = f
   const discounted = hasDiscount(course);
   const discountPercentage = Math.round(getDiscountPercentage(course));
   const prioritySerial = showPriorityBadge ? getCoursePrioritySerial(course.title) : null;
+  const isComingSoon = course.ctaText === "COMING_SOON";
+  const ctaLabel = isComingSoon ? "Coming Soon" : "Enroll Now";
+  const detailsHref = `/academy/courses/${course.slug}`;
   
   const formatDuration = (number) => {
     return `${number}h`;
@@ -50,6 +55,16 @@ export default function CourseCard({ course, variant = "default", isEnrolled = f
       h="full"
       display="flex"
       flexDirection="column"
+      cursor="pointer"
+      role="link"
+      tabIndex={0}
+      onClick={() => router.push(detailsHref)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          router.push(detailsHref);
+        }
+      }}
     >
       {/* Thumbnail */}
       <Box position="relative" aspectRatio="2/1">
@@ -250,17 +265,29 @@ export default function CourseCard({ course, variant = "default", isEnrolled = f
               colorScheme="green"
               size={variant === "compact" ? "sm" : "md"}
               rightIcon={<Icon as={FiPlay} boxSize="14px" />}
+              onClick={(event) => event.stopPropagation()}
             >
               Continue Learning
             </ButtonLink>
+          ) : isComingSoon ? (
+            <Button
+              colorScheme="gray"
+              size={variant === "compact" ? "sm" : "md"}
+              rightIcon={<Icon as={FiArrowRight} boxSize="14px" />}
+              isDisabled
+              onClick={(event) => event.stopPropagation()}
+            >
+              {ctaLabel}
+            </Button>
           ) : (
             <ButtonLink
-              href={`/academy/courses/${course.slug}`}
+              href={detailsHref}
               colorScheme="primary"
               size={variant === "compact" ? "sm" : "md"}
               rightIcon={<Icon as={FiArrowRight} boxSize="14px" />}
+              onClick={(event) => event.stopPropagation()}
             >
-              Enroll Now
+              {ctaLabel}
             </ButtonLink>
           )}
         </HStack>

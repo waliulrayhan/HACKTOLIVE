@@ -98,6 +98,21 @@ export class InstructorController {
     return normalized;
   }
 
+  private normalizeCourseCtaText(input: any, existingCourse?: any) {
+    const normalized = { ...input };
+    const allowedCta = new Set(['ENROLL_NOW', 'COMING_SOON']);
+
+    const rawValue = (normalized.ctaText ?? existingCourse?.ctaText ?? 'ENROLL_NOW') as string;
+    const ctaText = String(rawValue).toUpperCase().trim();
+
+    if (!allowedCta.has(ctaText)) {
+      throw new BadRequestException('Invalid CTA text. Allowed values: ENROLL_NOW, COMING_SOON');
+    }
+
+    normalized.ctaText = ctaText;
+    return normalized;
+  }
+
   @Get('dashboard')
   async getDashboard(@Request() req: any) {
     let instructor = await this.prisma.instructor.findUnique({
@@ -361,10 +376,11 @@ export class InstructorController {
     }
 
     const normalizedPricingData = this.normalizeAndValidateCoursePricing(courseData);
+    const normalizedCourseData = this.normalizeCourseCtaText(normalizedPricingData);
 
     // Prepare the course creation data with proper nested structure
     const createData: any = {
-      ...normalizedPricingData,
+      ...normalizedCourseData,
       instructor: {
         connect: { id: instructor.id },
       },
@@ -467,10 +483,11 @@ export class InstructorController {
     }
 
     const normalizedPricingData = this.normalizeAndValidateCoursePricing(processedData, course);
+    const normalizedCourseData = this.normalizeCourseCtaText(normalizedPricingData, course);
 
     return this.prisma.course.update({
       where: { id: courseId },
-      data: normalizedPricingData,
+      data: normalizedCourseData,
     });
   }
 

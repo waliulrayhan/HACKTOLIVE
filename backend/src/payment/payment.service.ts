@@ -58,6 +58,10 @@ export class PaymentService {
           throw new NotFoundException('Course not found');
         }
 
+        if ((course as any).ctaText === 'COMING_SOON') {
+          throw new BadRequestException('Enrollment is not open yet for this course');
+        }
+
         const finalCoursePrice = getCourseFinalPrice(course);
 
         if (finalCoursePrice === 0) {

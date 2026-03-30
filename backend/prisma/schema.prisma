@@ -103,6 +103,7 @@ model Course {
   maxStudents      Int?
   enrolledStudents Int            @default(0)
   meetingLink      String?        @db.VarChar(500)
+  ctaText          CourseCtaText  @default(ENROLL_NOW)
   status           CourseStatus   @default(DRAFT)
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
@@ -512,6 +513,11 @@ enum CourseStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
+}
+
+enum CourseCtaText {
+  ENROLL_NOW
+  COMING_SOON
 }
 
 enum LessonType {

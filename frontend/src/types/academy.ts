@@ -14,6 +14,7 @@ export type CourseCategory =
   | "security-fundamentals";
 
 export type CourseStatus = "draft" | "published" | "archived";
+export type CourseCtaText = "ENROLL_NOW" | "COMING_SOON";
 export type EnrollmentStatus = "active" | "completed" | "dropped";
 export type LessonType = "video" | "article" | "quiz" | "assignment";
 
@@ -112,6 +113,7 @@ export interface Course {
   maxStudents?: number;
   enrolledStudents?: number;
   meetingLink?: string;
+  ctaText?: CourseCtaText;
   status: CourseStatus;
   createdAt: string;
   updatedAt: string;

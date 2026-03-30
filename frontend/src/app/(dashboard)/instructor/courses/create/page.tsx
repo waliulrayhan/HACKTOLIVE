@@ -71,6 +71,7 @@ export default function CreateCoursePage() {
     level: "",
     tier: "",
     deliveryMode: "",
+    ctaText: "ENROLL_NOW",
     price: 0,
     discountedPrice: 0,
     discountPercentage: 0,
@@ -429,6 +430,7 @@ export default function CreateCoursePage() {
         level: formData.level,
         tier: formData.tier,
         deliveryMode: formData.deliveryMode,
+        ctaText: formData.ctaText,
         price: parseFloat(formData.price.toString()),
         discountedPrice:
           formData.tier === 'PREMIUM' && formData.discountedPrice > 0
@@ -829,6 +831,25 @@ export default function CreateCoursePage() {
                   />
                 </div>
                 {errors.duration && <p className="mt-1.5 text-xs text-red-500">{errors.duration}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Course CTA Button
+                </label>
+                <select
+                  name="ctaText"
+                  value={formData.ctaText}
+                  onChange={handleInputChange}
+                  className="w-full h-10 rounded-lg border border-gray-300 px-3 py-2 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_16px]"
+                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
+                >
+                  <option value="ENROLL_NOW">Enroll Now</option>
+                  <option value="COMING_SOON">Coming Soon</option>
+                </select>
+                <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                  This text will be shown on the public course card button.
+                </p>
               </div>
               </div>
             </div>
@@ -1431,6 +1452,12 @@ export default function CreateCoursePage() {
                     <div>
                       <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Delivery Mode</dt>
                       <dd className="font-medium text-gray-900 dark:text-white capitalize">{formData.deliveryMode.toLowerCase()}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Course CTA</dt>
+                      <dd className="font-medium text-gray-900 dark:text-white">
+                        {formData.ctaText === 'COMING_SOON' ? 'Coming Soon' : 'Enroll Now'}
+                      </dd>
                     </div>
                     <div>
                       <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Duration</dt>

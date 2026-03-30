@@ -198,6 +198,10 @@ export class StudentService {
       throw new BadRequestException('Course is not available for enrollment');
     }
 
+    if ((course as any).ctaText === 'COMING_SOON') {
+      throw new BadRequestException('Enrollment is not available yet for this course');
+    }
+
     // For LIVE courses, check capacity
     if (course.deliveryMode === 'LIVE' && course.maxStudents) {
       if (course.enrolledStudents >= course.maxStudents) {

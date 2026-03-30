@@ -74,6 +74,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const finalPrice = course ? getFinalPrice(course) : 0;
+  const isComingSoon = course?.ctaText === "COMING_SOON";
   
   const { user } = useAuth();
 
@@ -307,14 +308,25 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                       Continue Learning
                     </ButtonLink>
                   ) : (
-                    <ButtonLink 
-                      href={`/academy/enroll/${course.slug}`} 
-                      colorScheme="primary" 
-                      size={{ base: "md", md: "lg" }}
-                      width={{ base: "100%", sm: "auto" }}
-                    >
-                      {course.tier === "premium" ? `Enroll Now - ${finalPrice} Tk` : "Start Free Course"}
-                    </ButtonLink>
+                    isComingSoon ? (
+                      <Button
+                        colorScheme="gray"
+                        size={{ base: "md", md: "lg" }}
+                        width={{ base: "100%", sm: "auto" }}
+                        isDisabled
+                      >
+                        Coming Soon
+                      </Button>
+                    ) : (
+                      <ButtonLink 
+                        href={`/academy/enroll/${course.slug}`} 
+                        colorScheme="primary" 
+                        size={{ base: "md", md: "lg" }}
+                        width={{ base: "100%", sm: "auto" }}
+                      >
+                        {course.tier === "premium" ? `Enroll Now - ${finalPrice} Tk` : "Start Free Course"}
+                      </ButtonLink>
+                    )
                   )}
                   <Button 
                     onClick={scrollToCurriculum} 

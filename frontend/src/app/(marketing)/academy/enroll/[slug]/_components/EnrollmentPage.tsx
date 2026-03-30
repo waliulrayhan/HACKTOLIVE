@@ -145,6 +145,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
   const discounted = course ? hasDiscount(course) : false;
   const discountPercentage = course ? Math.round(getDiscountPercentage(course)) : 0;
   const isFree = finalPrice === 0;
+  const isComingSoon = course?.ctaText === "COMING_SOON";
   const isLoggedIn = !authLoading && !!user;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -152,6 +153,13 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
 
     if (!course) {
       toast.error("Course not found");
+      return;
+    }
+
+    if (isComingSoon) {
+      toast.error("Enrollment is not available yet", {
+        description: "This course is marked as Coming Soon.",
+      });
       return;
     }
 
@@ -251,6 +259,30 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
             <ButtonLink href="/academy/courses" colorScheme="primary">
               Browse All Courses
             </ButtonLink>
+          </VStack>
+        </Center>
+      </Container>
+    );
+  }
+
+  if (isComingSoon) {
+    return (
+      <Container maxW="container.xl" py="20">
+        <Center>
+          <VStack spacing="6" align="center">
+            <Icon as={FiClock} boxSize="16" color="orange.500" />
+            <Heading size="lg">Coming Soon</Heading>
+            <Text color="muted" maxW="md" textAlign="center">
+              Enrollment for this course is not open yet. Please check back later.
+            </Text>
+            <HStack spacing="4">
+              <ButtonLink href={`/academy/courses/${slug}`} colorScheme="primary" size="lg">
+                View Course Details
+              </ButtonLink>
+              <ButtonLink href="/academy/courses" variant="outline" colorScheme="primary" size="lg">
+                Browse Courses
+              </ButtonLink>
+            </HStack>
           </VStack>
         </Center>
       </Container>
