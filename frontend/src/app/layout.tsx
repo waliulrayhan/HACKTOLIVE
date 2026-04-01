@@ -92,22 +92,19 @@ export default function RootLayout({
       <head>
         <link
           rel="apple-touch-icon"
-          sizes="76x76"
-          href="/static/favicons/apple-touch-icon.png"
+          sizes="180x180"
+          href="/logo.png"
         />
         <link
           rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/static/favicons/favicon-32x32.png"
+          type="image/svg+xml"
+          href="/logo.svg"
         />
         <link
           rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/static/favicons/favicon-16x16.png"
+          type="image/x-icon"
+          href="/favicon.ico"
         />
-        <link rel="manifest" href="/static/favicons/manifest.json" />
       </head>
       <body className={`${outfit.className} dark:bg-gray-900`} suppressHydrationWarning>
         <GlobalLoading />
