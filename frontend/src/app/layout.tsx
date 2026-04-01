@@ -91,19 +91,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/logo.png"
-        />
-        <link
           rel="icon"
           type="image/svg+xml"
           href="/logo.svg"
-        />
-        <link
-          rel="icon"
-          type="image/x-icon"
-          href="/favicon.ico"
         />
       </head>
       <body className={`${outfit.className} dark:bg-gray-900`} suppressHydrationWarning>
