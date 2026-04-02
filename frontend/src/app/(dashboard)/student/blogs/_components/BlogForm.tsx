@@ -719,51 +719,6 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
               </div>
             </div>
 
-            <div className="mb-3 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => insertMarkdownSnippet("## Heading\n")}
-                className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-              >
-                H2
-              </button>
-              <button
-                type="button"
-                onClick={() => insertMarkdownSnippet("**bold text**")}
-                className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-              >
-                Bold
-              </button>
-              <button
-                type="button"
-                onClick={() => insertMarkdownSnippet("*italic text*")}
-                className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-              >
-                Italic
-              </button>
-              <button
-                type="button"
-                onClick={() => insertMarkdownSnippet("- list item\n- list item\n")}
-                className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-              >
-                List
-              </button>
-              <button
-                type="button"
-                onClick={() => insertMarkdownSnippet("[link text](https://example.com)")}
-                className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-              >
-                Link
-              </button>
-              <button
-                type="button"
-                onClick={() => insertMarkdownSnippet("```bash\n# command\n```\n")}
-                className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-              >
-                Code
-              </button>
-            </div>
-
             <div className="grid gap-0 rounded-lg border border-gray-300 dark:border-gray-700 overflow-hidden grid-cols-1">
               <div className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700">
                 <div className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
@@ -778,10 +733,6 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
                 />
               </div>
             </div>
-
-            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              Markdown supports headings, lists, links, tables, fenced code blocks, and images with <span className="font-medium">![alt](url)</span>.
-            </p>
 
             {errors.content && (
               <p className="mt-2 text-xs text-red-500">{errors.content}</p>

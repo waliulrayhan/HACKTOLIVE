@@ -706,7 +706,7 @@ export default function PendingBlogsPage() {
       {/* View Modal */}
       {showViewModal && selectedBlog && (
         <div className="fixed inset-0 z-100000 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm dark:bg-black/60 dark:backdrop-blur-md">
-          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="relative bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
             {/* Close Button */}
             <button
               onClick={() => setShowViewModal(false)}
