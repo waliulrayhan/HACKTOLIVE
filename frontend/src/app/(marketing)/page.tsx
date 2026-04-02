@@ -1849,7 +1849,7 @@ const BlogSection = () => {
                     height="100%"
                     textDecoration="none"
                   >
-                    <Box position="relative" height="200px">
+                    <Box position="relative" aspectRatio={4 / 3}>
                       {post.mainImage ? (
                         <ChakraImage
                           src={post.mainImage}

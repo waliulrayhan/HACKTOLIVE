@@ -103,7 +103,7 @@ const RecommendedPosts = ({ currentBlogId }: RecommendedPostsProps) => {
                 }}
                 h="full"
               >
-                <Box position="relative" height="180px" width="100%">
+                <Box position="relative" aspectRatio={4 / 3} width="100%">
                   {post.mainImage ? (
                     <Image
                       src={imageUrl}

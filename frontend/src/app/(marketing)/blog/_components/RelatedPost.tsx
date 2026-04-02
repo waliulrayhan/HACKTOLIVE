@@ -97,7 +97,7 @@ const RelatedPost = ({ currentBlogId }: RelatedPostProps) => {
                   <Box
                     position="relative"
                     width="100px"
-                    height="60px"
+                    aspectRatio={4 / 3}
                     flexShrink={0}
                     borderRadius="md"
                     overflow="hidden"

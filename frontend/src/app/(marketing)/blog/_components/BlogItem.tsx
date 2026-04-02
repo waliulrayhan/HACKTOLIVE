@@ -113,13 +113,9 @@ const BlogItem = ({ blog }: { blog: Blog }) => {
           <Box 
             position="relative" 
             width={{ base: "100%", md: "320px" }} 
-            height={{ base: "220px", md: "100%" }}
-            minHeight={{ md: "300px" }}
+            aspectRatio={4 / 3}
             overflow="hidden"
             flexShrink="0"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
           >
             <Image 
               src={imageUrl} 

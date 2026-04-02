@@ -15,14 +15,18 @@ import {
   Wrap,
   Tag,
   Icon,
+  useColorMode,
   useColorModeValue,
   SimpleGrid,
 } from "@chakra-ui/react";
+import MarkdownPreview from "@uiw/react-markdown-preview";
+import { normalizeMarkdownForRender } from "@/lib/markdown-utils";
 import { FiCalendar, FiClock, FiUser, FiLinkedin, FiFacebook, FiInstagram } from "react-icons/fi";
 import { RiTwitterXLine } from "react-icons/ri";
 import Image from "next/image";
 import Link from "next/link";
 import { FallInPlace } from "@/components/shared/motion/fall-in-place";
+import { ButtonLink } from "@/components/shared/button-link/button-link";
 import SharePost from "./SharePost";
 import RelatedPost from "./RelatedPost";
 import CategoriesSidebar from "./CategoriesSidebar";
@@ -62,6 +66,7 @@ interface SingleBlogContentProps {
 }
 
 export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
+  const { colorMode } = useColorMode();
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
@@ -81,6 +86,7 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
         ? blog.author.avatar 
         : `${process.env.NEXT_PUBLIC_API_URL}${blog.author.avatar}`)
     : undefined;
+  const staticHeroImage = "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2000";
 
   // Format publish date
   const formattedDate = new Date(blog.publishDate).toLocaleDateString('en-US', {
@@ -91,74 +97,80 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
 
   return (
     <Box bg={bgColor} minH="100vh">
-      {/* Hero Section with Image */}
-      <Box position="relative" overflow="hidden" mb={{ base: "6", md: "8", lg: "12" }}>
-        <Box 
-          position="relative" 
-          height={{ base: "300px", sm: "450px", md: "500px", lg: "500px" }}
-          width="100%"
+      {/* Hero Section with Static Background */}
+      <Box
+        position="relative"
+        overflow="hidden"
+        mt={{ base: "14", md: "16" }}
+        mb={{ base: "6", md: "8", lg: "10" }}
+        minH={{ base: "220px", md: "280px", lg: "320px" }}
+        bgImage={`url(${staticHeroImage})`}
+        bgPosition="center"
+        bgSize="cover"
+        bgRepeat="no-repeat"
+      >
+        <Box
+          position="absolute"
+          top="0"
+          left="0"
+          right="0"
+          bottom="0"
+          bg={useColorModeValue(
+            "linear-gradient(135deg, rgba(26, 32, 44, 0.75) 0%, rgba(45, 55, 72, 0.85) 100%)",
+            "linear-gradient(135deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.88) 100%)"
+          )}
+        />
+        <Container
+          maxW="container.xl"
+          position="relative"
+          minH={{ base: "220px", md: "280px", lg: "320px" }}
+          display="flex"
+          alignItems="flex-end"
+          pb={{ base: "5", md: "7" }}
+          px={{ base: "4", sm: "6", md: "8" }}
         >
-          <Image
-            src={mainImageUrl}
-            alt={blog.title}
-            fill
-            style={{ objectFit: "cover" }}
-            priority
-          />
-          <Box
-            position="absolute"
-            top="0"
-            left="0"
-            right="0"
-            bottom="0"
-            bg="blackAlpha.600"
-          />
-          <Container 
-            maxW="container.xl" 
-            position="absolute" 
-            bottom="0" 
-            left="0" 
-            right="0"
-            pb={{ base: "6", md: "8" }}
-            px={{ base: "4", sm: "6", md: "8" }}
-          >
-            <FallInPlace>
-              <VStack align="start" spacing={{ base: "3", md: "4" }} color="white">
-                <Wrap spacing={{ base: "2", md: "3" }}>
-                  <Badge
-                    colorScheme="green"
-                    fontSize={{ base: "xs", sm: "sm", md: "md" }}
-                    px={{ base: "3", md: "4" }}
-                    py={{ base: "1", md: "2" }}
-                    borderRadius="full"
-                  >
-                    {blog.category}
-                  </Badge>
-                  <Badge
-                    colorScheme="gray"
-                    fontSize={{ base: "xs", sm: "sm", md: "md" }}
-                    px={{ base: "3", md: "4" }}
-                    py={{ base: "1", md: "2" }}
-                    borderRadius="full"
-                  >
-                    {blog.blogType.replace(/_/g, ' ')}
-                  </Badge>
-                </Wrap>
-                <Heading
-                  fontSize={{ base: "xl", sm: "2xl", md: "3xl", lg: "4xl" }}
-                  fontWeight="bold"
-                  lineHeight="1.2"
-                  textShadow="2px 2px 4px rgba(0,0,0,0.5)"
+          <FallInPlace>
+            <VStack align="start" spacing={{ base: "3", md: "4" }} color="white" maxW="container.md">
+              <Wrap spacing={{ base: "2", md: "3" }}>
+                <Badge
+                  colorScheme="green"
+                  fontSize={{ base: "xs", sm: "sm", md: "md" }}
+                  px={{ base: "3", md: "4" }}
+                  py={{ base: "1", md: "2" }}
+                  borderRadius="full"
                 >
-                  {blog.title}
-                </Heading>
-              </VStack>
-            </FallInPlace>
-          </Container>
-        </Box>
+                  {blog.category}
+                </Badge>
+                <Badge
+                  colorScheme="gray"
+                  fontSize={{ base: "xs", sm: "sm", md: "md" }}
+                  px={{ base: "3", md: "4" }}
+                  py={{ base: "1", md: "2" }}
+                  borderRadius="full"
+                >
+                  {blog.blogType.replace(/_/g, ' ')}
+                </Badge>
+              </Wrap>
+              <Heading
+                fontSize={{ base: "lg", sm: "xl", md: "2xl", lg: "3xl" }}
+                fontWeight="bold"
+                lineHeight="1.2"
+                textShadow="2px 2px 4px rgba(0,0,0,0.5)"
+              >
+                {blog.title}
+              </Heading>
+            </VStack>
+          </FallInPlace>
+        </Container>
       </Box>
 
       <Container maxW="container.xl" pb={{ base: "20", md: "24" }}>
+        <Box mb={{ base: "5", md: "6" }}>
+          <ButtonLink href="/blog" variant="link" colorScheme="primary">
+            ← Back to Blog
+          </ButtonLink>
+        </Box>
+
         <SimpleGrid columns={{ base: 1, lg: 12 }} spacing={{ base: "8", lg: "10" }}>
           {/* Sidebar */}
           <Box gridColumn={{ base: "span 1", lg: "span 3" }} order={{ base: 2, lg: 1 }}>
@@ -536,12 +548,36 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                         </Text>
                       )}
 
+                      {/* Featured Image (4:3) */}
+                      {blog.mainImage && (
+                        <Box
+                          position="relative"
+                          width="100%"
+                          aspectRatio={4 / 3}
+                          borderRadius="xl"
+                          overflow="hidden"
+                          borderWidth="1px"
+                          borderColor={borderColor}
+                        >
+                          <Image
+                            src={mainImageUrl}
+                            alt={blog.title}
+                            fill
+                            style={{ objectFit: "cover" }}
+                            sizes="(max-width: 768px) 100vw, 900px"
+                          />
+                        </Box>
+                      )}
+
                       {/* Main Content */}
                       {blog.content ? (
-                        <Box
-                          className="blog-content"
-                          dangerouslySetInnerHTML={{ __html: blog.content }}
-                        />
+                        <Box className="blog-markdown-preview" data-color-mode={colorMode}>
+                          <MarkdownPreview
+                            source={normalizeMarkdownForRender(blog.content)}
+                            wrapperElement={{ "data-color-mode": colorMode }}
+                            className="blog-markdown-preview"
+                          />
+                        </Box>
                       ) : (
                         <Text fontSize="md" lineHeight="1.8" color={mutedColor}>
                           No content available for this article.
@@ -620,6 +656,27 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
       <FallInPlace delay={0.7}>
         <NewsletterSection />
       </FallInPlace>
+
+      <style jsx global>{`
+        .blog-markdown-preview,
+        .blog-markdown-preview.wmde-markdown {
+          background: transparent !important;
+          color: #334155 !important;
+          box-shadow: none !important;
+          --color-canvas-default: transparent;
+          --color-fg-default: #334155;
+          --color-canvas-subtle: rgba(148, 163, 184, 0.08);
+          --color-border-default: rgba(148, 163, 184, 0.25);
+        }
+
+        .blog-markdown-preview[data-color-mode="dark"],
+        .blog-markdown-preview[data-color-mode="dark"].wmde-markdown {
+          color: #e5e7eb !important;
+          --color-fg-default: #e5e7eb;
+          --color-canvas-subtle: rgba(148, 163, 184, 0.12);
+          --color-border-default: rgba(148, 163, 184, 0.32);
+        }
+      `}</style>
     </Box>
   );
 }
