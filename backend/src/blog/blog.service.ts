@@ -242,6 +242,7 @@ export class BlogService {
     console.log('=== BLOG UPDATE START ===');
     console.log('Blog ID:', id);
     console.log('Update DTO:', JSON.stringify(updateBlogDto, null, 2));
+    console.log('User object:', JSON.stringify(user, null, 2));
     
     // Check if blog exists
     const existingBlog = await this.prisma.blog.findUnique({
@@ -255,7 +256,13 @@ export class BlogService {
     const currentUserId = user?.id ?? user?.userId;
     const currentUserRole = user?.role;
 
-    if (currentUserRole === 'STUDENT' && currentUserId !== existingBlog.authorId) {
+    console.log('Current User ID:', currentUserId);
+    console.log('Current User Role:', currentUserRole);
+    console.log('Existing Blog Author ID:', existingBlog.authorId);
+
+    // Students and Instructors can only edit their own blogs; Admins can edit any blog
+    if (currentUserRole !== 'ADMIN' && currentUserId !== existingBlog.authorId) {
+      console.log('❌ FORBIDDEN: User trying to edit another user\'s blog');
       throw new ForbiddenException('You can only edit your own blog');
     }
 
@@ -345,13 +352,21 @@ export class BlogService {
     });
   }
 
-  async remove(id: string) {
+  async remove(id: string, user?: any) {
     const blog = await this.prisma.blog.findUnique({
       where: { id },
     });
 
     if (!blog) {
       throw new NotFoundException('Blog not found');
+    }
+
+    const currentUserId = user?.id ?? user?.userId;
+    const currentUserRole = user?.role;
+
+    // Students and Instructors can only delete their own blogs; Admins can delete any blog
+    if (currentUserRole !== 'ADMIN' && currentUserId !== blog.authorId) {
+      throw new ForbiddenException('You can only delete your own blog');
     }
 
     return this.prisma.blog.delete({

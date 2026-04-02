@@ -70,10 +70,10 @@ export class BlogController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR, UserRole.STUDENT)
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string) {
-    return this.blogService.remove(id);
+  remove(@Param('id') id: string, @Request() req) {
+    return this.blogService.remove(id, req.user);
   }
 
   // Comment endpoints
