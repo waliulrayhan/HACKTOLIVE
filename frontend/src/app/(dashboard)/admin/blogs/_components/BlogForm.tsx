@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/toast";
 import ImageCropper from "@/components/ImageCropper";
 import MarkdownPreview from "@uiw/react-markdown-preview";
+import { normalizeMarkdownForRender, normalizeMarkdownForStorage } from "@/lib/markdown-utils";
 import TurndownService from "turndown";
 import {
   HiOutlineArrowLeft,
@@ -101,15 +102,18 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
 
       const blog = await response.json();
       const rawContent = blog.content || "";
-      const normalizedContent = looksLikeHtml(rawContent)
-        ? turndownService.turndown(rawContent)
-        : rawContent;
+      const normalizedContent = normalizeMarkdownForRender(rawContent);
+      const shouldConvertHtmlToMarkdown =
+        looksLikeHtml(normalizedContent) &&
+        !/(^|\n)\s{0,3}(#{1,6}\s|[-*+]\s|\d+\.\s|\|.*\||---\s*$|!\[[^\]]*\]\(|\[[^\]]+\]\()/.test(normalizedContent);
       const blogData = {
         title: blog.title,
         slug: blog.slug,
         mainImage: blog.mainImage || "",
         metadata: blog.metadata,
-        content: normalizedContent,
+        content: shouldConvertHtmlToMarkdown
+          ? turndownService.turndown(normalizedContent)
+          : normalizedContent,
         category: blog.category,
         blogType: blog.blogType,
         readTime: blog.readTime || "",
@@ -326,8 +330,8 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
 
       // Include authorId for create mode
       const payload = mode === "create" 
-        ? { ...formData, authorId: user.id }
-        : formData;
+        ? { ...formData, content: normalizeMarkdownForStorage(formData.content), authorId: user.id }
+        : { ...formData, content: normalizeMarkdownForStorage(formData.content) };
 
       const response = await fetch(url, {
         method,
@@ -806,7 +810,7 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
 
             {imagePreview ? (
               <div className="space-y-3">
-                <div className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                <div className="relative mx-auto w-full max-w-xs aspect-[4/3] rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                   <img
                     src={`${process.env.NEXT_PUBLIC_API_URL}${imagePreview}`}
                     alt="Blog preview"
@@ -827,7 +831,7 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
                 type="button"
                 onClick={handleImageClick}
                 disabled={uploadingImage}
-                className="w-full h-40 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center gap-2 hover:border-brand-500 hover:bg-brand-50 dark:hover:bg-brand-950/20 transition-colors"
+                className="mx-auto w-full max-w-xs aspect-[4/3] rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center gap-2 hover:border-brand-500 hover:bg-brand-50 dark:hover:bg-brand-950/20 transition-colors"
               >
                 {uploadingImage ? (
                   <>
@@ -969,7 +973,7 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
           image={imageToCrop}
           onCropComplete={handleCropComplete}
           onCancel={() => setImageToCrop(null)}
-          aspectRatio={1}
+          aspectRatio={4 / 3}
         />
       )}
 
@@ -1010,9 +1014,9 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
               ) : null}
               {formData.content.trim() ? (
                 <MarkdownPreview
-                  source={formData.content}
+                  source={normalizeMarkdownForRender(formData.content)}
                   wrapperElement={{ "data-color-mode": previewColorMode }}
-                  className="blog-preview-markdown !bg-transparent"
+                  className="blog-preview-markdown"
                 />
               ) : (
                 <p className="text-sm text-gray-500 dark:text-gray-400">Start writing content to preview your blog.</p>

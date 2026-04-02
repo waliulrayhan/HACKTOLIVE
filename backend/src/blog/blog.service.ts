@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateBlogDto, UpdateBlogDto, FilterBlogDto, CreateCommentDto, CreateCommentReplyDto, CreateLikeDto, ToggleCommentLikeDto } from './dto';
 import { Prisma } from '@prisma/client';
@@ -238,7 +238,7 @@ export class BlogService {
     };
   }
 
-  async update(id: string, updateBlogDto: UpdateBlogDto) {
+  async update(id: string, updateBlogDto: UpdateBlogDto, user?: any) {
     console.log('=== BLOG UPDATE START ===');
     console.log('Blog ID:', id);
     console.log('Update DTO:', JSON.stringify(updateBlogDto, null, 2));
@@ -250,6 +250,13 @@ export class BlogService {
 
     if (!existingBlog) {
       throw new NotFoundException('Blog not found');
+    }
+
+    const currentUserId = user?.id ?? user?.userId;
+    const currentUserRole = user?.role;
+
+    if (currentUserRole === 'STUDENT' && currentUserId !== existingBlog.authorId) {
+      throw new ForbiddenException('You can only edit your own blog');
     }
 
     console.log('Existing blog approvalStatus:', existingBlog.approvalStatus);

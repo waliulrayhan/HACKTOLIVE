@@ -63,9 +63,9 @@ export class BlogController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR)
-  update(@Param('id') id: string, @Body() updateBlogDto: UpdateBlogDto) {
-    return this.blogService.update(id, updateBlogDto);
+  @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR, UserRole.STUDENT)
+  update(@Param('id') id: string, @Body() updateBlogDto: UpdateBlogDto, @Request() req) {
+    return this.blogService.update(id, updateBlogDto, req.user);
   }
 
   @Delete(':id')

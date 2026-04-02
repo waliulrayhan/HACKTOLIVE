@@ -3,6 +3,8 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/toast";
+import MarkdownPreview from "@uiw/react-markdown-preview";
+import { normalizeMarkdownForRender } from "@/lib/markdown-utils";
 import PageBreadcrumb from "@/components/shared/PageBreadCrumb";
 import { TablePageLoadingSkeleton } from "@/components/ui/skeleton/Skeleton";
 import {
@@ -93,6 +95,7 @@ export default function BlogsManagementPage() {
   const [showRejectionModal, setShowRejectionModal] = useState(false);
   const [rejectionDetails, setRejectionDetails] = useState<{ id: string; title: string; reason: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewColorMode, setPreviewColorMode] = useState<"light" | "dark">("dark");
 
   const fetchControllerRef = useRef<AbortController | null>(null);
 
@@ -182,6 +185,12 @@ export default function BlogsManagementPage() {
   useEffect(() => {
     fetchBlogs();
   }, [fetchBlogs]);
+
+  useEffect(() => {
+    if (!showModal) return;
+    const isDarkMode = document.documentElement.classList.contains("dark");
+    setPreviewColorMode(isDarkMode ? "dark" : "light");
+  }, [showModal]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -473,7 +482,7 @@ export default function BlogsManagementPage() {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <div className="min-w-[640px]">
+          <div className="min-w-160">
             <Table>
               <TableHeader className="border-b border-gray-100 dark:border-white/5">
                 <TableRow>
@@ -737,7 +746,7 @@ export default function BlogsManagementPage() {
               <div className="flex flex-col sm:flex-row gap-6 mb-6">
                 {/* Blog Hero Image - Left Side */}
                 {selectedBlog.mainImage && (
-                  <div className="flex-shrink-0 w-full sm:w-48 h-48">
+                  <div className="shrink-0 w-full sm:w-48 aspect-4/3">
                     <img
                       src={getFullImageUrl(selectedBlog.mainImage, 'general')}
                       alt={selectedBlog.title}
@@ -788,7 +797,7 @@ export default function BlogsManagementPage() {
                       className="h-12 w-12 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-800"
                     />
                   ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-white">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-brand-400 to-brand-600 text-white">
                       <HiOutlineUser className="h-6 w-6" />
                     </div>
                   )}
@@ -819,10 +828,11 @@ export default function BlogsManagementPage() {
               </div>
 
               {/* Blog Content */}
-              <div className="prose prose-lg dark:prose-invert max-w-none mb-8">
-                <div
-                  className="blog-content text-gray-700 dark:text-gray-300"
-                  dangerouslySetInnerHTML={{ __html: selectedBlog.content }}
+              <div className="max-w-none mb-8">
+                <MarkdownPreview
+                  source={normalizeMarkdownForRender(selectedBlog.content)}
+                  wrapperElement={{ "data-color-mode": previewColorMode }}
+                  className="blog-preview-markdown"
                 />
               </div>
 
@@ -869,6 +879,59 @@ export default function BlogsManagementPage() {
               </div>
             </article>
           </div>
+
+          <style jsx global>{`
+            .blog-preview-markdown,
+            .blog-preview-markdown.wmde-markdown {
+              background: transparent !important;
+              color: #334155 !important;
+              box-shadow: none !important;
+              --color-canvas-default: transparent;
+              --color-fg-default: #334155;
+              --color-canvas-subtle: rgba(148, 163, 184, 0.08);
+              --color-border-default: rgba(148, 163, 184, 0.25);
+            }
+
+            .blog-preview-markdown[data-color-mode="dark"],
+            .blog-preview-markdown[data-color-mode="dark"].wmde-markdown {
+              color: #e5e7eb !important;
+              --color-fg-default: #e5e7eb;
+              --color-canvas-subtle: rgba(148, 163, 184, 0.12);
+              --color-border-default: rgba(148, 163, 184, 0.32);
+            }
+
+            .blog-preview-markdown h1,
+            .blog-preview-markdown h2,
+            .blog-preview-markdown h3,
+            .blog-preview-markdown h4,
+            .blog-preview-markdown h5,
+            .blog-preview-markdown h6 {
+              color: #0f172a !important;
+            }
+
+            .blog-preview-markdown[data-color-mode="dark"] h1,
+            .blog-preview-markdown[data-color-mode="dark"] h2,
+            .blog-preview-markdown[data-color-mode="dark"] h3,
+            .blog-preview-markdown[data-color-mode="dark"] h4,
+            .blog-preview-markdown[data-color-mode="dark"] h5,
+            .blog-preview-markdown[data-color-mode="dark"] h6 {
+              color: #f8fafc !important;
+            }
+
+            .blog-preview-markdown pre {
+              background: #0f172a !important;
+              border: 1px solid #334155 !important;
+              border-radius: 10px;
+            }
+
+            .blog-preview-markdown a {
+              color: #2563eb !important;
+            }
+
+            .blog-preview-markdown[data-color-mode="dark"] a {
+              color: #93c5fd !important;
+            }
+          `}</style>
         </div>
       )}
 
