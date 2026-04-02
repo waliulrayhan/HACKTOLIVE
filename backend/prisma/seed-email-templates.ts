@@ -58,7 +58,7 @@ async function seedEmailTemplates() {
           <div style="border-top:1px solid #e5e7eb;padding-top:20px">
             <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">If you did not attempt to register for a HackToLive account, please disregard this email. Your email address will not be used without verification.</p>
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Need Help?</strong></p>
-            <p style="margin:0;color:#666;font-size:13px">Contact our support team at <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
+            <p style="margin:0;color:#666;font-size:13px">Contact our support team at <a href="mailto:info@hacktolive.net" style="color:#84cc16;text-decoration:none">info@hacktolive.net</a></p>
           </div>
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
@@ -109,7 +109,7 @@ async function seedEmailTemplates() {
           <div style="border-top:1px solid #e5e7eb;padding-top:20px">
             <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">For your security, this code will expire in {{expiryMinutes}} minutes. Never share your verification code with anyone, including HackToLive staff.</p>
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Need Assistance?</strong></p>
-            <p style="margin:0;color:#666;font-size:13px">Contact our support team at <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
+            <p style="margin:0;color:#666;font-size:13px">Contact our support team at <a href="mailto:info@hacktolive.net" style="color:#84cc16;text-decoration:none">info@hacktolive.net</a></p>
           </div>
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
@@ -169,7 +169,7 @@ async function seedEmailTemplates() {
           <div style="border-top:1px solid #e5e7eb;padding-top:20px">
             <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">This verification code will expire in {{expiryMinutes}} minutes for security reasons. If you need a new code, please submit another password reset request.</p>
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Need Help?</strong></p>
-            <p style="margin:0;color:#666;font-size:13px">Contact our support team at <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
+            <p style="margin:0;color:#666;font-size:13px">Contact our support team at <a href="mailto:info@hacktolive.net" style="color:#84cc16;text-decoration:none">info@hacktolive.net</a></p>
           </div>
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
@@ -234,7 +234,7 @@ async function seedEmailTemplates() {
           <div style="border-top:1px solid #e5e7eb;padding-top:20px">
             <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">If you have any questions or need assistance getting started, our support team is here to help you every step of the way.</p>
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Support Contact:</strong></p>
-            <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
+            <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:info@hacktolive.net" style="color:#84cc16;text-decoration:none">info@hacktolive.net</a></p>
             <p style="margin:0 0 15px;color:#666;font-size:13px">Website: <a href="https://hacktolive.net" style="color:#84cc16;text-decoration:none">www.hacktolive.net</a></p>
             <p style="margin:0;color:#666;font-size:13px;line-height:1.6">We look forward to supporting your learning journey!</p>
           </div>
@@ -366,13 +366,13 @@ async function seedEmailTemplates() {
 
           <div style="background-color:#fef2f2;border-left:4px solid #ef4444;padding:15px 20px;border-radius:4px;margin:0 0 25px">
             <p style="margin:0 0 5px;color:#991b1b;font-size:13px;font-weight:600">Urgent Matters</p>
-            <p style="margin:0;color:#666;font-size:13px;line-height:1.6">If your inquiry requires immediate attention or is time-sensitive, please contact us directly via email at support@hacktolive.net and mark your message as "Urgent" in the subject line.</p>
+            <p style="margin:0;color:#666;font-size:13px;line-height:1.6">If your inquiry requires immediate attention or is time-sensitive, please contact us directly via email at info@hacktolive.net and mark your message as "Urgent" in the subject line.</p>
           </div>
 
           <div style="border-top:1px solid #e5e7eb;padding-top:20px">
             <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">We value your communication and are committed to providing you with prompt and helpful support.</p>
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Support Contact:</strong></p>
-            <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
+            <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:info@hacktolive.net" style="color:#84cc16;text-decoration:none">info@hacktolive.net</a></p>
             <p style="margin:0 0 15px;color:#666;font-size:13px">Website: <a href="https://hacktolive.net" style="color:#84cc16;text-decoration:none">www.hacktolive.net</a></p>
             <p style="margin:0;color:#666;font-size:13px;line-height:1.6">Thank you for choosing HackToLive!</p>
           </div>
@@ -441,7 +441,7 @@ async function seedEmailTemplates() {
           <div style="border-top:1px solid #e5e7eb;padding-top:20px">
             <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">If you have any questions regarding this update or need additional information about your application status, please feel free to contact our HR team.</p>
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>HR Contact:</strong></p>
-            <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
+            <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:info@hacktolive.net" style="color:#84cc16;text-decoration:none">info@hacktolive.net</a></p>
             <p style="margin:0 0 15px;color:#666;font-size:13px">Website: <a href="https://hacktolive.net" style="color:#84cc16;text-decoration:none">www.hacktolive.net</a></p>
             <p style="margin:0;color:#666;font-size:13px;line-height:1.6">We appreciate your interest in HackToLive and thank you for your patience throughout this process.</p>
           </div>
@@ -540,7 +540,7 @@ async function seedEmailTemplates() {
           <div style="border-top:1px solid #e5e7eb;padding-top:20px;margin-top:20px">
             <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">If you have any questions regarding your enrollment or need assistance accessing the course materials, please don't hesitate to contact our support team. We are here to help you succeed in your learning journey.</p>
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Support Contact:</strong></p>
-            <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
+            <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:info@hacktolive.net" style="color:#84cc16;text-decoration:none">info@hacktolive.net</a></p>
             <p style="margin:0 0 15px;color:#666;font-size:13px">Website: <a href="https://hacktolive.net" style="color:#84cc16;text-decoration:none">www.hacktolive.net</a></p>
             <p style="margin:0;color:#666;font-size:13px;line-height:1.6">We wish you the best in your learning experience!</p>
           </div>
@@ -632,7 +632,7 @@ async function seedEmailTemplates() {
 
           <div style="border-top:1px solid #e5e7eb;padding-top:20px">
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Need Help?</strong></p>
-            <p style="margin:0;color:#666;font-size:13px">Contact: <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
+            <p style="margin:0;color:#666;font-size:13px">Contact: <a href="mailto:info@hacktolive.net" style="color:#84cc16;text-decoration:none">info@hacktolive.net</a></p>
           </div>
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
@@ -762,7 +762,7 @@ async function seedEmailTemplates() {
           <div style="border-top:1px solid #e5e7eb;padding-top:20px">
             <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">If you have any questions about your order, please feel free to contact us.</p>
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Support:</strong></p>
-            <p style="margin:0;color:#666;font-size:13px">Email: <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
+            <p style="margin:0;color:#666;font-size:13px">Email: <a href="mailto:info@hacktolive.net" style="color:#84cc16;text-decoration:none">info@hacktolive.net</a></p>
           </div>
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
@@ -860,7 +860,7 @@ async function seedEmailTemplates() {
           <div style="border-top:1px solid #e5e7eb;padding-top:20px">
             <p style="margin:0 0 15px;color:#666;font-size:13px;line-height:1.6">We're proud of your dedication and accomplishment. Keep up the excellent work in your learning journey!</p>
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Questions?</strong></p>
-            <p style="margin:0;color:#666;font-size:13px">Contact: <a href="mailto:support@hacktolive.net" style="color:#7c3aed;text-decoration:none">support@hacktolive.net</a></p>
+            <p style="margin:0;color:#666;font-size:13px">Contact: <a href="mailto:info@hacktolive.net" style="color:#7c3aed;text-decoration:none">info@hacktolive.net</a></p>
           </div>
         </td></tr>
         <tr><td style="background-color:#f9f9f9;padding:20px;text-align:center;border-top:1px solid #eee">
@@ -952,7 +952,7 @@ async function seedEmailTemplates() {
 
           <div style="border-top:1px solid #e5e7eb;padding-top:20px">
             <p style="margin:0 0 5px;color:#666;font-size:13px"><strong>Need Help?</strong></p>
-            <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:support@hacktolive.net" style="color:#84cc16;text-decoration:none">support@hacktolive.net</a></p>
+            <p style="margin:0 0 3px;color:#666;font-size:13px">Email: <a href="mailto:info@hacktolive.net" style="color:#84cc16;text-decoration:none">info@hacktolive.net</a></p>
             <p style="margin:0 0 15px;color:#666;font-size:13px">Website: <a href="https://hacktolive.net" style="color:#84cc16;text-decoration:none">www.hacktolive.net</a></p>
             <p style="margin:0;color:#666;font-size:13px;line-height:1.6">Thank you for choosing HackToLive Academy!</p>
           </div>

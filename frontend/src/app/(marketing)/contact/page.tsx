@@ -298,7 +298,7 @@ export default function ContactPage() {
                 >
                   contact@hacktolive.net
                   <br />
-                  support@hacktolive.net
+                  info@hacktolive.net
                 </Link>
               </VStack>
             </Card>

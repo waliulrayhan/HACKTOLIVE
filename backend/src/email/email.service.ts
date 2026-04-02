@@ -28,7 +28,7 @@ export class EmailService {
       password: process.env.NOREPLY_PASSWORD || '',
     },
     support: {
-      email: process.env.SUPPORT_EMAIL || 'support@hacktolive.net',
+      email: process.env.SUPPORT_EMAIL || 'info@hacktolive.net',
       password: process.env.SUPPORT_PASSWORD || '',
     },
   };

@@ -4,7 +4,7 @@ export default {
     {
       name: 'Md. Shakib Rahman',
       description: 'Security Engineer, Tech Corp',
-      avatar: '/static/images/avatar2.jpg',
+      avatar: '/images/user/Admin2.jpg',
       children: (
         <>
           "HackToLive Academy transformed my career. The Bengali courses made complex concepts easy to understand, 
@@ -15,7 +15,7 @@ export default {
     {
       name: 'Anika Tabassum',
       description: 'Penetration Tester',
-      avatar: '/static/images/avatar3.jpg',
+      avatar: '/images/user/Admin3.png',
       children: (
         <>
           "The premium batch was worth every taka. Expert instructors, practical training with Metasploit 
