@@ -25,6 +25,7 @@ COPY .env.production .env.production
 
 # Set build-time environment variable
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_OUTPUT=standalone
 
 # Build application
 RUN npm run build

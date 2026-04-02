@@ -1,8 +1,10 @@
 import type { NextConfig } from "next";
 
+const useStandaloneOutput = process.env.NEXT_OUTPUT === 'standalone';
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  output: 'standalone', // Required for Docker
+  ...(useStandaloneOutput ? { output: 'standalone' as const } : {}),
   images: {
     remotePatterns: [
       {
@@ -54,6 +56,7 @@ const nextConfig: NextConfig = {
   },
     
   turbopack: {
+    root: __dirname,
     rules: {
       '*.svg': {
         loaders: ['@svgr/webpack'],
