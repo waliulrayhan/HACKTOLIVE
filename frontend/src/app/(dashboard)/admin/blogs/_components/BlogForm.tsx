@@ -4,15 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/toast";
 import ImageCropper from "@/components/ImageCropper";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
-import Link from "@tiptap/extension-link";
-import TiptapImage from "@tiptap/extension-image";
-import TextAlign from "@tiptap/extension-text-align";
-import { TextStyle } from "@tiptap/extension-text-style";
-import { Color } from "@tiptap/extension-color";
-import Highlight from "@tiptap/extension-highlight";
+import MarkdownPreview from "@uiw/react-markdown-preview";
+import TurndownService from "turndown";
 import {
   HiOutlineArrowLeft,
   HiOutlineSave,
@@ -23,6 +16,14 @@ import {
   HiOutlinePencilAlt,
   HiOutlineDocumentText,
 } from "react-icons/hi";
+
+const turndownService = new TurndownService({
+  headingStyle: "atx",
+  codeBlockStyle: "fenced",
+  emDelimiter: "*",
+});
+
+const looksLikeHtml = (value: string) => /<[^>]+>/.test(value);
 
 interface BlogFormData {
   title: string;
@@ -48,17 +49,14 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [currentTag, setCurrentTag] = useState("");
+  const [previewColorMode, setPreviewColorMode] = useState<"light" | "dark">("dark");
   const imageInputRef = useRef<HTMLInputElement>(null);
-  const [imageModalOpen, setImageModalOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [linkModalOpen, setLinkModalOpen] = useState(false);
-  const [linkUrl, setLinkUrl] = useState("");
-  const [insertImageModalOpen, setInsertImageModalOpen] = useState(false);
-  const [insertImageUrl, setInsertImageUrl] = useState("");
+  const [activeContentTab, setActiveContentTab] = useState<"write" | "preview">("write");
 
   const [formData, setFormData] = useState<BlogFormData>({
     title: "",
@@ -74,29 +72,6 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
     status: "DRAFT",
   });
 
-  // Rich text editor
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Underline,
-      Link.configure({
-        openOnClick: false,
-      }),
-      TiptapImage,
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-      TextStyle,
-      Color,
-      Highlight,
-    ],
-    content: formData.content,
-    immediatelyRender: false,
-    onUpdate: ({ editor }) => {
-      setFormData(prev => ({ ...prev, content: editor.getHTML() }));
-    },
-  });
-
   useEffect(() => {
     if (mode === "edit" && blogId) {
       fetchBlog();
@@ -104,40 +79,10 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
   }, [blogId, mode]);
 
   useEffect(() => {
-    if (editor && formData.content && editor.getHTML() !== formData.content) {
-      editor.commands.setContent(formData.content);
-    }
-  }, [formData.content, editor]);
-
-  // Add click handler for images in editor
-  useEffect(() => {
-    if (!editor) return;
-
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'IMG') {
-        e.preventDefault();
-        const img = target as HTMLImageElement;
-        setSelectedImage(img.src);
-        setImageModalOpen(true);
-      }
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && imageModalOpen) {
-        setImageModalOpen(false);
-      }
-    };
-
-    const editorElement = editor.view.dom;
-    editorElement.addEventListener('click', handleClick);
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      editorElement.removeEventListener('click', handleClick);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [editor, imageModalOpen]);
+    if (!previewModalOpen) return;
+    const isDarkMode = document.documentElement.classList.contains("dark");
+    setPreviewColorMode(isDarkMode ? "dark" : "light");
+  }, [previewModalOpen]);
 
   const fetchBlog = async () => {
     try {
@@ -155,12 +100,16 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
       if (!response.ok) throw new Error("Failed to fetch blog");
 
       const blog = await response.json();
+      const rawContent = blog.content || "";
+      const normalizedContent = looksLikeHtml(rawContent)
+        ? turndownService.turndown(rawContent)
+        : rawContent;
       const blogData = {
         title: blog.title,
         slug: blog.slug,
         mainImage: blog.mainImage || "",
         metadata: blog.metadata,
-        content: blog.content || "",
+        content: normalizedContent,
         category: blog.category,
         blogType: blog.blogType,
         readTime: blog.readTime || "",
@@ -269,10 +218,12 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
   };
 
   const addTag = () => {
-    if (currentTag && !formData.tags.includes(currentTag)) {
+    const cleanedTag = currentTag.trim().toLowerCase();
+
+    if (cleanedTag && !formData.tags.includes(cleanedTag)) {
       setFormData((prev) => ({
         ...prev,
-        tags: [...prev.tags, currentTag],
+        tags: [...prev.tags, cleanedTag],
       }));
       setCurrentTag("");
       
@@ -293,27 +244,63 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
+    const cleanedTitle = formData.title.trim();
+    const cleanedMetadata = formData.metadata.trim();
+    const cleanedContent = formData.content.trim();
+    const cleanedSlug = formData.slug.trim();
+    const plainContent = cleanedContent.replace(/[#*_`>\-\[\]()!]/g, "").replace(/\s+/g, " ").trim();
 
-    if (!formData.title.trim()) newErrors.title = "Title is required";
-    if (!formData.slug.trim()) newErrors.slug = "Slug is required";
-    if (!formData.metadata.trim())
+    if (!cleanedTitle) {
+      newErrors.title = "Title is required";
+    } else if (cleanedTitle.length < 8) {
+      newErrors.title = "Title should be at least 8 characters";
+    }
+
+    if (!cleanedSlug) {
+      newErrors.slug = "Slug is required";
+    } else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(cleanedSlug)) {
+      newErrors.slug = "Slug can use lowercase letters, numbers, and hyphens only";
+    }
+
+    if (!cleanedMetadata) {
       newErrors.metadata = "Description is required";
-    if (!formData.content || formData.content.trim() === "" || formData.content === "<p></p>")
+    } else if (cleanedMetadata.length < 20) {
+      newErrors.metadata = "Description should be at least 20 characters";
+    } else if (cleanedMetadata.length > 180) {
+      newErrors.metadata = "Description should be under 180 characters";
+    }
+
+    if (!cleanedContent) {
       newErrors.content = "Content is required";
+    } else if (plainContent.length < 80) {
+      newErrors.content = "Content is too short. Write at least a short full paragraph";
+    }
+
     if (!formData.category) newErrors.category = "Category is required";
     if (!formData.blogType) newErrors.blogType = "Blog Type is required";
+
+    if (formData.readTime && !/^\d+\s*min(\s*read)?$/i.test(formData.readTime.trim())) {
+      newErrors.readTime = "Read time format should be like: 5 min or 5 min read";
+    }
+
     if (formData.tags.length === 0)
       newErrors.tags = "At least one tag is required";
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return {
+      isValid: Object.keys(newErrors).length === 0,
+      newErrors,
+    };
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    if (!validateForm()) {
-      toast.error("Please fix the errors before saving");
+    const validation = validateForm();
+
+    if (!validation.isValid) {
+      const summary = Object.values(validation.newErrors).slice(0, 3).join(" | ");
+      toast.error(summary || "Please fix the highlighted fields before saving");
       return;
     }
 
@@ -373,7 +360,18 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const { name, value } = e.target;
+    const { name } = e.target;
+    const rawValue = e.target.value;
+    const value =
+      name === "slug"
+        ? rawValue
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^-|-$/g, "")
+        : rawValue;
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -384,6 +382,40 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
       delete newErrors[name];
       setErrors(newErrors);
     }
+  };
+
+  const handleContentChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      content: value,
+    }));
+
+    if (errors.content) {
+      const newErrors = { ...errors };
+      delete newErrors.content;
+      setErrors(newErrors);
+    }
+  };
+
+  const insertMarkdownSnippet = (snippet: string) => {
+    const textarea = document.getElementById("blog-content-markdown") as HTMLTextAreaElement | null;
+    if (!textarea) {
+      handleContentChange(`${formData.content}${formData.content ? "\n" : ""}${snippet}`);
+      return;
+    }
+
+    const start = textarea.selectionStart ?? formData.content.length;
+    const end = textarea.selectionEnd ?? formData.content.length;
+    const currentValue = formData.content;
+    const nextValue = `${currentValue.slice(0, start)}${snippet}${currentValue.slice(end)}`;
+
+    handleContentChange(nextValue);
+
+    requestAnimationFrame(() => {
+      textarea.focus();
+      const cursorPosition = start + snippet.length;
+      textarea.setSelectionRange(cursorPosition, cursorPosition);
+    });
   };
 
   if (loading) {
@@ -418,32 +450,13 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
           </div>
         </div>
 
-        <button
-          onClick={handleSubmit}
-          disabled={saving}
-          className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-        >
-          {saving ? (
-            <>
-              <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Saving...
-            </>
-          ) : (
-            <>
-              <HiOutlineSave className="h-4 w-4" />
-              {mode === "create" ? "Publish Blog" : "Save Changes"}
-            </>
-          )}
-        </button>
+        <div></div>
       </div>
 
       {/* Main Form */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Left Column - Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6">
           {/* Basic Info Card */}
           <div className="border border-gray-200 rounded-lg bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
             <div className="flex items-center gap-2 mb-5">
@@ -665,396 +678,106 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
 
           {/* Content Editor Card */}
           <div className="border border-gray-200 rounded-lg bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-            <div className="flex items-center gap-2 mb-5">
-              <HiOutlineDocumentText className="h-5 w-5 text-brand-600" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Blog Content <span className="text-red-500">*</span>
-              </h3>
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+              <div className="flex items-center gap-2">
+                <HiOutlineDocumentText className="h-5 w-5 text-brand-600" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Blog Content <span className="text-red-500">*</span>
+                </h3>
+              </div>
+
+              <div className="inline-flex rounded-lg border border-gray-300 dark:border-gray-700 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setActiveContentTab("write")}
+                  className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
+                    activeContentTab === "write"
+                      ? "bg-brand-600 text-white"
+                      : "bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  Write
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveContentTab("preview");
+                    setPreviewModalOpen(true);
+                  }}
+                  className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
+                    activeContentTab === "preview"
+                      ? "bg-brand-600 text-white"
+                      : "bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  Preview
+                </button>
+              </div>
             </div>
 
-            {editor && (
-              <div className="border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-900">
-                {/* Enhanced Toolbar */}
-                <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 p-2 flex flex-wrap gap-1">
-                  <div className="flex flex-wrap gap-1.5">
-                    {/* Text Formatting Group */}
-                    <div className="flex items-center gap-1 bg-white dark:bg-gray-900 rounded-lg p-1 border border-gray-200 dark:border-gray-700">
-                      <button
-                        type="button"
-                        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                        className={`px-3 py-1.5 text-sm font-semibold rounded transition-all ${
-                          editor.isActive("heading", { level: 2 })
-                            ? "bg-brand-600 text-white"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        }`}
-                        title="Heading 2"
-                      >
-                        H2
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-                        className={`px-3 py-1.5 text-sm font-semibold rounded transition-all ${
-                          editor.isActive("heading", { level: 3 })
-                            ? "bg-brand-600 text-white"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        }`}
-                        title="Heading 3"
-                      >
-                        H3
-                      </button>
-                    </div>
+            <div className="mb-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => insertMarkdownSnippet("## Heading\n")}
+                className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                H2
+              </button>
+              <button
+                type="button"
+                onClick={() => insertMarkdownSnippet("**bold text**")}
+                className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                Bold
+              </button>
+              <button
+                type="button"
+                onClick={() => insertMarkdownSnippet("*italic text*")}
+                className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                Italic
+              </button>
+              <button
+                type="button"
+                onClick={() => insertMarkdownSnippet("- list item\n- list item\n")}
+                className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                List
+              </button>
+              <button
+                type="button"
+                onClick={() => insertMarkdownSnippet("[link text](https://example.com)")}
+                className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                Link
+              </button>
+              <button
+                type="button"
+                onClick={() => insertMarkdownSnippet("```bash\n# command\n```\n")}
+                className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                Code
+              </button>
+            </div>
 
-                    {/* Text Style Group */}
-                    <div className="flex items-center gap-1 bg-white dark:bg-gray-900 rounded-lg p-1 border border-gray-200 dark:border-gray-700">
-                      <button
-                        type="button"
-                        onClick={() => editor.chain().focus().toggleBold().run()}
-                        className={`px-3 py-1.5 text-sm font-bold rounded transition-all ${
-                          editor.isActive("bold")
-                            ? "bg-brand-600 text-white"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        }`}
-                        title="Bold"
-                      >
-                        B
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => editor.chain().focus().toggleItalic().run()}
-                        className={`px-3 py-1.5 text-sm italic rounded transition-all ${
-                          editor.isActive("italic")
-                            ? "bg-brand-600 text-white"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        }`}
-                        title="Italic"
-                      >
-                        I
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => editor.chain().focus().toggleUnderline().run()}
-                        className={`px-3 py-1.5 text-sm underline rounded transition-all ${
-                          editor.isActive("underline")
-                            ? "bg-brand-600 text-white"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        }`}
-                        title="Underline"
-                      >
-                        U
-                      </button>
-                    </div>
-
-                    {/* List Group */}
-                    <div className="flex items-center gap-1 bg-white dark:bg-gray-900 rounded-lg p-1 border border-gray-200 dark:border-gray-700">
-                      <button
-                        type="button"
-                        onClick={() => editor.chain().focus().toggleBulletList().run()}
-                        className={`px-3 py-1.5 text-sm rounded transition-all flex items-center gap-1.5 ${
-                          editor.isActive("bulletList")
-                            ? "bg-brand-600 text-white"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        }`}
-                        title="Bullet List"
-                      >
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" />
-                        </svg>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                        className={`px-3 py-1.5 text-sm rounded transition-all flex items-center gap-1.5 ${
-                          editor.isActive("orderedList")
-                            ? "bg-brand-600 text-white"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        }`}
-                        title="Numbered List"
-                      >
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M5.5 3a.5.5 0 00-1 0v5a.5.5 0 001 0V3zm0 7a.5.5 0 00-1 0v5a.5.5 0 001 0v-5zM2 4h1.5v1H2V4zm0 6h1.5v1H2v-1zm5-6h11v1H7V4zm0 6h11v1H7v-1z" />
-                        </svg>
-                      </button>
-                    </div>
-
-                    {/* Block Elements Group */}
-                    <div className="flex items-center gap-1 bg-white dark:bg-gray-900 rounded-lg p-1 border border-gray-200 dark:border-gray-700">
-                      <button
-                        type="button"
-                        onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                        className={`px-3 py-1.5 text-sm rounded transition-all ${
-                          editor.isActive("blockquote")
-                            ? "bg-brand-600 text-white"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        }`}
-                        title="Quote"
-                      >
-                        &quot;
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-                        className={`px-3 py-1.5 text-sm rounded transition-all ${
-                          editor.isActive("codeBlock")
-                            ? "bg-brand-600 text-white"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        }`}
-                        title="Code Block"
-                      >
-                        {"</>"}
-                      </button>
-                    </div>
-
-                    {/* Insert Elements Group */}
-                    <div className="flex items-center gap-1 bg-white dark:bg-gray-900 rounded-lg p-1 border border-gray-200 dark:border-gray-700">
-                      <button
-                        type="button"
-                        onClick={() => setLinkModalOpen(true)}
-                        className="px-3 py-1.5 text-sm rounded transition-all text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-1.5"
-                        title="Insert Link"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                        </svg>
-                        <span className="hidden sm:inline">Link</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setInsertImageModalOpen(true)}
-                        className="px-3 py-1.5 text-sm rounded transition-all text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-1.5"
-                        title="Insert Image"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <span className="hidden sm:inline">Image</span>
-                      </button>
-                    </div>
-                  </div>
+            <div className="grid gap-0 rounded-lg border border-gray-300 dark:border-gray-700 overflow-hidden grid-cols-1">
+              <div className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700">
+                <div className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
+                  Markdown
                 </div>
-
-                {/* Enhanced Editor Styles */}
-                <style dangerouslySetInnerHTML={{
-                  __html: `
-                    .ProseMirror { 
-                      min-height: 450px; 
-                      padding: 1.5rem; 
-                      outline: none;
-                      background: white;
-                      color: #111827;
-                      font-size: 16px;
-                      line-height: 1.75;
-                    }
-                    
-                    .dark .ProseMirror { 
-                      background: #0f172a; 
-                      color: #f1f5f9; 
-                    }
-                    
-                    .ProseMirror:focus {
-                      outline: none;
-                    }
-                    
-                    /* Headings */
-                    .ProseMirror h2 { 
-                      font-size: 1.875em; 
-                      font-weight: 700; 
-                      margin: 1.5em 0 0.75em;
-                      color: #1e293b;
-                      line-height: 1.3;
-                    }
-                    
-                    .dark .ProseMirror h2 {
-                      color: #f1f5f9;
-                    }
-                    
-                    .ProseMirror h3 { 
-                      font-size: 1.5em; 
-                      font-weight: 600; 
-                      margin: 1.25em 0 0.5em;
-                      color: #334155;
-                      line-height: 1.4;
-                    }
-                    
-                    .dark .ProseMirror h3 {
-                      color: #e2e8f0;
-                    }
-                    
-                    .ProseMirror h2:first-child,
-                    .ProseMirror h3:first-child {
-                      margin-top: 0;
-                    }
-                    
-                    /* Paragraphs */
-                    .ProseMirror p { 
-                      margin-bottom: 1em; 
-                      line-height: 1.75;
-                      color: #334155;
-                    }
-                    
-                    .dark .ProseMirror p {
-                      color: #cbd5e1;
-                    }
-                    
-                    .ProseMirror p:last-child {
-                      margin-bottom: 0;
-                    }
-                    
-                    /* Lists */
-                    .ProseMirror ul, 
-                    .ProseMirror ol { 
-                      padding-left: 1.75rem; 
-                      margin: 1em 0;
-                    }
-                    
-                    .ProseMirror ul li,
-                    .ProseMirror ol li {
-                      margin-bottom: 0.5em;
-                      color: #334155;
-                    }
-                    
-                    .dark .ProseMirror ul li,
-                    .dark .ProseMirror ol li {
-                      color: #cbd5e1;
-                    }
-                    
-                    .ProseMirror ul {
-                      list-style-type: disc;
-                    }
-                    
-                    .ProseMirror ol {
-                      list-style-type: decimal;
-                    }
-                    
-                    /* Blockquote */
-                    .ProseMirror blockquote { 
-                      border-left: 4px solid #3b82f6; 
-                      padding-left: 1.25rem;
-                      padding-top: 0.5rem;
-                      padding-bottom: 0.5rem; 
-                      margin: 1.5em 0; 
-                      font-style: italic; 
-                      color: #64748b;
-                      background: #f8fafc;
-                      border-radius: 0 0.375rem 0.375rem 0;
-                    }
-                    
-                    .dark .ProseMirror blockquote { 
-                      color: #94a3b8;
-                      background: #1e293b;
-                      border-left-color: #60a5fa;
-                    }
-                    
-                    /* Code */
-                    .ProseMirror pre { 
-                      background: #1e293b; 
-                      color: #f1f5f9; 
-                      padding: 1.25rem; 
-                      border-radius: 0.5rem; 
-                      overflow-x: auto; 
-                      margin: 1.5em 0;
-                      border: 1px solid #334155;
-                      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-                      font-size: 0.9em;
-                      line-height: 1.6;
-                    }
-                    
-                    .dark .ProseMirror pre {
-                      background: #0f172a;
-                      border-color: #1e293b;
-                    }
-                    
-                    .ProseMirror code { 
-                      background: #f1f5f9; 
-                      padding: 0.2em 0.4em; 
-                      border-radius: 0.25rem; 
-                      font-size: 0.9em;
-                      color: #e11d48;
-                      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-                    }
-                    
-                    .dark .ProseMirror code { 
-                      background: #1e293b;
-                      color: #fca5a5;
-                    }
-                    
-                    .ProseMirror pre code {
-                      background: transparent;
-                      padding: 0;
-                      color: inherit;
-                      font-size: 1em;
-                    }
-                    
-                    /* Links */
-                    .ProseMirror a { 
-                      color: #3b82f6; 
-                      text-decoration: underline;
-                      text-underline-offset: 2px;
-                      transition: color 0.2s;
-                    }
-                    
-                    .ProseMirror a:hover {
-                      color: #2563eb;
-                    }
-                    
-                    .dark .ProseMirror a {
-                      color: #60a5fa;
-                    }
-                    
-                    .dark .ProseMirror a:hover {
-                      color: #93c5fd;
-                    }
-                    
-                    /* Images */
-                    .ProseMirror img { 
-                      max-width: 100%; 
-                      height: auto; 
-                      border-radius: 0.5rem; 
-                      margin: 1.5rem 0;
-                      border: 1px solid #e2e8f0;
-                      cursor: pointer;
-                      transition: all 0.3s ease;
-                    }
-                    
-                    .dark .ProseMirror img {
-                      border-color: #334155;
-                    }
-                    
-                    .ProseMirror img:hover {
-                      transform: scale(1.02);
-                      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-                    }
-                    
-                    .dark .ProseMirror img:hover {
-                      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-                    }
-                    
-                    /* Placeholder */
-                    .ProseMirror p.is-editor-empty:first-child::before {
-                      content: attr(data-placeholder);
-                      float: left;
-                      color: #94a3b8;
-                      pointer-events: none;
-                      height: 0;
-                    }
-                    
-                    .dark .ProseMirror p.is-editor-empty:first-child::before {
-                      color: #64748b;
-                    }
-                    
-                    /* Selection */
-                    .ProseMirror ::selection {
-                      background: #dbeafe;
-                    }
-                    
-                    .dark .ProseMirror ::selection {
-                      background: #1e3a8a;
-                    }
-                  `
-                }} />
-                <EditorContent editor={editor} />
+                <textarea
+                  id="blog-content-markdown"
+                  value={formData.content}
+                  onChange={(e) => handleContentChange(e.target.value)}
+                  placeholder="# Start writing your blog post..."
+                  className="w-full min-h-105 resize-y border-0 bg-transparent px-4 py-4 text-sm leading-7 text-gray-900 placeholder-gray-400 focus:outline-none dark:text-white dark:placeholder-gray-500"
+                />
               </div>
-            )}
+            </div>
+
+            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              Markdown supports headings, lists, links, tables, fenced code blocks, and images with <span className="font-medium">![alt](url)</span>.
+            </p>
 
             {errors.content && (
               <p className="mt-2 text-xs text-red-500">{errors.content}</p>
@@ -1195,7 +918,7 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
           {/* Info Card */}
           <div className="border border-blue-200 dark:border-blue-800 rounded-lg bg-blue-50 dark:bg-blue-900/20 p-5">
             <div className="flex items-start gap-3">
-              <HiOutlineInformationCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <HiOutlineInformationCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
               <div>
                 <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-1">
                   Admin Control
@@ -1205,6 +928,37 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Actions */}
+      <div className="border border-gray-200 rounded-lg bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Complete all required fields and check preview before publishing.
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleSubmit}
+              disabled={saving}
+              className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+            >
+              {saving ? (
+                <>
+                  <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <HiOutlineSave className="h-4 w-4" />
+                  {mode === "create" ? "Publish Blog" : "Save Changes"}
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>
@@ -1219,171 +973,116 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
         />
       )}
 
-      {/* Image Viewer Modal */}
-      {imageModalOpen && selectedImage && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
-          onClick={() => setImageModalOpen(false)}
-        >
-          <div className="relative max-w-7xl max-h-[90vh] w-full">
-            {/* Close Button */}
-            <button
-              onClick={() => setImageModalOpen(false)}
-              className="absolute -top-12 right-0 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              aria-label="Close image"
-            >
-              <HiOutlineX className="w-6 h-6" />
-            </button>
-
-            {/* Image */}
-            <div className="flex items-center justify-center">
-              <img
-                src={selectedImage}
-                alt="Full size preview"
-                className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
-
-            {/* Image Info */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 rounded-b-lg">
-              <p className="text-white text-sm text-center">Click outside or press ESC to close</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Link Insert Modal */}
-      {linkModalOpen && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      {/* Markdown Preview Modal */}
+      {previewModalOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm p-4"
           onClick={() => {
-            setLinkModalOpen(false);
-            setLinkUrl("");
+            setPreviewModalOpen(false);
+            setActiveContentTab("write");
           }}
         >
-          <div 
-            className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl p-6 w-full max-w-md border border-gray-200 dark:border-gray-700"
+          <div
+            className="mx-auto h-[92vh] w-full max-w-6xl rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Insert Link</h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Enter URL:
-                </label>
-                <input
-                  type="url"
-                  value={linkUrl}
-                  onChange={(e) => setLinkUrl(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter' && linkUrl.trim()) {
-                      editor?.chain().focus().setLink({ href: linkUrl }).run();
-                      setLinkModalOpen(false);
-                      setLinkUrl("");
-                    }
-                  }}
-                  placeholder="https://example.com"
-                  className="w-full h-11 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                  autoFocus
-                />
-              </div>
-
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={() => {
-                    setLinkModalOpen(false);
-                    setLinkUrl("");
-                  }}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    if (linkUrl.trim() && editor) {
-                      editor.chain().focus().setLink({ href: linkUrl }).run();
-                      setLinkModalOpen(false);
-                      setLinkUrl("");
-                    }
-                  }}
-                  disabled={!linkUrl.trim()}
-                  className="px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  Insert Link
-                </button>
-              </div>
+            <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-5 py-3">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white">Blog Preview</h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setPreviewModalOpen(false);
+                  setActiveContentTab("write");
+                }}
+                className="rounded-md p-1.5 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+                aria-label="Close preview"
+              >
+                <HiOutlineX className="h-5 w-5" />
+              </button>
             </div>
+
+            <div className="flex-1 overflow-y-auto px-7 py-6 markdown-preview text-sm leading-7 text-gray-700 dark:text-gray-200">
+              {formData.title.trim() ? (
+                <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">{formData.title}</h1>
+              ) : null}
+              {formData.metadata.trim() ? (
+                <p className="text-gray-500 dark:text-gray-400 mb-6">{formData.metadata}</p>
+              ) : null}
+              {formData.content.trim() ? (
+                <MarkdownPreview
+                  source={formData.content}
+                  wrapperElement={{ "data-color-mode": previewColorMode }}
+                  className="blog-preview-markdown !bg-transparent"
+                />
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-400">Start writing content to preview your blog.</p>
+              )}
+            </div>
+
+            <style jsx global>{`
+              .blog-preview-markdown,
+              .blog-preview-markdown.wmde-markdown {
+                background: transparent !important;
+                color: #334155 !important;
+                box-shadow: none !important;
+                --color-canvas-default: transparent;
+                --color-fg-default: #334155;
+                --color-canvas-subtle: rgba(148, 163, 184, 0.08);
+                --color-border-default: rgba(148, 163, 184, 0.25);
+              }
+
+              .blog-preview-markdown[data-color-mode="dark"],
+              .blog-preview-markdown[data-color-mode="dark"].wmde-markdown {
+                color: #e5e7eb !important;
+                --color-fg-default: #e5e7eb;
+                --color-canvas-subtle: rgba(148, 163, 184, 0.12);
+                --color-border-default: rgba(148, 163, 184, 0.32);
+              }
+
+              .blog-preview-markdown h1,
+              .blog-preview-markdown h2,
+              .blog-preview-markdown h3,
+              .blog-preview-markdown h4,
+              .blog-preview-markdown h5,
+              .blog-preview-markdown h6 {
+                color: #0f172a !important;
+              }
+
+              .blog-preview-markdown[data-color-mode="dark"] h1,
+              .blog-preview-markdown[data-color-mode="dark"] h2,
+              .blog-preview-markdown[data-color-mode="dark"] h3,
+              .blog-preview-markdown[data-color-mode="dark"] h4,
+              .blog-preview-markdown[data-color-mode="dark"] h5,
+              .blog-preview-markdown[data-color-mode="dark"] h6 {
+                color: #f8fafc !important;
+              }
+
+              .blog-preview-markdown a {
+                color: #2563eb !important;
+              }
+
+              .blog-preview-markdown[data-color-mode="dark"] a {
+                color: #93c5fd !important;
+              }
+
+              .blog-preview-markdown code {
+                color: inherit !important;
+              }
+
+              .blog-preview-markdown pre {
+                background: #0f172a !important;
+                border: 1px solid #334155 !important;
+                border-radius: 10px;
+              }
+
+              .blog-preview-markdown hr {
+                border-color: rgba(148, 163, 184, 0.35) !important;
+              }
+            `}</style>
           </div>
         </div>
       )}
 
-      {/* Image Insert Modal */}
-      {insertImageModalOpen && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-          onClick={() => {
-            setInsertImageModalOpen(false);
-            setInsertImageUrl("");
-          }}
-        >
-          <div 
-            className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl p-6 w-full max-w-md border border-gray-200 dark:border-gray-700"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Insert Image</h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Enter image URL:
-                </label>
-                <input
-                  type="url"
-                  value={insertImageUrl}
-                  onChange={(e) => setInsertImageUrl(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter' && insertImageUrl.trim()) {
-                      editor?.chain().focus().setImage({ src: insertImageUrl }).run();
-                      setInsertImageModalOpen(false);
-                      setInsertImageUrl("");
-                    }
-                  }}
-                  placeholder="https://example.com/image.jpg"
-                  className="w-full h-11 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                  autoFocus
-                />
-              </div>
-
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={() => {
-                    setInsertImageModalOpen(false);
-                    setInsertImageUrl("");
-                  }}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    if (insertImageUrl.trim() && editor) {
-                      editor.chain().focus().setImage({ src: insertImageUrl }).run();
-                      setInsertImageModalOpen(false);
-                      setInsertImageUrl("");
-                    }
-                  }}
-                  disabled={!insertImageUrl.trim()}
-                  className="px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  Insert Image
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
