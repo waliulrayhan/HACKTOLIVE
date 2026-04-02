@@ -29,9 +29,10 @@ import {
   Spinner,
   Center,
   Divider,
+  Image as ChakraImage,
 } from "@chakra-ui/react";
 import { toast } from '@/components/ui/toast'
-import Image from "next/image";
+import NextImage from "next/image";
 import { Course } from "@/types/academy";
 import { FallInPlace } from "@/components/shared/motion/fall-in-place";
 import { ButtonLink } from "@/components/shared/button-link/button-link";
@@ -647,7 +648,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                                 overflow="hidden"
                                 bg={useColorModeValue("white", "gray.900")}
                               >
-                                <Image
+                                <NextImage
                                   src={useColorModeValue(
                                     "/images/payment/Footer-Mobile-Light-Version.png",
                                     "/images/payment/Footer-Mobile-Dark-Version.png"
@@ -754,7 +755,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                     h="200px"
                     overflow="hidden"
                   >
-                    <Image
+                    <NextImage
                       src={course.thumbnail}
                       alt={course.title}
                       width={400}
@@ -953,12 +954,13 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                     </HStack>
                     <Flex gap="4">
                       {course.instructor.user?.avatar ? (
-                        <Image
+                        <ChakraImage
                           src={course.instructor.user.avatar}
                           alt={course.instructor.user?.name || 'Instructor'}
-                          width={70}
-                          height={70}
-                          style={{ borderRadius: "12px", objectFit: "cover" }}
+                          boxSize="70px"
+                          borderRadius="12px"
+                          objectFit="cover"
+                          fallbackSrc="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E"
                         />
                       ) : (
                         <Box

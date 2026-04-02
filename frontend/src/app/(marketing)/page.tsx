@@ -39,6 +39,7 @@ import {
   useBreakpointValue,
   Spinner,
   Center,
+  Image as ChakraImage,
 } from '@chakra-ui/react'
 import { Br, Link } from '@saas-ui/react'
 import type { NextPage } from 'next'
@@ -1849,11 +1850,13 @@ const BlogSection = () => {
                   >
                     <Box position="relative" height="200px">
                       {post.mainImage ? (
-                        <Image
+                        <ChakraImage
                           src={post.mainImage}
                           alt={post.title}
-                          fill
-                          style={{ objectFit: 'cover' }}
+                          w="full"
+                          h="full"
+                          objectFit="cover"
+                          fallbackSrc="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'%3E%3Crect width='1200' height='600' fill='%23e2e8f0'/%3E%3Cpath d='M0 480 L240 300 L420 390 L620 210 L840 360 L1200 160 L1200 600 L0 600 Z' fill='%23cbd5e1'/%3E%3Ccircle cx='170' cy='150' r='55' fill='%23f8fafc'/%3E%3C/svg%3E"
                         />
                       ) : (
                         <Box
