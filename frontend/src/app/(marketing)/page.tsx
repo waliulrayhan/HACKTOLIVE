@@ -424,7 +424,7 @@ const ServicesOverviewSection = () => {
       description: 'Comprehensive security testing for web and mobile applications to identify vulnerabilities.',
       color: 'blue',
       features: ['Web App Testing', 'Mobile Security', 'API Testing', 'Network Pentesting'],
-      image: '/images/grid-image/image-01.png'
+      image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1400&q=80'
     },
     {
       icon: FiSearch,
@@ -432,7 +432,7 @@ const ServicesOverviewSection = () => {
       description: 'Thorough security evaluations with detailed remediation guidance and compliance reports.',
       color: 'purple',
       features: ['Infrastructure Audit', 'Code Review', 'Security Scanning', 'Risk Analysis'],
-      image: '/images/grid-image/image-02.png'
+      image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=1400&q=80'
     },
     {
       icon: FiActivity,
@@ -440,7 +440,7 @@ const ServicesOverviewSection = () => {
       description: '24/7 security monitoring and incident response to protect your organization.',
       color: 'red',
       features: ['Threat Monitoring', 'Incident Response', 'Log Analysis', 'Security Alerts'],
-      image: '/images/grid-image/image-03.png'
+      image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1400&q=80'
     },
     {
       icon: FiGlobe,
@@ -448,7 +448,7 @@ const ServicesOverviewSection = () => {
       description: 'Intelligence gathering and digital forensics investigation services.',
       color: 'cyan',
       features: ['OSINT Investigation', 'Digital Forensics', 'Threat Intelligence', 'Evidence Analysis'],
-      image: '/images/grid-image/image-04.png'
+      image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1400&q=80'
     },
   ]
 
@@ -794,30 +794,30 @@ const MeetOurExpertsSection = () => {
 
   const experts = [
     {
-      name: 'Md. Rayhan Ahmed',
+      name: 'Mosabbir Shemul',
       title: 'Senior Security Researcher',
       bio: 'OSCP & CEH certified with 7+ years of experience in penetration testing and red teaming operations.',
-      avatar: '/images/team/team-01.jpg',
+      avatar: '/images/user/Admin1.jpg',
       rating: 4.9,
       students: 3500,
       courses: 8,
       certifications: ['OSCP', 'CEH', 'Security+']
     },
     {
-      name: 'Fahim Hassan',
+      name: 'Md. Ziaur Rahman',
       title: 'Penetration Testing Lead',
       bio: 'Specializes in web application security and has discovered critical vulnerabilities in major platforms.',
-      avatar: '/images/cards/card-02.jpg',
+      avatar: '/images/user/Admin2.jpg',
       rating: 4.8,
       students: 2800,
       courses: 6,
       certifications: ['OSWE', 'OSCE', 'GWAPT']
     },
     {
-      name: 'Sakib Rahman',
+      name: 'Md. Mamun Mia',
       title: 'Red Team Specialist',
       bio: 'Expert in advanced exploitation techniques and infrastructure penetration testing.',
-      avatar: '/images/team/team-03.jpg',
+      avatar: '/images/user/Admin3.png',
       rating: 4.9,
       students: 2200,
       courses: 5,
@@ -863,7 +863,7 @@ const MeetOurExpertsSection = () => {
                   cursor="pointer"
                   h="full"
                 >
-                  <Box position="relative" overflow="hidden">
+                  <Box position="relative" overflow="hidden" aspectRatio="4 / 3">
                     <Image
                       src={expert.avatar}
                       alt={expert.name}
@@ -871,8 +871,9 @@ const MeetOurExpertsSection = () => {
                       height={400}
                       style={{
                         width: "100%",
-                        height: "280px",
-                        objectFit: "cover"
+                        height: "100%",
+                        objectFit: "cover",
+                        objectPosition: "center top"
                       }}
                     />
                     <Box
@@ -1943,16 +1944,11 @@ const TrustedBySection = () => {
 
   // Sample partners/clients - duplicated for infinite scroll
   const partners = [
-    { name: 'Government of Bangladesh', category: 'Public Sector', logo: '/images/grid-image/image-01.png' },
-    { name: 'BRAC Bank', category: 'Financial', logo: '/images/grid-image/image-02.png' },
-    { name: 'Robi Axiata', category: 'Telecom', logo: '/images/grid-image/image-03.png' },
-    { name: 'Daraz Bangladesh', category: 'E-commerce', logo: '/images/grid-image/image-04.png' },
-    { name: 'BUET', category: 'Education', logo: '/images/carousel/carousel-01.png' },
-    { name: 'City Bank', category: 'Financial', logo: '/images/carousel/carousel-02.png' },
-    { name: 'Grameenphone', category: 'Telecom', logo: '/images/cards/card-01.jpg' },
-    { name: 'Pathao', category: 'Tech', logo: '/images/cards/card-02.jpg' },
-    { name: 'bKash', category: 'FinTech', logo: '/images/cards/card-03.jpg' },
-    { name: 'Nagad', category: 'FinTech', logo: '/images/cards/card-04.jpg' },
+    { name: 'Google', category: 'AI & Cloud', logo: 'https://cdn.simpleicons.org/google' },
+    { name: 'Cloudflare', category: 'Web Security', logo: 'https://cdn.simpleicons.org/cloudflare' },
+    { name: 'Cisco', category: 'Networking', logo: 'https://cdn.simpleicons.org/cisco' },
+    { name: 'GitHub', category: 'Developer Tools', logo: 'https://cdn.simpleicons.org/github' },
+    { name: 'NVIDIA', category: 'AI Infrastructure', logo: 'https://cdn.simpleicons.org/nvidia' },
   ]
 
   // Duplicate for seamless loop
@@ -2014,13 +2010,14 @@ const TrustedBySection = () => {
                     alignItems="center"
                     justifyContent="center"
                   >
-                    <Box
+                    <ChakraImage
                       as="img"
                       src={partner.logo}
                       alt={partner.name}
                       maxW="100%"
-                      maxH="100%"
+                      maxH="70%"
                       objectFit="contain"
+                      loading="lazy"
                     />
                   </Box>
                   <Text
