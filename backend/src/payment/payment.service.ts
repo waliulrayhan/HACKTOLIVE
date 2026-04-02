@@ -2,11 +2,12 @@ import { Injectable, Logger, NotFoundException, BadRequestException } from '@nes
 import { PrismaService } from '../prisma.service';
 import { EpsService } from './eps.service';
 import { EmailService } from '../email/email.service';
-import { CoursePaymentStatus } from '@prisma/client';
+import { CourseCouponDiscountType, CoursePaymentStatus } from '@prisma/client';
 import { getCourseFinalPrice } from '../utils/transform.util';
 
 export interface InitiatePaymentDto {
   courseId?: string;
+  couponCode?: string;
   productId?: string;
   cartItems?: Array<{
     productId: string;
@@ -47,6 +48,9 @@ export class PaymentService {
       let productName = '';
       let productCategory = '';
       let cartData: string | null = null;
+      let courseOriginalAmount: number | null = null;
+      let appliedCouponId: string | null = null;
+      let couponDiscountAmount = 0;
 
       // Determine what user is paying for
       if (data.courseId) {
@@ -95,9 +99,24 @@ export class PaymentService {
           throw new BadRequestException('Already enrolled in this course');
         }
 
-        amount = finalCoursePrice;
+        courseOriginalAmount = finalCoursePrice;
+
+        const couponPricing = await this.resolveCourseCouponPricing(
+          data.courseId,
+          finalCoursePrice,
+          data.couponCode,
+          user?.student?.id,
+        );
+
+        amount = couponPricing.finalAmount;
         productName = course.title;
         productCategory = 'Course Enrollment';
+
+        if (couponPricing.appliedCoupon) {
+          data.couponCode = couponPricing.appliedCoupon.code;
+          appliedCouponId = couponPricing.appliedCoupon.id;
+          couponDiscountAmount = couponPricing.discountAmount;
+        }
       } else if (data.cartItems && data.cartItems.length > 0) {
         // Shopping cart checkout
         let subtotal = 0;
@@ -192,6 +211,10 @@ export class PaymentService {
           customerCountry: data.customerCountry,
           courseId: data.courseId,
           productId: data.productId,
+          couponId: data.courseId ? appliedCouponId : null,
+          couponCode: data.couponCode ? data.couponCode.trim().toUpperCase() : null,
+          originalAmount: data.courseId ? courseOriginalAmount : null,
+          couponDiscountAmount: data.courseId ? couponDiscountAmount : 0,
           metadata: cartData, // Store cart data for later order creation
         },
       });
@@ -251,6 +274,9 @@ export class PaymentService {
         transactionId,
         gatewayUrl: paymentInit.gatewayUrl,
         amount,
+        originalAmount: payment.originalAmount,
+        couponDiscountAmount: payment.couponDiscountAmount,
+        couponCode: payment.couponCode,
         currency: 'BDT',
         gateway: 'eps',
       };
@@ -258,6 +284,161 @@ export class PaymentService {
       this.logger.error(`Error initiating payment: ${error.message}`, error.stack);
       throw error;
     }
+  }
+
+  async previewCourseCoupon(
+    userId: string | undefined,
+    data: { courseId: string; couponCode: string },
+  ) {
+    const course = await this.prisma.course.findUnique({
+      where: { id: data.courseId },
+      select: { id: true, title: true, ctaText: true, price: true, discountedPrice: true, discountPercentage: true },
+    });
+
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
+
+    if ((course as any).ctaText === 'COMING_SOON') {
+      throw new BadRequestException('Enrollment is not open yet for this course');
+    }
+
+    const baseAmount = getCourseFinalPrice(course as any);
+    if (baseAmount <= 0) {
+      throw new BadRequestException('Coupons can only be used for paid courses');
+    }
+
+    let studentId: string | undefined;
+    if (userId) {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+        include: { student: true },
+      });
+      studentId = user?.student?.id;
+    }
+
+    const result = await this.resolveCourseCouponPricing(
+      data.courseId,
+      baseAmount,
+      data.couponCode,
+      studentId,
+    );
+
+    if (!result.appliedCoupon) {
+      throw new BadRequestException('Invalid coupon code');
+    }
+
+    return {
+      success: true,
+      courseId: data.courseId,
+      baseAmount,
+      finalAmount: result.finalAmount,
+      discountAmount: result.discountAmount,
+      coupon: {
+        id: result.appliedCoupon.id,
+        code: result.appliedCoupon.code,
+        description: result.appliedCoupon.description,
+        discountType: result.appliedCoupon.discountType,
+        discountValue: result.appliedCoupon.discountValue,
+      },
+    };
+  }
+
+  private async resolveCourseCouponPricing(
+    courseId: string,
+    baseAmount: number,
+    couponCode?: string,
+    studentId?: string,
+  ) {
+    const normalizedCode = couponCode?.trim().toUpperCase();
+
+    if (!normalizedCode) {
+      return {
+        finalAmount: baseAmount,
+        discountAmount: 0,
+        appliedCoupon: null,
+      };
+    }
+
+    const course = await this.prisma.course.findUnique({
+      where: { id: courseId },
+      select: { id: true, instructorId: true },
+    });
+
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
+
+    const coupon = await this.prisma.courseCoupon.findFirst({
+      where: {
+        code: normalizedCode,
+        instructorId: course.instructorId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    if (!coupon) {
+      throw new BadRequestException('Invalid coupon code for this course');
+    }
+
+    if (!(coupon as any).applyToAllCourses && coupon.courseId !== courseId) {
+      throw new BadRequestException('Invalid coupon code for this course');
+    }
+
+    const now = new Date();
+    if (!coupon.isActive) {
+      throw new BadRequestException('This coupon is inactive');
+    }
+    if (coupon.startsAt && coupon.startsAt > now) {
+      throw new BadRequestException('This coupon is not active yet');
+    }
+    if (coupon.expiresAt && coupon.expiresAt < now) {
+      throw new BadRequestException('This coupon has expired');
+    }
+
+    if (coupon.usageLimit !== null && coupon.usageCount >= coupon.usageLimit) {
+      throw new BadRequestException('This coupon has reached its usage limit');
+    }
+
+    if (coupon.minOrderAmount > 0 && baseAmount < coupon.minOrderAmount) {
+      throw new BadRequestException(`Minimum order amount for this coupon is ${coupon.minOrderAmount} BDT`);
+    }
+
+    if (studentId) {
+      const studentUsageCount = await this.prisma.courseCouponUsage.count({
+        where: {
+          couponId: coupon.id,
+          studentId,
+        },
+      });
+
+      if (studentUsageCount >= coupon.perStudentLimit) {
+        throw new BadRequestException('You have already reached the usage limit for this coupon');
+      }
+    }
+
+    let discountAmount =
+      coupon.discountType === CourseCouponDiscountType.PERCENTAGE
+        ? (baseAmount * coupon.discountValue) / 100
+        : coupon.discountValue;
+
+    if (coupon.maxDiscountAmount !== null && coupon.maxDiscountAmount !== undefined) {
+      discountAmount = Math.min(discountAmount, coupon.maxDiscountAmount);
+    }
+
+    discountAmount = Number(Math.min(baseAmount, Math.max(0, discountAmount)).toFixed(2));
+
+    if (discountAmount <= 0) {
+      throw new BadRequestException('Coupon does not provide any discount for this order');
+    }
+
+    return {
+      finalAmount: Number(Math.max(0, baseAmount - discountAmount).toFixed(2)),
+      discountAmount,
+      appliedCoupon: coupon,
+    };
   }
 
   /**
@@ -401,6 +582,46 @@ export class PaymentService {
             throw new NotFoundException('Student account required for course enrollment. Please sign up first.');
           }
 
+          if (payment.couponId) {
+            const coupon = await tx.courseCoupon.findUnique({
+              where: {
+                id: payment.couponId,
+              },
+            });
+
+            if (!coupon) {
+              throw new BadRequestException('Applied coupon is no longer valid');
+            }
+
+            if (!payment.course?.instructorId || coupon.instructorId !== payment.course.instructorId) {
+              throw new BadRequestException('Applied coupon is not valid for this course');
+            }
+
+            if (!(coupon as any).applyToAllCourses && coupon.courseId !== payment.courseId) {
+              throw new BadRequestException('Applied coupon is not valid for this course');
+            }
+
+            const now = new Date();
+            if (!coupon.isActive || (coupon.startsAt && coupon.startsAt > now) || (coupon.expiresAt && coupon.expiresAt < now)) {
+              throw new BadRequestException('Applied coupon has expired or is inactive');
+            }
+
+            if (coupon.usageLimit !== null && coupon.usageCount >= coupon.usageLimit) {
+              throw new BadRequestException('Applied coupon usage limit has been reached');
+            }
+
+            const studentUsageCount = await tx.courseCouponUsage.count({
+              where: {
+                couponId: coupon.id,
+                studentId: user.student.id,
+              },
+            });
+
+            if (studentUsageCount >= coupon.perStudentLimit) {
+              throw new BadRequestException('Coupon usage limit reached for this student');
+            }
+          }
+
           // Check for duplicate enrollment (within transaction)
           const existingEnrollment = await tx.enrollment.findFirst({
             where: {
@@ -444,6 +665,24 @@ export class PaymentService {
               where: { id: payment.course.instructorId },
               data: {
                 totalStudents: { increment: 1 },
+              },
+            });
+          }
+
+          if (payment.couponId && Number(payment.couponDiscountAmount || 0) > 0) {
+            await tx.courseCouponUsage.create({
+              data: {
+                couponId: payment.couponId,
+                paymentId: payment.id,
+                studentId: user.student.id,
+                discountAmount: Number(payment.couponDiscountAmount || 0),
+              },
+            });
+
+            await tx.courseCoupon.update({
+              where: { id: payment.couponId },
+              data: {
+                usageCount: { increment: 1 },
               },
             });
           }

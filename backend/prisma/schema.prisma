@@ -51,6 +51,7 @@ model Instructor {
   updatedAt     DateTime      @updatedAt
   certificates  Certificate[]
   courses       Course[]
+  courseCoupons CourseCoupon[]
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([rating])
@@ -67,6 +68,7 @@ model Student {
   updatedAt             DateTime               @updatedAt
   assignmentSubmissions AssignmentSubmission[]
   certificates          Certificate[]
+  couponUsages          CourseCouponUsage[]
   enrollments           Enrollment[]
   progress              LessonProgress[]
   quizAttempts          QuizAttempt[]
@@ -113,6 +115,7 @@ model Course {
   enrollments      Enrollment[]
   reviews          Review[]
   payments         CoursePayment[]
+  coupons          CourseCoupon[]
   products         Product[]
 
   @@index([slug])
@@ -242,6 +245,10 @@ model CoursePayment {
   // Course/Product Info
   courseId            String?
   productId           String?
+  couponId            String?
+  couponCode          String?
+  originalAmount      Float?
+  couponDiscountAmount Float?             @default(0)
   
   // IPN & Risk
   riskLevel           Int                 @default(0)
@@ -255,13 +262,64 @@ model CoursePayment {
   updatedAt           DateTime            @updatedAt
   
   course              Course?             @relation(fields: [courseId], references: [id])
+  coupon              CourseCoupon?       @relation(fields: [couponId], references: [id])
   product             Product?            @relation(fields: [productId], references: [id])
   enrollments         Enrollment[]
+  couponUsage         CourseCouponUsage?
 
   @@index([status])
   @@index([transactionId])
+  @@index([couponId])
   @@index([customerEmail])
   @@index([createdAt])
+}
+
+model CourseCoupon {
+  id                String                   @id @default(uuid())
+  courseId          String
+  instructorId      String
+  applyToAllCourses Boolean                  @default(false)
+  code              String                   @unique @db.VarChar(64)
+  description       String?                  @db.VarChar(255)
+  discountType      CourseCouponDiscountType
+  discountValue     Float
+  maxDiscountAmount Float?
+  minOrderAmount    Float                    @default(0)
+  usageLimit        Int?
+  usageCount        Int                      @default(0)
+  perStudentLimit   Int                      @default(1)
+  startsAt          DateTime?
+  expiresAt         DateTime?
+  isActive          Boolean                  @default(true)
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+  course            Course                   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  instructor        Instructor               @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+  payments          CoursePayment[]
+  usages            CourseCouponUsage[]
+
+  @@index([courseId])
+  @@index([instructorId])
+  @@index([code])
+  @@index([isActive])
+  @@index([expiresAt])
+}
+
+model CourseCouponUsage {
+  id             String       @id @default(uuid())
+  couponId       String
+  paymentId      String       @unique
+  studentId      String
+  discountAmount Float
+  createdAt      DateTime     @default(now())
+  coupon         CourseCoupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  payment        CoursePayment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  student        Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([couponId])
+  @@index([studentId])
+  @@index([createdAt])
+  @@unique([couponId, studentId, paymentId])
 }
 
 model Review {
@@ -548,6 +606,11 @@ enum CoursePaymentStatus {
   FAILED
   CANCELLED
   REFUNDED
+}
+
+enum CourseCouponDiscountType {
+  PERCENTAGE
+  FIXED
 }
 
 enum QuestionType {

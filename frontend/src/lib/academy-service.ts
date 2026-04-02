@@ -1,5 +1,5 @@
 import api from './api-client';
-import { Course, Instructor, Review, Enrollment } from '@/types/academy';
+import { Course, Instructor, Review, Enrollment, CourseCoupon, CourseCouponPreview } from '@/types/academy';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -268,6 +268,7 @@ class AcademyService {
    */
   async initiatePayment(paymentData: {
     courseId?: string;
+    couponCode?: string;
     productId?: string;
     cartItems?: Array<{
       productId: string;
@@ -292,6 +293,44 @@ class AcademyService {
       console.error('Error initiating payment:', error);
       throw error;
     }
+  }
+
+  async previewCourseCoupon(courseId: string, couponCode: string): Promise<CourseCouponPreview> {
+    const response = await api.post<CourseCouponPreview>('/payment/course-coupon/preview', {
+      courseId,
+      couponCode,
+    });
+    return response.data;
+  }
+
+  async getInstructorCourseCoupons(courseId: string): Promise<CourseCoupon[]> {
+    const response = await api.get<CourseCoupon[]>(`/instructor/courses/${courseId}/coupons`);
+    return response.data;
+  }
+
+  async getInstructorCoupons(): Promise<CourseCoupon[]> {
+    const response = await api.get<CourseCoupon[]>(`/instructor/coupons`);
+    return response.data;
+  }
+
+  async createInstructorCoupons(payload: Partial<CourseCoupon> & { applyToAllCourses?: boolean }): Promise<any> {
+    const response = await api.post(`/instructor/coupons`, payload);
+    return response.data;
+  }
+
+  async createInstructorCourseCoupon(courseId: string, payload: Partial<CourseCoupon>): Promise<CourseCoupon> {
+    const response = await api.post<CourseCoupon>(`/instructor/courses/${courseId}/coupons`, payload);
+    return response.data;
+  }
+
+  async updateInstructorCourseCoupon(courseId: string, couponId: string, payload: Partial<CourseCoupon>): Promise<CourseCoupon> {
+    const response = await api.patch<CourseCoupon>(`/instructor/courses/${courseId}/coupons/${couponId}`, payload);
+    return response.data;
+  }
+
+  async deleteInstructorCourseCoupon(courseId: string, couponId: string): Promise<{ message: string }> {
+    const response = await api.delete<{ message: string }>(`/instructor/courses/${courseId}/coupons/${couponId}`);
+    return response.data;
   }
 
   /**

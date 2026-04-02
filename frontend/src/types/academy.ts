@@ -15,6 +15,7 @@ export type CourseCategory =
 
 export type CourseStatus = "draft" | "published" | "archived";
 export type CourseCtaText = "ENROLL_NOW" | "COMING_SOON";
+export type CourseCouponDiscountType = "PERCENTAGE" | "FIXED";
 export type EnrollmentStatus = "active" | "completed" | "dropped";
 export type LessonType = "video" | "article" | "quiz" | "assignment";
 
@@ -143,6 +144,50 @@ export interface Enrollment {
   completedLessons: string[];
   lastAccessedLessonId?: string;
   certificateId?: string;
+}
+
+export interface CourseCoupon {
+  id: string;
+  courseId: string;
+  instructorId: string;
+  applyToAllCourses: boolean;
+  code: string;
+  description?: string | null;
+  discountType: CourseCouponDiscountType;
+  discountValue: number;
+  maxDiscountAmount?: number | null;
+  minOrderAmount: number;
+  usageLimit?: number | null;
+  usageCount: number;
+  perStudentLimit: number;
+  startsAt?: string | null;
+  expiresAt?: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  _count?: {
+    usages: number;
+  };
+  course?: {
+    id: string;
+    title: string;
+    slug?: string;
+  };
+}
+
+export interface CourseCouponPreview {
+  success: boolean;
+  courseId: string;
+  baseAmount: number;
+  finalAmount: number;
+  discountAmount: number;
+  coupon: {
+    id: string;
+    code: string;
+    description?: string | null;
+    discountType: CourseCouponDiscountType;
+    discountValue: number;
+  };
 }
 
 export interface Certificate {

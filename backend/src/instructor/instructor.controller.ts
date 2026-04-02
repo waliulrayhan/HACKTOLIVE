@@ -17,6 +17,10 @@ import { UserRole, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { InstructorService } from './instructor.service';
 import { getCourseFinalPrice } from '../utils/transform.util';
+import {
+  CreateCourseCouponDto,
+  UpdateCourseCouponDto,
+} from './dto/course-coupon.dto';
 
 @ApiTags('instructor')
 @ApiBearerAuth()
@@ -111,6 +115,92 @@ export class InstructorController {
 
     normalized.ctaText = ctaText;
     return normalized;
+  }
+
+  private normalizeCouponPayload(payload: CreateCourseCouponDto | UpdateCourseCouponDto) {
+    const normalized: any = { ...payload };
+
+    if (normalized.code !== undefined) {
+      normalized.code = String(normalized.code).trim().toUpperCase();
+    }
+
+    if (normalized.description !== undefined) {
+      const description = String(normalized.description || '').trim();
+      normalized.description = description.length > 0 ? description : null;
+    }
+
+    if (normalized.maxDiscountAmount === null || normalized.maxDiscountAmount === '') {
+      normalized.maxDiscountAmount = null;
+    }
+
+    if (normalized.usageLimit === null || normalized.usageLimit === '') {
+      normalized.usageLimit = null;
+    }
+
+    if (normalized.startsAt === null || normalized.startsAt === '') {
+      normalized.startsAt = null;
+    } else if (normalized.startsAt) {
+      normalized.startsAt = new Date(normalized.startsAt).toISOString();
+    }
+
+    if (normalized.expiresAt === null || normalized.expiresAt === '') {
+      normalized.expiresAt = null;
+    } else if (normalized.expiresAt) {
+      normalized.expiresAt = new Date(normalized.expiresAt).toISOString();
+    }
+
+    if (
+      normalized.startsAt &&
+      normalized.expiresAt &&
+      new Date(normalized.expiresAt).getTime() <= new Date(normalized.startsAt).getTime()
+    ) {
+      throw new BadRequestException('Coupon expiry date must be after start date');
+    }
+
+    if (normalized.discountType === 'PERCENTAGE' && normalized.discountValue > 100) {
+      throw new BadRequestException('Percentage discount cannot exceed 100');
+    }
+
+    return normalized;
+  }
+
+  private async verifyInstructorCourseOwnership(req: any, courseId: string) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId: req.user.id },
+    });
+
+    const course = await this.prisma.course.findFirst({
+      where: {
+        id: courseId,
+        instructorId: instructor?.id,
+      },
+      select: {
+        id: true,
+        instructorId: true,
+        title: true,
+        price: true,
+        discountedPrice: true,
+        discountPercentage: true,
+      },
+    });
+
+    if (!instructor || !course) {
+      throw new BadRequestException('Course not found or access denied');
+    }
+
+    return { instructor, course };
+  }
+
+  private async getInstructorOrThrow(req: any) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId: req.user.id },
+    });
+
+    if (!instructor) {
+      throw new BadRequestException('Instructor profile not found');
+    }
+
+    return instructor;
   }
 
   @Get('dashboard')
@@ -315,6 +405,288 @@ export class InstructorController {
         },
       },
     });
+  }
+
+  @Get('courses/:courseId/coupons')
+  async getCourseCoupons(@Request() req: any, @Param('courseId') courseId: string) {
+    const { instructor, course } = await this.verifyInstructorCourseOwnership(req, courseId);
+
+    const coupons = await this.prisma.courseCoupon.findMany({
+      where: {
+        instructorId: instructor.id,
+        courseId: course.id,
+      },
+      include: {
+        _count: {
+          select: {
+            usages: true,
+          },
+        },
+      },
+      orderBy: [
+        { isActive: 'desc' },
+        { createdAt: 'desc' },
+      ],
+    });
+
+    return coupons;
+  }
+
+  @Get('coupons')
+  async getAllInstructorCoupons(@Request() req: any) {
+    const instructor = await this.getInstructorOrThrow(req);
+
+    return this.prisma.courseCoupon.findMany({
+      where: { instructorId: instructor.id },
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+          },
+        },
+        _count: {
+          select: {
+            usages: true,
+          },
+        },
+      },
+      orderBy: [
+        { isActive: 'desc' },
+        { createdAt: 'desc' },
+      ],
+    });
+  }
+
+  @Post('coupons')
+  async createInstructorCoupons(
+    @Request() req: any,
+    @Body() payload: CreateCourseCouponDto,
+  ) {
+    const instructor = await this.getInstructorOrThrow(req);
+    const normalized = this.normalizeCouponPayload(payload);
+
+    const courses = await this.prisma.course.findMany({
+      where: {
+        instructorId: instructor.id,
+      },
+      select: {
+        id: true,
+        title: true,
+        price: true,
+        discountedPrice: true,
+        discountPercentage: true,
+      },
+    });
+
+    const paidCourses = courses.filter((course) => getCourseFinalPrice(course) > 0);
+
+    if (paidCourses.length === 0) {
+      throw new BadRequestException('No paid courses found to apply this coupon');
+    }
+
+    const targetCourse = paidCourses[0];
+
+    const existingCoupon = await this.prisma.courseCoupon.findFirst({
+      where: {
+        instructorId: instructor.id,
+        code: normalized.code,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (existingCoupon) {
+      throw new BadRequestException('Coupon code already exists for your instructor profile');
+    }
+
+    const createdCoupon = await this.prisma.courseCoupon.create({
+      data: {
+        courseId: targetCourse.id,
+        instructorId: instructor.id,
+        applyToAllCourses: Boolean(normalized.applyToAllCourses),
+        code: normalized.code,
+        description: normalized.description ?? null,
+        discountType: normalized.discountType,
+        discountValue: normalized.discountValue,
+        maxDiscountAmount: normalized.maxDiscountAmount ?? null,
+        minOrderAmount: normalized.minOrderAmount ?? 0,
+        usageLimit: normalized.usageLimit ?? null,
+        perStudentLimit: normalized.perStudentLimit ?? 1,
+        startsAt: normalized.startsAt ? new Date(normalized.startsAt) : null,
+        expiresAt: normalized.expiresAt ? new Date(normalized.expiresAt) : null,
+        isActive: normalized.isActive ?? true,
+      } as any,
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+          },
+        },
+      },
+    });
+
+    return {
+      createdCount: 1,
+      skippedCount: normalized.applyToAllCourses ? Math.max(0, paidCourses.length - 1) : 0,
+      coupons: [createdCoupon],
+      mode: normalized.applyToAllCourses ? 'ALL_COURSES_SHARED' : 'FIRST_PAID_COURSE',
+      note: normalized.applyToAllCourses
+        ? `Coupon created once and available in all-courses management view.`
+        : undefined,
+    };
+  }
+
+  @Post('courses/:courseId/coupons')
+  async createCourseCoupon(
+    @Request() req: any,
+    @Param('courseId') courseId: string,
+    @Body() payload: CreateCourseCouponDto,
+  ) {
+    const { instructor, course } = await this.verifyInstructorCourseOwnership(req, courseId);
+    const normalized = this.normalizeCouponPayload(payload);
+
+    const courseFinalPrice = getCourseFinalPrice(course);
+    if (courseFinalPrice <= 0) {
+      throw new BadRequestException('Coupons can only be added to paid courses');
+    }
+
+    const existing = await this.prisma.courseCoupon.findFirst({
+      where: {
+        code: normalized.code,
+      },
+      select: { id: true },
+    });
+
+    if (existing) {
+      throw new BadRequestException('Coupon code already exists. Please use another code.');
+    }
+
+    const coupon = await this.prisma.courseCoupon.create({
+      data: {
+        courseId: course.id,
+        instructorId: instructor.id,
+        applyToAllCourses: false,
+        code: normalized.code,
+        description: normalized.description ?? null,
+        discountType: normalized.discountType,
+        discountValue: normalized.discountValue,
+        maxDiscountAmount: normalized.maxDiscountAmount ?? null,
+        minOrderAmount: normalized.minOrderAmount ?? 0,
+        usageLimit: normalized.usageLimit ?? null,
+        perStudentLimit: normalized.perStudentLimit ?? 1,
+        startsAt: normalized.startsAt ? new Date(normalized.startsAt) : null,
+        expiresAt: normalized.expiresAt ? new Date(normalized.expiresAt) : null,
+        isActive: normalized.isActive ?? true,
+      } as any,
+    });
+
+    return coupon;
+  }
+
+  @Patch('courses/:courseId/coupons/:couponId')
+  async updateCourseCoupon(
+    @Request() req: any,
+    @Param('courseId') courseId: string,
+    @Param('couponId') couponId: string,
+    @Body() payload: UpdateCourseCouponDto,
+  ) {
+    const { instructor, course } = await this.verifyInstructorCourseOwnership(req, courseId);
+    const normalized = this.normalizeCouponPayload(payload);
+
+    const coupon = await this.prisma.courseCoupon.findFirst({
+      where: {
+        id: couponId,
+        instructorId: instructor.id,
+        courseId: course.id,
+      },
+    });
+
+    if (!coupon) {
+      throw new BadRequestException('Coupon not found for this course');
+    }
+
+    if (normalized.code && normalized.code !== coupon.code) {
+      const existing = await this.prisma.courseCoupon.findFirst({
+        where: {
+          code: normalized.code,
+          id: { not: coupon.id },
+        },
+        select: { id: true },
+      });
+
+      if (existing) {
+        throw new BadRequestException('Coupon code already exists. Please use another code.');
+      }
+    }
+
+    if (normalized.discountType === 'PERCENTAGE' && normalized.discountValue && normalized.discountValue > 100) {
+      throw new BadRequestException('Percentage discount cannot exceed 100');
+    }
+
+    return this.prisma.courseCoupon.update({
+      where: { id: coupon.id },
+      data: {
+        ...(normalized.code !== undefined ? { code: normalized.code } : {}),
+        ...(normalized.description !== undefined ? { description: normalized.description } : {}),
+        ...(normalized.discountType !== undefined ? { discountType: normalized.discountType } : {}),
+        ...(normalized.discountValue !== undefined ? { discountValue: normalized.discountValue } : {}),
+        ...(normalized.maxDiscountAmount !== undefined ? { maxDiscountAmount: normalized.maxDiscountAmount } : {}),
+        ...(normalized.minOrderAmount !== undefined ? { minOrderAmount: normalized.minOrderAmount } : {}),
+        ...(normalized.usageLimit !== undefined ? { usageLimit: normalized.usageLimit } : {}),
+        ...(normalized.perStudentLimit !== undefined ? { perStudentLimit: normalized.perStudentLimit } : {}),
+        ...(normalized.startsAt !== undefined ? { startsAt: normalized.startsAt ? new Date(normalized.startsAt) : null } : {}),
+        ...(normalized.expiresAt !== undefined ? { expiresAt: normalized.expiresAt ? new Date(normalized.expiresAt) : null } : {}),
+        ...(normalized.isActive !== undefined ? { isActive: normalized.isActive } : {}),
+      },
+    });
+  }
+
+  @Delete('courses/:courseId/coupons/:couponId')
+  async deleteCourseCoupon(
+    @Request() req: any,
+    @Param('courseId') courseId: string,
+    @Param('couponId') couponId: string,
+  ) {
+    const { instructor, course } = await this.verifyInstructorCourseOwnership(req, courseId);
+
+    const coupon = await this.prisma.courseCoupon.findFirst({
+      where: {
+        id: couponId,
+        instructorId: instructor.id,
+        courseId: course.id,
+      },
+      include: {
+        _count: {
+          select: { usages: true },
+        },
+      },
+    });
+
+    if (!coupon) {
+      throw new BadRequestException('Coupon not found for this course');
+    }
+
+    if ((coupon._count?.usages || 0) > 0) {
+      await this.prisma.courseCoupon.update({
+        where: { id: coupon.id },
+        data: { isActive: false },
+      });
+
+      return {
+        message: 'Coupon has previous usage and was deactivated instead of deleted',
+      };
+    }
+
+    await this.prisma.courseCoupon.delete({
+      where: { id: coupon.id },
+    });
+
+    return { message: 'Coupon deleted successfully' };
   }
 
   @Post('courses')

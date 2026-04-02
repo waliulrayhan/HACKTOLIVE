@@ -26,8 +26,6 @@ import {
   Alert,
   AlertIcon,
   AlertTitle,
-  Radio,
-  RadioGroup,
   Spinner,
   Center,
   Divider,
@@ -57,6 +55,7 @@ import {
 import academyService from "@/lib/academy-service";
 import { useAuth } from "@/context/AuthContext";
 import { getDiscountPercentage, getFinalPrice, getOriginalPrice, hasDiscount } from "@/lib/course-pricing";
+import { CourseCouponPreview } from "@/types/academy";
 
 interface EnrollmentPageProps {
   slug: string;
@@ -69,6 +68,10 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
+  const [couponCodeInput, setCouponCodeInput] = useState("");
+  const [couponPreview, setCouponPreview] = useState<CourseCouponPreview | null>(null);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [couponError, setCouponError] = useState("");
 
   // Initialize form data with empty values
   const [formData, setFormData] = useState({
@@ -79,20 +82,10 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
     agreeToTerms: false,
   });
 
-  const [paymentData, setPaymentData] = useState({
-    paymentMethod: "card",
-    cardNumber: "",
-    cardName: "",
-    expiryDate: "",
-    cvv: "",
-    couponCode: "",
-  });
-
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const accentBg = useColorModeValue("green.50", "green.900");
-  const accentColor = useColorModeValue("green.600", "green.300");
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -140,13 +133,53 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
     checkEnrollment();
   }, [user, course]);
 
+  useEffect(() => {
+    setCouponCodeInput("");
+    setCouponPreview(null);
+    setCouponError("");
+  }, [course?.id]);
+
   const finalPrice = course ? getFinalPrice(course) : 0;
   const originalPrice = course ? getOriginalPrice(course) : 0;
   const discounted = course ? hasDiscount(course) : false;
   const discountPercentage = course ? Math.round(getDiscountPercentage(course)) : 0;
   const isFree = finalPrice === 0;
+  const payableAmount = couponPreview?.finalAmount ?? finalPrice;
+  const couponDiscountAmount = couponPreview?.discountAmount ?? 0;
   const isComingSoon = course?.ctaText === "COMING_SOON";
   const isLoggedIn = !authLoading && !!user;
+
+  const handleApplyCoupon = async () => {
+    if (!course) return;
+
+    const normalizedCode = couponCodeInput.trim().toUpperCase();
+    if (!normalizedCode) {
+      setCouponError("Please enter a coupon code");
+      setCouponPreview(null);
+      return;
+    }
+
+    setIsApplyingCoupon(true);
+    setCouponError("");
+
+    try {
+      const preview = await academyService.previewCourseCoupon(course.id, normalizedCode);
+      setCouponPreview(preview);
+      setCouponCodeInput(preview.coupon.code);
+      toast.success("Coupon applied", {
+        description: `You saved ${preview.discountAmount.toLocaleString()} Tk`,
+      });
+    } catch (error: any) {
+      const message = error?.response?.data?.message || "Invalid coupon code";
+      setCouponPreview(null);
+      setCouponError(Array.isArray(message) ? message.join(", ") : message);
+      toast.error("Could not apply coupon", {
+        description: Array.isArray(message) ? message.join(", ") : message,
+      });
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,6 +234,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
 
         const paymentResponse = await academyService.initiatePayment({
           courseId: course.id,
+          couponCode: couponPreview?.coupon.code,
           customerName: formData.name,
           customerEmail: formData.email,
           customerPhone: formData.phone,
@@ -220,7 +254,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
     } catch (error: any) {
       console.error("Enrollment error:", error);
       const errorMessage = error.response?.data?.message || error.message || "An error occurred";
-      
+
       if (errorMessage.includes("already enrolled")) {
         toast.error("Already Enrolled", {
           description: "You are already enrolled in this course.",
@@ -294,11 +328,11 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
               </Text>
               <HStack spacing="4" flexWrap="wrap" justify="center">
                 <ButtonLink href={`/academy/courses/${slug}`} colorScheme="orange" size="lg">
-                View Course Details
-              </ButtonLink>
-              <ButtonLink href="/academy/courses" variant="outline" colorScheme="orange" size="lg">
-                Browse Courses
-              </ButtonLink>
+                  View Course Details
+                </ButtonLink>
+                <ButtonLink href="/academy/courses" variant="outline" colorScheme="orange" size="lg">
+                  Browse Courses
+                </ButtonLink>
               </HStack>
             </VStack>
           </Box>
@@ -364,15 +398,15 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
               You need to be logged in to enroll in this course. Please login or create an account to continue.
             </Text>
             <HStack spacing="4">
-              <ButtonLink 
-                href={`/login?redirect=/academy/enroll/${slug}`} 
+              <ButtonLink
+                href={`/login?redirect=/academy/enroll/${slug}`}
                 colorScheme="green"
                 size="lg"
               >
                 Login
               </ButtonLink>
-              <ButtonLink 
-                href={`/signup?redirect=/academy/enroll/${slug}`} 
+              <ButtonLink
+                href={`/signup?redirect=/academy/enroll/${slug}`}
                 variant="outline"
                 colorScheme="green"
                 size="lg"
@@ -392,10 +426,10 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
   return (
     <Box>
       {/* Header */}
-      <Box 
+      <Box
         mt={{ base: "14", md: "16" }}
         py={{ base: "8", md: "12" }}
-        bg={isFree ? accentBg : bgColor} 
+        bg={isFree ? accentBg : bgColor}
         borderBottomWidth="1px"
         borderColor={borderColor}
         sx={{ scrollMarginTop: "var(--navbar-height, 80px)" }}
@@ -407,11 +441,11 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                 ← Back to Course
               </ButtonLink>
               <HStack spacing="3">
-                <Badge 
-                  colorScheme={isFree ? "green" : "purple"} 
-                  fontSize="sm" 
-                  px="3" 
-                  py="1" 
+                <Badge
+                  colorScheme={isFree ? "green" : "purple"}
+                  fontSize="sm"
+                  px="3"
+                  py="1"
                   borderRadius="md"
                 >
                   {isFree ? "Free Course" : "Premium Course"}
@@ -429,7 +463,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                 {isFree ? "Start Learning Today" : "Complete Your Enrollment"}
               </Heading>
               <Text fontSize={{ base: "md", md: "lg" }} color="muted">
-                {isFree 
+                {isFree
                   ? "Click below to get instant access to this free course"
                   : "Secure your spot in this premium course and unlock expert-led content"}
               </Text>
@@ -470,7 +504,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                         <Icon as={FiUsers} boxSize="5" color="primary.500" />
                         <Heading size="lg">Student Information</Heading>
                       </HStack>
-                      
+
                       <form onSubmit={handleSubmit} id="enrollment-form">
                         <VStack spacing="5" align="stretch">
                           <SimpleGrid columns={{ base: 1, md: 2 }} spacing="4">
@@ -535,6 +569,57 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                   </Box>
                 </FallInPlace>
 
+
+                <Box
+                  p="5"
+                  borderRadius="xl"
+                  bg={useColorModeValue("teal.50", "teal.900")}
+                  borderWidth="1px"
+                  borderColor={useColorModeValue("teal.200", "teal.700")}
+                >
+                  <VStack spacing="3" align="stretch">
+                    <HStack justify="space-between">
+                      <Heading size="sm">Have a coupon?</Heading>
+                      {couponPreview && (
+                        <Badge colorScheme="green" borderRadius="full" px="3" py="1">
+                          Applied: {couponPreview.coupon.code}
+                        </Badge>
+                      )}
+                    </HStack>
+                    <HStack align="start">
+                      <Input
+                        placeholder="Enter course coupon"
+                        value={couponCodeInput}
+                        onChange={(e) => {
+                          setCouponCodeInput(e.target.value.toUpperCase());
+                          if (couponPreview) setCouponPreview(null);
+                          if (couponError) setCouponError("");
+                        }}
+                        bg={useColorModeValue("white", "gray.800")}
+                        borderRadius="lg"
+                      />
+                      <Button
+                        onClick={handleApplyCoupon}
+                        colorScheme="teal"
+                        isLoading={isApplyingCoupon}
+                        loadingText="Applying"
+                      >
+                        Apply
+                      </Button>
+                    </HStack>
+                    {couponError && (
+                      <Text fontSize="xs" color="red.400">
+                        {couponError}
+                      </Text>
+                    )}
+                    {couponPreview && (
+                      <Text fontSize="sm" color="teal.300">
+                        New payable amount: {couponPreview.finalAmount.toLocaleString()} Tk
+                      </Text>
+                    )}
+                  </VStack>
+                </Box>
+
                 {/* Payment Section - Only for Paid Courses */}
                 {!isFree && (
                   <FallInPlace delay={0.1}>
@@ -546,17 +631,17 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                         </HStack>
 
                         <VStack spacing="5" align="stretch">
-                          <Box 
-                            p="6" 
-                            bg={useColorModeValue("white", "gray.800")} 
+                          <Box
+                            p="6"
+                            bg={useColorModeValue("white", "gray.800")}
                             borderRadius="lg"
                             borderWidth="1px"
                             borderColor={borderColor}
                           >
                             <VStack spacing="4" align="center">
                               <Heading size="sm" textAlign="center">Accepted Payment Methods</Heading>
-                              <Box 
-                                w="full" 
+                              <Box
+                                w="full"
                                 maxW="600px"
                                 borderRadius="md"
                                 overflow="hidden"
@@ -578,9 +663,9 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                           </Box>
 
                           {/* Security Notice */}
-                          <HStack 
-                            p="4" 
-                            bg={useColorModeValue("green.50", "green.900")} 
+                          <HStack
+                            p="4"
+                            bg={useColorModeValue("green.50", "green.900")}
                             borderRadius="lg"
                             spacing="3"
                           >
@@ -629,15 +714,15 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                         isLoading={isSubmitting}
                         loadingText={isFree ? "Enrolling..." : "Redirecting to payment..."}
                         isDisabled={
-                          !formData.agreeToTerms || 
-                          !formData.name || 
-                          !formData.email || 
+                          !formData.agreeToTerms ||
+                          !formData.name ||
+                          !formData.email ||
                           !formData.phone
                         }
                       >
-                        {isFree 
-                          ? "Start Learning for Free" 
-                          : `Proceed to Payment - ${finalPrice.toLocaleString()} Tk`}
+                        {isFree
+                          ? "Start Learning for Free"
+                          : `Proceed to Payment - ${payableAmount.toLocaleString()} Tk`}
                       </Button>
 
                       {!isFree && (
@@ -655,17 +740,17 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
             <VStack spacing="6" align="stretch">
               {/* Price Summary Card */}
               <FallInPlace delay={0.2}>
-                <Box 
-                  bg={cardBg} 
-                  borderRadius="2xl" 
-                  overflow="hidden" 
-                  borderWidth="2px" 
+                <Box
+                  bg={cardBg}
+                  borderRadius="2xl"
+                  overflow="hidden"
+                  borderWidth="2px"
                   borderColor={isFree ? "green.500" : "purple.500"}
                   position="sticky"
                   top="calc(var(--navbar-height, 80px) + 20px)"
                 >
-                  <Box 
-                    position="relative" 
+                  <Box
+                    position="relative"
                     h="200px"
                     overflow="hidden"
                   >
@@ -697,10 +782,10 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                       </VStack> */}
                     </Box>
                   </Box>
-                  
+
                   <VStack p="6" spacing="4" align="stretch">
                     <Heading size="md" noOfLines={2}>{course.title}</Heading>
-                    
+
                     <HStack spacing="4" fontSize="sm">
                       <HStack spacing="1">
                         <Icon as={FiStar} color="yellow.500" />
@@ -720,7 +805,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                         </HStack>
                         <VStack spacing="0" align="end">
                           <Text fontWeight="semibold">
-                            {isFree ? "0 Tk" : `${finalPrice.toLocaleString()} Tk`}
+                            {isFree ? "0 Tk" : `${payableAmount.toLocaleString()} Tk`}
                           </Text>
                           {discounted && originalPrice > finalPrice && (
                             <HStack spacing="1">
@@ -732,8 +817,25 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                               </Badge>
                             </HStack>
                           )}
+                          {!isFree && couponPreview && (
+                            <Text fontSize="xs" color="green.400" fontWeight="semibold">
+                              Coupon saved {couponDiscountAmount.toLocaleString()} Tk
+                            </Text>
+                          )}
                         </VStack>
                       </HStack>
+
+                      {!isFree && couponPreview && (
+                        <HStack justify="space-between">
+                          <HStack spacing="2" color="muted">
+                            <Icon as={FiGift} />
+                            <Text>Coupon ({couponPreview.coupon.code})</Text>
+                          </HStack>
+                          <Text color="green.400" fontWeight="bold">
+                            -{couponDiscountAmount.toLocaleString()} Tk
+                          </Text>
+                        </HStack>
+                      )}
 
                       <HStack justify="space-between">
                         <HStack spacing="2" color="muted">
@@ -744,7 +846,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                           {course.duration}+ hours
                         </Text>
                       </HStack>
-                      
+
                       <HStack justify="space-between">
                         <HStack spacing="2" color="muted">
                           <Icon as={FiBook} />
@@ -787,9 +889,9 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                     {!isFree && (
                       <>
                         <Divider />
-                        <VStack 
-                          spacing="2" 
-                          p="4" 
+                        <VStack
+                          spacing="2"
+                          p="4"
                           bg={useColorModeValue("green.50", "green.900")}
                           borderRadius="lg"
                         >
@@ -894,9 +996,9 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
 
               {/* Trust Indicators */}
               <FallInPlace delay={0.5}>
-                <Box 
-                  bg={useColorModeValue("gray.50", "gray.700")} 
-                  p="6" 
+                <Box
+                  bg={useColorModeValue("gray.50", "gray.700")}
+                  p="6"
                   borderRadius="2xl"
                   textAlign="center"
                 >
@@ -904,7 +1006,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                     <Icon as={FiShield} boxSize="8" color="green.500" />
                     <Heading size="sm">Secure Enrollment</Heading>
                     <Text fontSize="xs" color="muted">
-                      Your data is protected with enterprise-grade security. 
+                      Your data is protected with enterprise-grade security.
                       {!isFree && " All payments are processed securely."}
                     </Text>
                   </VStack>

@@ -21,6 +21,10 @@ export class InitiatePaymentDto {
 
   @IsOptional()
   @IsString()
+  couponCode?: string;
+
+  @IsOptional()
+  @IsString()
   productId?: string;
 
   @IsOptional()

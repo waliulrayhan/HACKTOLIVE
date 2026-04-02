@@ -170,6 +170,7 @@ export default function DashboardLayout({
             subItems: [
               { icon: <VideoIcon />, name: "All Courses", path: "/instructor/courses" },
               { icon: <BoxIconLine />, name: "Create Course", path: "/instructor/courses/create" },
+              { icon: <FiDollarSign className="w-5 h-5" />, name: "Coupons", path: "/instructor/coupons" },
               { icon: <TaskIcon />, name: "Assignments", path: "/instructor/assignments" },
               { icon: <CheckCircleIcon />, name: "Certificates", path: "/instructor/certificates" },
             ],

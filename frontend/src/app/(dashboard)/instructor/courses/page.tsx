@@ -428,7 +428,7 @@ export default function InstructorCoursesPage() {
                     <TableRow key={course.id} className="border-b border-gray-100 hover:bg-gray-50 dark:border-white/5 dark:hover:bg-white/5">
                       <TableCell className="px-3 sm:px-4 py-3">
                         <div className="flex items-start gap-3">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-brand-400 to-brand-600">
                             <HiOutlineAcademicCap className="h-5 w-5 text-white" />
                           </div>
                           <div className="min-w-0 flex-1">
@@ -679,7 +679,7 @@ export default function InstructorCoursesPage() {
                 <div className="space-y-4">
                   {/* Thumbnail */}
                   {selectedCourse.thumbnail && (
-                    <div className="w-full aspect-[2/1] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div className="w-full aspect-2/1 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
                       <Image
                         width={600}
                         height={300}

@@ -20,6 +20,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.guard';
 import { UserRole, CoursePaymentStatus } from '@prisma/client';
 import { InitiatePaymentDto } from './dto/initiate-payment.dto';
+import { CourseCouponPreviewDto } from './dto/course-coupon-preview.dto';
 
 @Controller('payment')
 export class PaymentController {
@@ -37,6 +38,13 @@ export class PaymentController {
     const userId = req.user?.id; // JWT strategy returns User object with 'id' property
     this.logger.log(`Payment initiation - User: ${userId ? userId : 'Guest'}, Type: ${body.courseId ? 'Course' : 'Product'}`);
     return this.paymentService.initiatePayment(userId, body);
+  }
+
+  @Post('course-coupon/preview')
+  @UseGuards(OptionalJwtAuthGuard)
+  async previewCourseCoupon(@Request() req, @Body() body: CourseCouponPreviewDto) {
+    const userId = req.user?.id;
+    return this.paymentService.previewCourseCoupon(userId, body);
   }
 
   /**
