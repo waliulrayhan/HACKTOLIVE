@@ -300,8 +300,8 @@ export class BlogService {
     const isStudent = author?.role === 'STUDENT';
     console.log('Author role:', author?.role, '| Is student:', isStudent);
 
-    // Only apply approval workflow for STUDENT role
-    if (isStudent) {
+    // Only apply approval workflow for STUDENT role when STUDENT is editing (not when ADMIN is editing)
+    if (isStudent && currentUserRole !== 'ADMIN') {
       // If blog was rejected, reset to pending status for re-approval
       if (existingBlog.approvalStatus === 'REJECTED') {
         console.log('🔄 RESETTING REJECTED BLOG TO PENDING (Student)');
@@ -321,7 +321,7 @@ export class BlogService {
         data.status = 'DRAFT';
       }
     } else {
-      console.log('✅ NO APPROVAL REQUIRED (Instructor/Admin)');
+      console.log('✅ NO APPROVAL WORKFLOW (Admin editing or non-student author)');
       // For INSTRUCTOR and ADMIN, keep their existing approval status or set to APPROVED
       if (!data.approvalStatus) {
         data.approvalStatus = 'APPROVED';
