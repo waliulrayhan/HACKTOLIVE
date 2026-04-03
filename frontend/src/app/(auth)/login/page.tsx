@@ -128,11 +128,15 @@ const Login: NextPage = () => {
       }
     } catch (error: any) {
       console.error('Login error:', error)
-      // Only show error toast without page refresh
       toast.error('Login failed', {
         description: error.response?.data?.message || 'Invalid email or password. Please try again.',
         duration: 5000,
       })
+      
+      // Refresh page to reset Turnstile token for retry
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
     } finally {
       // Always set loading to false on error or success
       setIsLoading(false)
