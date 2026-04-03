@@ -58,7 +58,6 @@ import { Course, Review } from "@/types/academy";
 import academyService from "@/lib/academy-service";
 import { useAuth } from "@/context/AuthContext";
 import { getFinalPrice } from "@/lib/course-pricing";
-import { BackgroundColor } from "@tiptap/extension-text-style";
 
 interface CourseDetailsPageProps {
   slug: string;

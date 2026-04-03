@@ -5,6 +5,8 @@ import {
   HiOutlineBookOpen,
 } from "react-icons/hi";
 import NativeYouTubePlayer from "./NativeYouTubePlayer";
+import MarkdownPreview from "@uiw/react-markdown-preview";
+import { normalizeMarkdownForRender } from "@/lib/markdown-utils";
 
 interface LessonContentProps {
   type: "VIDEO" | "ARTICLE";
@@ -61,41 +63,11 @@ export default function LessonContent({ type, videoUrl, articleContent, onWatchT
 
       {/* Article Content */}
       {hasArticleContent && (
-        <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-600 dark:prose-p:text-gray-300 prose-a:text-brand-600 dark:prose-a:text-brand-400 prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100">
-          <style
-            dangerouslySetInnerHTML={{
-              __html: `
-              .lesson-article h2 { font-size: 1.375em; font-weight: 700; margin: 1.5em 0 0.75em; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5em; }
-              .dark .lesson-article h2 { color: #f3f4f6; border-color: #374151; }
-              .lesson-article h3 { font-size: 1.125em; font-weight: 600; margin: 1.25em 0 0.5em; color: #111827; }
-              .dark .lesson-article h3 { color: #f3f4f6; }
-              .lesson-article p { margin-bottom: 1em; line-height: 1.75; color: #374151; font-size: 0.9375rem; }
-              .dark .lesson-article p { color: #d1d5db; }
-              .lesson-article ul, .lesson-article ol { padding-left: 1.75rem; margin-bottom: 1em; color: #374151; }
-              .dark .lesson-article ul, .dark .lesson-article ol { color: #d1d5db; }
-              .lesson-article li { margin-bottom: 0.5em; line-height: 1.6; }
-              .lesson-article blockquote { border-left: 4px solid #3b82f6; padding: 1rem 1.25rem; margin: 1.25em 0; background: #eff6ff; border-radius: 0 0.5rem 0.5rem 0; font-style: normal; color: #1e40af; }
-              .dark .lesson-article blockquote { background: rgba(59, 130, 246, 0.1); color: #93c5fd; }
-              .lesson-article pre { background: #1f2937; color: #f3f4f6; padding: 1rem; border-radius: 0.75rem; overflow-x: auto; margin: 1.25em 0; font-size: 0.875rem; }
-              .lesson-article code { background: #f3f4f6; padding: 0.2rem 0.4rem; border-radius: 0.375rem; font-size: 0.875em; color: #1f2937; }
-              .dark .lesson-article code { background: #374151; color: #f3f4f6; }
-              .lesson-article pre code { background: transparent; padding: 0; color: #f3f4f6; }
-              .lesson-article a { color: #3b82f6; text-decoration: underline; text-underline-offset: 2px; }
-              .lesson-article a:hover { color: #2563eb; }
-              .lesson-article img { max-width: 100%; height: auto; border-radius: 0.75rem; margin: 1.5rem 0; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-              .lesson-article strong { font-weight: 600; color: #111827; }
-              .dark .lesson-article strong { color: #f3f4f6; }
-              .lesson-article table { width: 100%; border-collapse: collapse; margin: 1.25em 0; }
-              .lesson-article th, .lesson-article td { border: 1px solid #e5e7eb; padding: 0.75rem; text-align: left; }
-              .dark .lesson-article th, .dark .lesson-article td { border-color: #374151; }
-              .lesson-article th { background: #f9fafb; font-weight: 600; }
-              .dark .lesson-article th { background: #1f2937; }
-            `,
-            }}
-          />
-          <div
-            className="lesson-article"
-            dangerouslySetInnerHTML={{ __html: articleContent! }}
+        <div>
+          <MarkdownPreview
+            source={normalizeMarkdownForRender(articleContent!)}
+            wrapperElement={{ "data-color-mode": "dark" }}
+            className="lesson-article-markdown"
           />
         </div>
       )}
@@ -114,6 +86,27 @@ export default function LessonContent({ type, videoUrl, articleContent, onWatchT
           </p>
         </div>
       )}
+
+      <style jsx global>{`
+        .lesson-article-markdown,
+        .lesson-article-markdown.wmde-markdown {
+          background: transparent !important;
+          color: #374151 !important;
+          box-shadow: none !important;
+          --color-canvas-default: transparent;
+          --color-fg-default: #374151;
+          --color-canvas-subtle: rgba(148, 163, 184, 0.08);
+          --color-border-default: rgba(148, 163, 184, 0.25);
+        }
+
+        .dark .lesson-article-markdown,
+        .dark .lesson-article-markdown.wmde-markdown {
+          color: #d1d5db !important;
+          --color-fg-default: #d1d5db;
+          --color-canvas-subtle: rgba(148, 163, 184, 0.12);
+          --color-border-default: rgba(148, 163, 184, 0.32);
+        }
+      `}</style>
     </div>
   );
 }
