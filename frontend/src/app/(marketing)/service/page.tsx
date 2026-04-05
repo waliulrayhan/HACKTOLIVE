@@ -21,7 +21,7 @@ import {
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react'
-import { FiArrowRight, FiCompass, FiShield } from 'react-icons/fi'
+import { FiArrowRight, FiCheckCircle, FiClock, FiCompass, FiShield, FiTarget } from 'react-icons/fi'
 import { ConsultationModal } from './_components/ConsultationModal'
 import { ServiceCard } from './_components/ServiceCard'
 import {
@@ -246,32 +246,100 @@ export default function ServicesPage() {
         >
           <Box
             borderWidth="1px"
-            borderColor={panelBorder}
+            borderColor="rgba(16, 185, 129, 0.32)"
             borderRadius="2xl"
             p={{ base: 6, md: 10 }}
-            bg={panelBg}
+            bgGradient={useColorModeValue(
+              'linear(135deg, #f8fafc 0%, #ecfdf5 45%, #eef2ff 100%)',
+              'linear(135deg, #0b1220 0%, #0f2a2a 45%, #111827 100%)'
+            )}
+            position="relative"
+            overflow="hidden"
+            _before={{
+              content: '""',
+              position: 'absolute',
+              top: '-30%',
+              right: '-8%',
+              width: '320px',
+              height: '320px',
+              borderRadius: 'full',
+              bg: useColorModeValue('rgba(16, 185, 129, 0.12)', 'rgba(16, 185, 129, 0.16)'),
+              filter: 'blur(50px)',
+              pointerEvents: 'none',
+            }}
           >
-            <Grid templateColumns={{ base: '1fr', lg: '1.6fr 1fr' }} gap={8} alignItems="center">
+            <Grid templateColumns={{ base: '1fr', lg: '1.45fr 1fr' }} gap={8} alignItems="stretch" position="relative" zIndex={1}>
               <GridItem>
-                <Badge colorScheme="green" variant="subtle" mb={3} px={3} py={1} borderRadius="full">
-                  Free Consultation
-                </Badge>
-                <Heading as="h3" fontSize={{ base: '2xl', md: '3xl' }} mb={3}>
-                  Not Sure Where to Start?
-                </Heading>
-                <Text color={mutedColor} fontSize={{ base: 'md', md: 'lg' }}>
-                  Talk to our security advisors. We will review your current security posture, business risk,
-                  and compliance objectives, then recommend the right service plan with no obligation.
-                </Text>
+                <VStack align="start" spacing={5}>
+                  <Badge colorScheme="green" variant="subtle" px={3} py={1} borderRadius="full">
+                    Consultation Studio
+                  </Badge>
+
+                  <Heading as="h3" fontSize={{ base: '2xl', md: '3xl' }} lineHeight="1.2">
+                    Get a 30-Minute Security Strategy Session
+                  </Heading>
+
+                  <Text color={mutedColor} fontSize={{ base: 'md', md: 'lg' }} maxW="3xl" lineHeight="1.8">
+                    Share your current environment and risk priorities. Our specialists will suggest the right
+                    service path, timeline, and execution model for your team.
+                  </Text>
+
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={3} w="full" maxW="3xl">
+                    <HStack spacing={3} p={3} borderWidth="1px" borderColor={panelBorder} borderRadius="lg" bg={panelBg}>
+                      <FiTarget color="#34d399" />
+                      <Text color={mutedColor}>Service recommendation tailored to your goals</Text>
+                    </HStack>
+                    <HStack spacing={3} p={3} borderWidth="1px" borderColor={panelBorder} borderRadius="lg" bg={panelBg}>
+                      <FiClock color="#34d399" />
+                      <Text color={mutedColor}>Clear timeline and expected milestones</Text>
+                    </HStack>
+                    <HStack spacing={3} p={3} borderWidth="1px" borderColor={panelBorder} borderRadius="lg" bg={panelBg}>
+                      <FiShield color="#34d399" />
+                      <Text color={mutedColor}>Prioritized security outcomes and deliverables</Text>
+                    </HStack>
+                    <HStack spacing={3} p={3} borderWidth="1px" borderColor={panelBorder} borderRadius="lg" bg={panelBg}>
+                      <FiCheckCircle color="#34d399" />
+                      <Text color={mutedColor}>No-obligation planning conversation</Text>
+                    </HStack>
+                  </SimpleGrid>
+                </VStack>
               </GridItem>
 
               <GridItem>
-                <VStack spacing={3} align="stretch">
+                <VStack
+                  spacing={4}
+                  align="stretch"
+                  p={{ base: 5, md: 6 }}
+                  borderWidth="1px"
+                  borderColor={panelBorder}
+                  borderRadius="xl"
+                  bg={panelBg}
+                >
+                  <Text fontWeight="bold" fontSize={{ base: 'lg', md: 'xl' }}>
+                    What to Prepare
+                  </Text>
+
+                  <VStack spacing={2} align="stretch">
+                    <HStack spacing={2} color={mutedColor}>
+                      <FiArrowRight />
+                      <Text>Current infrastructure overview</Text>
+                    </HStack>
+                    <HStack spacing={2} color={mutedColor}>
+                      <FiArrowRight />
+                      <Text>Security pain points or incidents</Text>
+                    </HStack>
+                    <HStack spacing={2} color={mutedColor}>
+                      <FiArrowRight />
+                      <Text>Compliance or deadline expectations</Text>
+                    </HStack>
+                  </VStack>
+
                   <Button onClick={onOpen} colorScheme="green" size="lg" rightIcon={<FiCompass />}>
-                    Book Free Consultation
+                    Start Consultation
                   </Button>
+
                   <Button as={Link} href="/about" variant="outline" size="lg">
-                    Learn More About Us
+                    Meet HackToLive Team
                   </Button>
                 </VStack>
               </GridItem>
