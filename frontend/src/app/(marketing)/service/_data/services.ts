@@ -55,6 +55,7 @@ export interface Service {
   icon: IconType
   categoryId: ServiceCategoryId
   badge?: string
+  imageUrl: string
   shortDescription: string
   overview: string
   challenge: string
@@ -134,6 +135,7 @@ export const services: Service[] = [
     icon: FiGlobe,
     categoryId: 'penetration-testing',
     badge: 'Popular',
+    imageUrl: 'https://picsum.photos/seed/external-penetration-testing-cyber/1600/900',
     shortDescription:
       'Simulate internet-facing attacks against your perimeter to validate how exposed assets can be discovered and compromised.',
     overview:
@@ -195,6 +197,7 @@ export const services: Service[] = [
     title: 'Internal Penetration Testing',
     icon: FiServer,
     categoryId: 'penetration-testing',
+    imageUrl: 'https://picsum.photos/seed/internal-penetration-testing-cyber/1600/900',
     shortDescription:
       'Assess lateral movement, privilege escalation, and segmentation weaknesses from an assumed internal foothold.',
     overview:
@@ -251,6 +254,7 @@ export const services: Service[] = [
     title: 'Web Application Penetration Testing',
     icon: FiMonitor,
     categoryId: 'penetration-testing',
+    imageUrl: 'https://picsum.photos/seed/web-application-penetration-testing-cyber/1600/900',
     shortDescription:
       'Deep manual testing of business logic, authentication, authorization, and API security beyond automated scanner coverage.',
     overview:
@@ -307,6 +311,7 @@ export const services: Service[] = [
     title: 'Mobile Application Testing',
     icon: FiCpu,
     categoryId: 'penetration-testing',
+    imageUrl: 'https://picsum.photos/seed/mobile-application-testing-cyber/1600/900',
     shortDescription:
       'Security testing for Android and iOS apps, covering local storage, runtime controls, and backend API interactions.',
     overview:
@@ -363,6 +368,7 @@ export const services: Service[] = [
     title: 'Wireless Penetration Testing',
     icon: FiWifi,
     categoryId: 'penetration-testing',
+    imageUrl: 'https://picsum.photos/seed/wireless-penetration-testing-cyber/1600/900',
     shortDescription:
       'Assess Wi-Fi infrastructure for weak encryption, rogue access points, and protocol-level attacks affecting enterprise environments.',
     overview:
@@ -420,6 +426,7 @@ export const services: Service[] = [
     icon: FiSearch,
     categoryId: 'assessments-audits',
     badge: 'Fast Start',
+    imageUrl: 'https://picsum.photos/seed/vulnerability-assessment-cyber/1600/900',
     shortDescription:
       'Risk-prioritized scanning and manual validation to surface known weaknesses across infrastructure, applications, and cloud assets.',
     overview:
@@ -476,6 +483,7 @@ export const services: Service[] = [
     title: 'Cloud Security Assessment',
     icon: FiDatabase,
     categoryId: 'assessments-audits',
+    imageUrl: 'https://picsum.photos/seed/cloud-security-assessment-cyber/1600/900',
     shortDescription:
       'Assess AWS, Azure, and GCP environments for identity risk, exposed data paths, and control misconfigurations.',
     overview:
@@ -532,6 +540,7 @@ export const services: Service[] = [
     title: 'Security Risk Assessment',
     icon: FiAlertTriangle,
     categoryId: 'assessments-audits',
+    imageUrl: 'https://picsum.photos/seed/security-risk-assessment-cyber/1600/900',
     shortDescription:
       'Structured risk evaluation that translates technical exposures into business-impact priorities for leadership action.',
     overview:
@@ -588,6 +597,7 @@ export const services: Service[] = [
     title: 'Security Policy Assessment',
     icon: FiBookOpen,
     categoryId: 'assessments-audits',
+    imageUrl: 'https://picsum.photos/seed/security-policy-assessment-cyber/1600/900',
     shortDescription:
       'Evaluate and modernize policy frameworks to close governance gaps and align controls with real operational workflows.',
     overview:
@@ -645,6 +655,7 @@ export const services: Service[] = [
     icon: FiActivity,
     categoryId: 'soc-forensics',
     badge: '24/7',
+    imageUrl: 'https://picsum.photos/seed/soc-as-a-service-cyber/1600/900',
     shortDescription:
       'Managed detection and response support with continuous monitoring, triage, and escalation for high-confidence incidents.',
     overview:
@@ -701,6 +712,7 @@ export const services: Service[] = [
     title: 'Digital Forensics',
     icon: FiLock,
     categoryId: 'soc-forensics',
+    imageUrl: 'https://picsum.photos/seed/digital-forensics-cyber/1600/900',
     shortDescription:
       'Forensic investigation services for endpoint, server, and cloud incidents with evidence integrity and timeline reconstruction.',
     overview:
@@ -757,6 +769,7 @@ export const services: Service[] = [
     title: 'Threat Intelligence',
     icon: FiTarget,
     categoryId: 'soc-forensics',
+    imageUrl: 'https://picsum.photos/seed/threat-intelligence-cyber/1600/900',
     shortDescription:
       'Contextual intelligence on adversary activity, leaked credentials, and sector-specific threat trends to improve defense decisions.',
     overview:
@@ -813,6 +826,7 @@ export const services: Service[] = [
     title: 'Incident Response Retainer',
     icon: FiZap,
     categoryId: 'soc-forensics',
+    imageUrl: 'https://picsum.photos/seed/incident-response-retainer-cyber/1600/900',
     shortDescription:
       'Pre-negotiated rapid response coverage with playbooks, readiness drills, and expert support when incidents occur.',
     overview:
@@ -870,6 +884,7 @@ export const services: Service[] = [
     icon: FiUsers,
     categoryId: 'training-academy',
     badge: 'Bengali + English',
+    imageUrl: 'https://picsum.photos/seed/live-instructor-led-batches-cyber/1600/900',
     shortDescription:
       'Small-cohort practical cybersecurity training delivered by active practitioners with real lab environments.',
     overview:
@@ -926,6 +941,7 @@ export const services: Service[] = [
     title: 'On-Demand Academy',
     icon: FiRadio,
     categoryId: 'training-academy',
+    imageUrl: 'https://picsum.photos/seed/on-demand-academy-cyber/1600/900',
     shortDescription:
       'Self-paced cybersecurity tracks with labs, guided projects, and progress milestones for flexible learning schedules.',
     overview:
@@ -982,6 +998,7 @@ export const services: Service[] = [
     title: 'Practical Certifications',
     icon: FiShield,
     categoryId: 'training-academy',
+    imageUrl: 'https://picsum.photos/seed/practical-certifications-cyber/1600/900',
     shortDescription:
       'Scenario-based certification tracks that validate applied cybersecurity skills through practical exams.',
     overview:
@@ -1038,6 +1055,7 @@ export const services: Service[] = [
     title: 'CTF Challenges & Community',
     icon: FiFlag,
     categoryId: 'training-academy',
+    imageUrl: 'https://picsum.photos/seed/ctf-challenges-community-cyber/1600/900',
     shortDescription:
       'Continuous challenge ecosystem for offensive and defensive skill practice with an active cybersecurity community.',
     overview:

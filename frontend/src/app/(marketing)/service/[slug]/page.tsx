@@ -21,26 +21,23 @@ import {
   Text,
   VStack,
   useColorModeValue,
+  useDisclosure,
   Flex,
 } from '@chakra-ui/react'
 import {
   FiArrowLeft,
   FiArrowRight,
-  FiCalendar,
   FiCheckCircle,
   FiCompass,
   FiLayers,
   FiTarget,
   FiUsers,
-  FiTrendingUp,
   FiClock,
-  FiAward,
-  FiBarChart2,
   FiAlertCircle,
   FiClipboard,
 } from 'react-icons/fi'
 import ServiceFAQ from '../_components/ServiceFAQ'
-import { QuotationForm } from '../_components/QuotationForm'
+import { ConsultationModal } from '../_components/ConsultationModal'
 import {
   getServiceBySlug,
   getServicesByCategory,
@@ -52,6 +49,7 @@ import { MotionBox } from '@/components/shared/motion/box'
 export default function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
   const service = getServiceBySlug(slug)
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   if (!service) {
     notFound()
@@ -191,8 +189,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
 
                 <HStack spacing={4} flexWrap="wrap" pt={2}>
                   <Button 
-                    as={Link} 
-                    href="/contact" 
+                    onClick={onOpen}
                     colorScheme="green" 
                     size="lg"
                     rightIcon={<FiArrowRight size={18} />}
@@ -201,8 +198,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
                     Talk to an Advisor
                   </Button>
                   <Button
-                    as={Link}
-                    href="#quotation-form"
+                    onClick={onOpen}
                     variant="outline"
                     size="lg"
                     borderColor="rgba(16, 185, 129, 0.5)"
@@ -688,8 +684,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
               </VStack>
               <HStack spacing={4} flexWrap="wrap" justify="center">
                 <Button 
-                  as={Link} 
-                  href="/contact" 
+                  onClick={onOpen}
                   colorScheme="green" 
                   size="lg"
                   rightIcon={<FiArrowRight size={18} />}
@@ -697,8 +692,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
                   Schedule Consultation
                 </Button>
                 <Button
-                  as={Link}
-                  href="#quotation-form"
+                  onClick={onOpen}
                   variant="outline"
                   size="lg"
                   borderColor="rgba(16, 185, 129, 0.5)"
@@ -712,17 +706,14 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
           </Box>
         </MotionBox>
 
-        {/* QUOTATION FORM SECTION */}
-        <MotionBox
-          id="quotation-form"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-90px' }}
-          transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
-        >
-          <QuotationForm serviceName={service.title} />
-        </MotionBox>
       </Container>
+
+      <ConsultationModal
+        isOpen={isOpen}
+        onClose={onClose}
+        serviceName={service.title}
+        heading={`Request Consultation: ${service.title}`}
+      />
     </Box>
   )
 }

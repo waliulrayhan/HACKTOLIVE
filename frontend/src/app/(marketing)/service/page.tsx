@@ -19,8 +19,10 @@ import {
   Text,
   VStack,
   useColorModeValue,
+  useDisclosure,
 } from '@chakra-ui/react'
 import { FiArrowRight, FiCompass, FiShield } from 'react-icons/fi'
+import { ConsultationModal } from './_components/ConsultationModal'
 import { ServiceCard } from './_components/ServiceCard'
 import {
   getServicesByCategory,
@@ -32,6 +34,7 @@ import { FallInPlace } from '@/components/shared/motion/fall-in-place'
 import { MotionBox } from '@/components/shared/motion/box'
 
 export default function ServicesPage() {
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const pageBg = useColorModeValue('gray.50', '#030712')
   const heroGradient = useColorModeValue(
     'linear(128deg, #0a0f1f 0%, #0d1b2c 50%, #052e2b 100%)',
@@ -93,8 +96,7 @@ export default function ServicesPage() {
 
               <HStack spacing={4} flexWrap="wrap" justify="center">
                 <Button
-                  as={Link}
-                  href="/contact"
+                  onClick={onOpen}
                   rightIcon={<FiArrowRight />}
                   colorScheme="green"
                   size="lg"
@@ -265,7 +267,7 @@ export default function ServicesPage() {
 
               <GridItem>
                 <VStack spacing={3} align="stretch">
-                  <Button as={Link} href="/contact" colorScheme="green" size="lg" rightIcon={<FiCompass />}>
+                  <Button onClick={onOpen} colorScheme="green" size="lg" rightIcon={<FiCompass />}>
                     Book Free Consultation
                   </Button>
                   <Button as={Link} href="/about" variant="outline" size="lg">
@@ -318,6 +320,13 @@ export default function ServicesPage() {
           </SimpleGrid>
         </MotionBox>
       </Container>
+
+      <ConsultationModal
+        isOpen={isOpen}
+        onClose={onClose}
+        serviceName="General Security Consultation"
+        heading="Book a Security Consultation"
+      />
     </Box>
   )
 }
