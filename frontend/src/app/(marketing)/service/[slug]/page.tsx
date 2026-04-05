@@ -1,470 +1,424 @@
 'use client'
 
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { use } from 'react'
 import {
-  Box,
-  Container,
-  Heading,
-  Text,
-  SimpleGrid,
-  VStack,
-  HStack,
-  Icon,
-  useColorModeValue,
   Badge,
-  List,
-  ListItem,
-  ListIcon,
-  Divider,
-  Card,
-  CardBody,
+  Box,
+  Button,
+  Container,
   Grid,
   GridItem,
+  Heading,
+  HStack,
+  Icon,
+  List,
+  ListIcon,
+  ListItem,
+  SimpleGrid,
+  Stack,
+  Text,
+  VStack,
+  useColorModeValue,
 } from '@chakra-ui/react'
-import { FiCheckCircle, FiClock, FiUsers } from 'react-icons/fi'
-import { services } from '../_data/services'
-import { QuotationForm } from '../_components/QuotationForm'
+import {
+  FiArrowLeft,
+  FiArrowRight,
+  FiCalendar,
+  FiCheckCircle,
+  FiCompass,
+  FiLayers,
+  FiTarget,
+  FiUsers,
+} from 'react-icons/fi'
 import ServiceFAQ from '../_components/ServiceFAQ'
+import { QuotationForm } from '../_components/QuotationForm'
+import {
+  getServiceBySlug,
+  getServicesByCategory,
+  serviceCategoryMap,
+} from '../_data/services'
 import { FallInPlace } from '@/components/shared/motion/fall-in-place'
 import { MotionBox } from '@/components/shared/motion/box'
 
 export default function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
-  const service = services.find((s) => s.slug === slug)
+  const service = getServiceBySlug(slug)
 
   if (!service) {
     notFound()
   }
 
-  const cardBg = useColorModeValue('white', 'gray.800')
-  const borderColor = useColorModeValue('gray.200', 'gray.700')
-  const sectionBg = useColorModeValue('gray.50', 'gray.900')
-  const iconBg = useColorModeValue('primary.50', 'primary.900')
-  const iconColor = useColorModeValue('primary.500', 'primary.400')
-  const mutedColor = useColorModeValue('gray.600', 'gray.400')
+  const category = serviceCategoryMap[service.categoryId]
+  const relatedServices = getServicesByCategory(service.categoryId)
+
+  const pageBg = useColorModeValue('gray.50', '#030712')
+  const panelBg = useColorModeValue('white', 'rgba(10, 16, 30, 0.9)')
+  const panelBorder = useColorModeValue('gray.200', 'rgba(148, 163, 184, 0.2)')
+  const mutedColor = useColorModeValue('gray.600', 'gray.300')
 
   return (
-    <Box>
-      {/* Hero Section */}
+    <Box bg={pageBg}>
       <Box
         position="relative"
         overflow="hidden"
-        pt={{ base: 32, md: 40 }}
+        pt={{ base: 28, md: 34 }}
         pb={{ base: 16, md: 20 }}
-        bgImage="url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2000')"
-        bgPosition="center"
-        bgSize="cover"
-        bgRepeat="no-repeat"
-        _before={{
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          bg: useColorModeValue(
-            'linear-gradient(135deg, rgba(26, 32, 44, 0.85) 0%, rgba(45, 55, 72, 0.90) 100%)',
-            'linear-gradient(135deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.88) 100%)'
-          ),
-        }}
+        bgGradient={useColorModeValue(
+          'linear(128deg, #0a0f1f 0%, #0f172a 55%, #052e2b 100%)',
+          'linear(128deg, #05080f 0%, #081121 55%, #052918 100%)'
+        )}
+        borderBottomWidth="1px"
+        borderColor={panelBorder}
       >
         <Container maxW="container.xl" position="relative" zIndex={1}>
           <FallInPlace>
-            <VStack spacing={6} textAlign="center" maxW="4xl" mx="auto">
-              <HStack spacing={4} justify="center">
-                <Box
-                  bg={iconBg}
-                  color={iconColor}
-                  borderRadius="full"
-                  p={4}
-                >
-                  <Icon as={service.icon} boxSize={8} />
-                </Box>
-                {service.badge && (
-                  <Badge
-                    bg={useColorModeValue('green.200', 'green.700')}
-                    color={useColorModeValue('green.900', 'white')}
-                    fontSize="sm"
-                    px={4}
-                    py={1}
-                    borderRadius="full"
-                  >
+            <VStack align="start" spacing={6} maxW="4xl">
+              <Button
+                as={Link}
+                href="/service"
+                size="sm"
+                leftIcon={<FiArrowLeft />}
+                variant="outline"
+                borderColor="rgba(148, 163, 184, 0.45)"
+                color="gray.100"
+                _hover={{ bg: 'rgba(15, 23, 42, 0.8)' }}
+              >
+                Back to Services
+              </Button>
+
+              <HStack spacing={3} flexWrap="wrap">
+                <Badge colorScheme="green" variant="subtle" px={3} py={1} borderRadius="full">
+                  {category.label}
+                </Badge>
+                {service.badge ? (
+                  <Badge bg="rgba(30, 41, 59, 0.95)" color="gray.100" px={3} py={1} borderRadius="full">
                     {service.badge}
                   </Badge>
-                  
-                )}
+                ) : null}
               </HStack>
-              <Heading
-                as="h1"
-                fontSize={{ base: '3xl', md: '4xl', lg: '5xl' }}
-                fontWeight="bold"
-                color="white"
-                lineHeight="shorter"
-              >
+
+              <Heading as="h1" color="white" fontSize={{ base: '2xl', md: '4xl', lg: '5xl' }} lineHeight="1.18">
                 {service.title}
               </Heading>
-              <Text
-                fontSize={{ base: 'lg', md: 'xl' }}
-                color="gray.200"
-                maxW="3xl"
-              >
+
+              <Text color="gray.200" fontSize={{ base: 'md', md: 'xl' }} maxW="3xl" lineHeight="1.9">
                 {service.shortDescription}
               </Text>
+
+              <HStack spacing={3} flexWrap="wrap">
+                <Badge bg="rgba(15, 23, 42, 0.9)" color="gray.100" px={3} py={1.5} borderRadius="full">
+                  <HStack spacing={1.5}>
+                    <FiCalendar />
+                    <Text>{service.timeline}</Text>
+                  </HStack>
+                </Badge>
+                <Badge bg="rgba(15, 23, 42, 0.9)" color="gray.100" px={3} py={1.5} borderRadius="full">
+                  <HStack spacing={1.5}>
+                    <FiLayers />
+                    <Text>{service.engagementModel}</Text>
+                  </HStack>
+                </Badge>
+              </HStack>
+
+              <HStack spacing={4} flexWrap="wrap">
+                <Button as={Link} href="/contact" colorScheme="green" rightIcon={<FiArrowRight />}>
+                  Talk to an Advisor
+                </Button>
+                <Button
+                  as={Link}
+                  href="#quotation-form"
+                  variant="outline"
+                  borderColor="rgba(148, 163, 184, 0.45)"
+                  color="gray.100"
+                >
+                  Request Proposal
+                </Button>
+              </HStack>
             </VStack>
           </FallInPlace>
         </Container>
       </Box>
 
-      <Container maxW="container.xl" py={16}>
-        {/* Overview Section */}
+      <Container maxW="container.xl" py={{ base: 10, md: 16 }}>
         <MotionBox
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          mb={20}
+          viewport={{ once: true, margin: '-90px' }}
+          transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
         >
-          <VStack spacing={6} align="start">
-            <Heading
-              as="h2"
-              fontSize={{ base: '3xl', md: '4xl' }}
-              fontWeight="bold"
-            >
-              <Text as="span" color="green.400">
-                Overview
-              </Text>
-            </Heading>
-            <Text fontSize="lg" color={mutedColor} lineHeight="tall">
-              {service.overview}
-            </Text>
-          </VStack>
-        </MotionBox>
+          <Box borderWidth="1px" borderColor={panelBorder} borderRadius="2xl" p={{ base: 6, md: 8 }} bg={panelBg}>
+            <Grid templateColumns={{ base: '1fr', lg: '0.9fr 1.4fr' }} gap={8}>
+              <GridItem>
+                <Heading as="h2" fontSize={{ base: '2xl', md: '3xl' }} mb={4}>
+                  More {category.label}
+                </Heading>
+                <VStack align="stretch" spacing={2}>
+                  {relatedServices.map((item) => {
+                    const isCurrent = item.slug === service.slug
 
-        {/* Why This Matters Section */}
-        <Box bg={sectionBg} borderRadius="2xl" p={{ base: 8, md: 12 }} mb={20}>
-          <MotionBox
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          >
-            <Heading
-              as="h2"
-              fontSize={{ base: '2xl', md: '3xl' }}
-              mb={8}
-              textAlign="center"
-            >
-              Why This Matters
-            </Heading>
-            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-              {service.whyMatters.map((reason, index) => (
-                <MotionBox
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <Card
-                    bg={cardBg}
-                    borderColor={borderColor}
-                    variant="outline"
-                    _hover={{
-                      transform: 'translateY(-4px)',
-                      shadow: 'lg',
-                      borderColor: 'green.500',
-                    }}
-                    transition="all 0.3s"
-                  >
-                    <CardBody>
-                      <HStack align="start" spacing={3}>
-                        <Icon as={FiCheckCircle} color="green.500" boxSize={5} mt={1} flexShrink={0} />
-                        <Text>{reason}</Text>
-                      </HStack>
-                    </CardBody>
-                  </Card>
-                </MotionBox>
-              ))}
-            </SimpleGrid>
-          </MotionBox>
-        </Box>
+                    return (
+                      <Button
+                        as={Link}
+                        key={item.id}
+                        href={`/service/${item.slug}`}
+                        justifyContent="start"
+                        variant="ghost"
+                        fontWeight={isCurrent ? 'bold' : 'medium'}
+                        bg={isCurrent ? useColorModeValue('green.50', 'rgba(22, 101, 52, 0.25)') : 'transparent'}
+                        color={isCurrent ? useColorModeValue('green.700', 'green.200') : useColorModeValue('gray.700', 'gray.200')}
+                        borderLeftWidth="3px"
+                        borderColor={isCurrent ? useColorModeValue('green.500', 'green.400') : 'transparent'}
+                        borderRadius="md"
+                        _hover={{ bg: useColorModeValue('gray.100', 'rgba(30, 41, 59, 0.85)') }}
+                      >
+                        {item.title}
+                      </Button>
+                    )
+                  })}
+                </VStack>
+              </GridItem>
 
-        {/* Deliverables Section */}
-        <MotionBox
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          mb={20}
-        >
-          <Heading
-            as="h2"
-            fontSize={{ base: '2xl', md: '3xl' }}
-            mb={8}
-          >
-            What You'll Receive
-          </Heading>
-          <Card bg={cardBg} borderColor={borderColor} variant="outline">
-            <CardBody p={8}>
-              <List spacing={4}>
-                {service.deliverables.map((deliverable, index) => (
-                  <ListItem key={index}>
-                    <HStack align="start" spacing={3}>
-                      <ListIcon as={FiCheckCircle} color="green.500" fontSize="xl" mt={1} />
-                      <Text fontSize="md">{deliverable}</Text>
-                    </HStack>
-                  </ListItem>
-                ))}
-              </List>
-            </CardBody>
-          </Card>
-        </MotionBox>
-
-        {/* Methodology Section */}
-        <Box bg={sectionBg} borderRadius="2xl" p={{ base: 8, md: 12 }} mb={20}>
-          <MotionBox
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          >
-            <Heading
-              as="h2"
-              fontSize={{ base: '2xl', md: '3xl' }}
-              mb={8}
-              textAlign="center"
-            >
-              Our Methodology
-            </Heading>
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-              {service.methodology.map((step, index) => (
-                <MotionBox
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <Card
-                    bg={cardBg}
-                    borderColor={borderColor}
-                    variant="outline"
-                    height="full"
-                    _hover={{
-                      transform: 'translateY(-4px)',
-                      shadow: 'lg',
-                      borderColor: 'green.500',
-                    }}
-                    transition="all 0.3s"
-                  >
-                    <CardBody>
-                      <VStack align="start" spacing={3}>
-                        <HStack>
-                          <Box
-                            bg="green.500"
-                            color="white"
-                            borderRadius="full"
-                            w={10}
-                            h={10}
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                            fontWeight="bold"
-                            fontSize="lg"
-                          >
-                            {index + 1}
-                          </Box>
-                        </HStack>
-                        <Text fontWeight="semibold" fontSize="md">
-                          {step}
-                        </Text>
-                      </VStack>
-                    </CardBody>
-                  </Card>
-                </MotionBox>
-              ))}
-            </SimpleGrid>
-          </MotionBox>
-        </Box>
-
-        {/* Tools & Technologies Section */}
-        <MotionBox
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          mb={20}
-        >
-          <Heading
-            as="h2"
-            fontSize={{ base: '2xl', md: '3xl' }}
-            mb={6}
-          >
-            Tools & Technologies
-          </Heading>
-          <HStack spacing={3} flexWrap="wrap">
-            {service.tools.map((tool, index) => (
-              <Badge
-                key={index}
-                colorScheme="green"
-                fontSize="md"
-                px={4}
-                py={2}
-                borderRadius="full"
-                variant="subtle"
-              >
-                {tool}
-              </Badge>
-            ))}
-          </HStack>
-        </MotionBox>
-
-        {/* Timeline & Target Audience Section */}
-        <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={8} mb={20}>
-          <GridItem>
-            <MotionBox
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-              height="full"
-            >
-              <Card bg={cardBg} borderColor={borderColor} variant="outline" height="full">
-                <CardBody p={8}>
-                  <HStack mb={4}>
-                    <Icon as={FiClock} color="green.500" boxSize={6} />
-                    <Heading as="h3" size="md">
-                      Expected Timeline
-                    </Heading>
-                  </HStack>
-                  <Text fontSize="lg" fontWeight="semibold" color="green.500">
-                    {service.timeline}
+              <GridItem>
+                <VStack align="start" spacing={5}>
+                  <Text color={mutedColor} lineHeight="1.9" fontSize={{ base: 'md', md: 'lg' }}>
+                    {service.overview}
                   </Text>
-                </CardBody>
-              </Card>
-            </MotionBox>
-          </GridItem>
-
-          <GridItem>
-            <MotionBox
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-              height="full"
-            >
-              <Card bg={cardBg} borderColor={borderColor} variant="outline" height="full">
-                <CardBody p={8}>
-                  <HStack mb={4}>
-                    <Icon as={FiUsers} color="green.500" boxSize={6} />
-                    <Heading as="h3" size="md">
-                      Who Should Use This Service
-                    </Heading>
-                  </HStack>
-                  <List spacing={2}>
-                    {service.whoShouldUse.map((audience, index) => (
-                      <ListItem key={index}>
-                        <HStack align="start">
-                          <ListIcon as={FiCheckCircle} color="green.500" mt={1} />
-                          <Text fontSize="sm">{audience}</Text>
-                        </HStack>
-                      </ListItem>
-                    ))}
-                  </List>
-                </CardBody>
-              </Card>
-            </MotionBox>
-          </GridItem>
-        </Grid>
-
-        {/* Modules Section (if applicable) */}
-        {service.modules && service.modules.length > 0 && (
-          <Box bg={sectionBg} borderRadius="2xl" p={{ base: 8, md: 12 }} mb={20}>
-            <MotionBox
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-            >
-              <Heading
-                as="h2"
-                fontSize={{ base: '2xl', md: '3xl' }}
-                mb={8}
-                textAlign="center"
-              >
-                Service Modules
-              </Heading>
-              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-                {service.modules.map((module, index) => (
-                  <MotionBox
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                  >
-                    <Card
-                      bg={cardBg}
-                      borderColor={borderColor}
-                      variant="outline"
-                      _hover={{
-                        transform: 'translateY(-4px)',
-                        shadow: 'lg',
-                        borderColor: 'green.500',
-                      }}
-                      transition="all 0.3s"
-                    >
-                      <CardBody>
-                        <Heading as="h4" size="sm" mb={3} color="green.500">
-                          {module.name}
-                        </Heading>
-                        <Text color={mutedColor} fontSize="sm">
-                          {module.description}
-                        </Text>
-                      </CardBody>
-                    </Card>
-                  </MotionBox>
-                ))}
-              </SimpleGrid>
-            </MotionBox>
+                  <Box borderWidth="1px" borderColor={panelBorder} borderRadius="xl" p={5} w="full">
+                    <Badge colorScheme="red" variant="subtle" mb={3} borderRadius="full">
+                      Core Risk
+                    </Badge>
+                    <Text color={mutedColor} lineHeight="1.8">
+                      {service.challenge}
+                    </Text>
+                  </Box>
+                  <Button as={Link} href="/contact" colorScheme="green" rightIcon={<FiCompass />}>
+                    Discuss This Service
+                  </Button>
+                </VStack>
+              </GridItem>
+            </Grid>
           </Box>
-        )}
+        </MotionBox>
 
-        {/* FAQ Section */}
-        {service.faqs && service.faqs.length > 0 && (
-          <MotionBox
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-            mb={20}
-          >
-            <ServiceFAQ faqs={service.faqs} />
-          </MotionBox>
-        )}
-
-        <Divider my={12} />
-
-        {/* Request Quotation Form */}
         <MotionBox
+          mt={{ base: 12, md: 16 }}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+          viewport={{ once: true, margin: '-90px' }}
+          transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
         >
-          <VStack spacing={4} mb={8}>
-            <Heading
-              as="h2"
-              fontSize={{ base: '2xl', md: '3xl' }}
-              textAlign="center"
-            >
-              Request a Quote
+          <Box
+            borderRadius="2xl"
+            p={{ base: 6, md: 9 }}
+            bgGradient={useColorModeValue(
+              'linear(to-r, #0f172a, #1e293b, #1f3d3a)',
+              'linear(to-r, #0b1220, #111c31, #15352a)'
+            )}
+            borderWidth="1px"
+            borderColor="rgba(148, 163, 184, 0.2)"
+          >
+            <Badge colorScheme="blue" variant="subtle" px={3} py={1} borderRadius="full" mb={4}>
+              Our Approach
+            </Badge>
+            <Heading as="h2" color="white" fontSize={{ base: '2xl', md: '4xl' }} mb={4}>
+              Practical, Context-Aware Security Delivery
             </Heading>
-            <Text textAlign="center" fontSize="lg" color={mutedColor} maxW="2xl">
-              Get a customized proposal for your organization
+            <Text color="gray.200" fontSize={{ base: 'md', md: 'lg' }} lineHeight="1.9" maxW="5xl">
+              We design each engagement around your architecture, business criticality, and operational constraints.
+              The goal is simple: identify what matters most, prove risk clearly, and help your team reduce it fast.
             </Text>
+
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} mt={8}>
+              {service.approach.map((item, index) => (
+                <HStack
+                  key={index}
+                  align="start"
+                  spacing={3}
+                  p={4}
+                  borderWidth="1px"
+                  borderColor="rgba(148, 163, 184, 0.2)"
+                  borderRadius="xl"
+                  bg="rgba(15, 23, 42, 0.65)"
+                >
+                  <Icon as={FiCheckCircle} color="green.300" boxSize={5} mt={1} />
+                  <Text color="gray.100">{item}</Text>
+                </HStack>
+              ))}
+            </SimpleGrid>
+          </Box>
+        </MotionBox>
+
+        <MotionBox
+          mt={{ base: 12, md: 16 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-90px' }}
+          transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
+        >
+          <VStack align="start" spacing={4} mb={6}>
+            <Badge colorScheme="green" variant="subtle" px={3} py={1} borderRadius="full">
+              Delivery Methodology
+            </Badge>
+            <Heading as="h2" fontSize={{ base: '2xl', md: '4xl' }}>
+              Structured Execution from Discovery to Closure
+            </Heading>
           </VStack>
+
+          <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} spacing={5}>
+            {service.methodology.map((step) => (
+              <Box
+                key={step.title}
+                bg={panelBg}
+                borderWidth="1px"
+                borderColor={panelBorder}
+                borderRadius="xl"
+                p={6}
+              >
+                <Text fontWeight="bold" fontSize="xl" mb={2}>
+                  {step.title}
+                </Text>
+                <Text color={mutedColor} lineHeight="1.8" fontSize="sm">
+                  {step.description}
+                </Text>
+              </Box>
+            ))}
+          </SimpleGrid>
+        </MotionBox>
+
+        <MotionBox
+          mt={{ base: 12, md: 16 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-90px' }}
+          transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
+        >
+          <Box
+            borderRadius="2xl"
+            p={{ base: 6, md: 8 }}
+            bgGradient={useColorModeValue(
+              'linear(to-r, #0f172a, #1e293b, #3b1d4a)',
+              'linear(to-r, #0b1220, #10192d, #2a143c)'
+            )}
+            borderWidth="1px"
+            borderColor="rgba(148, 163, 184, 0.2)"
+          >
+            <VStack align="start" spacing={4} mb={6}>
+              <Badge colorScheme="pink" variant="subtle" px={3} py={1} borderRadius="full">
+                Key Statistics
+              </Badge>
+              <Heading as="h2" color="white" fontSize={{ base: '2xl', md: '4xl' }}>
+                Why This Risk Category Demands Attention
+              </Heading>
+            </VStack>
+
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+              {service.kpis.map((kpi) => (
+                <Box key={`${kpi.value}-${kpi.label}`} p={5} borderRadius="xl" bg="rgba(15, 23, 42, 0.62)" borderWidth="1px" borderColor="rgba(148, 163, 184, 0.24)">
+                  <Text fontSize={{ base: '3xl', md: '4xl' }} color="white" fontWeight="black" lineHeight="1">
+                    {kpi.value}
+                  </Text>
+                  <Text color="gray.200" mt={2} fontWeight="semibold">
+                    {kpi.label}
+                  </Text>
+                  <Text color="gray.400" mt={3} fontSize="xs">
+                    {kpi.source}
+                  </Text>
+                </Box>
+              ))}
+            </SimpleGrid>
+          </Box>
+        </MotionBox>
+
+        <MotionBox
+          mt={{ base: 12, md: 16 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-90px' }}
+          transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
+        >
+          <Grid templateColumns={{ base: '1fr', xl: '1.3fr 1fr' }} gap={6}>
+            <GridItem>
+              <Box bg={panelBg} borderWidth="1px" borderColor={panelBorder} borderRadius="2xl" p={{ base: 6, md: 8 }} h="full">
+                <Badge colorScheme="yellow" variant="subtle" px={3} py={1} borderRadius="full" mb={3}>
+                  Expected Outcomes
+                </Badge>
+                <Heading as="h2" fontSize={{ base: '2xl', md: '3xl' }} mb={4}>
+                  What You Achieve from This Engagement
+                </Heading>
+                <List spacing={3}>
+                  {service.outcomes.map((item, index) => (
+                    <ListItem key={index}>
+                      <HStack align="start" spacing={3}>
+                        <ListIcon as={FiTarget} color="green.400" mt={1} />
+                        <Text color={mutedColor}>{item}</Text>
+                      </HStack>
+                    </ListItem>
+                  ))}
+                </List>
+
+                <Heading as="h3" size="md" mt={8} mb={3}>
+                  Deliverables
+                </Heading>
+                <List spacing={3}>
+                  {service.deliverables.map((item, index) => (
+                    <ListItem key={index}>
+                      <HStack align="start" spacing={3}>
+                        <ListIcon as={FiCheckCircle} color="green.400" mt={1} />
+                        <Text color={mutedColor}>{item}</Text>
+                      </HStack>
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+            </GridItem>
+
+            <GridItem>
+              <Box bg={panelBg} borderWidth="1px" borderColor={panelBorder} borderRadius="2xl" p={{ base: 6, md: 8 }} h="full">
+                <Badge colorScheme="cyan" variant="subtle" px={3} py={1} borderRadius="full" mb={3}>
+                  Best Fit
+                </Badge>
+                <Heading as="h3" fontSize={{ base: 'xl', md: '2xl' }} mb={4}>
+                  Ideal For
+                </Heading>
+                <Stack spacing={3}>
+                  {service.idealFor.map((item, index) => (
+                    <HStack key={index} align="start" spacing={3}>
+                      <Icon as={FiUsers} color="green.400" mt={1} />
+                      <Text color={mutedColor}>{item}</Text>
+                    </HStack>
+                  ))}
+                </Stack>
+              </Box>
+            </GridItem>
+          </Grid>
+        </MotionBox>
+
+        {service.faqs.length > 0 ? (
+          <MotionBox
+            mt={{ base: 12, md: 16 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-90px' }}
+            transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
+          >
+            <ServiceFAQ
+              faqs={service.faqs}
+              title={`Frequently Asked Questions: ${service.title}`}
+              subtitle="Everything you need to know before starting this engagement."
+            />
+          </MotionBox>
+        ) : null}
+
+        <MotionBox
+          id="quotation-form"
+          mt={{ base: 12, md: 16 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-90px' }}
+          transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
+        >
           <QuotationForm serviceName={service.title} />
         </MotionBox>
       </Container>

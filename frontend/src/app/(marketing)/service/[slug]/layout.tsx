@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { services } from '../_data/services'
+import { getServiceBySlug, serviceCategoryMap } from '../_data/services'
 
 interface ServiceLayoutProps {
   children: React.ReactNode
@@ -8,7 +8,7 @@ interface ServiceLayoutProps {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  const service = services.find((s) => s.slug === slug)
+  const service = getServiceBySlug(slug)
 
   if (!service) {
     return {
@@ -17,19 +17,25 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   }
 
+  const category = serviceCategoryMap[service.categoryId]
+  const pageTitle = `${service.title} | ${category.label} - HackToLive`
+  const pageDescription = service.shortDescription
+
   return {
-    title: `${service.title} - HackToLive Services`,
-    description: service.shortDescription,
+    title: pageTitle,
+    description: pageDescription,
     keywords: [
       service.title,
+      category.label,
       'HackToLive service',
       'cybersecurity',
-      'tech services',
-      'consulting',
+      'penetration testing',
+      'security consulting',
+      'Bangladesh cybersecurity',
     ],
     openGraph: {
-      title: `${service.title} - HackToLive`,
-      description: service.shortDescription,
+      title: pageTitle,
+      description: pageDescription,
       url: `https://hacktolive.net/service/${slug}`,
       siteName: 'HackToLive',
       images: [
@@ -45,8 +51,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${service.title} - HackToLive`,
-      description: service.shortDescription,
+      title: pageTitle,
+      description: pageDescription,
       images: ['/logo.svg'],
     },
   }

@@ -1,23 +1,39 @@
 'use client'
 
-import { Card, CardBody, VStack, Heading, Text, Icon, Flex, Badge, useColorModeValue, Button } from '@chakra-ui/react'
+import Link from 'next/link'
+import {
+  Badge,
+  Card,
+  CardBody,
+  Flex,
+  Heading,
+  HStack,
+  Icon,
+  Text,
+  VStack,
+  useColorModeValue,
+} from '@chakra-ui/react'
 import { IconType } from 'react-icons'
 import { FiArrowRight } from 'react-icons/fi'
-import Link from 'next/link'
 
 interface ServiceCardProps {
   title: string
   description: string
   icon: IconType
   href: string
+  categoryLabel: string
   badge?: string
 }
 
-export function ServiceCard({ title, description, icon, href, badge }: ServiceCardProps) {
-  const cardBg = useColorModeValue('white', 'gray.800')
-  const borderColor = useColorModeValue('gray.200', 'gray.700')
-  const iconBg = useColorModeValue('primary.50', 'primary.900')
-  const iconColor = useColorModeValue('primary.500', 'primary.400')
+export function ServiceCard({ title, description, icon, href, categoryLabel, badge }: ServiceCardProps) {
+  const cardBg = useColorModeValue('white', 'rgba(13, 18, 31, 0.92)')
+  const borderColor = useColorModeValue('gray.200', 'rgba(148, 163, 184, 0.16)')
+  const iconBg = useColorModeValue('gray.100', 'rgba(34, 197, 94, 0.12)')
+  const iconColor = useColorModeValue('green.600', 'green.300')
+  const mutedColor = useColorModeValue('gray.600', 'gray.300')
+  const labelColor = useColorModeValue('gray.500', 'gray.400')
+  const hoverBorderColor = useColorModeValue('green.300', 'green.400')
+  const hoverShadow = useColorModeValue('xl', '0 16px 40px rgba(5, 150, 105, 0.22)')
 
   return (
     <Card
@@ -26,47 +42,71 @@ export function ServiceCard({ title, description, icon, href, badge }: ServiceCa
       bg={cardBg}
       borderWidth="1px"
       borderColor={borderColor}
+      backdropFilter="blur(8px)"
       _hover={{
-        shadow: '2xl',
-        borderColor: iconColor,
-        transform: 'translateY(-4px)',
+        borderColor: hoverBorderColor,
+        transform: 'translateY(-6px)',
+        shadow: hoverShadow,
       }}
-      transition="all 0.3s"
+      transition="all 0.25s ease"
       cursor="pointer"
       h="full"
+      rounded="2xl"
     >
-      <CardBody>
-        <VStack align="start" spacing={4} h="full">
-          <Flex justify="space-between" w="full" align="start">
+      <CardBody p={{ base: 6, md: 7 }}>
+        <VStack align="start" spacing={5} h="full">
+          <Flex justify="space-between" w="full" align="start" gap={3}>
             <Flex
-              w={14}
-              h={14}
+              w={12}
+              h={12}
               align="center"
               justify="center"
-              rounded="full"
+              rounded="xl"
               bg={iconBg}
+              borderWidth="1px"
+              borderColor={useColorModeValue('gray.200', 'rgba(34, 197, 94, 0.28)')}
             >
-              <Icon as={icon} boxSize={7} color={iconColor} />
+              <Icon as={icon} boxSize={6} color={iconColor} />
             </Flex>
-            {badge && (
-              <Badge colorScheme="green" fontSize="xs">
-                {badge}
+
+            <HStack spacing={2} flexWrap="wrap" justify="end">
+              <Badge
+                variant="subtle"
+                colorScheme="green"
+                fontSize="0.68rem"
+                px={2.5}
+                py={1}
+                borderRadius="full"
+              >
+                {categoryLabel}
               </Badge>
-            )}
+              {badge ? (
+                <Badge
+                  bg={useColorModeValue('gray.200', 'rgba(30, 41, 59, 0.95)')}
+                  color={useColorModeValue('gray.700', 'gray.200')}
+                  fontSize="0.68rem"
+                  px={2.5}
+                  py={1}
+                  borderRadius="full"
+                >
+                  {badge}
+                </Badge>
+              ) : null}
+            </HStack>
           </Flex>
-          
+
           <VStack align="start" spacing={2} flex={1}>
-            <Heading as="h3" size="md">
+            <Heading as="h3" size="md" lineHeight="1.3">
               {title}
             </Heading>
-            <Text color="gray.600" fontSize="sm" lineHeight="tall">
+            <Text color={mutedColor} fontSize="sm" lineHeight="tall">
               {description}
             </Text>
           </VStack>
 
-          <Flex align="center" color={iconColor} fontWeight="semibold" fontSize="sm">
-            Learn More
-            <Icon as={FiArrowRight} ml={2} />
+          <Flex align="center" color={iconColor} fontWeight="semibold" fontSize="sm" gap={2}>
+            <Text color={labelColor}>Explore service</Text>
+            <Icon as={FiArrowRight} />
           </Flex>
         </VStack>
       </CardBody>

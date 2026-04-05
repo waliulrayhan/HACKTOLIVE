@@ -24,8 +24,9 @@ interface QuotationFormProps {
 }
 
 export function QuotationForm({ serviceName }: QuotationFormProps) {
-  const cardBg = useColorModeValue('white', 'gray.800')
-  const borderColor = useColorModeValue('gray.200', 'gray.700')
+  const cardBg = useColorModeValue('white', 'rgba(13, 18, 31, 0.92)')
+  const borderColor = useColorModeValue('gray.200', 'rgba(148, 163, 184, 0.2)')
+  const mutedColor = useColorModeValue('gray.600', 'gray.300')
 
   const [formData, setFormData] = useState({
     name: '',
@@ -97,15 +98,15 @@ export function QuotationForm({ serviceName }: QuotationFormProps) {
   }
 
   return (
-    <Card bg={cardBg} borderWidth="1px" borderColor={borderColor}>
+    <Card bg={cardBg} borderWidth="1px" borderColor={borderColor} borderRadius="2xl" overflow="hidden">
       <CardBody>
         <VStack spacing={6} align="stretch">
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
-              Request a Quote
+              Request a Consultation
             </Heading>
-            <Text color="gray.600">
-              Fill out the form below and our team will get back to you within 24 hours.
+            <Text color={mutedColor}>
+              Share your goals and current challenges. Our advisory team will respond with a scoped approach, estimated timeline, and recommended next steps.
             </Text>
           </VStack>
 
@@ -157,7 +158,7 @@ export function QuotationForm({ serviceName }: QuotationFormProps) {
               </FormControl>
 
               <FormControl>
-                <FormLabel>Budget Range</FormLabel>
+                <FormLabel>Estimated Budget Range</FormLabel>
                 <Select
                   name="budget"
                   value={formData.budget}
@@ -183,6 +184,7 @@ export function QuotationForm({ serviceName }: QuotationFormProps) {
                   <option value="urgent">Urgent (Within 2 weeks)</option>
                   <option value="1-month">Within 1 month</option>
                   <option value="2-3-months">2-3 months</option>
+                  <option value="quarter">Within this quarter</option>
                   <option value="flexible">Flexible</option>
                 </Select>
               </FormControl>
@@ -193,7 +195,7 @@ export function QuotationForm({ serviceName }: QuotationFormProps) {
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  placeholder="Please describe your requirements, scope, and any specific concerns..."
+                  placeholder="Example: We want external and internal penetration testing for our production environment before compliance audit in Q3."
                   rows={6}
                 />
                 <FormErrorMessage>{errors.message}</FormErrorMessage>
@@ -206,7 +208,7 @@ export function QuotationForm({ serviceName }: QuotationFormProps) {
                 w="full"
                 isLoading={isSubmitting}
               >
-                Submit Request
+                Send Consultation Request
               </Button>
             </VStack>
           </form>
