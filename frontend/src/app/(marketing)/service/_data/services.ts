@@ -151,8 +151,8 @@ export const services: Service[] = [
       'Our external penetration tests emulate motivated attackers targeting your public-facing systems, APIs, VPN gateways, mail servers, and cloud edges. We move beyond scanner output by chaining weaknesses into realistic attack paths and documenting business impact clearly.',
     challenge:
       'Internet-facing systems are continuously probed by bots and human adversaries. A single misconfiguration or weak workflow can become an entry point to your internal environment.',
-    timeline: '2 to 4 weeks depending on scope size',
-    engagementModel: 'Black-box, gray-box, or targeted attack simulation',
+    timeline: 'Estimated 2 to 4 weeks, based on scope breadth and validation depth.',
+    engagementModel: 'Delivered as black-box, gray-box, or targeted simulation with agreed guardrails and reporting cadence.',
     approach: [
       'Asset discovery and external attack surface mapping',
       'Manual validation of exploitability and privilege boundaries',
@@ -198,6 +198,11 @@ export const services: Service[] = [
         answer:
           'At minimum annually, and always after major infrastructure changes, cloud migrations, or significant feature launches.',
       },
+      {
+        question: 'Do you include remediation validation after fixes?',
+        answer:
+          'Yes. We provide retest validation to confirm critical and high-risk issues are properly resolved and no equivalent external attack path remains open.',
+      },
     ],
   },
   {
@@ -215,8 +220,8 @@ export const services: Service[] = [
       'Internal tests simulate post-compromise scenarios where an attacker already has limited network access. We evaluate Active Directory security, endpoint hardening, segmentation, and paths to crown-jewel systems.',
     challenge:
       'Many organizations invest heavily in perimeter security but under-prioritize internal controls. Once inside, attackers often move quickly through weak privilege and trust relationships.',
-    timeline: '2 to 5 weeks depending on network size',
-    engagementModel: 'Compromised workstation simulation or authenticated internal test',
+    timeline: 'Estimated 2 to 5 weeks, based on network size, trust complexity, and testing depth.',
+    engagementModel: 'Delivered as compromised workstation simulation or authenticated internal testing with agreed execution guardrails.',
     approach: [
       'Map trust relationships and privilege boundaries',
       'Assess AD misconfigurations and identity weaknesses',
@@ -257,6 +262,16 @@ export const services: Service[] = [
         answer:
           'Not necessarily. Most engagements begin with low-privilege access to accurately measure how quickly privilege escalation is possible.',
       },
+      {
+        question: 'Can this assessment be executed without downtime?',
+        answer:
+          'Yes. Activities are coordinated with your infrastructure team, maintenance windows, and escalation contacts to minimize risk while preserving realistic testing depth.',
+      },
+      {
+        question: 'What systems are usually prioritized first?',
+        answer:
+          'We prioritize identity infrastructure, segmentation boundaries, privileged access paths, and systems that create the highest potential blast radius if compromised.',
+      },
     ],
   },
   {
@@ -274,8 +289,8 @@ export const services: Service[] = [
       'Our web application assessments combine OWASP testing standards with business workflow abuse scenarios. We validate how attackers can bypass controls, access unauthorized data, or manipulate critical transactions.',
     challenge:
       'Modern applications fail in complex ways: broken access controls, insecure APIs, and workflow flaws that scanners often miss.',
-    timeline: '1 to 3 weeks per application depending on complexity',
-    engagementModel: 'Gray-box with test accounts and architecture context',
+    timeline: 'Estimated 1 to 3 weeks per application, based on workflow complexity and validation depth.',
+    engagementModel: 'Delivered as gray-box testing with approved accounts, architecture context, and reporting checkpoints.',
     approach: [
       'Map user roles, trust boundaries, and critical flows',
       'Test auth/session management and privilege checks',
@@ -316,6 +331,16 @@ export const services: Service[] = [
         answer:
           'Yes. We test the full request lifecycle including client-side logic, server-side validation, and API authorization controls.',
       },
+      {
+        question: 'Do you provide developer-ready remediation guidance?',
+        answer:
+          'Yes. Findings include reproducible steps, exploit context, and practical fixes mapped to common engineering workflows so teams can remediate faster.',
+      },
+      {
+        question: 'Can testing align with a release timeline?',
+        answer:
+          'Yes. Engagements can be scheduled around sprint or release windows so critical risks are identified and triaged before production deployment.',
+      },
     ],
   },
   {
@@ -333,8 +358,8 @@ export const services: Service[] = [
       'We perform end-to-end mobile testing using static and dynamic techniques to uncover weak cryptography, insecure storage, improper certificate handling, and business logic flaws in app-to-API interactions.',
     challenge:
       'Mobile apps are frequently reverse engineered and tampered with. Weak client controls can expose sensitive user and business data.',
-    timeline: '2 to 4 weeks for app and API combined scope',
-    engagementModel: 'Black-box and gray-box hybrid mobile assessment',
+    timeline: 'Estimated 2 to 4 weeks for app and API scope, based on platform and feature depth.',
+    engagementModel: 'Delivered as a hybrid black-box and gray-box mobile assessment with controlled runtime validation.',
     approach: [
       'Reverse engineering and binary analysis',
       'Runtime tampering and bypass testing',
@@ -375,6 +400,16 @@ export const services: Service[] = [
         answer:
           'Yes. We regularly test staging and release candidate builds to support secure launch cycles and minimize production risk.',
       },
+      {
+        question: 'Do you assess both app binaries and backend APIs?',
+        answer:
+          'Yes. We analyze mobile binaries and runtime behavior, then validate related API trust assumptions to catch exploit chains that span app and backend.',
+      },
+      {
+        question: 'Will findings map to recognized mobile standards?',
+        answer:
+          'Yes. Reporting is aligned with OWASP MASVS and practical mobile hardening guidance so engineering teams can prioritize implementation efficiently.',
+      },
     ],
   },
   {
@@ -392,8 +427,8 @@ export const services: Service[] = [
       'Wireless assessments validate whether your Wi-Fi architecture can resist modern attack techniques, from rogue AP attacks to insecure segmentation between guest, BYOD, and corporate networks.',
     challenge:
       'Wireless is often treated as a convenience layer, but weak Wi-Fi controls can become a direct bridge into sensitive internal systems.',
-    timeline: '1 to 2 weeks including on-site validation',
-    engagementModel: 'On-site wireless and adjacent network attack simulation',
+    timeline: 'Estimated 1 to 2 weeks, including on-site wireless validation and control verification.',
+    engagementModel: 'Delivered as on-site wireless and adjacent network simulation with defined safety guardrails.',
     approach: [
       'Map AP inventory and encryption posture',
       'Assess guest-to-corporate segmentation controls',
@@ -434,6 +469,16 @@ export const services: Service[] = [
         answer:
           'Yes. Most meaningful wireless testing is performed on-site to validate radio coverage, segmentation behavior, and physical exposure.',
       },
+      {
+        question: 'Can you test guest and corporate network isolation?',
+        answer:
+          'Yes. We specifically validate whether guest, BYOD, and corporate segments can be traversed through misconfiguration or weak enforcement controls.',
+      },
+      {
+        question: 'Do you check for rogue access point risk?',
+        answer:
+          'Yes. We evaluate rogue AP exposure, evil twin susceptibility, and monitoring effectiveness so teams can improve detection and containment readiness.',
+      },
     ],
   },
   {
@@ -451,8 +496,8 @@ export const services: Service[] = [
       'Our social engineering engagements simulate realistic attacker behavior against employees, vendors, and support workflows. We test email phishing, voice-based deception, and pretext scenarios to identify where process and awareness controls break down under pressure.',
     challenge:
       'Even with strong technical controls, attackers often bypass systems by exploiting trust, urgency, and human behavior. Without controlled simulations, organizations cannot accurately measure real-world human-layer risk.',
-    timeline: '2 to 4 weeks including campaign design and reporting',
-    engagementModel: 'Controlled phishing, vishing, and pretexting simulations',
+    timeline: 'Estimated 2 to 4 weeks, including campaign design, execution waves, and reporting.',
+    engagementModel: 'Delivered through controlled phishing, vishing, and pretexting simulations with governance oversight.',
     approach: [
       'Define approved scenarios, targets, and escalation safeguards',
       'Execute phishing, vishing, and pretexting campaigns in waves',
@@ -498,6 +543,11 @@ export const services: Service[] = [
         answer:
           'Yes. We pair simulation outcomes with practical training paths and follow-up campaigns to validate improvement.',
       },
+      {
+        question: 'Can campaign difficulty be phased over time?',
+        answer:
+          'Yes. We can run progressive simulation waves that increase realism and complexity to measure maturity improvement across departments and roles.',
+      },
     ],
   },
   {
@@ -515,8 +565,8 @@ export const services: Service[] = [
       'Our vulnerability assessment service provides broad visibility into known weaknesses while filtering noise through analyst validation. You receive a prioritized action list tied to exploitability and business impact.',
     challenge:
       'Security teams are overloaded with scanner alerts, but not every finding is urgent. Without prioritization, critical fixes get delayed and risk accumulates.',
-    timeline: '1 to 3 weeks based on asset scope',
-    engagementModel: 'Snapshot assessment or recurring monthly program',
+    timeline: 'Estimated 1 to 3 weeks, based on asset inventory breadth and validation depth.',
+    engagementModel: 'Delivered as a snapshot assessment or recurring monthly program with prioritized remediation tracking.',
     approach: [
       'Comprehensive asset and service scanning',
       'Analyst-led false-positive reduction',
@@ -557,6 +607,16 @@ export const services: Service[] = [
         answer:
           'Vulnerability assessments focus on breadth and prioritization of known weaknesses, while penetration tests focus on depth and exploit chaining.',
       },
+      {
+        question: 'Can this run as a recurring monthly program?',
+        answer:
+          'Yes. Many teams use recurring cycles to track remediation progress, discover newly exposed assets, and maintain a stable risk reduction cadence.',
+      },
+      {
+        question: 'How are false positives handled?',
+        answer:
+          'High-value findings are manually validated by analysts so teams focus on actionable issues instead of spending cycles on scanner noise.',
+      },
     ],
   },
   {
@@ -574,8 +634,8 @@ export const services: Service[] = [
       'We review cloud identity, storage, network, and logging architecture to identify exploitable misconfigurations and governance gaps. Findings are aligned to your platform architecture and operational model.',
     challenge:
       'Cloud speed often outpaces cloud governance. Identity and misconfiguration mistakes can expose sensitive data in minutes.',
-    timeline: '2 to 4 weeks for single cloud tenant; longer for multi-cloud',
-    engagementModel: 'Read-only review plus targeted validation testing',
+    timeline: 'Estimated 2 to 4 weeks for a single tenant, with extended timelines for multi-cloud scope.',
+    engagementModel: 'Delivered as a least-privilege review with targeted validation testing and architecture-aligned reporting.',
     approach: [
       'Assess IAM roles, trust policies, and privileged access design',
       'Review storage and data exposure pathways',
@@ -616,6 +676,16 @@ export const services: Service[] = [
         answer:
           'Most engagements use least-privilege read access. Limited write access is requested only when explicitly approved for validation.',
       },
+      {
+        question: 'Can you assess multi-cloud environments?',
+        answer:
+          'Yes. We can evaluate AWS, Azure, and GCP estates, including cross-account trust paths and governance consistency across cloud platforms.',
+      },
+      {
+        question: 'Do findings include prioritized hardening actions?',
+        answer:
+          'Yes. Outputs include risk-ranked remediation guidance with ownership context so platform and security teams can sequence changes effectively.',
+      },
     ],
   },
   {
@@ -633,8 +703,8 @@ export const services: Service[] = [
       'This service identifies and scores cyber risks based on likelihood, impact, and control maturity. We connect technical findings to business operations so leadership can decide where to invest first.',
     challenge:
       'Security spending often lacks clear risk prioritization. Teams fix what is loudest, not what is most likely to cause major business disruption.',
-    timeline: '3 to 6 weeks including stakeholder workshops',
-    engagementModel: 'Framework-aligned risk workshops plus evidence review',
+    timeline: 'Estimated 3 to 6 weeks, including stakeholder workshops, scoring, and roadmap alignment.',
+    engagementModel: 'Delivered through framework-aligned workshops and evidence review with measurable prioritization outputs.',
     approach: [
       'Identify critical assets and business dependencies',
       'Model threat scenarios and control effectiveness',
@@ -675,6 +745,16 @@ export const services: Service[] = [
         answer:
           'Yes. We can align assessment outputs to ISO 27001 controls, NIST CSF functions, or your internal governance framework.',
       },
+      {
+        question: 'Is this suitable for board-level reporting?',
+        answer:
+          'Yes. We provide clear risk scoring, heat maps, and treatment priorities that help leadership discuss cyber risk in business impact terms.',
+      },
+      {
+        question: 'How often should risk assessments be refreshed?',
+        answer:
+          'A quarterly or semiannual cadence is common, with additional refresh cycles after major business, technology, or threat environment changes.',
+      },
     ],
   },
   {
@@ -692,8 +772,8 @@ export const services: Service[] = [
       'We review policy design, applicability, and enforcement maturity across your organization. The focus is practical governance that engineering, HR, legal, and operations can execute consistently.',
     challenge:
       'Policies often exist as static documents but fail to guide day-to-day decisions. This creates hidden compliance and operational risk.',
-    timeline: '2 to 4 weeks depending on policy maturity',
-    engagementModel: 'Document review, stakeholder interviews, and maturity scoring',
+    timeline: 'Estimated 2 to 4 weeks, based on policy maturity, ownership complexity, and update scope.',
+    engagementModel: 'Delivered through document review, stakeholder interviews, and maturity scoring with implementation guidance.',
     approach: [
       'Assess policy completeness against regulatory obligations',
       'Map policy intent to operational ownership',
@@ -734,6 +814,16 @@ export const services: Service[] = [
         answer:
           'Yes. We provide editable templates and ownership guidance tailored to your industry and operating model.',
       },
+      {
+        question: 'Can policies be mapped to specific owners?',
+        answer:
+          'Yes. We map each policy requirement to accountable roles and operational teams so enforcement becomes measurable and sustainable.',
+      },
+      {
+        question: 'Will this improve audit readiness?',
+        answer:
+          'Yes. We close policy-to-control gaps and document ownership clearly, which reduces repeat findings and strengthens audit defensibility.',
+      },
     ],
   },
   {
@@ -751,8 +841,8 @@ export const services: Service[] = [
       'Our OSINT investigations map your external digital footprint from an attacker perspective. We identify exposed credentials, shadow assets, public metadata leakage, and risky employee information patterns that can be weaponized for intrusion or fraud.',
     challenge:
       'Attackers gather intelligence before they attack. Most organizations underestimate the volume of actionable exposure available in public repositories, breach datasets, search indexes, and social platforms.',
-    timeline: '1 to 3 weeks depending on organization footprint',
-    engagementModel: 'External intelligence gathering and exposure analysis',
+    timeline: 'Estimated 1 to 3 weeks, based on digital footprint scale and exposure analysis depth.',
+    engagementModel: 'Delivered as external intelligence collection and exposure analysis with risk-ranked prioritization.',
     approach: [
       'Map domains, subdomains, employee footprint, and public tech stack',
       'Analyze leaked credential and breach data exposure',
@@ -798,6 +888,11 @@ export const services: Service[] = [
         answer:
           'Yes. OSINT findings are often used to prioritize realistic penetration testing scenarios and target selection.',
       },
+      {
+        question: 'Do you include credential exposure monitoring guidance?',
+        answer:
+          'Yes. Reports include practical monitoring and response recommendations for leaked credentials and externally visible digital footprint risks.',
+      },
     ],
   },
   {
@@ -815,8 +910,8 @@ export const services: Service[] = [
       'Our tailored consulting service builds custom cybersecurity programs for organizations with unique operating models, regulatory pressure, or strategic transformation needs. Engagements are shaped around your constraints, priorities, and business outcomes.',
     challenge:
       'Predefined service packages can miss organization-specific priorities. Teams often need flexible support that combines governance, technical assurance, and execution planning in one integrated roadmap.',
-    timeline: 'Engagement-based; typically 4 to 12 weeks',
-    engagementModel: 'Advisory sprints, program design, and embedded consulting',
+    timeline: 'Estimated 4 to 12 weeks per engagement phase, based on transformation scope and objectives.',
+    engagementModel: 'Delivered through advisory sprints, program design, and embedded consulting with milestone checkpoints.',
     approach: [
       'Assess business context, risk appetite, and control maturity',
       'Design a custom security roadmap with phased priorities',
@@ -862,6 +957,11 @@ export const services: Service[] = [
         answer:
           'Absolutely. Tailored consulting is useful for both lean teams and large enterprises when standard scopes do not fit.',
       },
+      {
+        question: 'Will we receive an execution roadmap with owners?',
+        answer:
+          'Yes. Engagements include phased priorities, ownership mapping, and measurable checkpoints so initiatives can be tracked through delivery.',
+      },
     ],
   },
   {
@@ -879,8 +979,8 @@ export const services: Service[] = [
       'Our SOC-as-a-Service model combines monitoring technology, analyst expertise, and incident playbooks to give your team enterprise-grade detection and response without building a full in-house SOC from scratch.',
     challenge:
       'Most teams lack 24/7 analyst coverage and threat hunting depth. Delayed detection increases impact, downtime, and recovery cost.',
-    timeline: '2 to 6 weeks onboarding, continuous operations after launch',
-    engagementModel: 'Managed detection and response with agreed SLAs',
+    timeline: 'Estimated 2 to 6 weeks for onboarding, followed by continuous monitored operations.',
+    engagementModel: 'Delivered as managed detection and response with agreed SLAs, escalation paths, and tuning cycles.',
     approach: [
       'Integrate SIEM/EDR and critical telemetry sources',
       'Build use-case detections tied to your risk profile',
@@ -921,6 +1021,16 @@ export const services: Service[] = [
         answer:
           'Usually no. We can work with your existing SIEM and EDR stack and recommend only targeted improvements where needed.',
       },
+      {
+        question: 'How quickly can onboarding start?',
+        answer:
+          'Onboarding typically begins in weeks, with telemetry integration, detection tuning, and escalation workflows prioritized by your operational risk profile.',
+      },
+      {
+        question: 'Do you provide monthly performance reporting?',
+        answer:
+          'Yes. We provide recurring reports covering alert quality, incident trends, detection improvements, and actionable recommendations for SOC maturity.',
+      },
     ],
   },
   {
@@ -938,8 +1048,8 @@ export const services: Service[] = [
       'We preserve and analyze digital evidence to establish what happened, how compromise occurred, what data was impacted, and what actions are required for containment and recovery.',
     challenge:
       'Without disciplined forensic process, critical evidence can be lost, root cause remains uncertain, and legal or regulatory reporting becomes risky.',
-    timeline: 'Immediate mobilization; investigation length based on complexity',
-    engagementModel: 'Incident-triggered response or retained forensic support',
+    timeline: 'Immediate mobilization with duration determined by incident scope, evidence volume, and complexity.',
+    engagementModel: 'Delivered as incident-triggered response or retained forensic support with legal-grade evidence handling.',
     approach: [
       'Preserve volatile and non-volatile evidence safely',
       'Reconstruct attacker timeline and actions',
@@ -980,6 +1090,16 @@ export const services: Service[] = [
         answer:
           'Yes. We frequently coordinate with legal and compliance stakeholders to provide evidence handling and reporting support.',
       },
+      {
+        question: 'How fast can forensic response be activated?',
+        answer:
+          'Response can be mobilized rapidly, with early actions focused on preserving volatile evidence and protecting investigation integrity.',
+      },
+      {
+        question: 'Do you provide chain-of-custody documentation?',
+        answer:
+          'Yes. Evidence handling is documented with chain-of-custody records to support legal defensibility and regulatory communication needs.',
+      },
     ],
   },
   {
@@ -997,8 +1117,8 @@ export const services: Service[] = [
       'We turn raw threat signals into actionable intelligence mapped to your industry, technology stack, and business exposure. Intelligence outputs feed detection engineering, hardening priorities, and leadership awareness.',
     challenge:
       'Generic threat feeds are noisy and often disconnected from your actual risk profile. Teams need targeted intelligence, not endless indicators.',
-    timeline: 'Ongoing subscription or campaign-based intelligence support',
-    engagementModel: 'Monthly reporting plus rapid advisory alerts',
+    timeline: 'Ongoing subscription cadence with campaign-based cycles matched to threat and business priorities.',
+    engagementModel: 'Delivered through monthly intelligence reporting plus rapid advisories for high-impact threat changes.',
     approach: [
       'Monitor actor activity relevant to your sector',
       'Track credential leaks and exposed infrastructure',
@@ -1039,6 +1159,16 @@ export const services: Service[] = [
         answer:
           'No. Mid-size organizations benefit significantly when intelligence is tailored to their business context and attack surface.',
       },
+      {
+        question: 'Can intelligence outputs improve detection engineering?',
+        answer:
+          'Yes. Intelligence deliverables include prioritized indicators, adversary behavior context, and detection recommendations that map to your telemetry.',
+      },
+      {
+        question: 'How often are intelligence updates delivered?',
+        answer:
+          'Delivery can be monthly, with rapid advisories for urgent threats that materially affect your sector, environment, or exposed technologies.',
+      },
     ],
   },
   {
@@ -1056,8 +1186,8 @@ export const services: Service[] = [
       'An IR retainer ensures your team can activate experienced responders immediately during high-stress incidents. We pair readiness planning with on-demand support to reduce decision latency and containment delays.',
     challenge:
       'During active incidents, time lost on vendor onboarding and unclear workflows can amplify business damage significantly.',
-    timeline: 'Retainer setup in 1 to 2 weeks; response available per SLA',
-    engagementModel: 'Annual retainer with response hour pool and readiness services',
+    timeline: 'Retainer setup is typically 1 to 2 weeks, with response activation available per SLA.',
+    engagementModel: 'Delivered as an annual retainer with response-hour pool, readiness exercises, and escalation governance.',
     approach: [
       'Define incident severity model and activation paths',
       'Build communication and escalation playbooks',
@@ -1098,6 +1228,16 @@ export const services: Service[] = [
         answer:
           'Yes. Retainer workflows can include legal, HR, PR, and executive stakeholders to ensure coordinated response execution.',
       },
+      {
+        question: 'Do retainers include readiness exercises?',
+        answer:
+          'Yes. Tabletop sessions and scenario drills are included to test escalation pathways and improve decision speed under incident pressure.',
+      },
+      {
+        question: 'What is the benefit of pre-negotiated response coverage?',
+        answer:
+          'It removes onboarding delay during active incidents, enabling faster containment and clearer coordination when business impact is highest.',
+      },
     ],
   },
   {
@@ -1115,8 +1255,8 @@ export const services: Service[] = [
       'Our live programs combine guided theory with hands-on labs and mentor feedback. Learners practice offensive and defensive workflows in realistic scenarios, not just slides and quizzes.',
     challenge:
       'Most training programs teach concepts without practical transfer. Teams need skill-building that maps directly to workplace incidents and operations.',
-    timeline: '4 to 12 week cohorts depending on track',
-    engagementModel: 'Scheduled cohorts for individuals and corporate teams',
+    timeline: 'Estimated 4 to 12 weeks per cohort, based on track depth and learner baseline.',
+    engagementModel: 'Delivered as scheduled live cohorts for individuals and teams, with practical lab-based progression.',
     approach: [
       'Role-based curriculum design by skill level',
       'Lab-first learning with guided instructor support',
@@ -1157,6 +1297,16 @@ export const services: Service[] = [
         answer:
           'Yes. We offer private cohorts customized by role, team maturity, and organizational objectives.',
       },
+      {
+        question: 'Are sessions recorded for later review?',
+        answer:
+          'Yes. Learners receive session recordings and supporting materials so teams can reinforce concepts after each live class.',
+      },
+      {
+        question: 'Can curriculum be adjusted by role level?',
+        answer:
+          'Yes. We tailor track depth and lab difficulty for beginner, intermediate, or advanced roles to match target capability outcomes.',
+      },
     ],
   },
   {
@@ -1174,8 +1324,8 @@ export const services: Service[] = [
       'Our on-demand academy provides structured pathways for learners who need flexibility without sacrificing depth. Courses include guided labs and practical projects built around real-world scenarios.',
     challenge:
       'Many self-paced courses are fragmented and theory-heavy. Learners need coherent pathways that build practical competence.',
-    timeline: 'Self-paced, typically 8 to 16 weeks per pathway',
-    engagementModel: 'Subscription-based digital learning with lab access',
+    timeline: 'Self-paced pathways typically run 8 to 16 weeks, based on learner pace and track depth.',
+    engagementModel: 'Delivered as subscription-based digital learning with structured labs, assessments, and optional mentor support.',
     approach: [
       'Structured roadmap across beginner to advanced paths',
       'Hands-on labs and practical project milestones',
@@ -1216,6 +1366,16 @@ export const services: Service[] = [
         answer:
           'Yes. Practical labs are a core part of each pathway, with exercises designed to reinforce real operational skills.',
       },
+      {
+        question: 'Can learners track progress across pathways?',
+        answer:
+          'Yes. The platform includes milestones, assessments, and progress indicators so learners and sponsors can monitor skill advancement.',
+      },
+      {
+        question: 'Is mentor support available for complex topics?',
+        answer:
+          'Yes. Optional mentor support is available for advanced modules, project feedback, and targeted guidance on difficult concepts.',
+      },
     ],
   },
   {
@@ -1233,8 +1393,8 @@ export const services: Service[] = [
       'Our certifications emphasize real capability over memorization. Learners complete practical challenges that mirror real security operations and offensive workflows.',
     challenge:
       'Credential inflation makes it hard to identify real practitioners. Employers need proof of hands-on competence, not only theoretical exams.',
-    timeline: '4 to 10 week prep plus practical certification assessment',
-    engagementModel: 'Training plus practical exam-based certification',
+    timeline: 'Estimated 4 to 10 weeks of preparation plus practical assessment and evaluation.',
+    engagementModel: 'Delivered through role-aligned training and practical exam-based certification with competency reporting.',
     approach: [
       'Map certification outcomes to job roles',
       'Provide guided prep labs and mock assessments',
@@ -1275,6 +1435,16 @@ export const services: Service[] = [
         answer:
           'No. Certification decisions are based on practical tasks and applied problem-solving in realistic environments.',
       },
+      {
+        question: 'Do candidates receive a competency report?',
+        answer:
+          'Yes. Assessment outputs include a competency summary and skill-gap guidance to support targeted improvement planning.',
+      },
+      {
+        question: 'Are retake paths available if needed?',
+        answer:
+          'Yes. Candidates can follow structured retake guidance with recommended prep labs before attempting practical evaluation again.',
+      },
     ],
   },
   {
@@ -1292,8 +1462,8 @@ export const services: Service[] = [
       'Our CTF and community platform helps learners sharpen skills through regular challenge drops, team competitions, and peer collaboration. It creates a sustained practice loop beyond one-off courses.',
     challenge:
       'Security skills degrade without regular practice. Teams and learners need continuous, engaging environments to maintain readiness.',
-    timeline: 'Ongoing participation with weekly and monthly challenge cycles',
-    engagementModel: 'Community membership with challenge and leaderboard access',
+    timeline: 'Ongoing participation with weekly and monthly challenge cycles for sustained skills practice.',
+    engagementModel: 'Delivered as community membership with challenge access, rankings, and collaborative learning events.',
     approach: [
       'Release tiered technical challenges regularly',
       'Encourage team-based problem solving and debriefs',
@@ -1333,6 +1503,16 @@ export const services: Service[] = [
         question: 'Is this beginner-friendly?',
         answer:
           'Yes. Challenges are tiered from beginner to advanced, with guided hints and community support available.',
+      },
+      {
+        question: 'How frequently are new challenges released?',
+        answer:
+          'New technical challenges are released on a recurring cadence so participants can build consistent practice and progression habits.',
+      },
+      {
+        question: 'Can teams participate collaboratively?',
+        answer:
+          'Yes. Team-based participation is supported through community events, debrief sessions, and collaborative challenge-solving formats.',
       },
     ],
   },
