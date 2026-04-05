@@ -21,7 +21,17 @@ import {
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react'
-import { FiArrowRight, FiCheckCircle, FiClock, FiCompass, FiShield, FiTarget } from 'react-icons/fi'
+import {
+  FiActivity,
+  FiArrowRight,
+  FiBookOpen,
+  FiCheckCircle,
+  FiClock,
+  FiCompass,
+  FiRefreshCw,
+  FiShield,
+  FiTarget,
+} from 'react-icons/fi'
 import { ConsultationModal } from './_components/ConsultationModal'
 import { ServiceCard } from './_components/ServiceCard'
 import {
@@ -43,6 +53,25 @@ export default function ServicesPage() {
   const panelBg = useColorModeValue('white', 'rgba(10, 16, 30, 0.9)')
   const panelBorder = useColorModeValue('gray.200', 'rgba(148, 163, 184, 0.2)')
   const mutedColor = useColorModeValue('gray.600', 'gray.300')
+
+  const highlightMeta: Record<string, { icon: any; insight: string }> = {
+    'Security Engagements': {
+      icon: FiShield,
+      insight: 'Delivered across enterprise, startup, and public-sector environments.',
+    },
+    'Learners Trained': {
+      icon: FiBookOpen,
+      insight: 'Hands-on practical learning through live cohorts and labs.',
+    },
+    'Client Renewal Rate': {
+      icon: FiRefreshCw,
+      insight: 'Long-term delivery relationships built on measurable outcomes.',
+    },
+    'Incident Coverage': {
+      icon: FiActivity,
+      insight: 'Always-on support model for detection, escalation, and response.',
+    },
+  }
 
   return (
     <Box bg={pageBg}>
@@ -123,26 +152,77 @@ export default function ServicesPage() {
       </Box>
 
       <Container maxW="container.xl" mt={{ base: -6, md: -8 }} pb={{ base: 16, md: 24 }}>
-        <Grid
-          templateColumns={{ base: 'repeat(2, minmax(0, 1fr))', lg: 'repeat(4, minmax(0, 1fr))' }}
+        <Box
           borderWidth="1px"
           borderColor={panelBorder}
           borderRadius="2xl"
-          overflow="hidden"
-          bg={panelBg}
+          bg={useColorModeValue('white', 'rgba(10, 16, 30, 0.9)')}
+          p={{ base: 5, md: 7 }}
+          boxShadow={useColorModeValue('0 14px 34px rgba(2, 6, 23, 0.07)', 'none')}
           backdropFilter="blur(8px)"
         >
-          {serviceHighlights.map((metric) => (
-            <GridItem key={metric.label} p={{ base: 5, md: 6 }} borderRightWidth={{ base: 0, lg: '1px' }} borderBottomWidth={{ base: '1px', lg: 0 }} borderColor={panelBorder}>
-              <Text color="green.300" fontWeight="bold" fontSize={{ base: '2xl', md: '3xl' }} lineHeight="1">
-                {metric.value}
+          <HStack justify="space-between" align={{ base: 'start', md: 'center' }} mb={5} flexWrap="wrap" gap={2}>
+            <VStack align="start" spacing={1}>
+              <Text fontWeight="bold" fontSize={{ base: 'md', md: 'lg' }}>
+                Measurable Performance Snapshot
               </Text>
-              <Text mt={2} color={useColorModeValue('gray.600', 'gray.300')} fontWeight="medium" letterSpacing="0.01em">
-                {metric.label}
+              <Text color={mutedColor} fontSize="sm">
+                Trusted delivery metrics across consulting, response, and training programs.
               </Text>
-            </GridItem>
-          ))}
-        </Grid>
+            </VStack>
+            <Badge colorScheme="green" variant="subtle" px={3} py={1} borderRadius="full">
+              Live Service Benchmarks
+            </Badge>
+          </HStack>
+
+          <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} spacing={4}>
+            {serviceHighlights.map((metric) => {
+              const meta = highlightMeta[metric.label]
+
+              return (
+                <Box
+                  key={metric.label}
+                  p={5}
+                  borderWidth="1px"
+                  borderColor={panelBorder}
+                  borderRadius="xl"
+                  bg={useColorModeValue('gray.50', 'rgba(15, 23, 42, 0.75)')}
+                  _hover={{
+                    transform: 'translateY(-3px)',
+                    borderColor: useColorModeValue('green.200', 'rgba(52, 211, 153, 0.5)'),
+                  }}
+                  transition="all 0.25s ease"
+                >
+                  <HStack justify="space-between" align="start" mb={3}>
+                    <Text color="green.300" fontWeight="black" fontSize={{ base: '2xl', md: '3xl' }} lineHeight="1">
+                      {metric.value}
+                    </Text>
+                    {meta ? (
+                      <Box
+                        p={2}
+                        borderRadius="md"
+                        bg={useColorModeValue('green.50', 'rgba(16, 185, 129, 0.14)')}
+                        color={useColorModeValue('green.700', 'green.300')}
+                      >
+                        <meta.icon size={18} />
+                      </Box>
+                    ) : null}
+                  </HStack>
+
+                  <Text fontWeight="semibold" mb={1.5}>
+                    {metric.label}
+                  </Text>
+
+                  {meta ? (
+                    <Text color={mutedColor} fontSize="sm" lineHeight="1.7">
+                      {meta.insight}
+                    </Text>
+                  ) : null}
+                </Box>
+              )
+            })}
+          </SimpleGrid>
+        </Box>
 
         <MotionBox
           mt={{ base: 16, md: 20 }}
