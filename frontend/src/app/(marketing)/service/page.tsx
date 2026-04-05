@@ -164,7 +164,7 @@ export default function ServicesPage() {
     },
     {
       quote:
-        'We brought in HackToLive before an ISO 27001 audit. They uncovered multiple serious issues and guided fast remediation before audit week.',
+        'We brought in HackToLive before an ISO 27001 audit. They uncovered multiple serious issues and guided fast remediation before audit week - we passed with zero non-conformities.',
       name: 'Masud Khan',
       role: 'CISO, Healthcare SaaS company',
     },
