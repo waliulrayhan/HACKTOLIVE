@@ -305,7 +305,7 @@ export default function ServicesPage() {
                             icon={service.icon}
                             href={`/service/${service.slug}`}
                             badge={service.badge}
-                            categoryLabel={category.label}
+                            badgeTone={service.badgeTone}
                           />
                         </MotionBox>
                       ))}
