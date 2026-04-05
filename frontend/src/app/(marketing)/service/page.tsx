@@ -23,13 +23,17 @@ import {
 } from '@chakra-ui/react'
 import {
   FiActivity,
+  FiAlertCircle,
   FiArrowRight,
   FiBookOpen,
   FiCheckCircle,
   FiClock,
+  FiFileText,
   FiCompass,
+  FiLock,
   FiRefreshCw,
   FiShield,
+  FiTrendingUp,
   FiTarget,
 } from 'react-icons/fi'
 import { ConsultationModal } from './_components/ConsultationModal'
@@ -72,6 +76,99 @@ export default function ServicesPage() {
       insight: 'Always-on support model for detection, escalation, and response.',
     },
   }
+
+  const engagementMethodology = [
+    {
+      step: '01',
+      title: 'Scoping & NDA',
+      description: 'Define targets, rules of engagement, timelines, and sign mutual NDA before execution.',
+      icon: FiTarget,
+    },
+    {
+      step: '02',
+      title: 'Reconnaissance',
+      description: 'Passive and active intelligence gathering to map attack surface and exposure paths.',
+      icon: FiCompass,
+    },
+    {
+      step: '03',
+      title: 'Exploitation',
+      description: 'Controlled attack simulation aligned with modern adversary techniques.',
+      icon: FiAlertCircle,
+    },
+    {
+      step: '04',
+      title: 'Reporting',
+      description: 'Executive summary plus technical deep-dive with severity, evidence, and fix roadmap.',
+      icon: FiFileText,
+    },
+    {
+      step: '05',
+      title: 'Remediation Support',
+      description: 'Guided verification sessions with your team to close findings correctly.',
+      icon: FiCheckCircle,
+    },
+    {
+      step: '06',
+      title: 'Retest & Sign-off',
+      description: 'Retest critical and high issues and issue final closure confirmation.',
+      icon: FiRefreshCw,
+    },
+  ]
+
+  const engagementIncludes = [
+    {
+      step: '01',
+      title: 'Executive Summary Report',
+      description: 'Board-ready summary of findings, risk impact, and strategic recommendations.',
+    },
+    {
+      step: '02',
+      title: 'Technical Findings Report',
+      description: 'Detailed writeups with CVSS scoring, proof evidence, and reproduction path.',
+    },
+    {
+      step: '03',
+      title: 'Remediation Roadmap',
+      description: 'Prioritized fix guidance by business impact and exploitability.',
+    },
+    {
+      step: '04',
+      title: 'Retest for Critical & High',
+      description: 'Validation of key remediations after your team applies fixes.',
+    },
+    {
+      step: '05',
+      title: 'Debrief Session',
+      description: 'Live walkthrough for engineering and leadership stakeholders.',
+    },
+    {
+      step: '06',
+      title: 'Certificate of Testing',
+      description: 'Signed completion certificate with scope and assessment methodology.',
+    },
+  ]
+
+  const clientFeedback = [
+    {
+      quote:
+        'HackToLive identified a critical authentication bypass our internal team had missed. The report was practical, and the retest confirmed complete remediation.',
+      name: 'Tanvir Ahmed',
+      role: 'CTO, FinTech startup - Dhaka',
+    },
+    {
+      quote:
+        'Professional, discreet, and highly thorough. Executive reporting was clear enough for leadership while technical details were strong for engineering.',
+      name: 'Sabrina Rahman',
+      role: 'Head of IT, E-commerce platform',
+    },
+    {
+      quote:
+        'We brought in HackToLive before an ISO 27001 audit. They uncovered multiple serious issues and guided fast remediation before audit week.',
+      name: 'Masud Khan',
+      role: 'CISO, Healthcare SaaS company',
+    },
+  ]
 
   return (
     <Box bg={pageBg}>
@@ -324,6 +421,147 @@ export default function ServicesPage() {
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
         >
+          <VStack align="start" spacing={4} mb={8}>
+            <Badge colorScheme="green" variant="subtle" px={3} py={1} borderRadius="full">
+              How We Work
+            </Badge>
+            <Heading as="h3" fontSize={{ base: '2xl', md: '4xl' }}>
+              Our Engagement Methodology
+            </Heading>
+            <Text color={mutedColor} maxW="3xl" lineHeight="1.8">
+              Every HackToLive engagement follows a structured, transparent process from scoping to final sign-off.
+            </Text>
+          </VStack>
+
+          <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
+            {engagementMethodology.map((item) => (
+              <Box
+                key={item.step}
+                borderWidth="1px"
+                borderColor={panelBorder}
+                borderRadius="xl"
+                p={5}
+                bg={useColorModeValue('white', 'rgba(15, 23, 42, 0.75)')}
+                _hover={{ borderColor: 'rgba(52, 211, 153, 0.42)', transform: 'translateY(-2px)' }}
+                transition="all 0.25s ease"
+              >
+                <Text color="green.300" fontSize="3xl" lineHeight="1" fontWeight="light" mb={3}>
+                  {item.step}
+                </Text>
+                <HStack spacing={2} mb={3} color="green.300">
+                  <item.icon size={16} />
+                  <Text fontWeight="semibold">{item.title}</Text>
+                </HStack>
+                <Text color={mutedColor} fontSize="sm" lineHeight="1.8">
+                  {item.description}
+                </Text>
+              </Box>
+            ))}
+          </SimpleGrid>
+        </MotionBox>
+
+        <MotionBox
+          mt={{ base: 16, md: 20 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+        >
+          <VStack align="start" spacing={4} mb={8}>
+            <Badge colorScheme="yellow" variant="subtle" px={3} py={1} borderRadius="full">
+              What You Get
+            </Badge>
+            <Heading as="h3" fontSize={{ base: '2xl', md: '4xl' }}>
+              Every Engagement Includes
+            </Heading>
+            <Text color={mutedColor} maxW="3xl" lineHeight="1.8">
+              Each project is delivered with actionable outputs your team can execute immediately.
+            </Text>
+          </VStack>
+
+          <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
+            {engagementIncludes.map((item) => (
+              <Box
+                key={item.step}
+                borderWidth="1px"
+                borderColor={panelBorder}
+                borderRadius="xl"
+                p={5}
+                bg={useColorModeValue('white', 'rgba(15, 23, 42, 0.75)')}
+              >
+                <HStack spacing={4} align="start">
+                  <Text color="green.300" fontSize="3xl" lineHeight="1" fontWeight="light" minW="40px">
+                    {item.step}
+                  </Text>
+                  <VStack align="start" spacing={1.5}>
+                    <Text fontWeight="semibold">{item.title}</Text>
+                    <Text color={mutedColor} fontSize="sm" lineHeight="1.8">
+                      {item.description}
+                    </Text>
+                  </VStack>
+                </HStack>
+              </Box>
+            ))}
+          </SimpleGrid>
+        </MotionBox>
+
+        <MotionBox
+          mt={{ base: 16, md: 20 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+        >
+          <VStack align="start" spacing={4} mb={8}>
+            <Badge colorScheme="purple" variant="subtle" px={3} py={1} borderRadius="full">
+              Client Feedback
+            </Badge>
+            <Heading as="h3" fontSize={{ base: '2xl', md: '4xl' }}>
+              Trusted by Security Teams Across Bangladesh
+            </Heading>
+            <Text color={mutedColor} maxW="3xl" lineHeight="1.8">
+              From startups to enterprise teams, our clients value practical findings and fast remediation support.
+            </Text>
+          </VStack>
+
+          <SimpleGrid columns={{ base: 1, lg: 3 }} spacing={5}>
+            {clientFeedback.map((item) => (
+              <Box
+                key={item.name}
+                borderWidth="1px"
+                borderColor={panelBorder}
+                borderRadius="xl"
+                p={6}
+                bg={useColorModeValue('white', 'rgba(15, 23, 42, 0.75)')}
+              >
+                <Text color={useColorModeValue('gray.700', 'gray.100')} lineHeight="1.9" mb={5}>
+                  {item.quote}
+                </Text>
+                <HStack justify="space-between" align="end">
+                  <VStack align="start" spacing={0}>
+                    <Text fontWeight="bold">{item.name}</Text>
+                    <Text fontSize="sm" color={mutedColor}>{item.role}</Text>
+                  </VStack>
+                  <HStack spacing={1} color="yellow.400">
+                    <FiTrendingUp size={14} />
+                    <FiTrendingUp size={14} />
+                    <FiTrendingUp size={14} />
+                    <FiTrendingUp size={14} />
+                    <FiTrendingUp size={14} />
+                  </HStack>
+                </HStack>
+              </Box>
+            ))}
+          </SimpleGrid>
+        </MotionBox>
+
+        <MotionBox
+          mt={{ base: 16, md: 20 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+        >
           <Box
             borderWidth="1px"
             borderColor="rgba(16, 185, 129, 0.32)"
@@ -401,15 +639,15 @@ export default function ServicesPage() {
 
                   <VStack spacing={2} align="stretch">
                     <HStack spacing={2} color={mutedColor}>
-                      <FiArrowRight />
+                      <FiLock />
                       <Text>Current infrastructure overview</Text>
                     </HStack>
                     <HStack spacing={2} color={mutedColor}>
-                      <FiArrowRight />
+                      <FiLock />
                       <Text>Security pain points or incidents</Text>
                     </HStack>
                     <HStack spacing={2} color={mutedColor}>
-                      <FiArrowRight />
+                      <FiLock />
                       <Text>Compliance or deadline expectations</Text>
                     </HStack>
                   </VStack>

@@ -57,6 +57,14 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
 
   const category = serviceCategoryMap[service.categoryId]
   const relatedServices = getServicesByCategory(service.categoryId).filter(s => s.id !== service.id)
+  const slugCommand = service.slug.replace(/-/g, '_')
+  const terminalFocus = service.idealFor[0] ?? category.label
+  const terminalOutcome = service.outcomes[0] ?? 'Operational resilience improved'
+  const terminalDeliverable = service.deliverables[0] ?? 'Actionable service report'
+  const terminalKpi = service.kpis[0]
+  const terminalRiskLine = terminalKpi
+    ? `${terminalKpi.value} ${terminalKpi.label}`
+    : `Priority risk profile validated for ${service.title}`
 
   const pageBg = useColorModeValue('gray.50', '#030712')
   const panelBg = useColorModeValue('white', 'rgba(10, 16, 30, 0.9)')
@@ -106,110 +114,160 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
 
         <Container maxW="container.xl" position="relative" zIndex={1}>
           <FallInPlace>
-            <VStack align="start" spacing={8} maxW="4xl">
-              <Button
-                as={Link}
-                href="/service"
-                size="sm"
-                leftIcon={<FiArrowLeft size={16} />}
-                variant="outline"
-                borderColor="rgba(148, 163, 184, 0.45)"
-                color="gray.100"
-                _hover={{ bg: 'rgba(15, 23, 42, 0.8)', borderColor: 'rgba(148, 163, 184, 0.7)' }}
-              >
-                Back to Services
-              </Button>
+            <Grid templateColumns={{ base: '1fr', lg: '1.1fr 0.9fr' }} gap={{ base: 10, lg: 12 }} alignItems="center">
+              <VStack align="start" spacing={8}>
+                <Button
+                  as={Link}
+                  href="/service"
+                  size="sm"
+                  leftIcon={<FiArrowLeft size={16} />}
+                  variant="outline"
+                  borderColor="rgba(148, 163, 184, 0.45)"
+                  color="gray.100"
+                  _hover={{ bg: 'rgba(15, 23, 42, 0.8)', borderColor: 'rgba(148, 163, 184, 0.7)' }}
+                >
+                  Back to Services
+                </Button>
 
-              <VStack align="start" spacing={6} w="full">
-                <HStack spacing={3} flexWrap="wrap">
-                  <Badge colorScheme="green" variant="subtle" px={4} py={2} borderRadius="full" fontSize="sm" fontWeight="600">
-                    {category.label}
-                  </Badge>
-                  {service.badge ? (
-                    <Badge bg="rgba(249, 115, 22, 0.2)" color="orange.200" px={4} py={2} borderRadius="full" fontSize="sm" fontWeight="600">
-                      {service.badge}
+                <VStack align="start" spacing={6} w="full">
+                  <HStack spacing={3} flexWrap="wrap">
+                    <Badge colorScheme="green" variant="subtle" px={4} py={2} borderRadius="full" fontSize="sm" fontWeight="600">
+                      {category.label}
                     </Badge>
-                  ) : null}
-                </HStack>
+                    {service.badge ? (
+                      <Badge bg="rgba(249, 115, 22, 0.2)" color="orange.200" px={4} py={2} borderRadius="full" fontSize="sm" fontWeight="600">
+                        {service.badge}
+                      </Badge>
+                    ) : null}
+                  </HStack>
 
-                <VStack align="start" spacing={4}>
-                  <Heading 
-                    as="h1" 
-                    color="white" 
-                    fontSize={{ base: '2.5xl', md: '4xl', lg: '5xl' }} 
-                    lineHeight="1.2"
-                    fontWeight="800"
-                  >
-                    {service.title}
-                  </Heading>
+                  <VStack align="start" spacing={4}>
+                    <Heading
+                      as="h1"
+                      color="white"
+                      fontSize={{ base: '2.5xl', md: '4xl', lg: '5xl' }}
+                      lineHeight="1.2"
+                      fontWeight="800"
+                    >
+                      {service.title}
+                    </Heading>
 
-                  <Text 
-                    color="gray.300" 
-                    fontSize={{ base: 'lg', md: 'xl', lg: '2xl' }} 
-                    maxW="3xl" 
-                    lineHeight="1.6"
-                    fontWeight="500"
-                  >
-                    {service.shortDescription}
-                  </Text>
+                    <Text
+                      color="gray.300"
+                      fontSize={{ base: 'lg', md: 'xl', lg: '2xl' }}
+                      maxW="3xl"
+                      lineHeight="1.6"
+                      fontWeight="500"
+                    >
+                      {service.shortDescription}
+                    </Text>
+                  </VStack>
+
+                  {/* Quick Info Cards */}
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full" maxW="2xl" pt={2}>
+                    <Box
+                      p={4}
+                      borderRadius="lg"
+                      bg="rgba(15, 23, 42, 0.85)"
+                      borderWidth="1px"
+                      borderColor="rgba(148, 163, 184, 0.25)"
+                      backdropFilter="blur(10px)"
+                    >
+                      <HStack spacing={2} mb={2}>
+                        <Icon as={FiClock} color="blue.300" boxSize={5} />
+                        <Text fontSize="sm" color="gray.400" fontWeight="500">Timeline</Text>
+                      </HStack>
+                      <Text fontSize="md" color="white" fontWeight="600">{service.timeline}</Text>
+                    </Box>
+
+                    <Box
+                      p={4}
+                      borderRadius="lg"
+                      bg="rgba(15, 23, 42, 0.85)"
+                      borderWidth="1px"
+                      borderColor="rgba(148, 163, 184, 0.25)"
+                      backdropFilter="blur(10px)"
+                    >
+                      <HStack spacing={2} mb={2}>
+                        <Icon as={FiLayers} color="emerald.300" boxSize={5} />
+                        <Text fontSize="sm" color="gray.400" fontWeight="500">Engagement Model</Text>
+                      </HStack>
+                      <Text fontSize="md" color="white" fontWeight="600">{service.engagementModel}</Text>
+                    </Box>
+                  </SimpleGrid>
+
+                  <HStack spacing={4} flexWrap="wrap" pt={2}>
+                    <Button
+                      onClick={onOpen}
+                      colorScheme="green"
+                      size="lg"
+                      rightIcon={<FiArrowRight size={18} />}
+                      _hover={{ transform: 'translateY(-2px)', boxShadow: 'lg' }}
+                    >
+                      Talk to an Advisor
+                    </Button>
+                    <Button
+                      onClick={onOpen}
+                      variant="outline"
+                      size="lg"
+                      borderColor="rgba(16, 185, 129, 0.5)"
+                      color="emerald.300"
+                      _hover={{ bg: 'rgba(16, 185, 129, 0.1)', borderColor: 'emerald.300' }}
+                    >
+                      Request Consultation
+                    </Button>
+                  </HStack>
                 </VStack>
-
-                {/* Quick Info Cards */}
-                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full" maxW="2xl" pt={2}>
-                  <Box 
-                    p={4} 
-                    borderRadius="lg" 
-                    bg="rgba(15, 23, 42, 0.85)"
-                    borderWidth="1px"
-                    borderColor="rgba(148, 163, 184, 0.25)"
-                    backdropFilter="blur(10px)"
-                  >
-                    <HStack spacing={2} mb={2}>
-                      <Icon as={FiClock} color="blue.300" boxSize={5} />
-                      <Text fontSize="sm" color="gray.400" fontWeight="500">Timeline</Text>
-                    </HStack>
-                    <Text fontSize="md" color="white" fontWeight="600">{service.timeline}</Text>
-                  </Box>
-
-                  <Box 
-                    p={4} 
-                    borderRadius="lg" 
-                    bg="rgba(15, 23, 42, 0.85)"
-                    borderWidth="1px"
-                    borderColor="rgba(148, 163, 184, 0.25)"
-                    backdropFilter="blur(10px)"
-                  >
-                    <HStack spacing={2} mb={2}>
-                      <Icon as={FiLayers} color="emerald.300" boxSize={5} />
-                      <Text fontSize="sm" color="gray.400" fontWeight="500">Engagement Model</Text>
-                    </HStack>
-                    <Text fontSize="md" color="white" fontWeight="600">{service.engagementModel}</Text>
-                  </Box>
-                </SimpleGrid>
-
-                <HStack spacing={4} flexWrap="wrap" pt={2}>
-                  <Button 
-                    onClick={onOpen}
-                    colorScheme="green" 
-                    size="lg"
-                    rightIcon={<FiArrowRight size={18} />}
-                    _hover={{ transform: 'translateY(-2px)', boxShadow: 'lg' }}
-                  >
-                    Talk to an Advisor
-                  </Button>
-                  <Button
-                    onClick={onOpen}
-                    variant="outline"
-                    size="lg"
-                    borderColor="rgba(16, 185, 129, 0.5)"
-                    color="emerald.300"
-                    _hover={{ bg: 'rgba(16, 185, 129, 0.1)', borderColor: 'emerald.300' }}
-                  >
-                    Request Consultation
-                  </Button>
-                </HStack>
               </VStack>
-            </VStack>
+
+              <Box
+                borderRadius="2xl"
+                overflow="hidden"
+                borderWidth="1px"
+                borderColor="rgba(148, 163, 184, 0.25)"
+                bg="#040b16"
+                boxShadow="0 30px 70px rgba(0, 0, 0, 0.45)"
+                w="full"
+                maxW={{ base: 'full', lg: '560px' }}
+                justifySelf={{ base: 'stretch', lg: 'end' }}
+              >
+                <Flex
+                  align="center"
+                  justify="space-between"
+                  px={4}
+                  py={3}
+                  bg="rgba(15, 23, 42, 0.95)"
+                  borderBottomWidth="1px"
+                  borderColor="rgba(148, 163, 184, 0.25)"
+                >
+                  <HStack spacing={2}>
+                    <Box w={3} h={3} borderRadius="full" bg="#f87171" />
+                    <Box w={3} h={3} borderRadius="full" bg="#fbbf24" />
+                    <Box w={3} h={3} borderRadius="full" bg="#4ade80" />
+                  </HStack>
+                  <Text color="gray.400" fontSize="xs" fontFamily="mono" letterSpacing="0.04em">
+                    htl-sec ~ {service.slug}
+                  </Text>
+                </Flex>
+
+                <Box px={{ base: 4, md: 6 }} py={{ base: 5, md: 6 }} fontFamily="mono" fontSize={{ base: 'sm', md: 'md' }}>
+                  <Text color="#4ade80" mb={3}>htl@sec:~$ assess_service --slug "{service.slug}"</Text>
+                  <VStack align="start" spacing={2} mb={5} color="gray.200" pl={2}>
+                    <Text>{'>'} Scope aligned for {category.label}</Text>
+                    <Text color="#fca5a5">{'>'} {terminalRiskLine}</Text>
+                    <Text>{'>'} Primary focus: {terminalFocus}</Text>
+                  </VStack>
+
+                  <Text color="#4ade80" mb={3}>htl@sec:~$ simulate_{slugCommand} --timeline "{service.timeline}"</Text>
+                  <VStack align="start" spacing={2} color="#86efac" pl={2}>
+                    <Text>{'>'} Outcome signal: {terminalOutcome}</Text>
+                    <Text>{'>'} Deliverable queued: {terminalDeliverable}</Text>
+                  </VStack>
+
+                  <Text color="#4ade80" mt={6}>htl@sec:~$</Text>
+                </Box>
+              </Box>
+            </Grid>
           </FallInPlace>
         </Container>
       </Box>
