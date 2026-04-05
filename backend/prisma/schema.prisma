@@ -840,6 +840,27 @@ model Contact {
   @@index([createdAt])
 }
 
+model ConsultationRequest {
+  id          String             @id @default(uuid())
+  name        String             @db.VarChar(255)
+  email       String             @db.VarChar(255)
+  company     String             @db.VarChar(255)
+  phone       String             @db.VarChar(50)
+  serviceType String             @db.VarChar(255)
+  budget      String?            @db.VarChar(120)
+  timeline    String?            @db.VarChar(120)
+  message     String             @db.Text
+  status      ConsultationStatus @default(PENDING)
+  notes       String?            @db.Text
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([email])
+  @@index([serviceType])
+  @@index([status])
+  @@index([createdAt])
+}
+
 model Notice {
   id        String   @id @default(uuid())
   title     String?  @db.VarChar(255)
@@ -859,6 +880,15 @@ enum ContactStatus {
   PENDING
   REPLIED
   RESOLVED
+  SPAM
+}
+
+enum ConsultationStatus {
+  PENDING
+  IN_REVIEW
+  CONTACTED
+  WON
+  CLOSED
   SPAM
 }
 

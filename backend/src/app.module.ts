@@ -17,6 +17,7 @@ import { EmailModule } from './email/email.module';
 import { ContactModule } from './contact/contact.module';
 import { NewsletterModule } from './newsletter/newsletter.module';
 import { PaymentModule } from './payment/payment.module';
+import { ConsultationModule } from './consultation/consultation.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { PaymentModule } from './payment/payment.module';
     ContactModule,
     NewsletterModule,
     PaymentModule,
+    ConsultationModule,
   ],
   controllers: [AppController],
   providers: [

@@ -135,6 +135,11 @@ export default function DashboardLayout({
             path: "/admin/contacts",
           },
           {
+            icon: <FiFileText className="w-5 h-5" />,
+            name: "Service Consultations",
+            path: "/admin/consultations",
+          },
+          {
             icon: <FiBell className="w-5 h-5" />,
             name: "Notices",
             path: "/admin/notices",

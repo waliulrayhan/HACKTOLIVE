@@ -41,6 +41,7 @@ export function QuotationForm({ serviceName }: QuotationFormProps) {
 
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -64,10 +65,30 @@ export function QuotationForm({ serviceName }: QuotationFormProps) {
 
     if (!validateForm()) return
 
-    setIsSubmitting(true)
+    try {
+      setIsSubmitting(true)
 
-    // Simulate API call
-    setTimeout(() => {
+      const response = await fetch(`${API_URL}/consultation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      if (!response.ok) {
+        let message = 'Failed to submit consultation request'
+
+        try {
+          const data = await response.json()
+          message = data?.message || message
+        } catch {
+          // Keep default message if backend response body is not JSON.
+        }
+
+        throw new Error(message)
+      }
+
       toast.success('Quote request submitted!', {
         description: "We'll get back to you within 24 hours.",
         duration: 5000,
@@ -83,8 +104,13 @@ export function QuotationForm({ serviceName }: QuotationFormProps) {
         timeline: '',
         message: '',
       })
+    } catch (error: any) {
+      toast.error('Submission failed', {
+        description: error?.message || 'Please try again in a moment.',
+      })
+    } finally {
       setIsSubmitting(false)
-    }, 1500)
+    }
   }
 
   const handleChange = (
