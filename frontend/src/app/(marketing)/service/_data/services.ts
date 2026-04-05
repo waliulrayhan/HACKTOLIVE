@@ -437,6 +437,70 @@ export const services: Service[] = [
     ],
   },
   {
+    id: 'social-engineering',
+    slug: 'social-engineering',
+    title: 'Social Engineering',
+    icon: FiUsers,
+    categoryId: 'penetration-testing',
+    badge: 'Human Risk',
+    badgeTone: 'danger',
+    imageUrl: 'https://picsum.photos/seed/social-engineering-cyber/1600/900',
+    shortDescription:
+      'Test your human layer with targeted phishing simulations, vishing campaigns, and pretexting scenarios to measure employee security awareness and reduce the risk of credential compromise.',
+    overview:
+      'Our social engineering engagements simulate realistic attacker behavior against employees, vendors, and support workflows. We test email phishing, voice-based deception, and pretext scenarios to identify where process and awareness controls break down under pressure.',
+    challenge:
+      'Even with strong technical controls, attackers often bypass systems by exploiting trust, urgency, and human behavior. Without controlled simulations, organizations cannot accurately measure real-world human-layer risk.',
+    timeline: '2 to 4 weeks including campaign design and reporting',
+    engagementModel: 'Controlled phishing, vishing, and pretexting simulations',
+    approach: [
+      'Define approved scenarios, targets, and escalation safeguards',
+      'Execute phishing, vishing, and pretexting campaigns in waves',
+      'Measure click, credential submission, and reporting behavior',
+      'Deliver awareness, process, and technical hardening recommendations',
+    ],
+    outcomes: [
+      'Measure true employee susceptibility to social manipulation',
+      'Improve incident reporting speed and quality from staff',
+      'Reduce credential theft and business email compromise exposure',
+    ],
+    deliverables: [
+      'Campaign performance dashboard by department and role',
+      'Human risk findings with evidence and scenario analysis',
+      'Role-specific awareness improvement recommendations',
+      'Follow-up simulation plan to validate improvement over time',
+    ],
+    idealFor: [
+      'Organizations with large email-reliant teams',
+      'Enterprises concerned about business email compromise',
+      'Security programs prioritizing human-risk reduction',
+    ],
+    methodology: [
+      { title: 'Scenario Design', description: 'Build realistic, business-contextual deception scenarios with clear guardrails.' },
+      { title: 'Simulation Execution', description: 'Run controlled phishing, vishing, and pretext campaigns.' },
+      { title: 'Behavior Analysis', description: 'Assess interaction patterns, reporting behavior, and control gaps.' },
+      { title: 'Awareness Uplift', description: 'Provide targeted training and process improvements by risk profile.' },
+    ],
+    kpis: [
+      { value: '74%', label: 'Breaches include a human element', source: 'Verizon DBIR 2025' },
+      { value: '31%', label: 'Users interact with phishing in initial waves', source: 'Awareness benchmark studies' },
+      { value: '2x', label: 'Reduction in repeat-click users after targeted training', source: 'Program maturity data' },
+      { value: 'Minutes', label: 'Critical response window for suspicious email reporting', source: 'SOC response observations' },
+    ],
+    faqs: [
+      {
+        question: 'Will employees be publicly named in reports?',
+        answer:
+          'No. Reports are role and team-focused unless your governance model explicitly requires individual-level tracking.',
+      },
+      {
+        question: 'Can this be aligned with awareness training?',
+        answer:
+          'Yes. We pair simulation outcomes with practical training paths and follow-up campaigns to validate improvement.',
+      },
+    ],
+  },
+  {
     id: 'vulnerability-assessment',
     slug: 'vulnerability-assessment',
     title: 'Vulnerability Assessment',
@@ -669,6 +733,134 @@ export const services: Service[] = [
         question: 'Do you provide policy templates?',
         answer:
           'Yes. We provide editable templates and ownership guidance tailored to your industry and operating model.',
+      },
+    ],
+  },
+  {
+    id: 'osint-investigations',
+    slug: 'osint-investigations',
+    title: 'OSINT Investigations',
+    icon: FiSearch,
+    categoryId: 'assessments-audits',
+    badge: 'Intelligence',
+    badgeTone: 'info',
+    imageUrl: 'https://picsum.photos/seed/osint-investigations-cyber/1600/900',
+    shortDescription:
+      'Uncover what attackers can learn about your organization from open sources - leaked credentials, exposed infrastructure, employee data, and digital footprint analysis.',
+    overview:
+      'Our OSINT investigations map your external digital footprint from an attacker perspective. We identify exposed credentials, shadow assets, public metadata leakage, and risky employee information patterns that can be weaponized for intrusion or fraud.',
+    challenge:
+      'Attackers gather intelligence before they attack. Most organizations underestimate the volume of actionable exposure available in public repositories, breach datasets, search indexes, and social platforms.',
+    timeline: '1 to 3 weeks depending on organization footprint',
+    engagementModel: 'External intelligence gathering and exposure analysis',
+    approach: [
+      'Map domains, subdomains, employee footprint, and public tech stack',
+      'Analyze leaked credential and breach data exposure',
+      'Identify exposed services, misconfigured assets, and sensitive metadata',
+      'Prioritize findings by attacker utility and business impact',
+    ],
+    outcomes: [
+      'Reduce external reconnaissance advantages available to attackers',
+      'Improve asset inventory and shadow IT visibility',
+      'Strengthen preventive controls before active exploitation occurs',
+    ],
+    deliverables: [
+      'OSINT exposure report with risk-ranked findings',
+      'Credential and digital footprint risk summary',
+      'External attack-surface cleanup action plan',
+      'Monitoring recommendations for ongoing exposure detection',
+    ],
+    idealFor: [
+      'Organizations with growing external digital presence',
+      'Enterprises preparing for threat-led security reviews',
+      'Teams seeking proactive intelligence-led hardening',
+    ],
+    methodology: [
+      { title: 'Footprint Mapping', description: 'Discover publicly exposed assets, identities, and service metadata.' },
+      { title: 'Exposure Analysis', description: 'Correlate leaked data and public intelligence signals.' },
+      { title: 'Risk Prioritization', description: 'Rank findings by exploitability and potential impact.' },
+      { title: 'Remediation Strategy', description: 'Provide targeted cleanup and monitoring roadmap.' },
+    ],
+    kpis: [
+      { value: '80%+', label: 'Campaigns begin with external recon', source: 'Threat actor behavior reports' },
+      { value: '41%', label: 'Organizations discover unmanaged internet assets', source: 'Attack surface management studies' },
+      { value: 'Top 3', label: 'Credential abuse remains a leading intrusion vector', source: 'Global incident trends' },
+      { value: 'Days', label: 'Typical delay before exposure is noticed without active monitoring', source: 'Operational benchmarks' },
+    ],
+    faqs: [
+      {
+        question: 'Do OSINT investigations require internal access?',
+        answer:
+          'No. This service focuses on externally accessible data and intelligence sources to simulate attacker reconnaissance.',
+      },
+      {
+        question: 'Can this feed into penetration testing scope?',
+        answer:
+          'Yes. OSINT findings are often used to prioritize realistic penetration testing scenarios and target selection.',
+      },
+    ],
+  },
+  {
+    id: 'tailored-security-consulting',
+    slug: 'tailored-security-consulting',
+    title: 'Tailored Security Consulting',
+    icon: FiShield,
+    categoryId: 'assessments-audits',
+    badge: 'Custom',
+    badgeTone: 'info',
+    imageUrl: 'https://picsum.photos/seed/tailored-security-consulting-cyber/1600/900',
+    shortDescription:
+      'Not every challenge fits a standard package. We design bespoke security programs aligned to your industry, risk appetite, budget, and specific compliance obligations.',
+    overview:
+      'Our tailored consulting service builds custom cybersecurity programs for organizations with unique operating models, regulatory pressure, or strategic transformation needs. Engagements are shaped around your constraints, priorities, and business outcomes.',
+    challenge:
+      'Predefined service packages can miss organization-specific priorities. Teams often need flexible support that combines governance, technical assurance, and execution planning in one integrated roadmap.',
+    timeline: 'Engagement-based; typically 4 to 12 weeks',
+    engagementModel: 'Advisory sprints, program design, and embedded consulting',
+    approach: [
+      'Assess business context, risk appetite, and control maturity',
+      'Design a custom security roadmap with phased priorities',
+      'Align technical and governance controls to obligations',
+      'Support execution planning with measurable checkpoints',
+    ],
+    outcomes: [
+      'Create a right-sized security strategy built for your business',
+      'Optimize security investment against real risk drivers',
+      'Accelerate governance and technical maturity with clear ownership',
+    ],
+    deliverables: [
+      'Custom cybersecurity strategy and roadmap',
+      'Priority matrix aligned to budget and risk tolerance',
+      'Execution plan with milestones, owners, and KPIs',
+      'Leadership briefing pack for decision support',
+    ],
+    idealFor: [
+      'Organizations undergoing rapid growth or transformation',
+      'Enterprises with complex compliance obligations',
+      'Leadership teams needing bespoke security planning support',
+    ],
+    methodology: [
+      { title: 'Discovery', description: 'Understand business constraints, obligations, and current maturity.' },
+      { title: 'Program Design', description: 'Build tailored control and capability roadmap.' },
+      { title: 'Prioritization', description: 'Sequence initiatives by risk, cost, and execution feasibility.' },
+      { title: 'Enablement', description: 'Support implementation planning and measurement.' },
+    ],
+    kpis: [
+      { value: '35%+', label: 'Efficiency gains from prioritized security spend', source: 'Program transformation studies' },
+      { value: '2x', label: 'Faster progress with owner-defined security roadmaps', source: 'Delivery benchmark data' },
+      { value: 'High', label: 'Board confidence with measurable planning artifacts', source: 'Governance advisory reports' },
+      { value: 'Quarterly', label: 'Recommended roadmap review cadence', source: 'Security program best practices' },
+    ],
+    faqs: [
+      {
+        question: 'Can this combine multiple service areas?',
+        answer:
+          'Yes. We can combine testing, assessments, SOC strategy, and training into a single custom engagement plan.',
+      },
+      {
+        question: 'Is this suitable for smaller teams?',
+        answer:
+          'Absolutely. Tailored consulting is useful for both lean teams and large enterprises when standard scopes do not fit.',
       },
     ],
   },
