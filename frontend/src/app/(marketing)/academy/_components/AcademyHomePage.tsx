@@ -6,13 +6,13 @@ import {
   Container,
   Heading,
   Text,
-  Button,
   VStack,
   HStack,
   SimpleGrid,
   Badge,
   Icon,
   Flex,
+  Wrap,
   useColorModeValue,
   Divider,
   Spinner,
@@ -39,7 +39,7 @@ import {
   FiLock,
   FiUser
 } from "react-icons/fi";
-import { Course } from "@/types/academy";
+import { Course, Instructor } from "@/types/academy";
 import academyService from "@/lib/academy-service";
 import { getFullImageUrl } from "@/lib/image-utils";
 import { prioritizeCourses } from "@/lib/course-priority";
@@ -61,6 +61,7 @@ export default function AcademyHomePage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [freeCourses, setFreeCourses] = useState<Course[]>([]);
   const [premiumCourses, setPremiumCourses] = useState<Course[]>([]);
+  const [highlightInstructors, setHighlightInstructors] = useState<Instructor[]>([]);
   const [featuredReviews, setFeaturedReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [enrolledCourseIds, setEnrolledCourseIds] = useState<string[]>([]);
@@ -72,9 +73,10 @@ export default function AcademyHomePage() {
       setLoading(true);
       try {
         // Fetch all courses and reviews
-        const [allCourses, allReviews] = await Promise.all([
+        const [allCourses, allReviews, allInstructors] = await Promise.all([
           academyService.getCourses(),
-          academyService.getReviews({ take: 100 })
+          academyService.getReviews({ take: 100 }),
+          academyService.getInstructors(),
         ]);
 
         // Filter only PUBLISHED courses
@@ -89,6 +91,7 @@ export default function AcademyHomePage() {
 
         setFreeCourses(free);
         setPremiumCourses(premium);
+        setHighlightInstructors(allInstructors.slice(0, 3));
 
         // Get top-rated reviews (5 stars) for testimonials
         const topReviews = allReviews
@@ -778,154 +781,141 @@ export default function AcademyHomePage() {
               </VStack>
             </FallInPlace>
 
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="8">
+            <SimpleGrid
+              columns={{ base: 1, md: 2, lg: 3 }}
+              spacing={{ base: 8, md: 10 }}
+              w="full"
+            >
               {(() => {
-                // Get unique instructors from published courses
-                const publishedCourses = courses.filter(c => c.status === "published");
-                const uniqueInstructors = Array.from(
-                  new Map(publishedCourses.map(course => [course.instructor.id, course.instructor])).values()
+                const fallbackInstructors = Array.from(
+                  new Map(courses.map((course) => [course.instructor.id, course.instructor])).values()
                 ).slice(0, 3);
+                const instructorsToShow =
+                  highlightInstructors.length > 0 ? highlightInstructors : fallbackInstructors;
 
-                return uniqueInstructors.map((instructor, index) => (
-                  <FallInPlace key={instructor.id} delay={0.1 * index}>
-                    <ButtonLink
-                      href={`/academy/instructors/${instructor.id}`}
-                      variant="unstyled"
-                      height="auto"
-                      display="block"
-                    >
+                return instructorsToShow.map((instructor, index) => (
+                  <FallInPlace key={instructor.id} delay={0.05 * index} w="full">
                       <Box
                         bg={cardBg}
-                        borderRadius="3xl"
-                        overflow="hidden"
                         borderWidth="1px"
                         borderColor={borderColor}
+                        borderRadius="3xl"
+                        overflow="hidden"
                         transition="all 0.4s ease"
                         position="relative"
                         _hover={{
                           transform: "translateY(-8px)",
                           shadow: "2xl",
                           borderColor: "purple.500",
-                          _before: {
-                            opacity: 1
-                          }
-                        }}
-                        _before={{
-                          content: '""',
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          bg: "linear-gradient(135deg, purple.500, pink.500)",
-                          opacity: 0,
-                          transition: "opacity 0.4s ease",
-                          borderRadius: "3xl",
-                          zIndex: -1,
-                          filter: "blur(20px)",
                         }}
                         cursor="pointer"
                         h="full"
+                        display="flex"
+                        flexDirection="column"
                       >
-                        <Box position="relative" overflow="hidden">
-                          {instructor.user?.avatar ? (
-                            <Image
-                              src={getFullImageUrl(instructor.user.avatar, 'avatar')}
-                              alt={instructor.user?.name || 'Instructor'}
-                              width={400}
-                              height={400}
-                              unoptimized
-                              style={{
-                                width: "100%",
-                                height: "280px",
-                                objectFit: "cover"
-                              }}
-                            />
-                          ) : (
-                            <Box
-                              display="flex"
-                              alignItems="center"
-                              justifyContent="center"
-                              bg={useColorModeValue('gray.200', 'gray.700')}
-                              style={{
-                                width: "100%",
-                                height: "280px"
-                              }}
-                            >
-                              <Icon as={FiUser} boxSize="80px" color={useColorModeValue('gray.500', 'gray.400')} />
-                            </Box>
-                          )}
+                      <Box position="relative" overflow="hidden" aspectRatio="4 / 3">
+                        {instructor.user?.avatar ? (
+                          <Image
+                            src={getFullImageUrl(instructor.user.avatar, 'avatar')}
+                            alt={instructor.user?.name || 'Instructor'}
+                            width={400}
+                            height={400}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              objectPosition: "center top"
+                            }}
+                          />
+                        ) : (
                           <Box
-                            position="absolute"
-                            bottom="0"
-                            left="0"
-                            right="0"
-                            bg="linear-gradient(to top, rgba(0,0,0,0.7), transparent)"
-                            p="4"
-                          >
-                            <Badge
-                              bg={useColorModeValue('blue.200', 'blue.500')}
-                              color={useColorModeValue('blue.900', 'white')}
-                              fontSize="xs"
-                              px="3"
-                              py="1"
-                              borderRadius="full"
-                              fontWeight="semibold"
-                            >
-                              Expert Instructor
-                            </Badge>
-                          </Box>
-                        </Box>
-
-                        <VStack p="6" spacing="4" align="start">
-                          <VStack align="start" spacing="2" w="full">
-                            <Heading size="md" color={headingColor}>
-                              {instructor.user?.name || 'Instructor'}
-                            </Heading>
-                            <Text fontSize="sm" color={textMuted} noOfLines={2} lineHeight="tall">
-                              {instructor.user?.bio || "Expert Cybersecurity Instructor"}
-                            </Text>
-                          </VStack>
-
-                          <Box
+                            position="relative"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            bg={useColorModeValue('gray.200', 'gray.700')}
                             w="full"
-                            pt="4"
-                            borderTopWidth="1px"
-                            borderColor={borderColor}
+                            h="full"
                           >
-                            <SimpleGrid columns={3} spacing="4" fontSize="sm">
-                              <VStack spacing="1">
-                                <HStack spacing="1" color="yellow.500">
-                                  <Icon as={FiStar} />
-                                  <Text fontWeight="bold">{instructor.rating}</Text>
-                                </HStack>
-                                <Text fontSize="xs" color={textMuted}>Rating</Text>
-                              </VStack>
-
-                              <VStack spacing="1">
-                                <HStack spacing="1" color="purple.500">
-                                  <Icon as={FiUsers} />
-                                  <Text fontWeight="bold">
-                                    {instructor.totalStudents > 999
-                                      ? `${(instructor.totalStudents / 1000).toFixed(1)}k`
-                                      : instructor.totalStudents}
-                                  </Text>
-                                </HStack>
-                                <Text fontSize="xs" color={textMuted}>Students</Text>
-                              </VStack>
-
-                              <VStack spacing="1">
-                                <HStack spacing="1" color="blue.500">
-                                  <Icon as={FiBook} />
-                                  <Text fontWeight="bold">{instructor.totalCourses}</Text>
-                                </HStack>
-                                <Text fontSize="xs" color={textMuted}>Courses</Text>
-                              </VStack>
-                            </SimpleGrid>
+                            <Icon as={FiUser} boxSize="80px" color={useColorModeValue('gray.500', 'gray.400')} />
                           </Box>
-                        </VStack>
+                        )}
+                        <Box
+                          position="absolute"
+                          bottom="0"
+                          left="0"
+                          right="0"
+                          bg="linear-gradient(to top, rgba(0,0,0,0.7), transparent)"
+                          p="4"
+                        />
                       </Box>
-                    </ButtonLink>
+
+                      <VStack p="6" spacing="4" align="start" flex="1">
+                        <VStack align="start" spacing="2" w="full">
+                          <Heading size="md" color={headingColor}>
+                            {instructor.user?.name || 'Instructor'}
+                          </Heading>
+                          <Text fontSize="sm" fontWeight="semibold" color="purple.500">
+                            {instructor.user?.bio || 'No bio available'}
+                          </Text>
+                        </VStack>
+
+                        {(() => {
+                          const skills = Array.isArray(instructor.skills)
+                            ? instructor.skills.filter(Boolean)
+                            : typeof instructor.skills === "string"
+                              ? instructor.skills.split(",").map((item) => item.trim()).filter(Boolean)
+                              : [];
+
+                          return skills.length > 0 ? (
+                            <Wrap spacing="2">
+                              {skills.slice(0, 3).map((skill) => (
+                                <Badge key={skill} colorScheme="green" fontSize="xs">
+                                  {skill}
+                                </Badge>
+                              ))}
+                            </Wrap>
+                          ) : null;
+                        })()}
+
+                        <Box
+                          w="full"
+                          pt="4"
+                          borderTopWidth="1px"
+                          borderColor={borderColor}
+                        >
+                          <SimpleGrid columns={3} spacing="4" fontSize="sm">
+                            <VStack spacing="1">
+                              <HStack spacing="1" color="yellow.500">
+                                <Icon as={FiStar} />
+                                <Text fontWeight="bold">{instructor.rating}</Text>
+                              </HStack>
+                              <Text fontSize="xs" color={textMuted}>Rating</Text>
+                            </VStack>
+
+                            <VStack spacing="1">
+                              <HStack spacing="1" color="purple.500">
+                                <Icon as={FiUsers} />
+                                <Text fontWeight="bold">
+                                  {instructor.totalStudents > 999
+                                    ? `${(instructor.totalStudents / 1000).toFixed(1)}k`
+                                    : instructor.totalStudents}
+                                </Text>
+                              </HStack>
+                              <Text fontSize="xs" color={textMuted}>Students</Text>
+                            </VStack>
+
+                            <VStack spacing="1">
+                              <HStack spacing="1" color="blue.500">
+                                <Icon as={FiBook} />
+                                <Text fontWeight="bold">{instructor.totalCourses}</Text>
+                              </HStack>
+                              <Text fontSize="xs" color={textMuted}>Courses</Text>
+                            </VStack>
+                          </SimpleGrid>
+                        </Box>
+                      </VStack>
+                    </Box>
                   </FallInPlace>
                 ));
               })()}

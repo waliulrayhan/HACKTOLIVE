@@ -501,24 +501,18 @@ class AcademyService {
    * Transform a single instructor from API to frontend format
    */
   private transformInstructor(instructor: any): Instructor {
+    const transformedUser = instructor.user
+      ? {
+          ...instructor.user,
+          avatar: this.transformImageUrl(instructor.user.avatar, 'avatar'),
+        }
+      : instructor.user;
+
     return {
       ...instructor,
-      // Transform image URLs
-      avatar: this.transformImageUrl(instructor.avatar, 'avatar'),
+      user: transformedUser,
       // Parse JSON fields if they come as strings
       skills: this.parseSkills(instructor.skills),
-      // Keep original URL fields from backend
-      linkedinUrl: instructor.linkedinUrl,
-      twitterUrl: instructor.twitterUrl,
-      githubUrl: instructor.githubUrl,
-      websiteUrl: instructor.websiteUrl,
-      // Legacy support for socialLinks format
-      socialLinks: {
-        linkedin: instructor.linkedinUrl,
-        twitter: instructor.twitterUrl,
-        github: instructor.githubUrl,
-        website: instructor.websiteUrl,
-      },
     };
   }
 

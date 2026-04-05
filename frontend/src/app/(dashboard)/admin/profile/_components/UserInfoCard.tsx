@@ -76,8 +76,8 @@ export default function UserInfoCard() {
       newErrors.phone = 'Please enter a valid phone number';
     }
     
-    if (formData.bio && formData.bio.length > 500) {
-      newErrors.bio = 'Bio must be less than 500 characters';
+    if (formData.bio && formData.bio.length > 50) {
+      newErrors.bio = 'Bio must be less than 50 characters';
     }
     
     setErrors(newErrors);
@@ -114,9 +114,10 @@ export default function UserInfoCard() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    const nextValue = name === "bio" ? value.slice(0, 35) : value;
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: nextValue,
     });
     // Clear error for this field
     if (errors[name]) {
@@ -301,6 +302,7 @@ export default function UserInfoCard() {
                         name="bio"
                         value={formData.bio}
                         onChange={handleChange}
+                        maxLength={35}
                         className={`w-full h-10 rounded-lg border ${errors.bio ? 'border-red-500' : 'border-gray-300'} bg-white pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500`}
                         placeholder="Enter bio"
                       />

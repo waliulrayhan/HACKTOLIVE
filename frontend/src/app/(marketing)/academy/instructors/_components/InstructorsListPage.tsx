@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import {
   Box,
+  Button,
   Container,
   Heading,
   Text,
@@ -13,14 +14,16 @@ import {
   Icon,
   Badge,
   Flex,
+  Wrap,
   Divider,
   Spinner,
   Center,
 } from "@chakra-ui/react";
 import Image from "next/image";
+import NextLink from "next/link";
 import { FallInPlace } from "@/components/shared/motion/fall-in-place";
 import { ButtonLink } from "@/components/shared/button-link/button-link";
-import { FiStar, FiUsers, FiBook, FiAward, FiTrendingUp, FiMapPin, FiMail, FiUser } from "react-icons/fi";
+import { FiStar, FiUsers, FiBook, FiAward, FiTrendingUp, FiUser } from "react-icons/fi";
 import { Instructor } from "@/types/academy";
 import academyService from "@/lib/academy-service";
 import { getFullImageUrl } from "@/lib/image-utils";
@@ -30,6 +33,7 @@ export default function InstructorsListPage() {
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const textMuted = useColorModeValue("gray.600", "gray.400");
+  const headingColor = useColorModeValue("gray.900", "white");
   const heroBg = useColorModeValue("gray.900", "gray.950");
   const accentColor = useColorModeValue("green.500", "green.400");
 
@@ -51,6 +55,32 @@ export default function InstructorsListPage() {
 
     fetchInstructors();
   }, []);
+
+  const totalStudents = instructors.reduce(
+    (sum, instructor) => sum + (instructor.totalStudents || 0),
+    0
+  );
+  const avgRating = instructors.length
+    ? instructors.reduce((sum, instructor) => sum + (instructor.rating || 0), 0) / instructors.length
+    : 0;
+
+  const formatCompactNumber = (value: number) =>
+    value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value.toString();
+
+  const getInstructorSkills = (skills: Instructor["skills"]): string[] => {
+    if (Array.isArray(skills)) {
+      return skills.filter(Boolean);
+    }
+
+    if (typeof skills === "string") {
+      return skills
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    return [];
+  };
 
   return (
     <Box bg={bgColor} minH="100vh">
@@ -124,7 +154,7 @@ export default function InstructorsListPage() {
                 <Divider orientation="vertical" h="50px" borderColor="gray.700" />
                 <VStack spacing={1}>
                   <Text fontSize="3xl" fontWeight="bold" color="white">
-                    50K+
+                    {formatCompactNumber(totalStudents)}+
                   </Text>
                   <Text fontSize="sm" color="gray.500" textTransform="uppercase">
                     Students Taught
@@ -133,7 +163,7 @@ export default function InstructorsListPage() {
                 <Divider orientation="vertical" h="50px" borderColor="gray.700" />
                 <VStack spacing={1}>
                   <Text fontSize="3xl" fontWeight="bold" color="white">
-                    4.8
+                    {avgRating.toFixed(1)}
                   </Text>
                   <Text fontSize="sm" color="gray.500" textTransform="uppercase">
                     Avg Rating
@@ -150,12 +180,23 @@ export default function InstructorsListPage() {
         <Container maxW="container.xl">
           {/* Section Header */}
           <VStack spacing={4} mb={{ base: 10, md: 14 }}>
+            <Badge
+              bg={useColorModeValue("blue.200", "blue.500")}
+              color={useColorModeValue("blue.900", "white")}
+              fontSize="sm"
+              px={4}
+              py={1}
+              borderRadius="full"
+              fontWeight="semibold"
+            >
+              Meet Our Expert
+            </Badge>
             <Heading
               fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}
               fontWeight="bold"
               textAlign="center"
             >
-              Meet Our Expert Team
+              Meet Our Expert Instructors
             </Heading>
             <Text
               fontSize={{ base: "md", md: "lg" }}
@@ -163,8 +204,7 @@ export default function InstructorsListPage() {
               textAlign="center"
               maxW="2xl"
             >
-              Each instructor brings unique expertise and real-world experience to help you
-              master cybersecurity.
+              Learn from industry professionals with years of real-world experience in cybersecurity
             </Text>
           </VStack>
 
@@ -182,194 +222,145 @@ export default function InstructorsListPage() {
               spacing={{ base: 8, md: 10 }}
             >
               {instructors.map((instructor, index) => {
+                const skills = getInstructorSkills(instructor.skills).slice(0, 3);
+                const title = instructor.experience || "Cybersecurity Expert";
+                const bio =
+                  instructor.user?.bio ||
+                  "Learn practical cybersecurity from real-world professionals.";
+
                 return (
                   <FallInPlace key={instructor.id} delay={0.05 * index}>
                     <Box
                       bg={cardBg}
                       borderWidth="1px"
                       borderColor={borderColor}
-                      borderRadius="xl"
+                      borderRadius="3xl"
                       overflow="hidden"
-                      transition="all 0.3s ease"
+                      transition="all 0.4s ease"
+                      position="relative"
                       _hover={{
                         transform: "translateY(-8px)",
                         shadow: "2xl",
-                        borderColor: accentColor,
+                        borderColor: "purple.500",
                       }}
+                      cursor="pointer"
                       h="full"
                       display="flex"
                       flexDirection="column"
                     >
                       {/* Instructor Image */}
-                      <Box position="relative" h="280px" w="full" overflow="hidden">
+                      <Box position="relative" overflow="hidden" aspectRatio="4 / 3">
                         {instructor.user?.avatar ? (
                           <Image
-                            src={getFullImageUrl(instructor.user.avatar, 'avatar')}
+                            src={getFullImageUrl(instructor.user.avatar, "avatar")}
                             alt={instructor.user?.name || 'Instructor'}
-                            fill
-                            style={{ objectFit: "cover" }}
+                            width={400}
+                            height={400}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              objectPosition: "center top",
+                            }}
                           />
                         ) : (
                           <Box
-                            position="absolute"
-                            inset={0}
+                            position="relative"
                             display="flex"
                             alignItems="center"
                             justifyContent="center"
                             bg={useColorModeValue('gray.200', 'gray.700')}
+                            w="full"
+                            h="full"
                           >
                             <Icon as={FiUser} boxSize="80px" color={useColorModeValue('gray.500', 'gray.400')} />
                           </Box>
                         )}
                         <Box
                           position="absolute"
-                          top={4}
-                          right={4}
-                          bg="blackAlpha.700"
-                          backdropFilter="blur(10px)"
-                          px={3}
-                          py={1}
-                          borderRadius="full"
+                          bottom={0}
+                          left={0}
+                          right={0}
+                          bg="linear-gradient(to top, rgba(0,0,0,0.7), transparent)"
+                          p={4}
                         >
-                          <HStack spacing={1}>
-                            <Icon as={FiStar} color="yellow.400" boxSize={4} />
-                            <Text color="white" fontWeight="bold" fontSize="sm">
-                              {instructor.rating}
-                            </Text>
-                          </HStack>
+                          {/* <Badge
+                            bg={useColorModeValue("blue.200", "blue.500")}
+                            color={useColorModeValue("blue.900", "white")}
+                            fontSize="xs"
+                            px={3}
+                            py={1}
+                            borderRadius="full"
+                            fontWeight="semibold"
+                          >
+                            Expert Instructor
+                          </Badge> */}
                         </Box>
                       </Box>
 
                       {/* Instructor Info */}
-                      <VStack p={6} spacing={4} align="stretch" flex="1">
-                        {/* Name & Badge */}
-                        <Box>
-                          <Heading size="md" mb={2}>
+                      <VStack p={6} spacing={4} align="start" flex="1">
+                        <VStack align="start" spacing={2} w="full">
+                          <Heading size="md" color={headingColor}>
                             {instructor.user?.name || 'Instructor'}
                           </Heading>
-                          {instructor.user?.bio && (
-                            <Badge
-                              colorScheme="green"
-                              fontSize="xs"
-                              px={3}
-                              py={1}
-                              borderRadius="full"
-                              fontWeight="semibold"
-                            >
-                              {instructor.user.bio}
-                            </Badge>
-                          )}
-                        </Box>
+                          <Text fontSize="sm" fontWeight="semibold" color="purple.500">
+                            {instructor.user?.bio || 'No bio available'}
+                          </Text>
+                        </VStack>
 
-                        {/* Additional Info - Location and Email if available */}
-                        {(instructor.user?.city || instructor.user?.country || instructor.user?.email) && (
-                          <VStack spacing={2} align="stretch">
-                            {/* {(instructor.user?.city || instructor.user?.country) && (
-                            <HStack spacing={2}>
-                              <Icon as={FiMapPin} color={textMuted} boxSize={4} />
-                              <Text fontSize="xs" color={textMuted} noOfLines={1}>
-                                {[instructor.user?.city, instructor.user?.country]
-                                  .filter(Boolean)
-                                  .join(", ")}
-                              </Text>
-                            </HStack>
-                          )} */}
-                            {instructor.user?.email && (
-                              <HStack spacing={2}>
-                                <Icon as={FiMail} color={textMuted} boxSize={4} />
-                                <Text fontSize="xs" color={textMuted} noOfLines={1}>
-                                  {instructor.user.email}
-                                </Text>
-                              </HStack>
-                            )}
-                          </VStack>
+                        {skills.length > 0 && (
+                          <Wrap spacing={2}>
+                            {skills.map((skill) => (
+                              <Badge key={skill} colorScheme="green" fontSize="xs" borderRadius="full" px={2} py={1}>
+                                {skill}
+                              </Badge>
+                            ))}
+                          </Wrap>
                         )}
 
-                        {/* Divider */}
-                        <Divider borderColor={borderColor} />
+                        <Box w="full" pt={4} borderTopWidth="1px" borderColor={borderColor}>
+                          <SimpleGrid columns={3} spacing={4} fontSize="sm">
+                            <VStack spacing={1}>
+                              <HStack spacing={1} color="yellow.500">
+                                <Icon as={FiStar} />
+                                <Text fontWeight="bold">{instructor.rating}</Text>
+                              </HStack>
+                              <Text fontSize="xs" color={textMuted}>Rating</Text>
+                            </VStack>
 
-                        {/* Stats Grid */}
-                        <SimpleGrid columns={3} spacing={4}>
-                          <VStack spacing={1}>
-                            <Flex
-                              w="40px"
-                              h="40px"
-                              borderRadius="lg"
-                              bg={useColorModeValue("blue.50", "blue.900")}
-                              align="center"
-                              justify="center"
-                            >
-                              <Icon
-                                as={FiBook}
-                                color={useColorModeValue("blue.500", "blue.300")}
-                                boxSize={5}
-                              />
-                            </Flex>
-                            <Text fontWeight="bold" fontSize="lg">
-                              {instructor.totalCourses}
-                            </Text>
-                            <Text fontSize="xs" color={textMuted}>
-                              Courses
-                            </Text>
-                          </VStack>
+                            <VStack spacing={1}>
+                              <HStack spacing={1} color="purple.500">
+                                <Icon as={FiUsers} />
+                                <Text fontWeight="bold">
+                                  {formatCompactNumber(instructor.totalStudents || 0)}
+                                </Text>
+                              </HStack>
+                              <Text fontSize="xs" color={textMuted}>Students</Text>
+                            </VStack>
 
-                          <VStack spacing={1}>
-                            <Flex
-                              w="40px"
-                              h="40px"
-                              borderRadius="lg"
-                              bg={useColorModeValue("green.50", "green.900")}
-                              align="center"
-                              justify="center"
-                            >
-                              <Icon
-                                as={FiUsers}
-                                color={useColorModeValue("green.500", "green.300")}
-                                boxSize={5}
-                              />
-                            </Flex>
-                            <Text fontWeight="bold" fontSize="lg">
-                              {(instructor.totalStudents / 1000).toFixed(0)}K
-                            </Text>
-                            <Text fontSize="xs" color={textMuted}>
-                              Students
-                            </Text>
-                          </VStack>
-
-                          <VStack spacing={1}>
-                            <Flex
-                              w="40px"
-                              h="40px"
-                              borderRadius="lg"
-                              bg={useColorModeValue("purple.50", "purple.900")}
-                              align="center"
-                              justify="center"
-                            >
-                              <Icon
-                                as={FiAward}
-                                color={useColorModeValue("purple.500", "purple.300")}
-                                boxSize={5}
-                              />
-                            </Flex>
-                            <Text fontWeight="bold" fontSize="lg">
-                              {instructor.rating}
-                            </Text>
-                            <Text fontSize="xs" color={textMuted}>
-                              Rating
-                            </Text>
-                          </VStack>
-                        </SimpleGrid>
+                            <VStack spacing={1}>
+                              <HStack spacing={1} color="blue.500">
+                                <Icon as={FiBook} />
+                                <Text fontWeight="bold">{instructor.totalCourses}</Text>
+                              </HStack>
+                              <Text fontSize="xs" color={textMuted}>Courses</Text>
+                            </VStack>
+                          </SimpleGrid>
+                        </Box>
 
                         {/* CTA Button */}
-                        <ButtonLink
+                        <Button
+                          as={NextLink}
                           href={`/academy/instructors/${instructor.id}`}
                           colorScheme="green"
                           size="md"
                           width="full"
                           mt={2}
+                          borderRadius="md"
                         >
                           View Profile
-                        </ButtonLink>
+                        </Button>
                       </VStack>
                     </Box>
                   </FallInPlace>
