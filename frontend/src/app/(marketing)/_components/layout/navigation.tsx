@@ -77,7 +77,6 @@ const Navigation: React.FC<NavigationProps> = ({
           return (
             <MegaMenuItem
               key={i}
-              label={label}
               onMouseEnter={() => hasMegaMenu && onMenuChange(label)}
               onMouseLeave={() => hasMegaMenu && onMenuChange(null)}
             >

@@ -94,6 +94,7 @@ export default function InstructorCouponsPage() {
       : selectedCourse
         ? getFinalPrice(selectedCourse as any) > 0
         : false;
+  const hasPaidCourses = courses.some((course) => getFinalPrice(course as any) > 0);
 
   const courseFinalPrice = selectedCourse ? getFinalPrice(selectedCourse as any) : 0;
   const rawPreviewDiscountAmount =
@@ -153,6 +154,12 @@ export default function InstructorCouponsPage() {
 
     return { active, expired, totalUsage, nearLimit };
   }, [coupons]);
+
+  const getCouponStatus = (coupon: CourseCoupon) => {
+    const isExpired = coupon.expiresAt ? new Date(coupon.expiresAt).getTime() < Date.now() : false;
+    if (isExpired) return "EXPIRED" as const;
+    return coupon.isActive ? "ACTIVE" as const : "INACTIVE" as const;
+  };
 
   useEffect(() => {
     document.title = "Course Coupons - Instructor";
@@ -266,8 +273,10 @@ export default function InstructorCouponsPage() {
 
     try {
       setDeleteLoading(true);
-      await handleDelete(couponToDelete);
-      closeDeleteModal();
+      const deleted = await handleDelete(couponToDelete);
+      if (deleted) {
+        closeDeleteModal();
+      }
     } finally {
       setDeleteLoading(false);
     }
@@ -358,9 +367,9 @@ export default function InstructorCouponsPage() {
     }
   };
 
-  const handleDelete = async (coupon: CourseCoupon) => {
-    const targetCourseId = selectedCourseId === ALL_COURSES_OPTION ? coupon.courseId : selectedCourseId;
-    if (!targetCourseId) return;
+  const handleDelete = async (coupon: CourseCoupon): Promise<boolean> => {
+    const targetCourseId = coupon.courseId || selectedCourseId;
+    if (!targetCourseId) return false;
 
     try {
       await academyService.deleteInstructorCourseCoupon(targetCourseId, coupon.id);
@@ -371,9 +380,11 @@ export default function InstructorCouponsPage() {
         setEditingCouponCourseId(null);
         setEditingCouponScope(null);
       }
+      return true;
     } catch (error: any) {
       const message = error?.response?.data?.message || "Failed to delete coupon";
       toast.error("Delete failed", { description: message });
+      return false;
     }
   };
 
@@ -426,7 +437,7 @@ export default function InstructorCouponsPage() {
         <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Active Coupons</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Live Coupons</p>
               <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">{couponStats.active}</p>
             </div>
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-success-100 dark:bg-success-500/15">
@@ -513,7 +524,7 @@ export default function InstructorCouponsPage() {
                 <button
                   type="button"
                   onClick={openCreateModal}
-                  disabled={!paidEligible}
+                  disabled={!hasPaidCourses || loading}
                   className="inline-flex items-center gap-1 rounded-lg border border-brand-500 bg-brand-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-brand-600 hover:border-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <HiOutlinePlus className="h-4 w-4" />
@@ -556,6 +567,7 @@ export default function InstructorCouponsPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             {filteredCoupons.map((coupon, index) => {
               const isExpired = coupon.expiresAt ? new Date(coupon.expiresAt).getTime() < Date.now() : false;
+              const couponStatus = getCouponStatus(coupon);
               const usagePercent = coupon.usageLimit && coupon.usageLimit > 0
                 ? Math.min(100, Math.round((coupon.usageCount / coupon.usageLimit) * 100))
                 : null;
@@ -638,12 +650,14 @@ export default function InstructorCouponsPage() {
                   <div className="mt-4 flex items-center gap-2 text-xs">
                     <span
                       className={`rounded-full px-2.5 py-1 font-semibold ring-1 ${
-                        coupon.isActive && !isExpired
+                        couponStatus === "ACTIVE"
                           ? "bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-200 dark:ring-emerald-500/20"
-                          : "bg-rose-50 text-rose-700 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-200 dark:ring-rose-500/20"
+                          : couponStatus === "EXPIRED"
+                            ? "bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-200 dark:ring-amber-500/20"
+                            : "bg-rose-50 text-rose-700 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-200 dark:ring-rose-500/20"
                       }`}
                     >
-                      {coupon.isActive && !isExpired ? "Active" : "Inactive"}
+                      {couponStatus === "ACTIVE" ? "Active" : couponStatus === "EXPIRED" ? "Expired" : "Inactive"}
                     </span>
                     {coupon.expiresAt && (
                       <span className="text-gray-500 dark:text-gray-400">
@@ -718,7 +732,7 @@ export default function InstructorCouponsPage() {
                     className="h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none ring-brand-500/40 transition focus:ring-2 dark:border-white/10 dark:bg-gray-900 dark:text-white"
                   >
                     <option value={ALL_COURSES_OPTION}>All paid courses</option>
-                    {courses.map((course) => {
+                    {courses.filter((course) => getFinalPrice(course as any) > 0).map((course) => {
                       const finalPrice = getFinalPrice(course as any);
                       return (
                         <option key={course.id} value={course.id}>

@@ -5,6 +5,7 @@ import {
   Container,
   Grid,
   GridItem,
+  Button,
   Heading,
   Text,
   VStack,
@@ -15,12 +16,14 @@ import {
 } from '@chakra-ui/react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import { FiArrowRight } from 'react-icons/fi'
 import { MegaMenuSection, MegaMenuItem } from './mega-menu-data'
 
 const MotionBox = motion(Box)
 
 interface MegaMenuContentProps {
   sections: MegaMenuSection[]
+  showItemDescriptions?: boolean
   featured?: {
     title: string
     description: string
@@ -33,6 +36,7 @@ interface MegaMenuContentProps {
 
 export const MegaMenuContent = ({
   sections,
+  showItemDescriptions = true,
   featured,
   isOpen,
   onClose,
@@ -62,10 +66,7 @@ export const MegaMenuContent = ({
           zIndex={50}
         >
           <Container maxW="container.2xl" px={{ base: '8', md: '12', lg: '20' }} py="8">
-            <Grid
-              templateColumns={featured ? 'repeat(4, 1fr)' : `repeat(${sections.length}, 1fr)`}
-              gap={8}
-            >
+            <Grid templateColumns={`repeat(${sections.length}, minmax(0, 1fr))`} gap={8}>
               {sections.map((section, idx) => (
                 <GridItem key={idx}>
                   <VStack align="stretch" spacing={4}>
@@ -79,6 +80,11 @@ export const MegaMenuContent = ({
                     >
                       {section.title}
                     </Heading>
+                    {section.description ? (
+                      <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')} lineHeight="tall">
+                        {section.description}
+                      </Text>
+                    ) : null}
                     <VStack align="stretch" spacing={1}>
                       {section.items.map((item, itemIdx) => (
                         <MenuItemCard
@@ -86,35 +92,36 @@ export const MegaMenuContent = ({
                           item={item}
                           hoverBg={hoverBg}
                           onClose={onClose}
+                          showDescription={showItemDescriptions}
                         />
                       ))}
                     </VStack>
                   </VStack>
                 </GridItem>
               ))}
+            </Grid>
 
-              {featured && (
-                <GridItem>
-                  <ChakraLink
-                    as={Link}
-                    href={featured.href}
-                    onClick={onClose}
-                    _hover={{ textDecoration: 'none' }}
+            {/* {featured && (
+              <Box mt={8}>
+                <ChakraLink
+                  as={Link}
+                  href={featured.href}
+                  onClick={onClose}
+                  _hover={{ textDecoration: 'none' }}
+                >
+                  <Box
+                    px={6}
+                    py={5}
+                    bgGradient={useColorModeValue(
+                      'linear(135deg, rgba(240,249,255,0.9), rgba(236,253,245,0.95))',
+                      'linear(135deg, rgba(15,23,42,0.95), rgba(6,78,59,0.55))'
+                    )}
+                    borderRadius="xl"
+                    border="1px"
+                    borderColor={featuredBorder}
                   >
-                    <Box
-                      p={6}
-                      bg={featuredBg}
-                      borderRadius="lg"
-                      border="1px"
-                      borderColor={featuredBorder}
-                      h="full"
-                      transition="all 0.2s"
-                      _hover={{
-                        transform: 'translateY(-2px)',
-                        boxShadow: 'lg',
-                      }}
-                    >
-                      <VStack align="start" spacing={3} h="full">
+                    <Grid templateColumns={{ base: '1fr', md: '1.2fr auto' }} gap={4} alignItems="center">
+                      <Box>
                         <Box
                           px={3}
                           py={1}
@@ -124,32 +131,27 @@ export const MegaMenuContent = ({
                           fontWeight="bold"
                           borderRadius="full"
                           textTransform="uppercase"
+                          display="inline-flex"
+                          mb={3}
                         >
                           Featured
                         </Box>
-                        <Heading size="sm" color={useColorModeValue('gray.900', 'white')}>
+                        <Heading size="sm" color={useColorModeValue('gray.900', 'white')} mb={1}>
                           {featured.title}
                         </Heading>
-                        <Text
-                          fontSize="sm"
-                          color={useColorModeValue('gray.600', 'gray.300')}
-                          flex="1"
-                        >
+                        <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.300')}>
                           {featured.description}
                         </Text>
-                        <Text
-                          fontSize="sm"
-                          color={useColorModeValue('blue.600', 'blue.300')}
-                          fontWeight="semibold"
-                        >
-                          Learn more →
-                        </Text>
-                      </VStack>
-                    </Box>
-                  </ChakraLink>
-                </GridItem>
-              )}
-            </Grid>
+                      </Box>
+
+                      <Button colorScheme="green" rightIcon={<FiArrowRight />}>
+                        Explore services
+                      </Button>
+                    </Grid>
+                  </Box>
+                </ChakraLink>
+              </Box>
+            )} */}
           </Container>
         </MotionBox>
       )}
@@ -161,9 +163,10 @@ interface MenuItemCardProps {
   item: MegaMenuItem
   hoverBg: string
   onClose: () => void
+  showDescription: boolean
 }
 
-const MenuItemCard = ({ item, hoverBg, onClose }: MenuItemCardProps) => {
+const MenuItemCard = ({ item, hoverBg, onClose, showDescription }: MenuItemCardProps) => {
   return (
     <ChakraLink
       as={Link}
@@ -172,7 +175,8 @@ const MenuItemCard = ({ item, hoverBg, onClose }: MenuItemCardProps) => {
       _hover={{ textDecoration: 'none' }}
     >
       <Box
-        p={3}
+        px={3}
+        py={showDescription ? 2.5 : 3}
         borderRadius="md"
         transition="all 0.2s"
         _hover={{
@@ -188,7 +192,7 @@ const MenuItemCard = ({ item, hoverBg, onClose }: MenuItemCardProps) => {
               color={useColorModeValue('blue.500', 'blue.300')}
             />
           )}
-          <VStack align="start" spacing={0.5} flex="1">
+          <VStack align="start" spacing={showDescription ? 0 : 0.5} flex="1">
             <Text
               fontWeight="semibold"
               fontSize="sm"
@@ -196,13 +200,15 @@ const MenuItemCard = ({ item, hoverBg, onClose }: MenuItemCardProps) => {
             >
               {item.title}
             </Text>
-            <Text
-              fontSize="xs"
-              color={useColorModeValue('gray.600', 'gray.400')}
-              lineHeight="short"
-            >
-              {item.description}
-            </Text>
+            {showDescription ? (
+              <Text
+                fontSize="xs"
+                color={useColorModeValue('gray.600', 'gray.400')}
+                lineHeight="short"
+              >
+                {item.description}
+              </Text>
+            ) : null}
           </VStack>
         </HStack>
       </Box>

@@ -18,6 +18,10 @@ import {
   FiMail,
   FiInfo
 } from 'react-icons/fi'
+import { getServicesByCategory, serviceCategories } from '@/app/(marketing)/service/_data/services'
+
+const truncate = (value: string, maxLength = 92) =>
+  value.length > maxLength ? `${value.slice(0, maxLength - 1).trimEnd()}…` : value
 
 export interface MegaMenuItem {
   title: string
@@ -28,12 +32,14 @@ export interface MegaMenuItem {
 
 export interface MegaMenuSection {
   title: string
+  description?: string
   items: MegaMenuItem[]
 }
 
 export interface MegaMenuData {
   [key: string]: {
     sections: MegaMenuSection[]
+    showItemDescriptions?: boolean
     featured?: {
       title: string
       description: string
@@ -135,98 +141,21 @@ export const megaMenuData: MegaMenuData = {
     },
   },
   'Service': {
-    sections: [
-      {
-        title: 'Security Services',
-        items: [
-          {
-            title: 'Penetration Testing',
-            description: 'Comprehensive security testing',
-            href: '/service#penetration-testing',
-            icon: FiTarget,
-          },
-          {
-            title: 'Vulnerability Assessment',
-            description: 'Identify security weaknesses',
-            href: '/service#vulnerability-assessment',
-            icon: FiSearch,
-          },
-          {
-            title: 'Security Audit',
-            description: 'Complete security evaluation',
-            href: '/service#security-audit',
-            icon: FiShield,
-          },
-          {
-            title: 'SOC Services',
-            description: '24/7 security monitoring',
-            href: '/service#soc-services',
-            icon: FiMonitor,
-          },
-        ],
-      },
-      {
-        title: 'Specialized Services',
-        items: [
-          {
-            title: 'Digital Forensics',
-            description: 'Cyber incident investigation',
-            href: '/service#digital-forensics',
-            icon: FiDatabase,
-          },
-          {
-            title: 'Compliance & Consulting',
-            description: 'Security compliance guidance',
-            href: '/service#compliance',
-            icon: FiFileText,
-          },
-          {
-            title: 'Secure Code Review',
-            description: 'Application security analysis',
-            href: '/service#code-review',
-            icon: FiCode,
-          },
-          {
-            title: 'Red Team Operations',
-            description: 'Advanced security testing',
-            href: '/service#red-team',
-            icon: FiLock,
-          },
-        ],
-      },
-      {
-        title: 'Compliance & Certifications',
-        items: [
-          {
-            title: 'ISO 27001 Implementation',
-            description: 'Information security management system',
-            href: '/service/iso-27001',
-            icon: FiShield,
-          },
-          {
-            title: 'ISO 9001 Implementation',
-            description: 'Quality management system',
-            href: '/service/iso-9001',
-            icon: FiAward,
-          },
-          {
-            title: 'PCI DSS Compliance',
-            description: 'Payment card industry standards',
-            href: '/service/pci-dss',
-            icon: FiLock,
-          },
-          {
-            title: 'SOC 2 Readiness',
-            description: 'Trust services criteria compliance',
-            href: '/service/soc-2',
-            icon: FiFileText,
-          },
-        ],
-      },
-    ],
+    showItemDescriptions: false,
+    sections: serviceCategories.map((category) => ({
+      title: category.label,
+      description: category.description,
+      items: getServicesByCategory(category.id).slice(0, 5).map((service) => ({
+        title: service.title,
+        description: truncate(service.shortDescription),
+        href: `/service/${service.slug}`,
+        icon: service.icon,
+      })),
+    })),
     featured: {
-      title: 'Enterprise Security Solutions',
-      description: 'Protect your organization with our comprehensive security services',
+      title: 'Need a tailored security plan?',
+      description:
+        'Explore all services, then open the consultation modal from the service page to shape the right scope for your team.',
       href: '/service',
     },
   },

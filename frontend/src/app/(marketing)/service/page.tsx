@@ -445,9 +445,9 @@ export default function ServicesPage() {
                 _hover={{ borderColor: 'rgba(52, 211, 153, 0.42)', transform: 'translateY(-2px)' }}
                 transition="all 0.25s ease"
               >
-                <Text color="green.300" fontSize="3xl" lineHeight="1" fontWeight="light" mb={3}>
+                {/* <Text color="green.300" fontSize="3xl" lineHeight="1" fontWeight="light" mb={3}>
                   {item.step}
-                </Text>
+                </Text> */}
                 <HStack spacing={2} mb={3} color="green.300">
                   <item.icon size={16} />
                   <Text fontWeight="semibold">{item.title}</Text>

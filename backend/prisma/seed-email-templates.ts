@@ -32,10 +32,6 @@ async function seedEmailTemplates() {
     }
   </style>
 </head>
-      .logo-dark { display: block !important; }
-    }
-  </style>
-</head>
 <body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,sans-serif">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:20px 0">
     <tr><td align="center">
