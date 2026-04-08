@@ -38,8 +38,11 @@ export const metadata = {
     telephone: false,
   },
   icons: {
-    icon: '/logo.svg',
-    apple: '/logo.svg',
+    icon: [
+      { url: '/brand.png', type: 'image/png' },
+    ],
+    shortcut: ['/brand.png'],
+    apple: [{ url: '/brand.png', type: 'image/png' }],
   },
   openGraph: {
     title: 'HackToLive - Cybersecurity, Development & Tech Solutions',
@@ -89,13 +92,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link
-          rel="icon"
-          type="image/svg+xml"
-          href="/logo.svg"
-        />
-      </head>
+      <head />
       <body className={`${outfit.className} dark:bg-gray-900`} suppressHydrationWarning>
         <GlobalLoading />
         <ThemeProvider>
