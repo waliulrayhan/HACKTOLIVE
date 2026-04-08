@@ -112,6 +112,10 @@ export class PaymentService {
         productName = course.title;
         productCategory = 'Course Enrollment';
 
+        if (amount < 1) {
+          throw new BadRequestException('This coupon reduces payable amount below the minimum payment amount (1 BDT). Please use a smaller coupon.');
+        }
+
         if (couponPricing.appliedCoupon) {
           data.couponCode = couponPricing.appliedCoupon.code;
           appliedCouponId = couponPricing.appliedCoupon.id;
@@ -369,15 +373,30 @@ export class PaymentService {
       throw new NotFoundException('Course not found');
     }
 
-    const coupon = await this.prisma.courseCoupon.findFirst({
+    const candidateCoupons = await this.prisma.courseCoupon.findMany({
       where: {
         code: normalizedCode,
         instructorId: course.instructorId,
+        OR: [
+          { courseId },
+          { applyToAllCourses: true } as any,
+        ],
       },
       orderBy: {
         createdAt: 'desc',
       },
     });
+
+    if (candidateCoupons.length > 1) {
+      this.logger.warn(
+        `Multiple coupons found for code ${normalizedCode} and instructor ${course.instructorId}. Using deterministic priority.`
+      );
+    }
+
+    const exactCourseCoupon = candidateCoupons.find((item) => item.courseId === courseId);
+    const allCoursesCoupon = candidateCoupons.find((item) => Boolean((item as any).applyToAllCourses));
+
+    const coupon = exactCourseCoupon ?? allCoursesCoupon ?? null;
 
     if (!coupon) {
       throw new BadRequestException('Invalid coupon code for this course');
@@ -434,8 +453,14 @@ export class PaymentService {
       throw new BadRequestException('Coupon does not provide any discount for this order');
     }
 
+    const finalAmount = Number(Math.max(0, baseAmount - discountAmount).toFixed(2));
+
+    if (finalAmount < 1) {
+      throw new BadRequestException('This coupon reduces payable amount below the minimum payment amount (1 BDT). Please use a smaller coupon.');
+    }
+
     return {
-      finalAmount: Number(Math.max(0, baseAmount - discountAmount).toFixed(2)),
+      finalAmount,
       discountAmount,
       appliedCoupon: coupon,
     };

@@ -120,6 +120,16 @@ export class InstructorController {
   private normalizeCouponPayload(payload: CreateCourseCouponDto | UpdateCourseCouponDto) {
     const normalized: any = { ...payload };
 
+    const toNumberOrUndefined = (value: any) => {
+      if (value === undefined) return undefined;
+      if (value === null || value === '') return null;
+      const num = Number(value);
+      if (!Number.isFinite(num)) {
+        throw new BadRequestException('Coupon numeric fields must be valid numbers');
+      }
+      return num;
+    };
+
     if (normalized.code !== undefined) {
       normalized.code = String(normalized.code).trim().toUpperCase();
     }
@@ -131,6 +141,41 @@ export class InstructorController {
 
     if (normalized.maxDiscountAmount === null || normalized.maxDiscountAmount === '') {
       normalized.maxDiscountAmount = null;
+    }
+
+    if (normalized.discountValue !== undefined) {
+      normalized.discountValue = toNumberOrUndefined(normalized.discountValue);
+      if (normalized.discountValue === null || normalized.discountValue <= 0) {
+        throw new BadRequestException('Discount value must be greater than 0');
+      }
+    }
+
+    if (normalized.maxDiscountAmount !== undefined) {
+      normalized.maxDiscountAmount = toNumberOrUndefined(normalized.maxDiscountAmount);
+      if (normalized.maxDiscountAmount !== null && normalized.maxDiscountAmount < 0) {
+        throw new BadRequestException('Discount cap cannot be negative');
+      }
+    }
+
+    if (normalized.minOrderAmount !== undefined) {
+      normalized.minOrderAmount = toNumberOrUndefined(normalized.minOrderAmount);
+      if (normalized.minOrderAmount !== null && normalized.minOrderAmount < 0) {
+        throw new BadRequestException('Minimum order amount cannot be negative');
+      }
+    }
+
+    if (normalized.perStudentLimit !== undefined) {
+      normalized.perStudentLimit = toNumberOrUndefined(normalized.perStudentLimit);
+      if (normalized.perStudentLimit !== null && normalized.perStudentLimit < 1) {
+        throw new BadRequestException('Per student limit must be at least 1');
+      }
+    }
+
+    if (normalized.usageLimit !== undefined) {
+      normalized.usageLimit = toNumberOrUndefined(normalized.usageLimit);
+      if (normalized.usageLimit !== null && normalized.usageLimit < 1) {
+        throw new BadRequestException('Usage limit must be at least 1');
+      }
     }
 
     if (normalized.usageLimit === null || normalized.usageLimit === '') {
@@ -436,7 +481,7 @@ export class InstructorController {
   async getAllInstructorCoupons(@Request() req: any) {
     const instructor = await this.getInstructorOrThrow(req);
 
-    return this.prisma.courseCoupon.findMany({
+    const coupons = await this.prisma.courseCoupon.findMany({
       where: { instructorId: instructor.id },
       include: {
         course: {
@@ -457,6 +502,12 @@ export class InstructorController {
         { createdAt: 'desc' },
       ],
     });
+
+    // For all-course coupons, course is an internal anchor only and should not be exposed as scope.
+    return coupons.map((coupon) => ({
+      ...coupon,
+      course: (coupon as any).applyToAllCourses ? null : coupon.course,
+    }));
   }
 
   @Post('coupons')
