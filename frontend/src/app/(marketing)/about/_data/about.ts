@@ -229,7 +229,7 @@ export const aboutTeam: AboutTeamMember[] = [
     name: 'Md. Siful Islam',
     role: 'Senior Red Team Lead',
     expertise: 'Advanced Penetration Testing, OSEP',
-    avatar: '/images/user/siful.jpg',
+    avatar: '/images/user/siful.png',
   },
   {
     name: 'Md Zahid Hasan',

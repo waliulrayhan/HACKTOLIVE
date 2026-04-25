@@ -43,7 +43,7 @@ import {
 } from './_data/about'
 import { FallInPlace } from '@/components/shared/motion/fall-in-place'
 import { MotionBox } from '@/components/shared/motion/box'
-import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 
 export default function AboutPage() {
   const cardBg = useColorModeValue('white', 'gray.800')
@@ -57,34 +57,6 @@ export default function AboutPage() {
 
   const valuesRef = useRef<HTMLDivElement>(null)
   const achievementsRef = useRef<HTMLDivElement>(null)
-
-  // Auto-scroll carousel for team
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const [isPaused, setIsPaused] = useState(false)
-
-  useEffect(() => {
-    const scrollContainer = scrollContainerRef.current
-    if (!scrollContainer || isPaused) return
-
-    let scrollAmount = 0
-    const scrollSpeed = 1 // pixels per frame
-
-    const scroll = () => {
-      if (!isPaused && scrollContainer) {
-        scrollAmount += scrollSpeed
-        scrollContainer.scrollLeft = scrollAmount
-
-        // Reset scroll when reaching the end
-        if (scrollAmount >= scrollContainer.scrollWidth / 2) {
-          scrollAmount = 0
-        }
-      }
-      requestAnimationFrame(scroll)
-    }
-
-    const animationFrame = requestAnimationFrame(scroll)
-    return () => cancelAnimationFrame(animationFrame)
-  }, [isPaused])
 
   return (
     <Box>
@@ -615,61 +587,80 @@ export default function AboutPage() {
               w="full"
               overflow="hidden"
               position="relative"
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
+              _hover={{
+                '& .about-team-track': {
+                  animationPlayState: 'paused',
+                },
+              }}
             >
               <Flex
-                ref={scrollContainerRef}
+                className="about-team-track"
+                align="stretch"
+                w="max-content"
                 gap={8}
                 overflow="hidden"
                 css={{
                   '&::-webkit-scrollbar': { display: 'none' },
                   scrollbarWidth: 'none',
                 }}
+                sx={{
+                  animation: 'aboutTeamTicker 44s linear infinite',
+                  willChange: 'transform',
+                  '@keyframes aboutTeamTicker': {
+                    '0%': { transform: 'translateX(0)' },
+                    '100%': { transform: 'translateX(-25%)' },
+                  },
+                  '@media (prefers-reduced-motion: reduce)': {
+                    animation: 'none',
+                  },
+                }}
               >
-                {/* Duplicate team array for seamless loop */}
-                {[...aboutTeam, ...aboutTeam].map((member, index) => (
-                  <Box
-                    key={index}
-                    minW={{ base: '280px', sm: '320px', md: '280px' }}
-                    flexShrink={0}
-                  >
-                    <Card
-                      bg={cardBg}
-                      borderWidth="1px"
-                      borderColor={borderColor}
-                      _hover={{
-                        transform: 'translateY(-8px) scale(1.02)',
-                        shadow: '2xl',
-                        borderColor: iconColor,
-                      }}
-                      transition="all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
-                      h="full"
-                    >
-                      <CardBody>
-                        <VStack spacing={4}>
-                          <Avatar
-                            size="2xl"
-                            src={member.avatar}
-                            name={member.name}
-                            transition="all 0.3s"
-                            _hover={{ transform: 'scale(1.1)' }}
-                          />
-                          <VStack spacing={1} textAlign="center">
-                            <Heading as="h3" size="md" noOfLines={1}>
-                              {member.name}
-                            </Heading>
-                            <Text color={iconColor} fontWeight="semibold" noOfLines={1}>
-                              {member.role}
-                            </Text>
-                            <Text color={mutedColor} fontSize="sm" noOfLines={2}>
-                              {member.expertise}
-                            </Text>
-                          </VStack>
-                        </VStack>
-                      </CardBody>
-                    </Card>
-                  </Box>
+                {[0, 1, 2, 3].map((group) => (
+                  <Flex key={group} gap={8} pr={8}>
+                    {aboutTeam.map((member, index) => (
+                      <Box
+                        key={`${group}-${member.name}-${index}`}
+                        minW={{ base: '280px', sm: '320px', md: '280px' }}
+                        flexShrink={0}
+                      >
+                        <Card
+                          bg={cardBg}
+                          borderWidth="1px"
+                          borderColor={borderColor}
+                          _hover={{
+                            transform: 'translateY(-8px) scale(1.02)',
+                            shadow: '2xl',
+                            borderColor: iconColor,
+                          }}
+                          transition="all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+                          h="full"
+                        >
+                          <CardBody>
+                            <VStack spacing={4}>
+                              <Avatar
+                                size="2xl"
+                                src={member.avatar}
+                                name={member.name}
+                                transition="all 0.3s"
+                                _hover={{ transform: 'scale(1.1)' }}
+                              />
+                              <VStack spacing={1} textAlign="center">
+                                <Heading as="h3" size="md" noOfLines={1}>
+                                  {member.name}
+                                </Heading>
+                                <Text color={iconColor} fontWeight="semibold" noOfLines={1}>
+                                  {member.role}
+                                </Text>
+                                <Text color={mutedColor} fontSize="sm" noOfLines={2}>
+                                  {member.expertise}
+                                </Text>
+                              </VStack>
+                            </VStack>
+                          </CardBody>
+                        </Card>
+                      </Box>
+                    ))}
+                  </Flex>
                 ))}
               </Flex>
 
