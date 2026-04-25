@@ -75,6 +75,7 @@ export interface CourseModule {
   title: string;
   description: string;
   order: number;
+  isVisibleForMarketing?: boolean;
   lessons: Lesson[];
 }
 

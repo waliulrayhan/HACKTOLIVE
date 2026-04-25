@@ -551,7 +551,11 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   <TabPanel px="0" py="8">
                     <FallInPlace>
                       {course.modules && course.modules.length > 0 ? (
-                        <CurriculumAccordion modules={course.modules} />
+                        <CurriculumAccordion 
+                          modules={course.modules} 
+                          isEnrolled={isEnrolled}
+                          showLockedModules={true}
+                        />
                       ) : (
                         <Box
                           p="12"
