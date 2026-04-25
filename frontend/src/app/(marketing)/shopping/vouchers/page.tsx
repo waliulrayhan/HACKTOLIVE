@@ -473,19 +473,13 @@ export default function VouchersPage() {
                       }}
                     >
                       <Box position="relative" height="200px" overflow="hidden" bg={borderColor}>
-                        {(product.thumbnail || product.images[0]) ? (
-                          <NextImage
-                            src={getFullImageUrl(product.thumbnail || product.images[0], 'general')}
-                            alt={product.name}
-                            fill
-                            style={{ objectFit: 'cover' }}
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          />
-                        ) : (
-                          <Flex align="center" justify="center" height="100%" bg={borderColor}>
-                            <Icon as={FiPackage} boxSize={16} color={mutedColor} />
-                          </Flex>
-                        )}
+                        <NextImage
+                          src={getFullImageUrl(product.thumbnail || product.images[0], 'general')}
+                          alt={product.name}
+                          fill
+                          style={{ objectFit: 'cover' }}
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
                         {product.featured && (
                           <Badge
                             position="absolute"

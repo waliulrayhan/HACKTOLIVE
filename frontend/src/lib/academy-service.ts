@@ -1,4 +1,5 @@
 import api from './api-client';
+import { getFullImageUrl } from './image-utils';
 import { Course, Instructor, Review, Enrollment, CourseCoupon, CourseCouponPreview } from '@/types/academy';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -425,16 +426,7 @@ class AcademyService {
    * Transform image URL to full URL if it's a relative path
    */
   private transformImageUrl(url: string | null | undefined, type: 'course' | 'avatar' = 'course'): string {
-    if (!url || url.trim() === '') {
-      return type === 'avatar' ? '' : '/images/placeholder-course.jpg';
-    }
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return url;
-    }
-    if (url.startsWith('/uploads/')) {
-      return `${API_URL}${url}`;
-    }
-    return url;
+    return getFullImageUrl(url, type);
   }
   
   /**

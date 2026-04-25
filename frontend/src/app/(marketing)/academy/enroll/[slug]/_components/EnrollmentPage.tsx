@@ -57,6 +57,7 @@ import academyService from "@/lib/academy-service";
 import { useAuth } from "@/context/AuthContext";
 import { getDiscountPercentage, getFinalPrice, getOriginalPrice, hasDiscount } from "@/lib/course-pricing";
 import { CourseCouponPreview } from "@/types/academy";
+import { getFallbackImageUrl, getFullImageUrl } from "@/lib/image-utils";
 
 interface EnrollmentPageProps {
   slug: string;
@@ -73,6 +74,7 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
   const [couponPreview, setCouponPreview] = useState<CourseCouponPreview | null>(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [couponError, setCouponError] = useState("");
+  const [courseThumbnailSrc, setCourseThumbnailSrc] = useState(getFallbackImageUrl('course'));
 
   // Initialize form data with empty values
   const [formData, setFormData] = useState({
@@ -139,6 +141,10 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
     setCouponPreview(null);
     setCouponError("");
   }, [course?.id]);
+
+  useEffect(() => {
+    setCourseThumbnailSrc(course?.thumbnail ? getFullImageUrl(course.thumbnail, 'course') : getFallbackImageUrl('course'));
+  }, [course?.thumbnail]);
 
   const finalPrice = course ? getFinalPrice(course) : 0;
   const originalPrice = course ? getOriginalPrice(course) : 0;
@@ -756,11 +762,12 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                     overflow="hidden"
                   >
                     <NextImage
-                      src={course.thumbnail}
+                      src={courseThumbnailSrc}
                       alt={course.title}
                       width={400}
                       height={200}
                       style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      onError={() => setCourseThumbnailSrc(getFallbackImageUrl('course'))}
                     />
                     <Box
                       position="absolute"
@@ -953,28 +960,14 @@ export default function EnrollmentPage({ slug }: EnrollmentPageProps) {
                       <Heading size="md">Your Instructor</Heading>
                     </HStack>
                     <Flex gap="4">
-                      {course.instructor.user?.avatar ? (
-                        <ChakraImage
-                          src={course.instructor.user.avatar}
-                          alt={course.instructor.user?.name || 'Instructor'}
-                          boxSize="70px"
-                          borderRadius="12px"
-                          objectFit="cover"
-                          fallbackSrc="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E"
-                        />
-                      ) : (
-                        <Box
-                          w="70px"
-                          h="70px"
-                          borderRadius="12px"
-                          display="flex"
-                          alignItems="center"
-                          justifyContent="center"
-                          bg={useColorModeValue('gray.200', 'gray.700')}
-                        >
-                          <Icon as={FiUser} boxSize="35px" color={useColorModeValue('gray.500', 'gray.400')} />
-                        </Box>
-                      )}
+                      <ChakraImage
+                        src={getFullImageUrl(course.instructor.user?.avatar, 'avatar')}
+                        alt={course.instructor.user?.name || 'Instructor'}
+                        boxSize="70px"
+                        borderRadius="12px"
+                        objectFit="cover"
+                        fallbackSrc={getFallbackImageUrl('avatar')}
+                      />
                       <VStack align="start" spacing="1" flex="1">
                         <Text fontWeight="bold" fontSize="lg">{course.instructor.user?.name || 'Instructor'}</Text>
                         <Text fontSize="sm" color="muted" noOfLines={2}>

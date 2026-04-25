@@ -31,14 +31,14 @@ import { PageTransition } from '@/components/shared/motion/page-transition'
 import { Header } from '../../(marketing)/_components/layout/header'
 import { NextPage } from 'next'
 import { FaGoogle, FaEye, FaEyeSlash, FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
-import { useState, useMemo } from 'react'
+import { Suspense, useMemo, useState } from 'react'
 import { Turnstile } from '@marsidev/react-turnstile'
 import NextLink from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { toast } from '@/components/ui/toast'
 
-const Signup: NextPage = () => {
+const SignupContent = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { signup } = useAuth()
@@ -619,6 +619,14 @@ const Signup: NextPage = () => {
         </GridItem>
       </Grid>
     </>
+  )
+}
+
+const Signup: NextPage = () => {
+  return (
+    <Suspense fallback={<Center minH="100vh"><Text>Loading signup page...</Text></Center>}>
+      <SignupContent />
+    </Suspense>
   )
 }
 

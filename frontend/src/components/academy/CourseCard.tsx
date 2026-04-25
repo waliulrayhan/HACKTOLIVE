@@ -6,6 +6,7 @@ import { ButtonLink } from "@/components/shared/button-link/button-link";
 import { Course } from "@/types/academy";
 import { getDiscountPercentage, getFinalPrice, getOriginalPrice, hasDiscount } from "@/lib/course-pricing";
 import { getCoursePrioritySerial } from "@/lib/course-priority";
+import { getFallbackImageUrl, getFullImageUrl } from "@/lib/image-utils";
 import { FiStar, FiUsers, FiClock, FiBook, FiArrowRight, FiVideo, FiPlay } from "react-icons/fi";
 
 interface CourseCardProps {
@@ -68,26 +69,14 @@ export default function CourseCard({ course, variant = "default", isEnrolled = f
     >
       {/* Thumbnail */}
       <Box position="relative" aspectRatio="2/1">
-        {course.thumbnail && course.thumbnail ? (
-          <Image
-            src={course.thumbnail}
-            alt={course.title}
-            w="full"
-            h="full"
-            objectFit="cover"
-          />
-        ) : (
-          <Box
-            w="full"
-            h="full"
-            bg={useColorModeValue('gray.200', 'gray.700')}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <Icon as={FiBook} boxSize="12" color={useColorModeValue('gray.400', 'gray.500')} />
-          </Box>
-        )}
+        <Image
+          src={getFullImageUrl(course.thumbnail, 'course')}
+          fallbackSrc={getFallbackImageUrl('course')}
+          alt={course.title}
+          w="full"
+          h="full"
+          objectFit="cover"
+        />
         {/* Tier Badge */}
         <Badge
           position="absolute"
@@ -180,8 +169,8 @@ export default function CourseCard({ course, variant = "default", isEnrolled = f
         {/* Instructor */}
         <HStack spacing="2">
           <Image
-            src={course.instructor.user?.avatar || undefined}
-            fallbackSrc="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E"
+            src={getFullImageUrl(course.instructor.user?.avatar, 'avatar')}
+            fallbackSrc={getFallbackImageUrl('avatar')}
             objectFit="cover"
             alt={course.instructor.user?.name || 'Instructor'}
             boxSize="24px"

@@ -30,7 +30,7 @@ import { PageTransition } from '@/components/shared/motion/page-transition'
 import { Header } from '../../(marketing)/_components/layout/header'
 import { NextPage } from 'next'
 import { FaGoogle, FaEye, FaEyeSlash, FaMoon, FaSun, FaHome } from 'react-icons/fa'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { Turnstile } from '@marsidev/react-turnstile'
 import NextLink from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -44,7 +44,7 @@ const providers = {
   },
 }
 
-const Login: NextPage = () => {
+const LoginContent = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { login } = useAuth()
@@ -459,6 +459,14 @@ const Login: NextPage = () => {
       </GridItem>
     </Grid>
     </>
+  )
+}
+
+const Login: NextPage = () => {
+  return (
+    <Suspense fallback={<Center minH="100vh"><Text>Loading login page...</Text></Center>}>
+      <LoginContent />
+    </Suspense>
   )
 }
 

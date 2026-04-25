@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Box, HStack, VStack, Text, Image, Badge, Icon, useColorModeValue } from "@chakra-ui/react";
 import { Instructor } from "@/types/academy";
 import { FiStar, FiUsers, FiBook, FiUser } from "react-icons/fi";
 import { ButtonLink } from "@/components/shared/button-link";
+import { getFallbackImageUrl, getFullImageUrl } from "@/lib/image-utils";
 
 interface InstructorCardProps {
   instructor: Instructor;
@@ -11,6 +13,12 @@ interface InstructorCardProps {
 }
 
 export default function InstructorCard({ instructor, showFullBio = false }: InstructorCardProps) {
+  const [avatarSrc, setAvatarSrc] = useState(getFallbackImageUrl("avatar"));
+
+  useEffect(() => {
+    setAvatarSrc(getFullImageUrl(instructor.user?.avatar, "avatar"));
+  }, [instructor.user?.avatar]);
+
   return (
     <Box
       borderWidth="1px"
@@ -25,31 +33,21 @@ export default function InstructorCard({ instructor, showFullBio = false }: Inst
     >
       <VStack spacing="5" align="center" textAlign="center">
         {/* Avatar */}
-        {instructor.user?.avatar ? (
-          <Image
-            src={instructor.user.avatar}
-            alt={instructor.user?.name || 'Instructor'}
-            boxSize="120px"
-            borderRadius="full"
-            objectFit="cover"
-            border="4px solid"
-            borderColor="primary.500"
-          />
-        ) : (
-          <Box
-            w="120px"
-            h="120px"
-            borderRadius="full"
-            border="4px solid"
-            borderColor="primary.500"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            bg={useColorModeValue('gray.200', 'gray.700')}
-          >
-            <Icon as={FiUser} boxSize="60px" color={useColorModeValue('gray.500', 'gray.400')} />
-          </Box>
-        )}
+        <Image
+          src={avatarSrc}
+          alt={instructor.user?.name || "Instructor"}
+          boxSize="120px"
+          borderRadius="full"
+          objectFit="cover"
+          border="4px solid"
+          borderColor="primary.500"
+          onError={() => {
+            const fallbackAvatar = getFallbackImageUrl("avatar");
+            if (avatarSrc !== fallbackAvatar) {
+              setAvatarSrc(fallbackAvatar);
+            }
+          }}
+        />
 
         {/* Name */}
         <VStack spacing="2">

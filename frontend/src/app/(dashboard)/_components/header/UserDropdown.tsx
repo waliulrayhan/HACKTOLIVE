@@ -8,6 +8,7 @@ import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
 import { toast } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
 import { authService, User } from "@/lib/auth-service";
+import { getFallbackImageUrl, getFullImageUrl } from "@/lib/image-utils";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +16,7 @@ export default function UserDropdown() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [avatarSrc, setAvatarSrc] = useState(getFallbackImageUrl('avatar'));
   const router = useRouter();
 
   useEffect(() => {
@@ -22,6 +24,10 @@ export default function UserDropdown() {
     const currentUser = authService.getUser();
     setUser(currentUser);
   }, []);
+
+  useEffect(() => {
+    setAvatarSrc(user?.avatar ? getFullImageUrl(user.avatar, 'avatar') : getFallbackImageUrl('avatar'));
+  }, [user]);
 
   // Get role-based profile path
   const getProfilePath = () => {
@@ -107,20 +113,15 @@ function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
           className="flex items-center text-gray-700 dark:text-gray-400 dropdown-toggle"
         >
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-          {user?.avatar ? (
-            <Image
-              width={44}
-              height={44}
-              src={`${apiUrl}${user.avatar}`}
-              alt={user.name || 'User'}
-              className="object-cover w-full h-full"
-              unoptimized
-            />
-          ) : (
-            <span className="text-lg font-semibold text-gray-600 dark:text-gray-300">
-              {getUserInitials()}
-            </span>
-          )}
+          <Image
+            width={44}
+            height={44}
+            src={avatarSrc}
+            alt={user?.name || 'User'}
+            className="object-cover w-full h-full"
+            unoptimized
+            onError={() => setAvatarSrc(getFallbackImageUrl('avatar'))}
+          />
         </span>
 
         <span className="block mr-1 font-medium text-theme-sm">

@@ -240,19 +240,13 @@ export default function CartPage() {
                               overflow="hidden"
                               bg={borderColor}
                             >
-                              {(item.product.thumbnail || item.product.images[0]) ? (
-                                <NextImage
-                                  src={getFullImageUrl(item.product.thumbnail || item.product.images[0], 'general')}
-                                  alt={item.product.name}
-                                  fill
-                                  style={{ objectFit: 'cover' }}
-                                  sizes="(max-width: 640px) 100vw, 120px"
-                                />
-                              ) : (
-                                <Flex align="center" justify="center" height="100%" bg={borderColor}>
-                                  <Icon as={FiShoppingBag} boxSize={10} color={mutedColor} />
-                                </Flex>
-                              )}
+                              <NextImage
+                                src={getFullImageUrl(item.product.thumbnail || item.product.images[0], 'general')}
+                                alt={item.product.name}
+                                fill
+                                style={{ objectFit: 'cover' }}
+                                sizes="(max-width: 640px) 100vw, 120px"
+                              />
                             </Box>
 
                             {/* Product Info */}

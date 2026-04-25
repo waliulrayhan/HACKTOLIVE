@@ -54,13 +54,15 @@ import { useRouter } from 'next/navigation'
 import { toast } from '@/components/ui/toast'
 import { useCart } from '@/context/CartContext'
 import NextImage from 'next/image'
-import { getFullImageUrl } from '@/lib/image-utils'
+import { getFallbackImageUrl, getFullImageUrl } from '@/lib/image-utils'
 
 export default function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params)
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState(0)
+  const [mainImageErrored, setMainImageErrored] = useState(false)
+  const [thumbnailErrors, setThumbnailErrors] = useState<Record<number, boolean>>({})
   const [quantity, setQuantity] = useState(1)
   const [selectedOptions, setSelectedOptions] = useState<any>({})
   const [addingToCart, setAddingToCart] = useState(false)
@@ -80,6 +82,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
     fetchProduct()
     checkIfInCart()
   }, [resolvedParams.slug])
+
+  useEffect(() => {
+    setMainImageErrored(false)
+  }, [selectedImage, product?.id])
+
+  useEffect(() => {
+    setThumbnailErrors({})
+  }, [product?.id])
 
   const checkIfInCart = async () => {
     try {
@@ -155,7 +165,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
     return null
   }
 
-  const images = product.images.length > 0 ? product.images : [product.thumbnail || '/images/placeholder.png']
+  const images = product.images.length > 0 ? product.images : [product.thumbnail || '']
+  const primaryImage = mainImageErrored
+    ? getFallbackImageUrl('general')
+    : getFullImageUrl(images[selectedImage], 'general')
   const averageRating = product.reviews?.length
     ? product.reviews.reduce((sum, r) => sum + r.rating, 0) / product.reviews.length
     : 0
@@ -191,20 +204,15 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
               <Card bg={cardBg} borderColor={borderColor} borderWidth="1px" borderRadius="xl" overflow="hidden">
                 <AspectRatio ratio={1}>
                   <Box position="relative" width="100%" height="100%">
-                    {images[selectedImage] ? (
-                      <NextImage
-                        src={getFullImageUrl(images[selectedImage], 'general')}
-                        alt={product.name}
-                        fill
-                        style={{ objectFit: 'cover' }}
-                        priority
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                      />
-                    ) : (
-                      <Center height="100%" bg={borderColor}>
-                        <Icon as={FiShoppingCart} boxSize={16} color={mutedColor} />
-                      </Center>
-                    )}
+                    <NextImage
+                      src={primaryImage}
+                      alt={product.name}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      priority
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      onError={() => setMainImageErrored(true)}
+                    />
                   </Box>
                 </AspectRatio>
               </Card>
@@ -226,19 +234,16 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                     >
                       <AspectRatio ratio={1}>
                         <Box position="relative">
-                          {img ? (
-                            <NextImage
-                              src={getFullImageUrl(img, 'general')}
-                              alt={`${product.name} ${idx + 1}`}
-                              fill
-                              style={{ objectFit: 'cover' }}
-                              sizes="150px"
-                            />
-                          ) : (
-                            <Center height="100%" bg={borderColor}>
-                              <Icon as={FiShoppingCart} boxSize={6} color={mutedColor} />
-                            </Center>
-                          )}
+                          <NextImage
+                            src={thumbnailErrors[idx] ? getFallbackImageUrl('general') : getFullImageUrl(img, 'general')}
+                            alt={`${product.name} ${idx + 1}`}
+                            fill
+                            style={{ objectFit: 'cover' }}
+                            sizes="150px"
+                            onError={() => {
+                              setThumbnailErrors((prev) => ({ ...prev, [idx]: true }))
+                            }}
+                          />
                         </Box>
                       </AspectRatio>
                     </Card>

@@ -281,19 +281,13 @@ export default function DailyDealsPage() {
                     }}
                   >
                     <Box position="relative" height="240px" overflow="hidden" bg={borderColor}>
-                      {(product.thumbnail || product.images[0]) ? (
-                        <NextImage
-                          src={getFullImageUrl(product.thumbnail || product.images[0], 'general')}
-                          alt={product.name}
-                          fill
-                          style={{ objectFit: 'cover' }}
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
-                      ) : (
-                        <Flex align="center" justify="center" height="100%" bg={borderColor}>
-                          <Icon as={FiShoppingCart} boxSize={16} color={mutedColor} />
-                        </Flex>
-                      )}
+                      <NextImage
+                        src={getFullImageUrl(product.thumbnail || product.images[0], 'general')}
+                        alt={product.name}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
                       {discount > 0 && (
                         <Badge
                           position="absolute"

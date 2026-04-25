@@ -1,5 +1,6 @@
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
+import { getFallbackImageUrl } from "@/lib/image-utils";
 
 interface AvatarProps {
   src: string; // URL of the avatar image
@@ -38,6 +39,8 @@ const Avatar: React.FC<AvatarProps> = ({
   size = "medium",
   status = "none",
 }) => {
+  const [imageSrc, setImageSrc] = useState(src || getFallbackImageUrl('avatar'));
+
   return (
     <div className={`relative  rounded-full ${sizeClasses[size]}`}>
       {/* Avatar Image */}
@@ -45,9 +48,10 @@ const Avatar: React.FC<AvatarProps> = ({
         width="0"
         height="0"
         sizes="100vw"
-        src={src}
+        src={imageSrc}
         alt={alt}
         className="object-cover w-full rounded-full"
+        onError={() => setImageSrc(getFallbackImageUrl('avatar'))}
       />
 
       {/* Status Indicator */}

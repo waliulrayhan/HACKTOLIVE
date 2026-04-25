@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { getFallbackImageUrl, getFullImageUrl } from "@/lib/image-utils";
 import {
   HiOutlineStar,
   HiOutlineUsers,
@@ -68,7 +69,7 @@ export default function CourseHeader({
   return (
     <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden shadow-sm">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-brand-600 via-brand-700 to-purple-700 dark:from-brand-800 dark:via-brand-900 dark:to-purple-900">
+      <div className="relative bg-linear-to-r from-brand-600 via-brand-700 to-purple-700 dark:from-brand-800 dark:via-brand-900 dark:to-purple-900">
         <div className="absolute inset-0 bg-[url('/images/grid-pattern.svg')] opacity-10" />
         <div className="relative px-6 py-8 lg:px-8">
           <div className="flex flex-col lg:flex-row lg:items-start gap-6">
@@ -119,21 +120,16 @@ export default function CourseHeader({
               {/* Instructor */}
               <div className="flex items-center gap-3 mb-6">
                 <div className="relative h-10 w-10 rounded-full overflow-hidden ring-2 ring-white/30">
-                  {instructorAvatar ? (
-                    <Image
-                      src={instructorAvatar.startsWith("http") ? instructorAvatar : `${process.env.NEXT_PUBLIC_API_URL}${instructorAvatar}`}
-                      alt={instructorName}
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-white/20 flex items-center justify-center">
-                      <span className="text-lg font-semibold text-white">
-                        {instructorName?.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
+                  <Image
+                    src={getFullImageUrl(instructorAvatar, 'avatar')}
+                    alt={instructorName}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                    onError={(event) => {
+                      event.currentTarget.src = getFallbackImageUrl('avatar');
+                    }}
+                  />
                 </div>
                 <div>
                   <p className="text-xs text-white/60">Instructor</p>

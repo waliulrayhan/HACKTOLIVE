@@ -23,7 +23,7 @@ import * as React from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { toast } from '@/components/ui/toast'
-import { getFullImageUrl } from '@/lib/image-utils'
+import { getFallbackImageUrl, getFullImageUrl } from '@/lib/image-utils'
 
 import { Logo } from '../layout/logo'
 import siteConfig from '@/lib/config/data/config'
@@ -106,11 +106,16 @@ export function MobileNavContent(props: MobileNavContentProps) {
   const { logout } = useAuth()
   const bgColor = useColorModeValue('white', 'gray.900')
   const [user, setUser] = React.useState<User | null>(null)
+  const [avatarSrc, setAvatarSrc] = React.useState(getFallbackImageUrl('avatar'))
 
   React.useEffect(() => {
     const currentUser = authService.getUser()
     setUser(currentUser)
   }, [isOpen])
+
+  React.useEffect(() => {
+    setAvatarSrc(user?.avatar ? getFullImageUrl(user.avatar, 'avatar') : getFallbackImageUrl('avatar'))
+  }, [user])
 
   const getUserInitials = () => {
     if (!user?.name) return 'U'
@@ -180,20 +185,15 @@ export function MobileNavContent(props: MobileNavContentProps) {
                   <Flex alignItems="center" justifyContent="space-between" gap="2" mb="2">
                     <Flex alignItems="center" gap="3">
                       <Box overflow="hidden" borderRadius="full" h="9" w="9" bg={useColorModeValue('gray.200', 'gray.700')} display="flex" alignItems="center" justifyContent="center">
-                        {user.avatar ? (
-                          <Image
-                            width={36}
-                            height={36}
-                            src={getFullImageUrl(user.avatar, 'avatar')}
-                            alt={user.name || 'User'}
-                            className="object-cover w-full h-full"
-                            unoptimized
-                          />
-                        ) : (
-                          <Box fontSize="base" fontWeight="semibold" color={useColorModeValue('gray.600', 'gray.300')}>
-                            {getUserInitials()}
-                          </Box>
-                        )}
+                        <Image
+                          width={36}
+                          height={36}
+                          src={avatarSrc}
+                          alt={user.name || 'User'}
+                          className="object-cover w-full h-full"
+                          unoptimized
+                          onError={() => setAvatarSrc(getFallbackImageUrl('avatar'))}
+                        />
                       </Box>
                       <Box>
                         <Box fontSize="xs" fontWeight="medium" color={useColorModeValue('gray.700', 'gray.400')}>

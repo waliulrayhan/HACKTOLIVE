@@ -4,6 +4,18 @@
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
+export const FALLBACK_IMAGE_URLS = {
+  general: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=1600&auto=format&fit=crop',
+  course: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1600&auto=format&fit=crop',
+  avatar: 'https://ui-avatars.com/api/?name=User&background=e2e8f0&color=64748b&size=128&rounded=true',
+} as const;
+
+export function getFallbackImageUrl(
+  type: 'course' | 'avatar' | 'general' = 'general'
+): string {
+  return FALLBACK_IMAGE_URLS[type];
+}
+
 /**
  * Transform image URL from backend to full URL
  * Handles relative paths from uploads directory and ensures they point to the backend server
@@ -14,9 +26,7 @@ export function getFullImageUrl(
 ): string {
   // Return default image if URL is empty
   if (!url || url.trim() === '') {
-    if (type === 'avatar') return '';
-    if (type === 'course') return '/images/placeholder-course.jpg';
-    return '/images/placeholder.jpg';
+    return getFallbackImageUrl(type);
   }
 
   // If it's already a full URL, return as-is

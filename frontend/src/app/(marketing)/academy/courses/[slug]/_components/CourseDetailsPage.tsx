@@ -58,6 +58,7 @@ import { Course, Review } from "@/types/academy";
 import academyService from "@/lib/academy-service";
 import { useAuth } from "@/context/AuthContext";
 import { getFinalPrice } from "@/lib/course-pricing";
+import { getFallbackImageUrl, getFullImageUrl } from "@/lib/image-utils";
 
 interface CourseDetailsPageProps {
   slug: string;
@@ -69,6 +70,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
   const [ratingStats, setRatingStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEnrolled, setIsEnrolled] = useState(false);
+  const [heroImageSrc, setHeroImageSrc] = useState(getFallbackImageUrl("course"));
 
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
@@ -77,6 +79,10 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
   const comingSoonNoticeText = useColorModeValue("orange.800", "orange.100");
   const finalPrice = course ? getFinalPrice(course) : 0;
   const isComingSoon = course?.ctaText === "COMING_SOON";
+
+  useEffect(() => {
+    setHeroImageSrc(getFullImageUrl(course?.thumbnail, "course"));
+  }, [course?.thumbnail]);
   
   const { user } = useAuth();
 
@@ -211,7 +217,7 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                   _dark={{ bg: "gray.700" }}
                 >
                   <Image
-                    src={course.thumbnail || '/images/placeholder-course.jpg'}
+                    src={heroImageSrc}
                     alt={course.title}
                     width={500}
                     height={340}
@@ -220,9 +226,11 @@ export default function CourseDetailsPage({ slug }: CourseDetailsPageProps) {
                       height: "auto",
                       display: "block"
                     }}
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = '/images/placeholder-course.jpg';
+                    onError={() => {
+                      const fallbackCourseImage = getFallbackImageUrl("course");
+                      if (heroImageSrc !== fallbackCourseImage) {
+                        setHeroImageSrc(fallbackCourseImage);
+                      }
                     }}
                   />
                 </Box>
