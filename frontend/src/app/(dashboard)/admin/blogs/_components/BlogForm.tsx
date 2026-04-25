@@ -212,6 +212,11 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
       const data = await response.json();
       setFormData((prev) => ({ ...prev, mainImage: data.imageUrl }));
       setImagePreview(data.imageUrl);
+      if (errors.mainImage) {
+        const newErrors = { ...errors };
+        delete newErrors.mainImage;
+        setErrors(newErrors);
+      }
       toast.success("Image uploaded successfully");
     } catch (error) {
       console.error("Failed to upload image:", error);
@@ -282,6 +287,9 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
 
     if (!formData.category) newErrors.category = "Category is required";
     if (!formData.blogType) newErrors.blogType = "Blog Type is required";
+    if (mode === "create" && !formData.mainImage.trim()) {
+      newErrors.mainImage = "Featured image is required";
+    }
 
     if (formData.readTime && !/^\d+\s*min(\s*read)?$/i.test(formData.readTime.trim())) {
       newErrors.readTime = "Read time format should be like: 5 min or 5 min read";
@@ -747,7 +755,7 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
             <div className="flex items-center gap-2 mb-4">
               <HiOutlinePhotograph className="h-5 w-5 text-brand-600" />
               <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                Featured Image
+                Featured Image <span className="text-red-500">*</span>
               </h3>
             </div>
 
@@ -761,7 +769,7 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
 
             {imagePreview ? (
               <div className="space-y-3">
-                <div className="relative mx-auto w-full max-w-xs aspect-[4/3] rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                <div className="relative mx-auto w-full max-w-xs aspect-4/3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                   <img
                     src={`${process.env.NEXT_PUBLIC_API_URL}${imagePreview}`}
                     alt="Blog preview"
@@ -782,7 +790,7 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
                 type="button"
                 onClick={handleImageClick}
                 disabled={uploadingImage}
-                className="mx-auto w-full max-w-xs aspect-[4/3] rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center gap-2 hover:border-brand-500 hover:bg-brand-50 dark:hover:bg-brand-950/20 transition-colors"
+                className="mx-auto w-full max-w-xs aspect-4/3 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center gap-2 hover:border-brand-500 hover:bg-brand-50 dark:hover:bg-brand-950/20 transition-colors"
               >
                 {uploadingImage ? (
                   <>
@@ -806,6 +814,10 @@ export default function BlogForm({ blogId, mode }: BlogFormProps) {
                   </>
                 )}
               </button>
+            )}
+
+            {errors.mainImage && (
+              <p className="mt-2 text-xs text-red-500">{errors.mainImage}</p>
             )}
           </div>
 

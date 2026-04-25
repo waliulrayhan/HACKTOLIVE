@@ -12,6 +12,8 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 
+const FALLBACK_BLOG_IMAGE = "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=1600&auto=format&fit=crop";
+
 interface RelatedPostProps {
   currentBlogId?: string | number;
 }
@@ -80,9 +82,11 @@ const RelatedPost = ({ currentBlogId }: RelatedPostProps) => {
 
       <VStack spacing="4" align="stretch">
         {relatedPosts.map((post, key) => {
-          const imageUrl = post.mainImage?.startsWith('http') 
-            ? post.mainImage 
-            : `${process.env.NEXT_PUBLIC_API_URL}${post.mainImage}`;
+          const imageUrl = post.mainImage
+            ? (post.mainImage.startsWith("http")
+                ? post.mainImage
+                : `${process.env.NEXT_PUBLIC_API_URL}${post.mainImage}`)
+            : FALLBACK_BLOG_IMAGE;
           
           return (
             <Link key={key} href={`/blog/${post.slug}`}>
@@ -102,16 +106,12 @@ const RelatedPost = ({ currentBlogId }: RelatedPostProps) => {
                     borderRadius="md"
                     overflow="hidden"
                   >
-                    {post.mainImage ? (
-                      <Image 
-                        fill 
-                        src={imageUrl} 
-                        alt={post.title}
-                        style={{ objectFit: "cover" }}
-                      />
-                    ) : (
-                      <Box bg="gray.200" width="100%" height="100%" />
-                    )}
+                    <Image 
+                      fill 
+                      src={imageUrl} 
+                      alt={post.title}
+                      style={{ objectFit: "cover" }}
+                    />
                   </Box>
                   <VStack align="start" spacing="1" flex="1">
                     <Text

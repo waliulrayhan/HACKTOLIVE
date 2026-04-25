@@ -16,6 +16,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { blogApi } from "@/lib/api/blog";
 
+const FALLBACK_BLOG_IMAGE = "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=1600&auto=format&fit=crop";
+
 interface RecommendedPostsProps {
   currentBlogId?: string | number;
 }
@@ -83,9 +85,11 @@ const RecommendedPosts = ({ currentBlogId }: RecommendedPostsProps) => {
       
       <SimpleGrid columns={{ base: 1, md: 3 }} spacing="6" w="full">
         {recommendedPosts.map((post, index) => {
-          const imageUrl = post.mainImage?.startsWith('http') 
-            ? post.mainImage 
-            : `${process.env.NEXT_PUBLIC_API_URL}${post.mainImage}`;
+          const imageUrl = post.mainImage
+            ? (post.mainImage.startsWith("http")
+                ? post.mainImage
+                : `${process.env.NEXT_PUBLIC_API_URL}${post.mainImage}`)
+            : FALLBACK_BLOG_IMAGE;
           
           return (
             <Link key={index} href={`/blog/${post.slug}`}>
@@ -104,16 +108,12 @@ const RecommendedPosts = ({ currentBlogId }: RecommendedPostsProps) => {
                 h="full"
               >
                 <Box position="relative" aspectRatio={4 / 3} width="100%">
-                  {post.mainImage ? (
-                    <Image
-                      src={imageUrl}
-                      alt={post.title}
-                      fill
-                      style={{ objectFit: "cover" }}
-                    />
-                  ) : (
-                    <Box bg="gray.200" width="100%" height="100%" />
-                  )}
+                  <Image
+                    src={imageUrl}
+                    alt={post.title}
+                    fill
+                    style={{ objectFit: "cover" }}
+                  />
                 </Box>
                 <CardBody p="5">
                   <VStack align="start" spacing="3">

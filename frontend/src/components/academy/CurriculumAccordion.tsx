@@ -26,6 +26,7 @@ import { CourseModule } from "@/types/academy";
 import { FaPlayCircle, FaFileAlt, FaQuestionCircle, FaFileUpload, FaClock, FaLock, FaBook, FaPlay } from "react-icons/fa";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import { normalizeMarkdownForRender } from "@/lib/markdown-utils";
+import NativeYouTubePlayer from "@/components/student/course/NativeYouTubePlayer";
 
 interface CurriculumAccordionProps {
   modules: CourseModule[];
@@ -37,6 +38,7 @@ export default function CurriculumAccordion({ modules, isEnrolled = false, showL
   const [expandedIndexes, setExpandedIndexes] = useState<number[]>([0]);
   const [selectedLesson, setSelectedLesson] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const isVideoLesson = selectedLesson?.type === "VIDEO" && !!selectedLesson?.videoUrl;
 
   // Show fallback UI if no modules are available
   if (!modules || modules.length === 0) {
@@ -110,301 +112,256 @@ export default function CurriculumAccordion({ modules, isEnrolled = false, showL
     return /(?:youtube\.com|youtu\.be)/.test(url);
   };
 
-  const getYouTubeVideoId = (url: string) => {
-    if (!url) return null;
-    const patterns = [
-      /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
-      /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
-      /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-    ];
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match && match[1]) return match[1];
-    }
-    return null;
-  };
-
   return (
     <>
       <Accordion
-      allowMultiple
-      index={expandedIndexes}
-      onChange={(indexes) => setExpandedIndexes(indexes as number[])}
-    >
-      {modules.map((module, moduleIndex) => {
-        const totalDuration = module.lessons.reduce((sum, lesson) => sum + lesson.duration, 0);
-        // Count preview lessons: individual preview lessons OR all lessons if module has marketing visibility and not enrolled
-        const previewLessons = isEnrolled 
-          ? 0 
-          : module.lessons.filter((l) => l.isPreview || module.isVisibleForMarketing).length;
+        allowMultiple
+        index={expandedIndexes}
+        onChange={(indexes) => setExpandedIndexes(indexes as number[])}
+      >
+        {modules.map((module, moduleIndex) => {
+          const totalDuration = module.lessons.reduce((sum, lesson) => sum + lesson.duration, 0);
+          // Count preview lessons: individual preview lessons OR all lessons if module has marketing visibility and not enrolled
+          const previewLessons = isEnrolled
+            ? 0
+            : module.lessons.filter((l) => l.isPreview || module.isVisibleForMarketing).length;
 
-        return (
-          <AccordionItem key={module.id} border="1px" borderColor="gray.200" _dark={{ borderColor: "gray.700" }} mb="2" borderRadius="md">
-            <AccordionButton
-              _hover={{ bg: "gray.50", _dark: { bg: "gray.800" } }}
-              p="4"
-              borderRadius="md"
-            >
-              <Box flex="1" textAlign="left">
-                <HStack justify="space-between" align="start" spacing="4">
-                  <VStack align="start" spacing="1" flex="1">
-                    <HStack>
-                      <Badge colorScheme="blue" fontSize="xs">
-                        Module {module.order}
-                      </Badge>
-                      <Text fontWeight="bold" fontSize="md">
-                        {module.title}
-                      </Text>
-                      {module.isVisibleForMarketing && !isEnrolled && (
-                        <Badge colorScheme="green" fontSize="xs">
-                          Free Preview
+          return (
+            <AccordionItem key={module.id} border="1px" borderColor="gray.200" _dark={{ borderColor: "gray.700" }} mb="2" borderRadius="md">
+              <AccordionButton
+                _hover={{ bg: "gray.50", _dark: { bg: "gray.800" } }}
+                p="4"
+                borderRadius="md"
+              >
+                <Box flex="1" textAlign="left">
+                  <HStack justify="space-between" align="start" spacing="4">
+                    <VStack align="start" spacing="1" flex="1">
+                      <HStack>
+                        <Badge colorScheme="blue" fontSize="xs">
+                          Module {module.order}
                         </Badge>
-                      )}
-                    </HStack>
-                    <Text fontSize="sm" color="gray.600" _dark={{ color: "gray.400" }} whiteSpace="pre-wrap">
-                      {module.description}
-                    </Text>
-                  </VStack>
-                  <VStack align="end" spacing="0" minW="120px">
-                    <Text fontSize="xs" color="gray.500">
-                      {module.lessons.length} lessons
-                    </Text>
-                    <HStack spacing="1" fontSize="xs" color="gray.500">
-                      <FaClock />
-                      <Text>{totalDuration} min</Text>
-                    </HStack>
-                    {previewLessons > 0 && (
-                      <Text fontSize="xs" color="green.600" _dark={{ color: "green.400" }}>
-                        {previewLessons} preview
+                        <Text fontWeight="bold" fontSize="md">
+                          {module.title}
+                        </Text>
+                        {module.isVisibleForMarketing && !isEnrolled && (
+                          <Badge colorScheme="green" fontSize="xs">
+                            Free Preview
+                          </Badge>
+                        )}
+                      </HStack>
+                      <Text fontSize="sm" color="gray.600" _dark={{ color: "gray.400" }} whiteSpace="pre-wrap">
+                        {module.description}
                       </Text>
-                    )}
-                  </VStack>
-                </HStack>
-              </Box>
-              <AccordionIcon ml="2" />
-            </AccordionButton>
-            <AccordionPanel pb="4" px="4">
-              <VStack align="stretch" spacing="2">
-                {module.lessons.map((lesson, lessonIndex) => {
-                  // Lesson is accessible if: enrolled, lesson has preview enabled, or module has marketing preview enabled
-                  const canAccess = isEnrolled || lesson.isPreview || module.isVisibleForMarketing;
-                  const LessonIcon = getLessonIcon(lesson.type);
+                    </VStack>
+                    <VStack align="end" spacing="0" minW="120px">
+                      <Text fontSize="xs" color="gray.500">
+                        {module.lessons.length} lessons
+                      </Text>
+                      <HStack spacing="1" fontSize="xs" color="gray.500">
+                        <FaClock />
+                        <Text>{totalDuration} min</Text>
+                      </HStack>
+                      {previewLessons > 0 && (
+                        <Text fontSize="xs" color="green.600" _dark={{ color: "green.400" }}>
+                          {previewLessons} preview
+                        </Text>
+                      )}
+                    </VStack>
+                  </HStack>
+                </Box>
+                <AccordionIcon ml="2" />
+              </AccordionButton>
+              <AccordionPanel pb="4" px="4">
+                <VStack align="stretch" spacing="2">
+                  {module.lessons.map((lesson, lessonIndex) => {
+                    // Lesson is accessible if: enrolled, lesson has preview enabled, or module has marketing preview enabled
+                    const canAccess = isEnrolled || lesson.isPreview || module.isVisibleForMarketing;
+                    const LessonIcon = getLessonIcon(lesson.type);
 
-                  return (
-                    <HStack
-                      key={lesson.id}
-                      p="3"
-                      borderRadius="md"
-                      bg={canAccess ? "gray.50" : "gray.100"}
-                      _dark={{
-                        bg: canAccess ? "gray.700" : "gray.800",
-                      }}
-                      justify="space-between"
-                      opacity={canAccess ? 1 : 0.6}
-                      cursor={canAccess ? "pointer" : "not-allowed"}
-                      _hover={
-                        canAccess
-                          ? { bg: "blue.50", _dark: { bg: "gray.600" } }
-                          : undefined
-                      }
-                      transition="all 0.2s"
-                      onClick={() => canAccess && handleLessonClick(lesson)}
-                    >
-                      <HStack spacing="3" flex="1">
-                        <Icon
-                          as={LessonIcon}
-                          color={`${getLessonTypeColor(lesson.type)}.500`}
-                          boxSize="18px"
-                        />
-                        <VStack align="start" spacing="0" flex="1">
-                          <HStack>
-                            <Text fontSize="sm" fontWeight="medium">
-                              {lessonIndex + 1}. {lesson.title}
-                            </Text>
-                            {lesson.isPreview && (
-                              <Badge colorScheme="green" fontSize="xs">
-                                Preview
-                              </Badge>
+                    return (
+                      <HStack
+                        key={lesson.id}
+                        p="3"
+                        borderRadius="md"
+                        bg={canAccess ? "gray.50" : "gray.100"}
+                        _dark={{
+                          bg: canAccess ? "gray.700" : "gray.800",
+                        }}
+                        justify="space-between"
+                        opacity={canAccess ? 1 : 0.6}
+                        cursor={canAccess ? "pointer" : "not-allowed"}
+                        _hover={
+                          canAccess
+                            ? { bg: "blue.50", _dark: { bg: "gray.600" } }
+                            : undefined
+                        }
+                        transition="all 0.2s"
+                        onClick={() => canAccess && handleLessonClick(lesson)}
+                      >
+                        <HStack spacing="3" flex="1">
+                          <Icon
+                            as={LessonIcon}
+                            color={`${getLessonTypeColor(lesson.type)}.500`}
+                            boxSize="18px"
+                          />
+                          <VStack align="start" spacing="0" flex="1">
+                            <HStack>
+                              <Text fontSize="sm" fontWeight="medium">
+                                {lessonIndex + 1}. {lesson.title}
+                              </Text>
+                              {lesson.isPreview && (
+                                <Badge colorScheme="green" fontSize="xs">
+                                  Preview
+                                </Badge>
+                              )}
+                            </HStack>
+                            {lesson.description && (
+                              <Text
+                                fontSize="xs"
+                                color="gray.600"
+                                _dark={{ color: "gray.400" }}
+                                noOfLines={1}
+                                whiteSpace="pre-wrap"
+                              >
+                                {lesson.description}
+                              </Text>
                             )}
-                          </HStack>
-                          {lesson.description && (
-                            <Text
-                              fontSize="xs"
-                              color="gray.600"
-                              _dark={{ color: "gray.400" }}
-                              noOfLines={1}
-                              whiteSpace="pre-wrap"
-                            >
-                              {lesson.description}
-                            </Text>
-                          )}
-                        </VStack>
-                      </HStack>
-                      <HStack spacing="3">
-                        <HStack spacing="1" fontSize="xs" color="gray.500">
-                          <FaClock />
-                          <Text>{lesson.duration} min</Text>
+                          </VStack>
                         </HStack>
-                        {!canAccess && <Icon as={FaLock} color="gray.400" boxSize="14px" />}
+                        <HStack spacing="3">
+                          <HStack spacing="1" fontSize="xs" color="gray.500">
+                            <FaClock />
+                            <Text>{lesson.duration} min</Text>
+                          </HStack>
+                          {!canAccess && <Icon as={FaLock} color="gray.400" boxSize="14px" />}
+                        </HStack>
                       </HStack>
-                    </HStack>
-                  );
-                })}
-              </VStack>
-            </AccordionPanel>
-          </AccordionItem>
-        );
-      })}
-    </Accordion>
+                    );
+                  })}
+                </VStack>
+              </AccordionPanel>
+            </AccordionItem>
+          );
+        })}
+      </Accordion>
 
-    {/* Lesson Content Modal */}
-    <Modal isOpen={isModalOpen} onClose={closeModal} size="6xl">
-      <ModalOverlay />
-      <ModalContent maxH="95vh" overflowY="auto" bg="white" _dark={{ bg: "gray.900" }}>
-        <ModalHeader borderBottomWidth="1px" borderColor="gray.200" _dark={{ borderColor: "gray.700" }}>
-          <VStack align="start" spacing="2">
-            <Text fontSize="lg" fontWeight="bold">
-              {selectedLesson?.title}
-            </Text>
-            <Badge colorScheme={getLessonTypeColor(selectedLesson?.type) as any} fontSize="xs">
-              {selectedLesson?.type === "VIDEO"
-                ? "Video"
-                : selectedLesson?.type === "ARTICLE"
-                ? "Article"
-                : selectedLesson?.type === "QUIZ"
-                ? "Quiz"
-                : "Assignment"}
-            </Badge>
-          </VStack>
-        </ModalHeader>
-        <ModalCloseButton />
-        <ModalBody pb="8" pt="6">
-          <VStack spacing="8" align="stretch">
-            {/* Video Lesson - YouTube or HTML5 */}
-            {selectedLesson?.type === "VIDEO" && selectedLesson?.videoUrl && (
-              <Box>
-                <Box
-                  bg="black"
-                  borderRadius="lg"
-                  overflow="hidden"
-                  w="100%"
-                  aspectRatio="16/9"
-                >
-                  {isYouTubeUrl(selectedLesson.videoUrl) ? (
-                    // YouTube Video
-                    <iframe
-                      width="100%"
-                      height="100%"
-                      src={`https://www.youtube.com/embed/${getYouTubeVideoId(selectedLesson.videoUrl)}?modestbranding=1`}
-                      title={selectedLesson.title}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      style={{ width: "100%", height: "100%" }}
+      {/* Lesson Content Modal */}
+      <Modal isOpen={isModalOpen} onClose={closeModal} size={isVideoLesson ? "7xl" : "6xl"} isCentered>
+        <ModalOverlay />
+        <ModalContent
+          maxH="95vh"
+          maxW={isVideoLesson ? "min(96vw, 1280px)" : undefined}
+          overflowY={isVideoLesson ? "hidden" : "auto"}
+          bg="white"
+          _dark={{ bg: "gray.900" }}
+        >
+          <ModalHeader borderBottomWidth="1px" borderColor="gray.200" _dark={{ borderColor: "gray.700" }}>
+            <VStack align="start" spacing="2">
+              <Text fontSize="lg" fontWeight="bold">
+                {selectedLesson?.title}
+              </Text>
+              <Badge colorScheme={getLessonTypeColor(selectedLesson?.type) as any} fontSize="xs">
+                {selectedLesson?.type === "VIDEO"
+                  ? "Video"
+                  : selectedLesson?.type === "ARTICLE"
+                    ? "Article"
+                    : selectedLesson?.type === "QUIZ"
+                      ? "Quiz"
+                      : "Assignment"}
+              </Badge>
+            </VStack>
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb="6" pt="5" overflowY={isVideoLesson ? "hidden" : "auto"}>
+            <VStack spacing={isVideoLesson ? "5" : "8"} align="stretch">
+              {/* Video Lesson - YouTube or HTML5 */}
+              {selectedLesson?.type === "VIDEO" && selectedLesson?.videoUrl && (
+                <Box>
+                  <Box
+                    bg="black"
+                    borderRadius="lg"
+                    overflow="hidden"
+                    w="100%"
+                    maxW="calc((95vh - 260px) * 16 / 9)"
+                    mx="auto"
+                  >
+                    {isYouTubeUrl(selectedLesson.videoUrl) ? (
+                      <NativeYouTubePlayer url={selectedLesson.videoUrl} />
+                    ) : (
+                      <Box aspectRatio="16/9" w="100%">
+                        <video
+                          width="100%"
+                          height="100%"
+                          controls
+                          controlsList="nodownload"
+                          style={{ width: "100%", height: "100%" }}
+                        >
+                          <source src={selectedLesson.videoUrl} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      </Box>
+                    )}
+                  </Box>
+                </Box>
+              )}
+
+              {/* Article Lesson - Markdown Preview */}
+              {selectedLesson?.type === "ARTICLE" && selectedLesson?.articleContent && (
+                <Box w="100%">
+                  <Box
+                    borderRadius="lg"
+                    overflow="hidden"
+                    bg="gray.50"
+                    _dark={{ bg: "gray.800" }}
+                    p="6"
+                    className="lesson-article-markdown-wrapper"
+                  >
+                    <MarkdownPreview
+                      source={normalizeMarkdownForRender(selectedLesson.articleContent)}
+                      wrapperElement={{ "data-color-mode": "dark" }}
+                      className="lesson-article-markdown"
                     />
-                  ) : (
-                    // HTML5 Video
-                    <video
-                      width="100%"
-                      height="100%"
-                      controls
-                      controlsList="nodownload"
-                      style={{ width: "100%", height: "100%" }}
-                    >
-                      <source src={selectedLesson.videoUrl} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  )}
+                  </Box>
                 </Box>
-              </Box>
-            )}
+              )}
 
-            {/* Article Lesson - Markdown Preview */}
-            {selectedLesson?.type === "ARTICLE" && selectedLesson?.articleContent && (
-              <Box w="100%">
-                <Box
-                  borderRadius="lg"
-                  overflow="hidden"
-                  bg="gray.50"
-                  _dark={{ bg: "gray.800" }}
-                  p="6"
-                  className="lesson-article-markdown-wrapper"
-                >
-                  <MarkdownPreview
-                    source={normalizeMarkdownForRender(selectedLesson.articleContent)}
-                    wrapperElement={{ "data-color-mode": "dark" }}
-                    className="lesson-article-markdown"
-                  />
+              {/* Quiz Placeholder */}
+              {selectedLesson?.type === "QUIZ" && (
+                <Box p="6" borderRadius="lg" bg="purple.50" border="2px dashed" borderColor="purple.200" _dark={{ bg: "purple.900/20", borderColor: "purple.700" }}>
+                  <VStack spacing="3">
+                    <Icon as={FaQuestionCircle} boxSize="8" color="purple.500" />
+                    <VStack spacing="1" textAlign="center">
+                      <Text fontWeight="semibold" color="purple.900" _dark={{ color: "purple.100" }}>
+                        Interactive Quiz
+                      </Text>
+                      <Text fontSize="sm" color="purple.700" _dark={{ color: "purple.300" }}>
+                        To take this quiz, please enroll in the course
+                      </Text>
+                    </VStack>
+                  </VStack>
                 </Box>
-              </Box>
-            )}
+              )}
 
-            {/* Lesson Description */}
-            {selectedLesson?.description && selectedLesson?.type !== "ARTICLE" && (
-              <Box p="4" borderRadius="lg" bg="blue.50" _dark={{ bg: "blue.900/20" }} border="1px solid" borderColor="blue.200" _dark={{ borderColor: "blue.700" }}>
-                <Text fontWeight="semibold" mb="2" fontSize="sm">
-                  About This Lesson
-                </Text>
-                <Text fontSize="sm" color="gray.700" _dark={{ color: "gray.300" }} whiteSpace="pre-wrap">
-                  {selectedLesson.description}
-                </Text>
-              </Box>
-            )}
-
-            {/* Lesson Duration */}
-            {/* <HStack spacing="4" p="4" borderRadius="lg" bg="gray.50" _dark={{ bg: "gray.800" }}>
-              <Icon as={FaClock} color="gray.500" boxSize="5" />
-              <VStack align="start" spacing="0">
-                <Text fontSize="xs" color="gray.500">
-                  Duration
-                </Text>
-                <Text fontWeight="semibold">
-                  {selectedLesson?.duration} minutes
-                </Text>
-              </VStack>
-            </HStack> */}
-
-            {/* Quiz Placeholder */}
-            {selectedLesson?.type === "QUIZ" && (
-              <Box p="6" borderRadius="lg" bg="purple.50" _dark={{ bg: "purple.900/20" }} border="2px dashed" borderColor="purple.200" _dark={{ borderColor: "purple.700" }}>
-                <VStack spacing="3">
-                  <Icon as={FaQuestionCircle} boxSize="8" color="purple.500" />
-                  <VStack spacing="1" textAlign="center">
-                    <Text fontWeight="semibold" color="purple.900" _dark={{ color: "purple.100" }}>
-                      Interactive Quiz
-                    </Text>
-                    <Text fontSize="sm" color="purple.700" _dark={{ color: "purple.300" }}>
-                      To take this quiz, please enroll in the course
-                    </Text>
+              {/* Assignment Placeholder */}
+              {selectedLesson?.type === "ASSIGNMENT" && (
+                <Box p="6" borderRadius="lg" bg="orange.50" border="2px dashed" borderColor="orange.200" _dark={{ bg: "orange.900/20", borderColor: "orange.700" }}>
+                  <VStack spacing="3">
+                    <Icon as={FaFileUpload} boxSize="8" color="orange.500" />
+                    <VStack spacing="1" textAlign="center">
+                      <Text fontWeight="semibold" color="orange.900" _dark={{ color: "orange.100" }}>
+                        Assignment
+                      </Text>
+                      <Text fontSize="sm" color="orange.700" _dark={{ color: "orange.300" }}>
+                        To submit this assignment, please enroll in the course
+                      </Text>
+                    </VStack>
                   </VStack>
-                </VStack>
-              </Box>
-            )}
+                </Box>
+              )}
 
-            {/* Assignment Placeholder */}
-            {selectedLesson?.type === "ASSIGNMENT" && (
-              <Box p="6" borderRadius="lg" bg="orange.50" _dark={{ bg: "orange.900/20" }} border="2px dashed" borderColor="orange.200" _dark={{ borderColor: "orange.700" }}>
-                <VStack spacing="3">
-                  <Icon as={FaFileUpload} boxSize="8" color="orange.500" />
-                  <VStack spacing="1" textAlign="center">
-                    <Text fontWeight="semibold" color="orange.900" _dark={{ color: "orange.100" }}>
-                      Assignment
-                    </Text>
-                    <Text fontSize="sm" color="orange.700" _dark={{ color: "orange.300" }}>
-                      To submit this assignment, please enroll in the course
-                    </Text>
-                  </VStack>
-                </VStack>
-              </Box>
-            )}
+            </VStack>
 
-            {/* Close Button */}
-            {/* <Button onClick={closeModal} colorScheme="primary" w="100%" size="lg">
-              Close
-            </Button> */}
-          </VStack>
-
-          <style jsx global>{`
+            <style jsx global>{`
             .lesson-article-markdown-wrapper {
               overflow-x: auto;
             }
@@ -531,9 +488,9 @@ export default function CurriculumAccordion({ modules, isEnrolled = false, showL
               text-decoration: underline !important;
             }
           `}</style>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </>
   );
 }

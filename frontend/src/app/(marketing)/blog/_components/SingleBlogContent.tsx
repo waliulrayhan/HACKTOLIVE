@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import {
   Box,
   Container,
@@ -35,6 +37,8 @@ import LikeButton from "./LikeButton";
 import NewsletterSection from "./NewsletterSection";
 import RecommendedPosts from "./RecommendedPosts";
 import CommentSection from "./CommentSection";
+
+const FALLBACK_BLOG_IMAGE = "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=1600&auto=format&fit=crop";
 
 interface Blog {
   _id?: string;
@@ -77,9 +81,12 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
   const blogId = blog._id || blog.id || '';
 
   // Construct full image URLs
-  const mainImageUrl = blog.mainImage?.startsWith('http') 
-    ? blog.mainImage 
-    : `${process.env.NEXT_PUBLIC_API_URL}${blog.mainImage}`;
+  const resolvedMainImageUrl = blog.mainImage
+    ? (blog.mainImage.startsWith("http")
+        ? blog.mainImage
+        : `${process.env.NEXT_PUBLIC_API_URL}${blog.mainImage}`)
+    : FALLBACK_BLOG_IMAGE;
+  const [mainImageSrc, setMainImageSrc] = useState(resolvedMainImageUrl);
   
   const avatarUrl = blog.author?.avatar 
     ? (blog.author.avatar.startsWith('http') 
@@ -549,25 +556,28 @@ export default function SingleBlogContent({ blog }: SingleBlogContentProps) {
                       )}
 
                       {/* Featured Image (4:3) */}
-                      {blog.mainImage && (
-                        <Box
-                          position="relative"
-                          width="100%"
-                          aspectRatio={4 / 3}
-                          borderRadius="xl"
-                          overflow="hidden"
-                          borderWidth="1px"
-                          borderColor={borderColor}
-                        >
-                          <Image
-                            src={mainImageUrl}
-                            alt={blog.title}
-                            fill
-                            style={{ objectFit: "cover" }}
-                            sizes="(max-width: 768px) 100vw, 900px"
-                          />
-                        </Box>
-                      )}
+                      <Box
+                        position="relative"
+                        width="100%"
+                        aspectRatio={4 / 3}
+                        borderRadius="xl"
+                        overflow="hidden"
+                        borderWidth="1px"
+                        borderColor={borderColor}
+                      >
+                        <Image
+                          src={mainImageSrc}
+                          alt={blog.title}
+                          fill
+                          onError={() => {
+                            if (mainImageSrc !== FALLBACK_BLOG_IMAGE) {
+                              setMainImageSrc(FALLBACK_BLOG_IMAGE);
+                            }
+                          }}
+                          style={{ objectFit: "cover" }}
+                          sizes="(max-width: 768px) 100vw, 900px"
+                        />
+                      </Box>
 
                       {/* Main Content */}
                       {blog.content ? (

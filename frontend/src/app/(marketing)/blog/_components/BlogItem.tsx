@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { Blog } from "@/types/blog";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,6 +22,8 @@ import {
 } from "@chakra-ui/react";
 import { FiStar, FiCalendar, FiClock } from "react-icons/fi";
 
+const FALLBACK_BLOG_IMAGE = "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=1600&auto=format&fit=crop";
+
 const BlogItem = ({ blog }: { blog: Blog }) => {
   const { 
     mainImage, 
@@ -36,10 +39,13 @@ const BlogItem = ({ blog }: { blog: Blog }) => {
     featured 
   } = blog;
   
-  // Construct full image URL if path is relative
-  const imageUrl = mainImage.startsWith('http') 
-    ? mainImage 
-    : `${process.env.NEXT_PUBLIC_API_URL}${mainImage}`;
+  // Construct full image URL if path is relative, otherwise use fallback.
+  const resolvedImageUrl = mainImage
+    ? (mainImage.startsWith("http")
+        ? mainImage
+        : `${process.env.NEXT_PUBLIC_API_URL}${mainImage}`)
+    : FALLBACK_BLOG_IMAGE;
+  const [imageSrc, setImageSrc] = useState(resolvedImageUrl);
   
   const avatarUrl = author.avatar 
     ? (author.avatar.startsWith('http') 
@@ -118,9 +124,14 @@ const BlogItem = ({ blog }: { blog: Blog }) => {
             flexShrink="0"
           >
             <Image 
-              src={imageUrl} 
+              src={imageSrc} 
               alt={title} 
               fill 
+              onError={() => {
+                if (imageSrc !== FALLBACK_BLOG_IMAGE) {
+                  setImageSrc(FALLBACK_BLOG_IMAGE);
+                }
+              }}
               style={{ objectFit: "cover" }}
             />
             <Box
