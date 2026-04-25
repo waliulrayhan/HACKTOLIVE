@@ -683,14 +683,36 @@ export class StudentService {
       where: { studentId: student.id },
       include: {
         quiz: {
-          include: {
+          select: {
+            id: true,
+            title: true,
+            passingScore: true,
             lesson: {
-              include: {
+              select: {
+                id: true,
+                title: true,
                 module: {
-                  include: {
-                    course: true,
+                  select: {
+                    id: true,
+                    title: true,
+                    course: {
+                      select: {
+                        id: true,
+                        title: true,
+                      },
+                    },
                   },
                 },
+              },
+            },
+            questions: {
+              select: {
+                id: true,
+                question: true,
+                type: true,
+                options: true,
+                order: true,
+                // SECURITY FIX: Excluded correctAnswer
               },
             },
           },
@@ -746,6 +768,15 @@ export class StudentService {
         quizzes: {
           include: {
             questions: {
+              select: {
+                id: true,
+                question: true,
+                type: true,
+                options: true,
+                order: true,
+                explanation: true,
+                // SECURITY FIX: Excluded correctAnswer
+              },
               orderBy: {
                 order: 'asc',
               },
@@ -964,13 +995,6 @@ export class StudentService {
         answers: JSON.stringify(answers),
         passed,
       },
-      include: {
-        quiz: {
-          include: {
-            questions: true,
-          },
-        },
-      },
     });
 
     // If passed, mark lesson as complete
@@ -978,11 +1002,50 @@ export class StudentService {
       await this.markLessonComplete(userId, quiz.lessonId);
     }
 
+    // Build detailed answer comparison for result view
+    const answerDetails = quiz.questions.map((question) => {
+      const studentAnswer = answers[question.id];
+      
+      const isCorrect = () => {
+        if (!studentAnswer) return false;
+        
+        if (question.type === 'MULTIPLE_SELECT') {
+          const studentOptions = studentAnswer
+            .split(',')
+            .map(opt => opt.trim())
+            .sort()
+            .join(',');
+          const correctOptions = question.correctAnswer
+            .split(',')
+            .map(opt => opt.trim())
+            .sort()
+            .join(',');
+          return studentOptions === correctOptions;
+        }
+        
+        return studentAnswer === question.correctAnswer;
+      };
+
+      return {
+        id: question.id,
+        question: question.question,
+        type: question.type,
+        options: question.options,
+        studentAnswer: studentAnswer || 'Not answered',
+        correctAnswer: question.correctAnswer,
+        isCorrect: isCorrect(),
+        explanation: question.explanation || '',
+      };
+    });
+
+    // Return detailed response with answer comparison
     return {
-      attempt,
-      correctAnswers,
-      totalQuestions,
-      passed,
+      score: attempt.score,
+      passed: attempt.passed,
+      message: attempt.passed 
+        ? 'Congratulations! You passed the quiz.' 
+        : `You need ${quiz.passingScore}% to pass. Try again!`,
+      answers: answerDetails,
     };
   }
 

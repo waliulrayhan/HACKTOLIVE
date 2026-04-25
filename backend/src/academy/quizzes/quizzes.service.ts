@@ -50,6 +50,15 @@ export class QuizzesService {
       where: { id },
       include: {
         questions: {
+          select: {
+            id: true,
+            question: true,
+            type: true,
+            options: true,
+            order: true,
+            explanation: true,
+            // SECURITY FIX: Excluded correctAnswer from public API response
+          },
           orderBy: {
             order: 'asc',
           },
@@ -78,6 +87,15 @@ export class QuizzesService {
       where: { lessonId },
       include: {
         questions: {
+          select: {
+            id: true,
+            question: true,
+            type: true,
+            options: true,
+            order: true,
+            explanation: true,
+            // SECURITY FIX: Excluded correctAnswer from public API response
+          },
           orderBy: {
             order: 'asc',
           },

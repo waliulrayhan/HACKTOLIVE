@@ -224,7 +224,17 @@ export class CoursesService {
             lessons: {
               include: {
                 resources: true,
-                quizzes: true,
+                quizzes: {
+                  select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    passingScore: true,
+                    timeLimit: true,
+                    // SECURITY FIX: Excluded questions and questions.correctAnswer
+                    // Students should fetch questions through dedicated /academy/quizzes/:id endpoint
+                  },
+                },
                 assignments: true,
               },
               orderBy: {

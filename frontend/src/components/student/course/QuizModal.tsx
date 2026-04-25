@@ -20,7 +20,7 @@ interface QuizQuestion {
   question: string;
   type: string;
   options: string | string[];
-  correctAnswer: string;
+  correctAnswer?: string; // SECURITY: Now optional - not sent to students
   explanation?: string;
   order: number;
 }
@@ -418,126 +418,105 @@ export default function QuizModal({
 
           {/* Result Mode */}
           {mode === "result" && result && (
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-4">
               {/* Result Summary */}
-              <div
-                className={`text-center p-8 rounded-2xl ${
-                  result.passed
-                    ? "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20"
-                    : "bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20"
-                }`}
-              >
+              <div className="text-center py-6">
                 <div
-                  className={`flex h-20 w-20 mx-auto items-center justify-center rounded-full mb-4 ${
+                  className={`flex h-16 w-16 mx-auto items-center justify-center rounded-full mb-4 ${
                     result.passed
                       ? "bg-green-100 dark:bg-green-900/30"
                       : "bg-red-100 dark:bg-red-900/30"
                   }`}
                 >
                   {result.passed ? (
-                    <HiOutlineCheckCircle className="h-10 w-10 text-green-600 dark:text-green-400" />
+                    <HiOutlineCheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
                   ) : (
-                    <HiOutlineXCircle className="h-10 w-10 text-red-600 dark:text-red-400" />
+                    <HiOutlineXCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
                   )}
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                  {result.passed ? "Congratulations! 🎉" : "Keep Trying! 💪"}
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">
+                  {result.passed ? "Quiz Passed" : "Quiz Failed"}
                 </h3>
-                <p className="text-5xl font-bold text-gray-900 dark:text-white mb-2">
+                <p className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
                   {result.score || result.attempt?.score || 0}%
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {result.passed
-                    ? "You've successfully passed the quiz!"
-                    : `You need ${quiz.passingScore}% to pass. Review the material and try again!`}
+                    ? "Great work!"
+                    : `Pass score: ${quiz.passingScore}%`}
                 </p>
               </div>
+              <div className="border-t border-gray-200 dark:border-gray-700" />
 
-              {/* Question Review */}
-              <div className="space-y-3">
-                <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-                  Question Review
-                </h4>
-                {sortedQuestions.map((question, index) => {
-                  const rawStudentAnswer = result.attempt?.answers
-                    ? JSON.parse(result.attempt.answers)[question.id]
-                    : answers[question.id];
-                  
-                  // Format answer for display (handle arrays from local state)
-                  const studentAnswer = Array.isArray(rawStudentAnswer) 
-                    ? rawStudentAnswer.join(", ") 
-                    : rawStudentAnswer;
-                  
-                  // For comparison, also format for MULTIPLE_SELECT questions
-                  const normalizeAnswer = (ans: string | string[]) => {
-                    if (!ans) return "";
-                    const ansStr = Array.isArray(ans) ? ans.join(", ") : ans;
-                    // Sort comma-separated values for comparison
-                    return ansStr.split(',').map(s => s.trim()).sort().join(', ');
-                  };
-                  
-                  const isCorrect = normalizeAnswer(rawStudentAnswer) === normalizeAnswer(question.correctAnswer);
-
-                  return (
-                    <div
-                      key={question.id}
-                      className={`p-4 rounded-xl border-2 ${
-                        isCorrect
-                          ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
-                          : "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20"
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div
-                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
-                            isCorrect
-                              ? "bg-green-200 dark:bg-green-800"
-                              : "bg-red-200 dark:bg-red-800"
-                          }`}
-                        >
-                          {isCorrect ? (
-                            <HiOutlineCheckCircle className="h-4 w-4 text-green-700 dark:text-green-300" />
-                          ) : (
-                            <HiOutlineXCircle className="h-4 w-4 text-red-700 dark:text-red-300" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                            Q{index + 1}: {question.question}
-                          </p>
-                          <div className="space-y-1 text-sm">
-                            <p>
-                              <span className="text-gray-600 dark:text-gray-400">Your answer: </span>
-                              <span className={isCorrect ? "text-green-700 dark:text-green-400" : "text-red-700 dark:text-red-400"}>
-                                {studentAnswer || "Not answered"}
-                              </span>
+              {/* Detailed Answer Review - Minimalist */}
+              {result.answers && result.answers.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Question Review
+                  </h4>
+                  <div className="space-y-3">
+                    {result.answers.map((answer, index) => (
+                      <div
+                        key={answer.id}
+                        className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
+                      >
+                        {/* Question */}
+                        <div className="flex items-start gap-2 mb-2">
+                          <span
+                            className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                              answer.isCorrect
+                                ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
+                                : "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
+                            }`}
+                          >
+                            {answer.isCorrect ? "✓" : "✕"}
+                          </span>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              {answer.question}
                             </p>
-                            {!isCorrect && (
-                              <p>
-                                <span className="text-gray-600 dark:text-gray-400">Correct: </span>
-                                <span className="text-green-700 dark:text-green-400">
-                                  {question.correctAnswer}
-                                </span>
-                              </p>
-                            )}
-                            {question.explanation && (
-                              <div className="mt-2 flex items-start gap-2 p-2 rounded-lg bg-white/50 dark:bg-black/20">
-                                <HiOutlineInformationCircle className="h-4 w-4 text-gray-500 shrink-0 mt-0.5" />
-                                <p className="text-gray-600 dark:text-gray-400">
-                                  {question.explanation}
-                                </p>
-                              </div>
-                            )}
                           </div>
                         </div>
+
+                        {/* Answer Comparison */}
+                        <div className="ml-7 space-y-2 text-sm">
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Your answer:</p>
+                            <p className={`font-medium ${
+                              answer.isCorrect
+                                ? "text-green-700 dark:text-green-400"
+                                : "text-red-700 dark:text-red-400"
+                            }`}>
+                              {answer.studentAnswer}
+                            </p>
+                          </div>
+
+                          {!answer.isCorrect && (
+                            <div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Correct answer:</p>
+                              <p className="font-medium text-green-700 dark:text-green-400">
+                                {answer.correctAnswer}
+                              </p>
+                            </div>
+                          )}
+
+                          {answer.explanation && (
+                            <div className="pt-1">
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Explanation:</p>
+                              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                                {answer.explanation}
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Actions */}
-              <div className="flex gap-3">
+              <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <Button onClick={onClose} variant="outline" className="flex-1">
                   Close
                 </Button>

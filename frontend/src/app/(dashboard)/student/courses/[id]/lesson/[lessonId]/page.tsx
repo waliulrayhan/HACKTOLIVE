@@ -433,19 +433,13 @@ export default function StudentLessonPage() {
       if (!response.ok) throw new Error("Failed to submit quiz");
 
       const data = await response.json();
-      
-      // Calculate score percentage from response
-      const scorePercentage = data.attempt?.score ?? 
-        (data.correctAnswers && data.totalQuestions 
-          ? Math.round((data.correctAnswers / data.totalQuestions) * 100) 
-          : 0);
-      
+
+      // Backend returns: { score, passed, message, answers }
       const result = {
-        score: scorePercentage,
+        score: data.score,
         passed: data.passed,
-        correctAnswers: data.correctAnswers,
-        totalQuestions: data.totalQuestions,
-        attempt: data.attempt
+        message: data.message,
+        answers: data.answers || [],
       };
       
       setQuizResult(result);
@@ -968,16 +962,13 @@ export default function StudentLessonPage() {
               if (!response.ok) throw new Error("Failed to submit quiz");
 
               const data = await response.json();
-              const scorePercentage = data.attempt?.score ?? 
-                (data.correctAnswers && data.totalQuestions 
-                  ? Math.round((data.correctAnswers / data.totalQuestions) * 100) 
-                  : 0);
 
+              // Backend returns: { score, passed, message, answers }
               return {
-                score: scorePercentage,
+                score: data.score,
                 passed: data.passed,
-                correctAnswers: data.correctAnswers,
-                totalQuestions: data.totalQuestions,
+                message: data.message,
+                answers: data.answers || [],
               };
             } catch (error) {
               toast.error("Failed to submit quiz");
