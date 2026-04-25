@@ -22,30 +22,25 @@ import {
   Stat,
   StatLabel,
   StatNumber,
-  StatHelpText,
   List,
   ListItem,
   ListIcon,
 } from '@chakra-ui/react'
+import { FiCheckCircle } from 'react-icons/fi'
 import {
-  FiTarget,
-  FiEye,
-  FiHeart,
-  FiAward,
-  FiShield,
-  FiUsers,
-  FiGlobe,
-  FiTrendingUp,
-  FiZap,
-  FiBook,
-  FiCheckCircle,
-  FiStar,
-  FiClock,
-  FiFlag,
-  FiLayers,
-  FiCode,
-} from 'react-icons/fi'
-import { BackgroundGradient } from '@/components/shared/gradients/background-gradient'
+  aboutAchievements,
+  aboutCallToAction,
+  aboutCertifications,
+  aboutHighlights,
+  aboutFeatures,
+  aboutHero,
+  aboutMilestones,
+  aboutMission,
+  aboutOverview,
+  aboutTeam,
+  aboutValues,
+  aboutVision,
+} from './_data/about'
 import { FallInPlace } from '@/components/shared/motion/fall-in-place'
 import { MotionBox } from '@/components/shared/motion/box'
 import { useEffect, useRef, useState } from 'react'
@@ -60,25 +55,12 @@ export default function AboutPage() {
   const sectionBg = useColorModeValue('gray.50', 'gray.900')
   const timelineBorderColor = useColorModeValue('primary.200', 'primary.700')
 
-  // Scroll animation states
-  const [scrollY, setScrollY] = useState(0)
-  const statsRef = useRef<HTMLDivElement>(null)
   const valuesRef = useRef<HTMLDivElement>(null)
-  const timelineRef = useRef<HTMLDivElement>(null)
   const achievementsRef = useRef<HTMLDivElement>(null)
 
   // Auto-scroll carousel for team
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isPaused, setIsPaused] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY)
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current
@@ -104,178 +86,6 @@ export default function AboutPage() {
     return () => cancelAnimationFrame(animationFrame)
   }, [isPaused])
 
-  const isInView = (ref: React.RefObject<HTMLDivElement>) => {
-    if (!ref.current) return false
-    const rect = ref.current.getBoundingClientRect()
-    return rect.top < window.innerHeight && rect.bottom > 0
-  }
-
-  const stats = [
-    { label: 'Students Trained', value: '5,000+', icon: FiUsers },
-    { label: 'Security Audits', value: '500+', icon: FiShield },
-    { label: 'CTF Challenges', value: '200+', icon: FiFlag },
-    { label: 'Years of Excellence', value: '5+', icon: FiAward },
-  ]
-
-  const values = [
-    {
-      icon: FiShield,
-      title: 'Security First',
-      description: 'We prioritize security in everything we do, ensuring the highest standards of protection for our clients and students.',
-    },
-    {
-      icon: FiHeart,
-      title: 'Integrity',
-      description: 'We maintain the highest ethical standards in all our operations, building trust through transparency and honesty.',
-    },
-    {
-      icon: FiUsers,
-      title: 'Community',
-      description: 'We foster a collaborative learning environment where knowledge sharing and mutual growth are encouraged.',
-    },
-    {
-      icon: FiTrendingUp,
-      title: 'Excellence',
-      description: 'We strive for excellence in our training programs, security services, and continuous innovation.',
-    },
-    {
-      icon: FiGlobe,
-      title: 'Accessibility',
-      description: 'We make cybersecurity education accessible to everyone through Bengali language content and affordable pricing.',
-    },
-    {
-      icon: FiZap,
-      title: 'Innovation',
-      description: 'We stay ahead of emerging threats and technologies, constantly updating our curriculum and methodologies.',
-    },
-  ]
-
-  const milestones = [
-    {
-      year: '2019',
-      title: 'Foundation',
-      description: 'HackToLive was founded with a vision to democratize cybersecurity education in Bangladesh.',
-    },
-    {
-      year: '2020',
-      title: 'First Academy Launch',
-      description: 'Launched our first ethical hacking course in Bengali, reaching 500+ students in the first year.',
-    },
-    {
-      year: '2021',
-      title: 'Service Expansion',
-      description: 'Expanded into professional security services, conducting our first penetration testing engagements.',
-    },
-    {
-      year: '2022',
-      title: 'CTF Platform',
-      description: 'Launched our Capture The Flag platform, hosting Bangladesh\'s largest cybersecurity competitions.',
-    },
-    {
-      year: '2023',
-      title: 'Industry Recognition',
-      description: 'Recognized as Bangladesh\'s leading cybersecurity education platform with 3,000+ active students.',
-    },
-    {
-      year: '2024',
-      title: 'Global Expansion',
-      description: 'Partnered with international organizations and expanded our reach to serve clients across South Asia.',
-    },
-  ]
-
-  const team = [
-    {
-      name: 'MD. Sabbir Ahmed',
-      role: 'Founder & CEO',
-      expertise: 'Offensive Security, OSCP',
-      avatar: 'https://i.pravatar.cc/150?img=1',
-    },
-    {
-      name: 'Fatima Rahman',
-      role: 'Head of Education',
-      expertise: 'Cybersecurity Training, CEH',
-      avatar: 'https://i.pravatar.cc/150?img=5',
-    },
-    {
-      name: 'Kamal Hassan',
-      role: 'Lead Security Consultant',
-      expertise: 'Penetration Testing, CISSP',
-      avatar: 'https://i.pravatar.cc/150?img=3',
-    },
-    {
-      name: 'Nusrat Jahan',
-      role: 'SOC Manager',
-      expertise: 'Threat Intelligence, GCIH',
-      avatar: 'https://i.pravatar.cc/150?img=9',
-    },
-    {
-      name: 'Rafiq Ahmed',
-      role: 'Chief Technology Officer',
-      expertise: 'Cloud Security, AWS Certified',
-      avatar: 'https://i.pravatar.cc/150?img=12',
-    },
-    {
-      name: 'Saima Hossain',
-      role: 'Head of Research',
-      expertise: 'Malware Analysis, GREM',
-      avatar: 'https://i.pravatar.cc/150?img=10',
-    },
-    {
-      name: 'Imran Khan',
-      role: 'Senior Red Team Lead',
-      expertise: 'Advanced Penetration Testing, OSEP',
-      avatar: 'https://i.pravatar.cc/150?img=13',
-    },
-    {
-      name: 'Ayesha Malik',
-      role: 'Compliance & Risk Manager',
-      expertise: 'ISO 27001, Risk Assessment',
-      avatar: 'https://i.pravatar.cc/150?img=16',
-    },
-  ]
-
-  const achievements = [
-    'First Bengali cybersecurity academy in Bangladesh',
-    'ISO 27001 certified security operations',
-    'Trained 5,000+ cybersecurity professionals',
-    'Conducted 500+ successful security audits',
-    'Partnership with leading tech companies',
-    'Active community of 10,000+ members',
-  ]
-
-  const certifications = [
-    {
-      name: 'ISO 27001',
-      description: 'Information Security Management System',
-      icon: FiShield,
-    },
-    {
-      name: 'OSCP',
-      description: 'Offensive Security Certified Professional',
-      icon: FiAward,
-    },
-    {
-      name: 'CEH',
-      description: 'Certified Ethical Hacker',
-      icon: FiCode,
-    },
-    {
-      name: 'CISSP',
-      description: 'Certified Information Systems Security Professional',
-      icon: FiShield,
-    },
-    {
-      name: 'GCIH',
-      description: 'GIAC Certified Incident Handler',
-      icon: FiFlag,
-    },
-    {
-      name: 'GREM',
-      description: 'GIAC Reverse Engineering Malware',
-      icon: FiLayers,
-    },
-  ]
-
   return (
     <Box>
       {/* Hero Section */}
@@ -284,7 +94,7 @@ export default function AboutPage() {
         overflow="hidden"
         pt={{ base: 32, md: 40 }}
         pb={{ base: 16, md: 20 }}
-        bgImage="url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2000')"
+        bgImage={`url('${aboutHero.backgroundImage}')`}
         bgPosition="center"
         bgSize="cover"
         bgRepeat="no-repeat"
@@ -312,7 +122,7 @@ export default function AboutPage() {
                 py={1}
                 borderRadius="full"
               >
-                About HackToLive
+                {aboutHero.badge}
               </Badge>
               <Heading
                 as="h1"
@@ -321,9 +131,9 @@ export default function AboutPage() {
                 color="white"
                 lineHeight="shorter"
               >
-                Empowering Bangladesh Through{' '}
+                {aboutHero.titlePrefix}{' '}
                 <Text as="span" color="green.400">
-                  Cybersecurity Excellence
+                  {aboutHero.titleAccent}
                 </Text>
               </Heading>
               <Text
@@ -331,8 +141,7 @@ export default function AboutPage() {
                 color="gray.200"
                 maxW="3xl"
               >
-                Bangladesh's premier cybersecurity platform, dedicated to providing professional
-                security services and ethical hacking training in Bengali.
+                {aboutHero.description}
               </Text>
             </VStack>
           </FallInPlace>
@@ -351,29 +160,27 @@ export default function AboutPage() {
                 transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
               >
                 <VStack align="start" spacing={6}>
-                  <Badge bg={useColorModeValue('green.200', 'green.700')}
-                    color={useColorModeValue('green.900', 'white')} fontSize="sm" px={4} py={1} borderRadius="full">
-                    Company Overview
+                  <Badge
+                    bg={useColorModeValue('green.200', 'green.700')}
+                    color={useColorModeValue('green.900', 'white')}
+                    fontSize="sm"
+                    px={4}
+                    py={1}
+                    borderRadius="full"
+                  >
+                    {aboutOverview.badge}
                   </Badge>
                   <Heading as="h2" fontSize={{ base: '3xl', md: '4xl' }}>
-                    Leading the Cybersecurity Revolution in Bangladesh
+                    {aboutOverview.heading}
                   </Heading>
                   <Text fontSize="lg" color={mutedColor} lineHeight="tall">
-                    Founded in 2019, HackToLive (H4K2LIV3) has emerged as Bangladesh's most
-                    trusted cybersecurity platform. We bridge the gap between traditional education
-                    and industry needs by providing world-class security training in Bengali, making
-                    cybersecurity accessible to millions.
+                    {aboutOverview.paragraphs[0]}
                   </Text>
                   <Text fontSize="lg" color={mutedColor} lineHeight="tall">
-                    Our comprehensive approach combines professional security services, hands-on
-                    training programs, and a vibrant community of ethical hackers. We've trained
-                    over 5,000 professionals and conducted 500+ successful security audits for
-                    leading organizations across South Asia.
+                    {aboutOverview.paragraphs[1]}
                   </Text>
                   <Text fontSize="lg" color={mutedColor} lineHeight="tall">
-                    What sets us apart is our commitment to quality education in Bengali, practical
-                    hands-on training, and real-world experience through CTF challenges and live projects.
-                    We're not just teaching cybersecurity – we're building Bangladesh's digital defense force.
+                    {aboutOverview.paragraphs[2]}
                   </Text>
                 </VStack>
               </MotionBox>
@@ -387,85 +194,28 @@ export default function AboutPage() {
                 transition={{ duration: 0.6, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
               >
                 <SimpleGrid columns={2} spacing={6}>
-                  <Card
-                    bg={cardBg}
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    _hover={{ transform: 'translateY(-4px)', shadow: 'lg' }}
-                    transition="all 0.3s"
-                  >
-                    <CardBody textAlign="center">
-                      <VStack spacing={3}>
-                        <Icon as={FiUsers} boxSize={12} color={iconColor} />
-                        <Stat textAlign="center">
-                          <StatNumber fontSize="3xl" fontWeight="bold" color={iconColor}>
-                            5,000+
-                          </StatNumber>
-                          <StatLabel color={mutedColor}>Students</StatLabel>
-                        </Stat>
-                      </VStack>
-                    </CardBody>
-                  </Card>
-
-                  <Card
-                    bg={cardBg}
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    _hover={{ transform: 'translateY(-4px)', shadow: 'lg' }}
-                    transition="all 0.3s"
-                  >
-                    <CardBody textAlign="center">
-                      <VStack spacing={3}>
-                        <Icon as={FiShield} boxSize={12} color={iconColor} />
-                        <Stat textAlign="center">
-                          <StatNumber fontSize="3xl" fontWeight="bold" color={iconColor}>
-                            500+
-                          </StatNumber>
-                          <StatLabel color={mutedColor}>Security Audits</StatLabel>
-                        </Stat>
-                      </VStack>
-                    </CardBody>
-                  </Card>
-
-                  <Card
-                    bg={cardBg}
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    _hover={{ transform: 'translateY(-4px)', shadow: 'lg' }}
-                    transition="all 0.3s"
-                  >
-                    <CardBody textAlign="center">
-                      <VStack spacing={3}>
-                        <Icon as={FiAward} boxSize={12} color={iconColor} />
-                        <Stat textAlign="center">
-                          <StatNumber fontSize="3xl" fontWeight="bold" color={iconColor}>
-                            50+
-                          </StatNumber>
-                          <StatLabel color={mutedColor}>Courses</StatLabel>
-                        </Stat>
-                      </VStack>
-                    </CardBody>
-                  </Card>
-
-                  <Card
-                    bg={cardBg}
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    _hover={{ transform: 'translateY(-4px)', shadow: 'lg' }}
-                    transition="all 0.3s"
-                  >
-                    <CardBody textAlign="center">
-                      <VStack spacing={3}>
-                        <Icon as={FiGlobe} boxSize={12} color={iconColor} />
-                        <Stat textAlign="center">
-                          <StatNumber fontSize="3xl" fontWeight="bold" color={iconColor}>
-                            10+
-                          </StatNumber>
-                          <StatLabel color={mutedColor}>Countries</StatLabel>
-                        </Stat>
-                      </VStack>
-                    </CardBody>
-                  </Card>
+                  {aboutOverview.metrics.map((metric) => (
+                    <Card
+                      key={metric.label}
+                      bg={cardBg}
+                      borderWidth="1px"
+                      borderColor={borderColor}
+                      _hover={{ transform: 'translateY(-4px)', shadow: 'lg' }}
+                      transition="all 0.3s"
+                    >
+                      <CardBody textAlign="center">
+                        <VStack spacing={3}>
+                          <Icon as={metric.icon} boxSize={12} color={iconColor} />
+                          <Stat textAlign="center">
+                            <StatNumber fontSize="3xl" fontWeight="bold" color={iconColor}>
+                              {metric.value}
+                            </StatNumber>
+                            <StatLabel color={mutedColor}>{metric.label}</StatLabel>
+                          </Stat>
+                        </VStack>
+                      </CardBody>
+                    </Card>
+                  ))}
                 </SimpleGrid>
               </MotionBox>
             </GridItem>
@@ -560,38 +310,23 @@ export default function AboutPage() {
                         rounded="full"
                         bg={iconBg}
                       >
-                        <Icon as={FiTarget} boxSize={8} color={iconColor} />
+                        <Icon as={aboutMission.icon} boxSize={8} color={iconColor} />
                       </Flex>
                       <Heading as="h2" size="xl" color={iconColor}>
-                        Our Mission
+                        {aboutMission.title}
                       </Heading>
                       <Text fontSize="lg" color={mutedColor} lineHeight="tall">
-                        To empower individuals and organizations in Bangladesh with world-class
-                        cybersecurity knowledge and skills, making digital security accessible
-                        through education in Bengali. We strive to build a safer digital
-                        ecosystem by training the next generation of ethical hackers and
-                        providing professional security services that protect businesses from
-                        cyber threats.
+                        {aboutMission.description}
                       </Text>
                       <List spacing={3} pt={4}>
-                        <ListItem>
-                          <ListIcon as={FiCheckCircle} color="green.500" />
-                          <Text as="span" fontSize="md">
-                            Provide quality cybersecurity education in Bengali
-                          </Text>
-                        </ListItem>
-                        <ListItem>
-                          <ListIcon as={FiCheckCircle} color="green.500" />
-                          <Text as="span" fontSize="md">
-                            Deliver professional security services
-                          </Text>
-                        </ListItem>
-                        <ListItem>
-                          <ListIcon as={FiCheckCircle} color="green.500" />
-                          <Text as="span" fontSize="md">
-                            Foster a community of security professionals
-                          </Text>
-                        </ListItem>
+                        {aboutMission.bullets.map((bullet) => (
+                          <ListItem key={bullet}>
+                            <ListIcon as={FiCheckCircle} color="green.500" />
+                            <Text as="span" fontSize="md">
+                              {bullet}
+                            </Text>
+                          </ListItem>
+                        ))}
                       </List>
                     </VStack>
                   </CardBody>
@@ -623,37 +358,23 @@ export default function AboutPage() {
                         rounded="full"
                         bg={iconBg}
                       >
-                        <Icon as={FiEye} boxSize={8} color={iconColor} />
+                        <Icon as={aboutVision.icon} boxSize={8} color={iconColor} />
                       </Flex>
                       <Heading as="h2" size="xl" color={iconColor}>
-                        Our Vision
+                        {aboutVision.title}
                       </Heading>
                       <Text fontSize="lg" color={mutedColor} lineHeight="tall">
-                        To become South Asia's leading cybersecurity platform, recognized
-                        globally for excellence in ethical hacking education and security
-                        services. We envision a future where Bangladesh is known for its
-                        cybersecurity expertise, with thousands of certified professionals
-                        protecting the digital infrastructure of businesses worldwide.
+                        {aboutVision.description}
                       </Text>
                       <List spacing={3} pt={4}>
-                        <ListItem>
-                          <ListIcon as={FiCheckCircle} color="green.500" />
-                          <Text as="span" fontSize="md">
-                            Lead cybersecurity innovation in South Asia
-                          </Text>
-                        </ListItem>
-                        <ListItem>
-                          <ListIcon as={FiCheckCircle} color="green.500" />
-                          <Text as="span" fontSize="md">
-                            Create 50,000+ certified security professionals
-                          </Text>
-                        </ListItem>
-                        <ListItem>
-                          <ListIcon as={FiCheckCircle} color="green.500" />
-                          <Text as="span" fontSize="md">
-                            Build a safer digital Bangladesh
-                          </Text>
-                        </ListItem>
+                        {aboutVision.bullets.map((bullet) => (
+                          <ListItem key={bullet}>
+                            <ListIcon as={FiCheckCircle} color="green.500" />
+                            <Text as="span" fontSize="md">
+                              {bullet}
+                            </Text>
+                          </ListItem>
+                        ))}
                       </List>
                     </VStack>
                   </CardBody>
@@ -670,8 +391,14 @@ export default function AboutPage() {
           <VStack spacing={12}>
             <VStack spacing={4} textAlign="center">
               <FallInPlace>
-                <Badge bg={useColorModeValue('green.200', 'green.700')}
-                  color={useColorModeValue('green.900', 'white')} fontSize="sm" px={4} py={1} borderRadius="full">
+                <Badge
+                  bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')}
+                  fontSize="sm"
+                  px={4}
+                  py={1}
+                  borderRadius="full"
+                >
                   Our Core Values
                 </Badge>
               </FallInPlace>
@@ -688,7 +415,7 @@ export default function AboutPage() {
             </VStack>
 
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8} w="full">
-              {values.map((value, index) => (
+              {aboutValues.map((value, index) => (
                 <MotionBox
                   key={index}
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -746,8 +473,14 @@ export default function AboutPage() {
           <VStack spacing={12}>
             <VStack spacing={4} textAlign="center">
               <FallInPlace>
-                <Badge bg={useColorModeValue('green.200', 'green.700')}
-                  color={useColorModeValue('green.900', 'white')} fontSize="sm" px={4} py={1} borderRadius="full">
+                <Badge
+                  bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')}
+                  fontSize="sm"
+                  px={4}
+                  py={1}
+                  borderRadius="full"
+                >
                   Our Journey
                 </Badge>
               </FallInPlace>
@@ -775,7 +508,7 @@ export default function AboutPage() {
                 transform={{ base: 'none', md: 'translateX(-50%)' }}
               />
 
-              {milestones.map((milestone, index) => (
+              {aboutMilestones.map((milestone, index) => (
                 <MotionBox
                   key={index}
                   initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
@@ -854,8 +587,14 @@ export default function AboutPage() {
           <VStack spacing={12}>
             <VStack spacing={4} textAlign="center">
               <FallInPlace>
-                <Badge bg={useColorModeValue('green.200', 'green.700')}
-                  color={useColorModeValue('green.900', 'white')} fontSize="sm" px={4} py={1} borderRadius="full">
+                <Badge
+                  bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')}
+                  fontSize="sm"
+                  px={4}
+                  py={1}
+                  borderRadius="full"
+                >
                   Leadership Team
                 </Badge>
               </FallInPlace>
@@ -889,7 +628,7 @@ export default function AboutPage() {
                 }}
               >
                 {/* Duplicate team array for seamless loop */}
-                {[...team, ...team].map((member, index) => (
+                {[...aboutTeam, ...aboutTeam].map((member, index) => (
                   <Box
                     key={index}
                     minW={{ base: '280px', sm: '320px', md: '280px' }}
@@ -970,8 +709,14 @@ export default function AboutPage() {
           <VStack spacing={12}>
             <VStack spacing={4} textAlign="center">
               <FallInPlace>
-                <Badge bg={useColorModeValue('green.200', 'green.700')}
-                  color={useColorModeValue('green.900', 'white')} fontSize="sm" px={4} py={1} borderRadius="full">
+                <Badge
+                  bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')}
+                  fontSize="sm"
+                  px={4}
+                  py={1}
+                  borderRadius="full"
+                >
                   Certifications
                 </Badge>
               </FallInPlace>
@@ -988,7 +733,7 @@ export default function AboutPage() {
             </VStack>
 
             <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} spacing={8} w="full">
-              {certifications.map((cert, index) => (
+              {aboutCertifications.map((cert, index) => (
                 <MotionBox
                   key={index}
                   initial={{ opacity: 0, y: 30 }}
@@ -1070,8 +815,14 @@ export default function AboutPage() {
                 transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
               >
                 <VStack align="start" spacing={6}>
-                  <Badge bg={useColorModeValue('green.200', 'green.700')}
-                  color={useColorModeValue('green.900', 'white')} fontSize="sm" px={4} py={1} borderRadius="full">
+                  <Badge
+                    bg={useColorModeValue('green.200', 'green.700')}
+                    color={useColorModeValue('green.900', 'white')}
+                    fontSize="sm"
+                    px={4}
+                    py={1}
+                    borderRadius="full"
+                  >
                     Our Achievements
                   </Badge>
                   <Heading as="h2" fontSize={{ base: '3xl', md: '4xl' }}>
@@ -1083,7 +834,7 @@ export default function AboutPage() {
                     Bangladesh.
                   </Text>
                   <List spacing={4} pt={4}>
-                    {achievements.map((achievement, index) => (
+                    {aboutAchievements.map((achievement, index) => (
                       <ListItem key={index}>
                         <HStack align="start">
                           <Icon as={FiCheckCircle} color="green.500" mt={1} boxSize={5} />
@@ -1104,129 +855,39 @@ export default function AboutPage() {
                 transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
               >
                 <SimpleGrid columns={2} spacing={6}>
-                  <Card
-                    bg={cardBg}
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    _hover={{
-                      transform: 'scale(1.1) rotate(2deg)',
-                      shadow: 'xl',
-                      borderColor: iconColor,
-                    }}
-                    transition="all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)"
-                    cursor="pointer"
-                  >
-                    <CardBody textAlign="center">
-                      <VStack spacing={2}>
-                        <Icon
-                          as={FiAward}
-                          boxSize={10}
-                          color={iconColor}
-                          transition="all 0.3s"
-                          _groupHover={{ transform: 'scale(1.2)' }}
-                        />
-                        <Stat textAlign="center">
-                          <StatNumber fontSize="2xl" fontWeight="bold">
-                            15+
-                          </StatNumber>
-                          <StatLabel color={mutedColor}>Certifications</StatLabel>
-                        </Stat>
-                      </VStack>
-                    </CardBody>
-                  </Card>
-
-                  <Card
-                    bg={cardBg}
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    _hover={{
-                      transform: 'scale(1.1) rotate(-2deg)',
-                      shadow: 'xl',
-                      borderColor: iconColor,
-                    }}
-                    transition="all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)"
-                    cursor="pointer"
-                  >
-                    <CardBody textAlign="center">
-                      <VStack spacing={2}>
-                        <Icon
-                          as={FiCode}
-                          boxSize={10}
-                          color={iconColor}
-                          transition="all 0.3s"
-                          _groupHover={{ transform: 'scale(1.2)' }}
-                        />
-                        <Stat textAlign="center">
-                          <StatNumber fontSize="2xl" fontWeight="bold">
-                            50+
-                          </StatNumber>
-                          <StatLabel color={mutedColor}>Courses</StatLabel>
-                        </Stat>
-                      </VStack>
-                    </CardBody>
-                  </Card>
-
-                  <Card
-                    bg={cardBg}
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    _hover={{
-                      transform: 'scale(1.1) rotate(2deg)',
-                      shadow: 'xl',
-                      borderColor: iconColor,
-                    }}
-                    transition="all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)"
-                    cursor="pointer"
-                  >
-                    <CardBody textAlign="center">
-                      <VStack spacing={2}>
-                        <Icon
-                          as={FiGlobe}
-                          boxSize={10}
-                          color={iconColor}
-                          transition="all 0.3s"
-                          _groupHover={{ transform: 'scale(1.2)' }}
-                        />
-                        <Stat textAlign="center">
-                          <StatNumber fontSize="2xl" fontWeight="bold">
-                            10+
-                          </StatNumber>
-                          <StatLabel color={mutedColor}>Countries</StatLabel>
-                        </Stat>
-                      </VStack>
-                    </CardBody>
-                  </Card>
-
-                  <Card
-                    bg={cardBg}
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    _hover={{
-                      transform: 'scale(1.1) rotate(-2deg)',
-                      shadow: 'xl',
-                      borderColor: iconColor,
-                    }}
-                    transition="all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)"
-                    cursor="pointer"
-                  >
-                    <CardBody textAlign="center">
-                      <VStack spacing={2}>
-                        <Icon
-                          as={FiStar}
-                          boxSize={10}
-                          color={iconColor}
-                          transition="all 0.3s"
-                          _groupHover={{ transform: 'scale(1.2)' }}
-                        />
-                        <Stat textAlign="center">
-                          <StatNumber fontSize="2xl" fontWeight="bold">
-                            4.9/5
-                          </StatNumber>
-                          <StatLabel color={mutedColor}>Rating</StatLabel>
-                        </Stat>
-                      </VStack>
-                    </CardBody>
-                  </Card>
+                  {aboutHighlights.map((highlight, index) => (
+                    <Card
+                      key={highlight.label}
+                      bg={cardBg}
+                      borderWidth="1px"
+                      borderColor={borderColor}
+                      _hover={{
+                        transform: index % 2 === 0 ? 'scale(1.1) rotate(2deg)' : 'scale(1.1) rotate(-2deg)',
+                        shadow: 'xl',
+                        borderColor: iconColor,
+                      }}
+                      transition="all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)"
+                      cursor="pointer"
+                    >
+                      <CardBody textAlign="center">
+                        <VStack spacing={2}>
+                          <Icon
+                            as={highlight.icon}
+                            boxSize={10}
+                            color={iconColor}
+                            transition="all 0.3s"
+                            _groupHover={{ transform: 'scale(1.2)' }}
+                          />
+                          <Stat textAlign="center">
+                            <StatNumber fontSize="2xl" fontWeight="bold">
+                              {highlight.value}
+                            </StatNumber>
+                            <StatLabel color={mutedColor}>{highlight.label}</StatLabel>
+                          </Stat>
+                        </VStack>
+                      </CardBody>
+                    </Card>
+                  ))}
                 </SimpleGrid>
               </MotionBox>
             </GridItem>
@@ -1240,8 +901,14 @@ export default function AboutPage() {
           <VStack spacing={12}>
             <VStack spacing={4} textAlign="center">
               <FallInPlace>
-                <Badge bg={useColorModeValue('green.200', 'green.700')}
-                  color={useColorModeValue('green.900', 'white')} fontSize="sm" px={4} py={1} borderRadius="full">
+                <Badge
+                  bg={useColorModeValue('green.200', 'green.700')}
+                  color={useColorModeValue('green.900', 'white')}
+                  fontSize="sm"
+                  px={4}
+                  py={1}
+                  borderRadius="full"
+                >
                   Why Choose Us
                 </Badge>
               </FallInPlace>
@@ -1258,179 +925,34 @@ export default function AboutPage() {
             </VStack>
 
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8} w="full">
-              <MotionBox
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.5, delay: 0.1, ease: [0.4, 0, 0.2, 1] }}
-              >
-                <Card
-                  bg={cardBg}
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  h="full"
-                  _hover={{ borderColor: iconColor, shadow: 'lg' }}
-                  transition="all 0.3s"
+              {aboutFeatures.map((feature, index) => (
+                <MotionBox
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-100px' }}
+                  transition={{ duration: 0.5, delay: 0.1 + index * 0.1, ease: [0.4, 0, 0.2, 1] }}
                 >
-                  <CardBody>
-                    <VStack align="start" spacing={4}>
-                      <Icon as={FiBook} boxSize={10} color={iconColor} />
-                      <Heading as="h3" size="md">
-                        Bengali Education
-                      </Heading>
-                      <Text color={mutedColor}>
-                        First and only comprehensive cybersecurity platform offering training in
-                        Bengali language, making it accessible to millions.
-                      </Text>
-                    </VStack>
-                  </CardBody>
-                </Card>
-              </MotionBox>
-
-              <MotionBox
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.5, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
-              >
-                <Card
-                  bg={cardBg}
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  h="full"
-                  _hover={{ borderColor: iconColor, shadow: 'lg' }}
-                  transition="all 0.3s"
-                >
-                  <CardBody>
-                    <VStack align="start" spacing={4}>
-                      <Icon as={FiLayers} boxSize={10} color={iconColor} />
-                      <Heading as="h3" size="md">
-                        Hands-on Learning
-                      </Heading>
-                      <Text color={mutedColor}>
-                        Learn by doing with our extensive lab environment, CTF challenges, and
-                        real-world scenarios from actual security engagements.
-                      </Text>
-                    </VStack>
-                  </CardBody>
-                </Card>
-              </MotionBox>
-
-              <MotionBox
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.5, delay: 0.3, ease: [0.4, 0, 0.2, 1] }}
-              >
-                <Card
-                  bg={cardBg}
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  h="full"
-                  _hover={{ borderColor: iconColor, shadow: 'lg' }}
-                  transition="all 0.3s"
-                >
-                  <CardBody>
-                    <VStack align="start" spacing={4}>
-                      <Icon as={FiUsers} boxSize={10} color={iconColor} />
-                      <Heading as="h3" size="md">
-                        Expert Instructors
-                      </Heading>
-                      <Text color={mutedColor}>
-                        Learn from certified professionals with years of industry experience in
-                        penetration testing, security audits, and ethical hacking.
-                      </Text>
-                    </VStack>
-                  </CardBody>
-                </Card>
-              </MotionBox>
-
-              <MotionBox
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.5, delay: 0.4, ease: [0.4, 0, 0.2, 1] }}
-              >
-                <Card
-                  bg={cardBg}
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  h="full"
-                  _hover={{ borderColor: iconColor, shadow: 'lg' }}
-                  transition="all 0.3s"
-                >
-                  <CardBody>
-                    <VStack align="start" spacing={4}>
-                      <Icon as={FiClock} boxSize={10} color={iconColor} />
-                      <Heading as="h3" size="md">
-                        Flexible Learning
-                      </Heading>
-                      <Text color={mutedColor}>
-                        Self-paced courses with lifetime access, allowing you to learn at your own
-                        speed while balancing work and personal commitments.
-                      </Text>
-                    </VStack>
-                  </CardBody>
-                </Card>
-              </MotionBox>
-
-              <MotionBox
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.5, delay: 0.5, ease: [0.4, 0, 0.2, 1] }}
-              >
-                <Card
-                  bg={cardBg}
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  h="full"
-                  _hover={{ borderColor: iconColor, shadow: 'lg' }}
-                  transition="all 0.3s"
-                >
-                  <CardBody>
-                    <VStack align="start" spacing={4}>
-                      <Icon as={FiAward} boxSize={10} color={iconColor} />
-                      <Heading as="h3" size="md">
-                        Industry Recognition
-                      </Heading>
-                      <Text color={mutedColor}>
-                        Earn certificates recognized by leading companies in Bangladesh and build a
-                        portfolio through our CTF competitions.
-                      </Text>
-                    </VStack>
-                  </CardBody>
-                </Card>
-              </MotionBox>
-
-              <MotionBox
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.5, delay: 0.6, ease: [0.4, 0, 0.2, 1] }}
-              >
-                <Card
-                  bg={cardBg}
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  h="full"
-                  _hover={{ borderColor: iconColor, shadow: 'lg' }}
-                  transition="all 0.3s"
-                >
-                  <CardBody>
-                    <VStack align="start" spacing={4}>
-                      <Icon as={FiShield} boxSize={10} color={iconColor} />
-                      <Heading as="h3" size="md">
-                        Professional Services
-                      </Heading>
-                      <Text color={mutedColor}>
-                        Beyond training, we offer penetration testing, security audits, and SOC
-                        services to protect your organization.
-                      </Text>
-                    </VStack>
-                  </CardBody>
-                </Card>
-              </MotionBox>
+                  <Card
+                    bg={cardBg}
+                    borderWidth="1px"
+                    borderColor={borderColor}
+                    h="full"
+                    _hover={{ borderColor: iconColor, shadow: 'lg' }}
+                    transition="all 0.3s"
+                  >
+                    <CardBody>
+                      <VStack align="start" spacing={4}>
+                        <Icon as={feature.icon} boxSize={10} color={iconColor} />
+                        <Heading as="h3" size="md">
+                          {feature.title}
+                        </Heading>
+                        <Text color={mutedColor}>{feature.description}</Text>
+                      </VStack>
+                    </CardBody>
+                  </Card>
+                </MotionBox>
+              ))}
             </SimpleGrid>
           </VStack>
         </Container>
@@ -1451,16 +973,15 @@ export default function AboutPage() {
               <CardBody p={{ base: 8, md: 12 }}>
                 <VStack spacing={6} textAlign="center" maxW="3xl" mx="auto">
                   <Heading as="h2" fontSize={{ base: '3xl', md: '4xl' }}>
-                    Ready to Start Your Cybersecurity Journey?
+                    {aboutCallToAction.heading}
                   </Heading>
                   <Text fontSize="lg" opacity={0.9}>
-                    Join thousands of students and professionals who trust HackToLive for their
-                    cybersecurity education and security needs.
+                    {aboutCallToAction.description}
                   </Text>
                   <HStack spacing={4} pt={4}>
                     <Box
                       as="a"
-                      href="/academy"
+                      href={aboutCallToAction.primaryHref}
                       bg="white"
                       color="primary.500"
                       px={8}
@@ -1470,11 +991,11 @@ export default function AboutPage() {
                       _hover={{ bg: 'gray.100' }}
                       transition="all 0.3s"
                     >
-                      Explore Courses
+                      {aboutCallToAction.primaryLabel}
                     </Box>
                     <Box
                       as="a"
-                      href="/contact"
+                      href={aboutCallToAction.secondaryHref}
                       bg="transparent"
                       color="white"
                       px={8}
@@ -1486,7 +1007,7 @@ export default function AboutPage() {
                       _hover={{ bg: 'whiteAlpha.200' }}
                       transition="all 0.3s"
                     >
-                      Contact Us
+                      {aboutCallToAction.secondaryLabel}
                     </Box>
                   </HStack>
                 </VStack>
