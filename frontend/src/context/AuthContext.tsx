@@ -8,9 +8,9 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   isLoading: boolean;
-  login: (email: string, password: string, turnstileToken: string) => Promise<{ userId?: string; email?: string; requiresOtp: boolean; user?: User; token?: string }>;
+  login: (email: string, password: string, turnstileToken: string, redirectTo?: string) => Promise<{ userId?: string; email?: string; requiresOtp: boolean; user?: User; token?: string }>;
   signup: (name: string, email: string, password: string, turnstileToken: string, role?: string) => Promise<{ userId: string; email: string; requiresOtp: boolean }>;
-  verifyOtp: (userId: string, code: string, type: 'registration' | 'login') => Promise<void>;
+  verifyOtp: (userId: string, code: string, type: 'registration' | 'login', redirectTo?: string) => Promise<void>;
   resendOtp: (userId: string, type: 'registration' | 'login') => Promise<void>;
   logout: () => void;
   updateUser: (user: User) => void;
@@ -24,6 +24,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  const getDefaultRedirectByRole = (role: User['role']) => {
+    switch (role) {
+      case 'ADMIN':
+        return '/admin/dashboard';
+      case 'INSTRUCTOR':
+        return '/instructor/dashboard';
+      case 'STUDENT':
+      default:
+        return '/student/dashboard';
+    }
+  };
+
+  const getSafeRedirectPath = (redirectTo?: string) => {
+    if (!redirectTo) {
+      return null;
+    }
+
+    // Only allow same-origin relative paths and block protocol-relative URLs.
+    if (!redirectTo.startsWith('/') || redirectTo.startsWith('//')) {
+      return null;
+    }
+
+    return redirectTo;
+  };
 
   useEffect(() => {
     // Check if user is logged in on mount
@@ -47,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initAuth();
   }, []);
 
-  const login = async (email: string, password: string, turnstileToken: string) => {
+  const login = async (email: string, password: string, turnstileToken: string, redirectTo?: string) => {
     try {
       const data = await authService.login(email, password, turnstileToken);
       
@@ -66,19 +91,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           authService.setUser(data.user);
           setUser(data.user);
 
-          // Redirect based on role
-          switch (data.user.role) {
-            case 'ADMIN':
-              router.push('/admin/dashboard');
-              break;
-            case 'INSTRUCTOR':
-              router.push('/instructor/dashboard');
-              break;
-            case 'STUDENT':
-            default:
-              router.push('/student/dashboard');
-              break;
-          }
+          const targetPath = getSafeRedirectPath(redirectTo) || getDefaultRedirectByRole(data.user.role);
+          router.push(targetPath);
         }
         
         return {
@@ -108,7 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const verifyOtp = async (userId: string, code: string, type: 'registration' | 'login') => {
+  const verifyOtp = async (userId: string, code: string, type: 'registration' | 'login', redirectTo?: string) => {
     try {
       const data = type === 'registration'
         ? await authService.verifyRegistration(userId, code)
@@ -118,19 +132,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       authService.setUser(data.user);
       setUser(data.user);
 
-      // Redirect based on role
-      switch (data.user.role) {
-        case 'ADMIN':
-          router.push('/admin/dashboard');
-          break;
-        case 'INSTRUCTOR':
-          router.push('/instructor/dashboard');
-          break;
-        case 'STUDENT':
-        default:
-          router.push('/student/dashboard');
-          break;
-      }
+      const targetPath = getSafeRedirectPath(redirectTo) || getDefaultRedirectByRole(data.user.role);
+      router.push(targetPath);
     } catch (error) {
       console.error('OTP verification failed:', error);
       throw error;

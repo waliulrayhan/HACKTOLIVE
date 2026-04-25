@@ -28,13 +28,12 @@ import { NextPage } from 'next'
 import { FaMoon, FaSun } from 'react-icons/fa'
 import { useState, useEffect, Suspense } from 'react'
 import NextLink from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { toast } from '@/components/ui/toast'
 import ResendTimer from './_components/ResendTimer'
 
 const VerifyOTPContent = () => {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const { verifyOtp, resendOtp } = useAuth()
   const [otp, setOtp] = useState('')
@@ -47,6 +46,7 @@ const VerifyOTPContent = () => {
   const userId = searchParams?.get('userId') || ''
   const email = searchParams?.get('email') || 'your email'
   const type = (searchParams?.get('type') || 'login') as 'registration' | 'login'
+  const redirectTo = searchParams?.get('redirect') || undefined
 
   const handleOtpChange = (value: string) => {
     setOtp(value)
@@ -68,7 +68,7 @@ if (!userId) {
     setIsLoading(true)
     
     try {
-      await verifyOtp(userId, otp, type)
+      await verifyOtp(userId, otp, type, redirectTo)
       
       toast.success('Verification successful!', {
         description: type === 'registration' ? 'Welcome to HackToLive!' : 'Welcome back!',

@@ -33,7 +33,7 @@ import { FaGoogle, FaEye, FaEyeSlash, FaMoon, FaSun, FaHome } from 'react-icons/
 import { useState } from 'react'
 import { Turnstile } from '@marsidev/react-turnstile'
 import NextLink from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { toast } from '@/components/ui/toast'
 
@@ -46,6 +46,7 @@ const providers = {
 
 const Login: NextPage = () => {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [keepSignedIn, setKeepSignedIn] = useState(false)
@@ -58,6 +59,7 @@ const Login: NextPage = () => {
   const leftBgColor = useColorModeValue('#4d7c0f', '#365314')
   const rightBgColor = useColorModeValue('white', 'gray.800')
   const { colorMode, toggleColorMode } = useColorMode()
+  const redirectTo = searchParams?.get('redirect') || undefined
 
   const handleTurnstileVerify = (token: string) => {
     setTurnstileToken(token)
@@ -108,7 +110,7 @@ const Login: NextPage = () => {
     try {
       // Use 'dev-bypass' token in development if no turnstile token
       const token = turnstileToken || (isDevelopment ? 'dev-bypass' : '')
-      const result = await login(email, password, token)
+      const result = await login(email, password, token, redirectTo)
       
       if (result.requiresOtp) {
         // For INSTRUCTOR and ADMIN - show success and redirect to OTP
@@ -117,7 +119,17 @@ const Login: NextPage = () => {
           duration: 3000,
         })
         // Redirect to OTP verification
-        router.push(`/verify-otp?userId=${result.userId}&email=${encodeURIComponent(result.email!)}&type=login`)
+        const otpQuery = new URLSearchParams({
+          userId: result.userId!,
+          email: result.email!,
+          type: 'login',
+        })
+
+        if (redirectTo) {
+          otpQuery.set('redirect', redirectTo)
+        }
+
+        router.push(`/verify-otp?${otpQuery.toString()}`)
       } else {
         // For STUDENT - direct login, show success message
         toast.success('Login successful!', {
@@ -432,7 +444,7 @@ const Login: NextPage = () => {
                   No account yet?{' '}
                   <Link
                     as={NextLink}
-                    href="/signup"
+                    href={redirectTo ? `/signup?redirect=${encodeURIComponent(redirectTo)}` : '/signup'}
                     color="blue.500"
                     fontWeight="semibold"
                     _hover={{ color: 'blue.600', textDecoration: 'underline' }}

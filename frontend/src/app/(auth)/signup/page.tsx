@@ -34,12 +34,13 @@ import { FaGoogle, FaEye, FaEyeSlash, FaCheckCircle, FaTimesCircle } from 'react
 import { useState, useMemo } from 'react'
 import { Turnstile } from '@marsidev/react-turnstile'
 import NextLink from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { toast } from '@/components/ui/toast'
 
 const Signup: NextPage = () => {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { signup } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -65,6 +66,7 @@ const Signup: NextPage = () => {
   const leftBgColor = useColorModeValue('#4d7c0f', '#365314')
   const rightBgColor = useColorModeValue('white', 'gray.800')
   const { colorMode, toggleColorMode } = useColorMode()
+  const redirectTo = searchParams?.get('redirect') || undefined
 
   // Password complexity requirements
   const passwordRequirements = useMemo(() => {
@@ -178,7 +180,17 @@ const Signup: NextPage = () => {
           duration: 3000,
         })
         // Redirect to OTP verification
-        router.push(`/verify-otp?userId=${result.userId}&email=${encodeURIComponent(result.email)}&type=registration`)
+        const otpQuery = new URLSearchParams({
+          userId: result.userId,
+          email: result.email,
+          type: 'registration',
+        })
+
+        if (redirectTo) {
+          otpQuery.set('redirect', redirectTo)
+        }
+
+        router.push(`/verify-otp?${otpQuery.toString()}`)
       }
     } catch (error: any) {
       console.error('Signup error:', error)
@@ -592,7 +604,7 @@ const Signup: NextPage = () => {
                     Already have an account?{' '}
                     <Link
                       as={NextLink}
-                      href="/login"
+                      href={redirectTo ? `/login?redirect=${encodeURIComponent(redirectTo)}` : '/login'}
                       color="blue.500"
                       fontWeight="semibold"
                       _hover={{ color: 'blue.600', textDecoration: 'underline' }}
