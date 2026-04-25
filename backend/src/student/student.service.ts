@@ -15,6 +15,10 @@ export class StudentService {
       where: { userId },
       include: {
         enrollments: {
+          where: {
+            // Exclude BANNED enrollments from dashboard
+            status: { not: 'BANNED' },
+          },
           include: {
             course: {
               include: {
@@ -314,7 +318,10 @@ export class StudentService {
     }
 
     const enrollments = await this.prisma.enrollment.findMany({
-      where: { studentId: student.id },
+      where: { 
+        studentId: student.id,
+        // Include all enrollments (BANNED, ACTIVE, COMPLETED)
+      },
       include: {
         course: {
           include: {
@@ -355,7 +362,11 @@ export class StudentService {
     }
 
     const enrollments = await this.prisma.enrollment.findMany({
-      where: { studentId: student.id },
+      where: {
+        studentId: student.id,
+        // Exclude BANNED enrollments from enrolled course IDs
+        status: { not: 'BANNED' },
+      },
       select: {
         courseId: true,
       },
@@ -383,6 +394,13 @@ export class StudentService {
 
     if (!enrollment) {
       throw new NotFoundException('Not enrolled in this course');
+    }
+
+    // Check if student is banned from this course
+    if (enrollment.status === 'BANNED') {
+      throw new NotFoundException(
+        'You have been banned from this course and cannot access its content',
+      );
     }
 
     // Get course with full details

@@ -19,6 +19,7 @@ import {
   HiOutlineViewList,
   HiOutlineCalendar,
   HiOutlineTrendingUp,
+  HiOutlineShieldExclamation,
 } from "react-icons/hi";
 import { HiOutlineSignal } from "react-icons/hi2";
 import { FiUser } from "react-icons/fi";
@@ -146,6 +147,7 @@ export default function MyCoursesPage() {
     total: enrollments.length,
     inProgress: enrollments.filter((e) => e.status === "ACTIVE").length,
     completed: enrollments.filter((e) => e.status === "COMPLETED").length,
+    banned: enrollments.filter((e) => e.status === "BANNED").length,
     totalHours: Math.floor(enrollments.reduce((sum, e) => sum + e.course.duration, 0) / 60),
   };
 
@@ -213,6 +215,18 @@ export default function MyCoursesPage() {
 
         <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
           <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-red-100 dark:bg-red-500/15">
+              <HiOutlineShieldExclamation className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 dark:text-red-500" />
+            </div>
+            <div>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Restricted</p>
+              <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">{stats.banned}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-md border border-gray-200 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-500/15">
               <HiOutlineClock className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 dark:text-orange-500" />
             </div>
@@ -245,6 +259,7 @@ export default function MyCoursesPage() {
               { value: "ALL", label: "All", count: stats.total },
               { value: "ACTIVE", label: "In Progress", count: stats.inProgress },
               { value: "COMPLETED", label: "Completed", count: stats.completed },
+              { value: "BANNED", label: "Restricted", count: stats.banned },
             ].map((tab) => (
               <button
                 key={tab.value}
@@ -374,11 +389,12 @@ function CourseCard({
   const isLive = course.deliveryMode === "LIVE";
   const isPremium = course.tier === "PREMIUM";
   const isCompleted = enrollment.status === "COMPLETED";
+  const isBanned = enrollment.status === "BANNED";
 
   return (
     <div
       onClick={onNavigate}
-      className="group cursor-pointer rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+      className={`group cursor-pointer rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${isBanned ? "opacity-75" : ""}`}
     >
       {/* Thumbnail */}
       <div className="relative aspect-[2/1] overflow-hidden bg-gray-100 dark:bg-gray-700">
@@ -411,12 +427,20 @@ function CourseCard({
               </Badge>
             )}
           </div>
-          {isCompleted && (
-            <Badge color="success" variant="solid" size="sm">
-              <HiOutlineCheckCircle className="h-3 w-3" />
-              Done
-            </Badge>
-          )}
+          <div className="flex items-center gap-2">
+            {isBanned && (
+              <Badge color="error" variant="solid" size="sm">
+                <HiOutlineShieldExclamation className="h-3 w-3" />
+                BANNED
+              </Badge>
+            )}
+            {isCompleted && !isBanned && (
+              <Badge color="success" variant="solid" size="sm">
+                <HiOutlineCheckCircle className="h-3 w-3" />
+                Done
+              </Badge>
+            )}
+          </div>
         </div>
 
         {/* Progress Bar */}
@@ -512,12 +536,20 @@ function CourseCard({
 
         {/* Action Button */}
         <button
-          className={`mt-4 w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white transition-all hover:shadow-md ${isCompleted
+          disabled={isBanned}
+          className={`mt-4 w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white transition-all hover:shadow-md ${isBanned
+              ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed opacity-60"
+              : isCompleted
               ? "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
               : "bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700"
             }`}
         >
-          {isCompleted ? (
+          {isBanned ? (
+            <>
+              <HiOutlineShieldExclamation className="h-5 w-5" />
+              Access Restricted
+            </>
+          ) : isCompleted ? (
             <>
               <HiOutlineTrendingUp className="h-5 w-5" />
               Review Course

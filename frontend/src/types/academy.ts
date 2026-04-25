@@ -16,7 +16,7 @@ export type CourseCategory =
 export type CourseStatus = "draft" | "published" | "archived";
 export type CourseCtaText = "ENROLL_NOW" | "COMING_SOON";
 export type CourseCouponDiscountType = "PERCENTAGE" | "FIXED";
-export type EnrollmentStatus = "active" | "completed" | "dropped";
+export type EnrollmentStatus = "active" | "completed" | "dropped" | "banned";
 export type LessonType = "video" | "article" | "quiz" | "assignment";
 
 export interface Instructor {

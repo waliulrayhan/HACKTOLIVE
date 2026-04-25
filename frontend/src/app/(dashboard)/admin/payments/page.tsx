@@ -1102,7 +1102,7 @@ export default function AdminPaymentsPage() {
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-600 dark:text-gray-400">Status:</span>
-                            <Badge variant="light" color={enrollment.status === 'ACTIVE' ? 'success' : 'warning'} size="sm">
+                            <Badge variant="light" color={enrollment.status === 'ACTIVE' ? 'success' : enrollment.status === 'BANNED' ? 'error' : 'warning'} size="sm">
                               {enrollment.status}
                             </Badge>
                           </div>

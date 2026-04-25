@@ -211,6 +211,8 @@ export default function AdminDashboard() {
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                     enrollment.status === 'ACTIVE' 
                       ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                      : enrollment.status === 'BANNED'
+                      ? 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
                       : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
                   }`}>
                     {enrollment.status}

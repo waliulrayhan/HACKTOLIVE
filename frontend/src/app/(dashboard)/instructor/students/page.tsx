@@ -676,7 +676,15 @@ export default function InstructorStudentsPage() {
                                 </p>
                               </div>
                               <Badge 
-                                color={enrollment.status === 'COMPLETED' ? 'success' : enrollment.status === 'ACTIVE' ? 'info' : 'dark'}
+                                color={
+                                  enrollment.status === 'COMPLETED' 
+                                    ? 'success' 
+                                    : enrollment.status === 'ACTIVE' 
+                                    ? 'success' 
+                                    : enrollment.status === 'BANNED'
+                                    ? 'error'
+                                    : 'dark'
+                                }
                                 size="sm"
                               >
                                 {enrollment.status}
@@ -702,16 +710,18 @@ export default function InstructorStudentsPage() {
                             </div>
 
                             {/* View Progress Button */}
-                            <button
-                              onClick={() => {
-                                router.push(`/instructor/students/${selectedStudent.id}/progress/${enrollment.course.id}`);
-                                setShowModal(false);
-                              }}
-                              className="mt-3 w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 bg-brand-50 hover:bg-brand-100 dark:bg-brand-500/10 dark:hover:bg-brand-500/20 rounded-lg transition-all duration-200"
-                            >
-                              <HiOutlineChartBar className="h-3.5 w-3.5" />
-                              View Detailed Progress
-                            </button>
+                            <div className="mt-3">
+                              <button
+                                onClick={() => {
+                                  router.push(`/instructor/students/${selectedStudent.id}/progress/${enrollment.course.id}`);
+                                  setShowModal(false);
+                                }}
+                                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 bg-brand-50 hover:bg-brand-100 dark:bg-brand-500/10 dark:hover:bg-brand-500/20 rounded-lg transition-all duration-200"
+                              >
+                                <HiOutlineChartBar className="h-3.5 w-3.5" />
+                                {enrollment.status === 'BANNED' ? 'Manage Ban Status' : 'View Detailed Progress'}
+                              </button>
+                            </div>
                           </div>
                         </div>
                       ))}

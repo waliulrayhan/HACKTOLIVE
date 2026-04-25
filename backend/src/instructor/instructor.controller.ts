@@ -1039,6 +1039,146 @@ export class InstructorController {
     });
   }
 
+  @Patch('enrollments/:enrollmentId/ban')
+  @ApiOperation({ summary: 'Ban a student from a course' })
+  async banStudentFromCourse(
+    @Request() req: any,
+    @Param('enrollmentId') enrollmentId: string,
+  ) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId: req.user.id },
+      include: {
+        courses: true,
+      },
+    });
+
+    if (!instructor) {
+      throw new BadRequestException('Instructor profile not found');
+    }
+
+    // Verify the enrollment belongs to one of the instructor's courses
+    const enrollment = await this.prisma.enrollment.findUnique({
+      where: { id: enrollmentId },
+      include: { course: true },
+    });
+
+    if (!enrollment) {
+      throw new BadRequestException('Enrollment not found');
+    }
+
+    // Check if the course belongs to this instructor
+    const courseExists = instructor.courses.some(
+      (course) => course.id === enrollment.courseId,
+    );
+
+    if (!courseExists) {
+      throw new BadRequestException(
+        'You do not have permission to ban students from this course',
+      );
+    }
+
+    // Update enrollment status to BANNED
+    const updatedEnrollment = await this.prisma.enrollment.update({
+      where: { id: enrollmentId },
+      data: {
+        status: 'BANNED',
+      },
+      include: {
+        student: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+        course: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+      },
+    });
+
+    return {
+      message: `Student has been banned from the course`,
+      enrollment: updatedEnrollment,
+    };
+  }
+
+  @Patch('enrollments/:enrollmentId/unban')
+  @ApiOperation({ summary: 'Unban a student from a course' })
+  async unbanStudentFromCourse(
+    @Request() req: any,
+    @Param('enrollmentId') enrollmentId: string,
+  ) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId: req.user.id },
+      include: {
+        courses: true,
+      },
+    });
+
+    if (!instructor) {
+      throw new BadRequestException('Instructor profile not found');
+    }
+
+    // Verify the enrollment belongs to one of the instructor's courses
+    const enrollment = await this.prisma.enrollment.findUnique({
+      where: { id: enrollmentId },
+      include: { course: true },
+    });
+
+    if (!enrollment) {
+      throw new BadRequestException('Enrollment not found');
+    }
+
+    // Check if the course belongs to this instructor
+    const courseExists = instructor.courses.some(
+      (course) => course.id === enrollment.courseId,
+    );
+
+    if (!courseExists) {
+      throw new BadRequestException(
+        'You do not have permission to unban students from this course',
+      );
+    }
+
+    // Update enrollment status back to ACTIVE
+    const updatedEnrollment = await this.prisma.enrollment.update({
+      where: { id: enrollmentId },
+      data: {
+        status: 'ACTIVE',
+      },
+      include: {
+        student: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+        course: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+      },
+    });
+
+    return {
+      message: `Student has been unbanned from the course`,
+      enrollment: updatedEnrollment,
+    };
+  }
+
   @Get('analytics')
   async getAnalytics(@Request() req: any) {
     const instructor = await this.prisma.instructor.findUnique({
