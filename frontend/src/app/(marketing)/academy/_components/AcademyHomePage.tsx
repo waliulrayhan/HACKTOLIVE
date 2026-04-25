@@ -17,8 +17,8 @@ import {
   Divider,
   Spinner,
   Center,
+  Image,
 } from "@chakra-ui/react";
-import Image from "next/image";
 import { ButtonLink } from "@/components/shared/button-link/button-link";
 import CourseCard from "@/components/academy/CourseCard";
 import SearchBar from "@/components/academy/SearchBar";
@@ -388,7 +388,7 @@ export default function AcademyHomePage() {
         </Container>
       </Box>
 
-      {/* Free Courses Section */}
+      {/* Featured Courses Section */}
       <Box py={{ base: '16', md: '24' }} position="relative" bg={bgColorAlt}>
         <Container maxW="container.xl">
           <VStack spacing={{ base: '8', md: '12' }} align="stretch">
@@ -409,22 +409,22 @@ export default function AcademyHomePage() {
                     borderRadius="full"
                     fontWeight="semibold"
                   >
-                    Free Access
+                    Featured Courses
                   </Badge>
                   <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
-                    Start Learning For Free
+                    Start Your Learning Journey
                   </Heading>
                   <Text fontSize={{ base: 'md', md: 'lg' }} color={textMuted}>
-                    Begin your cybersecurity journey with our free courses
+                    Choose from our free and premium courses with industry-recognized certifications
                   </Text>
                 </VStack>
                 <ButtonLink
-                  href="/academy/courses?free=true"
+                  href="/academy/courses"
                   colorScheme="primary"
                   variant="outline"
                   rightIcon={<Icon as={FiArrowRight} />}
                 >
-                  View All Free Courses
+                  View All Courses
                 </ButtonLink>
               </Flex>
             </FallInPlace>
@@ -434,9 +434,9 @@ export default function AcademyHomePage() {
                 <Center gridColumn="1 / -1" py="12">
                   <Spinner size="xl" color="green.500" thickness="4px" />
                 </Center>
-              ) : freeCourses.length > 0 ? (
-                freeCourses.map((course, index) => (
-                  <FallInPlace key={course.id} delay={0.1 * index}>
+              ) : [...freeCourses, ...premiumCourses].length > 0 ? (
+                [...freeCourses, ...premiumCourses].map((course, index) => (
+                  <FallInPlace key={course.id} delay={0.1 * (index % 6)}>
                     <CourseCard
                       course={course}
                       isEnrolled={enrolledCourseIds.includes(course.id)}
@@ -446,73 +446,7 @@ export default function AcademyHomePage() {
                 ))
               ) : (
                 <Center gridColumn="1 / -1" py="12">
-                  <Text color={textMuted}>No free courses available at the moment.</Text>
-                </Center>
-              )}
-            </SimpleGrid>
-          </VStack>
-        </Container>
-      </Box>
-
-      {/* Premium Courses Section */}
-      <Box py={{ base: '16', md: '24' }} bg={bgColor}>
-        <Container maxW="container.xl">
-          <VStack spacing={{ base: '8', md: '12' }} align="stretch">
-            <FallInPlace>
-              <Flex
-                justify="space-between"
-                align={{ base: "start", md: "center" }}
-                direction={{ base: "column", md: "row" }}
-                gap="4"
-              >
-                <VStack align="start" spacing="2">
-                  <Badge
-                    bg={useColorModeValue('blue.200', 'blue.500')}
-                    color={useColorModeValue('blue.900', 'white')}
-                    fontSize="sm"
-                    px="3"
-                    py="1"
-                    borderRadius="full"
-                    fontWeight="semibold"
-                  >
-                    Premium Content
-                  </Badge>
-                  <Heading fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}>
-                    Advanced Training Programs
-                  </Heading>
-                  <Text fontSize={{ base: 'md', md: 'lg' }} color={textMuted}>
-                    Professional courses with industry-recognized certifications
-                  </Text>
-                </VStack>
-                <ButtonLink
-                  href="/academy/courses?premium=true"
-                  colorScheme="primary"
-                  variant="outline"
-                  rightIcon={<Icon as={FiArrowRight} />}
-                >
-                  View All Premium
-                </ButtonLink>
-              </Flex>
-            </FallInPlace>
-
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="6">
-              {loading ? (
-                <Center gridColumn="1 / -1" py="12">
-                  <Spinner size="xl" color="purple.500" thickness="4px" />
-                </Center>
-              ) : premiumCourses.length > 0 ? (
-                premiumCourses.map((course, index) => (
-                  <FallInPlace key={course.id} delay={0.1 * index}>
-                    <CourseCard
-                      course={course}
-                      isEnrolled={enrolledCourseIds.includes(course.id)}
-                      showPriorityBadge
-                    />
-                  </FallInPlace>
-                ))
-              ) : (
-                <Center gridColumn="1 / -1" py="12">
-                  <Text color={textMuted}>No premium courses available at the moment.</Text>
+                  <Text color={textMuted}>No courses available at the moment.</Text>
                 </Center>
               )}
             </SimpleGrid>
@@ -722,11 +656,12 @@ export default function AcademyHomePage() {
                         </Text>
                         <HStack spacing="3" mt="auto">
                           <Image
-                            src={getFullImageUrl(testimonial.user?.avatar || '/images/default-avatar.png', 'avatar')}
+                            src={getFullImageUrl(testimonial.user?.avatar, 'avatar') || ''}
+                            fallbackSrc="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E"
                             alt={testimonial.user?.name || 'User'}
-                            width={48}
-                            height={48}
-                            style={{ borderRadius: "50%" }}
+                            boxSize="36px"
+                            borderRadius="full"
+                            objectFit="cover"
                           />
                           <VStack align="start" spacing="0">
                             <Text fontWeight="bold" fontSize="sm">
@@ -756,7 +691,7 @@ export default function AcademyHomePage() {
       </Box>
 
       {/* Instructor Highlights Section */}
-      <Box py={{ base: '16', md: '24' }} bg={bgColor}>
+      {/* <Box py={{ base: '16', md: '24' }} bg={bgColor}>
         <Container maxW="container.xl">
           <VStack spacing={{ base: '8', md: '12' }}>
             <FallInPlace>
@@ -814,32 +749,15 @@ export default function AcademyHomePage() {
                         flexDirection="column"
                       >
                       <Box position="relative" overflow="hidden" aspectRatio="4 / 3">
-                        {instructor.user?.avatar ? (
-                          <Image
-                            src={getFullImageUrl(instructor.user.avatar, 'avatar')}
-                            alt={instructor.user?.name || 'Instructor'}
-                            width={400}
-                            height={400}
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "cover",
-                              objectPosition: "center top"
-                            }}
-                          />
-                        ) : (
-                          <Box
-                            position="relative"
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                            bg={useColorModeValue('gray.200', 'gray.700')}
-                            w="full"
-                            h="full"
-                          >
-                            <Icon as={FiUser} boxSize="80px" color={useColorModeValue('gray.500', 'gray.400')} />
-                          </Box>
-                        )}
+                        <Image
+                          src={getFullImageUrl(instructor.user?.avatar, 'avatar') || ''}
+                          fallbackSrc="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E"
+                          alt={instructor.user?.name || 'Instructor'}
+                          w="full"
+                          h="full"
+                          objectFit="cover"
+                          objectPosition="center top"
+                        />
                         <Box
                           position="absolute"
                           bottom="0"
@@ -934,7 +852,7 @@ export default function AcademyHomePage() {
             </FallInPlace>
           </VStack>
         </Container>
-      </Box>
+      </Box> */}
 
       {/* CTA Section */}
       <Box py={{ base: '16', md: '24' }} bg={bgColorAlt}>

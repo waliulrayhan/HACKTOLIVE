@@ -140,7 +140,7 @@ export const megaMenuData: MegaMenuData = {
       href: '/academy/courses/advanced-web-security',
     },
   },
-  'Service': {
+  'Services': {
     showItemDescriptions: false,
     sections: serviceCategories.map((category) => ({
       title: category.label,

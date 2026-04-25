@@ -17,7 +17,7 @@ const siteConfig = {
   header: {
     links: [
       {
-        label: 'Service',
+        label: 'Services',
         href: '/service',
       },
       {

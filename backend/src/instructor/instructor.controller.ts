@@ -1196,6 +1196,85 @@ export class InstructorController {
     });
   }
 
+  @Patch('courses/:courseId/modules/:moduleId/lessons/reorder')
+  @ApiOperation({ summary: 'Reorder lessons within a module' })
+  async reorderLessons(
+    @Request() req: any,
+    @Param('courseId') courseId: string,
+    @Param('moduleId') moduleId: string,
+    @Body() data: { lessonIds?: string[] },
+  ) {
+    const instructor = await this.prisma.instructor.findUnique({
+      where: { userId: req.user.id },
+    });
+
+    const course = await this.prisma.course.findFirst({
+      where: {
+        id: courseId,
+        instructorId: instructor?.id,
+      },
+    });
+
+    if (!course) {
+      throw new Error('Course not found or access denied');
+    }
+
+    const module = await this.prisma.courseModule.findFirst({
+      where: {
+        id: moduleId,
+        courseId,
+      },
+    });
+
+    if (!module) {
+      throw new Error('Module not found');
+    }
+
+    const lessonIds = Array.isArray(data?.lessonIds)
+      ? data.lessonIds.filter((lessonId) => typeof lessonId === 'string')
+      : [];
+
+    if (lessonIds.length === 0) {
+      throw new BadRequestException('lessonIds is required');
+    }
+
+    const existingLessons = await this.prisma.lesson.findMany({
+      where: { moduleId },
+      select: { id: true },
+    });
+
+    if (existingLessons.length !== lessonIds.length) {
+      throw new BadRequestException(
+        'Lesson reorder payload must include every lesson in the module',
+      );
+    }
+
+    const existingLessonIds = new Set(existingLessons.map((lesson) => lesson.id));
+    const uniqueLessonIds = new Set(lessonIds);
+
+    if (
+      uniqueLessonIds.size !== lessonIds.length ||
+      lessonIds.some((lessonId) => !existingLessonIds.has(lessonId))
+    ) {
+      throw new BadRequestException('Invalid lesson ids provided');
+    }
+
+    // Updates order field for each lesson based on array position
+    await this.prisma.$transaction(
+      lessonIds.map((lessonId, index) =>
+        this.prisma.lesson.update({
+          where: { id: lessonId },
+          data: { order: index + 1 },
+        }),
+      ),
+    );
+
+    return this.prisma.lesson.findMany({
+      where: { moduleId },
+      orderBy: { order: 'asc' },
+    });
+  }
+
   @Patch('courses/:courseId/modules/:moduleId')
   @ApiOperation({ summary: 'Update a module' })
   async updateModule(

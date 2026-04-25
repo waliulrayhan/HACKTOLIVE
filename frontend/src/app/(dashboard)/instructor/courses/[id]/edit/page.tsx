@@ -159,6 +159,7 @@ export default function EditCoursePage() {
   const [savingModule, setSavingModule] = useState<string | null>(null);
   const [savingLesson, setSavingLesson] = useState<string | null>(null);
   const [reorderingModules, setReorderingModules] = useState(false);
+  const [reorderingLessons, setReorderingLessons] = useState<string | null>(null);
   const [draggedModuleId, setDraggedModuleId] = useState<string | null>(null);
   const [dropTargetModuleId, setDropTargetModuleId] = useState<string | null>(null);
 
@@ -733,6 +734,63 @@ export default function EditCoursePage() {
     [newModules[index], newModules[newIndex]] = [newModules[newIndex], newModules[index]];
 
     await applyModuleOrder(newModules);
+  };
+
+  const moveLesson = async (moduleId: string, lessonId: string, direction: 'up' | 'down') => {
+    const module = modules.find(m => m.id === moduleId);
+    if (!module || !module.lessons) return;
+
+    if (savingLesson) return;
+
+    const index = module.lessons.findIndex(l => l.id === lessonId);
+    if (
+      (direction === 'up' && index === 0) ||
+      (direction === 'down' && index === module.lessons.length - 1)
+    ) return;
+
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    const newLessons = [...module.lessons];
+    [newLessons[index], newLessons[newIndex]] = [newLessons[newIndex], newLessons[index]];
+
+    try {
+      setReorderingLessons(lessonId);
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/instructor/courses/${courseId}/modules/${moduleId}/lessons/reorder`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            lessonIds: newLessons.map(l => l.id),
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to save lesson order');
+      }
+
+      const reorderedLessons = await response.json();
+      setModules(modules.map(m => {
+        if (m.id === moduleId) {
+          return {
+            ...m,
+            lessons: reorderedLessons,
+          };
+        }
+        return m;
+      }));
+
+      toast.success('Lesson order updated');
+    } catch (error) {
+      console.error('Error reordering lessons:', error);
+      toast.error('Failed to reorder lessons');
+    } finally {
+      setReorderingLessons(null);
+    }
   };
 
   const handleModuleDragStart = (
@@ -1685,7 +1743,7 @@ export default function EditCoursePage() {
                     Build and manage your course curriculum
                   </p>
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Drag modules by the handle to reorder them. Changes save automatically.
+                    Use Move Up/Down buttons to reorder modules and lessons. Changes save automatically.
                   </p>
                   {reorderingModules && (
                     <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700 ring-1 ring-inset ring-brand-200 dark:bg-brand-500/10 dark:text-brand-300 dark:ring-brand-500/20">
@@ -1721,33 +1779,34 @@ export default function EditCoursePage() {
               {modules.map((module, moduleIndex) => (
                 <div
                   key={module.id}
-                  draggable={editingModuleId !== module.id && !reorderingModules}
-                  onDragStart={(event) => handleModuleDragStart(event, module.id)}
-                  onDragOver={(event) => handleModuleDragOver(event, module.id)}
-                  onDrop={(event) => handleModuleDrop(event, module.id)}
-                  onDragEnd={handleModuleDragEnd}
                   className={`rounded-lg border bg-white dark:bg-white/3 overflow-hidden transition-all ${
-                    draggedModuleId === module.id
-                      ? 'border-brand-400 opacity-70 shadow-lg shadow-brand-500/10'
-                      : dropTargetModuleId === module.id
-                        ? 'border-brand-500 ring-2 ring-brand-500/20'
-                        : 'border-gray-200 dark:border-white/5'
-                  } ${reorderingModules ? 'pointer-events-none' : ''}`}
+                    reorderingModules ? 'pointer-events-none opacity-75' : 'border-gray-200 dark:border-white/5'
+                  }`}
                 >
                   <div className="bg-gray-50 p-3 sm:p-4 dark:bg-gray-800/50">
                     <div className="flex items-center gap-3">
-                      <div
-                        className="flex h-10 w-10 items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white text-gray-500 dark:border-gray-600 dark:bg-gray-900/40 dark:text-gray-400 shrink-0 cursor-grab active:cursor-grabbing"
-                        title="Drag to reorder module"
-                      >
-                        {reorderingModules && draggedModuleId === module.id ? (
-                          <div className="h-4 w-4 rounded-full border-2 border-brand-500 border-t-transparent animate-spin" />
-                        ) : (
-                          <HiOutlineMenuAlt2 className="h-5 w-5" />
-                        )}
-                      </div>
-                      <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-sm sm:text-base font-bold text-white shadow-lg shrink-0">
-                        {moduleIndex + 1}
+                      <div className="flex items-center gap-2">
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() => moveModule(module.id, 'up')}
+                            disabled={moduleIndex === 0 || reorderingModules}
+                            className="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                            title="Move module up"
+                          >
+                            <HiOutlineChevronUp className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => moveModule(module.id, 'down')}
+                            disabled={moduleIndex === modules.length - 1 || reorderingModules}
+                            className="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                            title="Move module down"
+                          >
+                            <HiOutlineChevronDown className="h-4 w-4" />
+                          </button>
+                        </div>
+                        <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-sm sm:text-base font-bold text-white shadow-lg shrink-0">
+                          {moduleIndex + 1}
+                        </div>
                       </div>
                       
                       <div className="flex-1 min-w-0">
@@ -1847,24 +1906,6 @@ export default function EditCoursePage() {
                                 <span className="hidden sm:inline">Add Lesson</span>
                               </button>
                               <button
-                                onClick={() => moveModule(module.id, 'up')}
-                                disabled={moduleIndex === 0 || reorderingModules}
-                                className="inline-flex items-center gap-1 sm:gap-1.5 h-7 sm:h-8 rounded-lg border border-gray-300 bg-white px-2 sm:px-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-                                title="Move module up"
-                              >
-                                <HiOutlineChevronUp className="h-3.5 w-3.5" />
-                                <span className="hidden sm:inline">Up</span>
-                              </button>
-                              <button
-                                onClick={() => moveModule(module.id, 'down')}
-                                disabled={moduleIndex === modules.length - 1 || reorderingModules}
-                                className="inline-flex items-center gap-1 sm:gap-1.5 h-7 sm:h-8 rounded-lg border border-gray-300 bg-white px-2 sm:px-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-                                title="Move module down"
-                              >
-                                <HiOutlineChevronDown className="h-3.5 w-3.5" />
-                                <span className="hidden sm:inline">Down</span>
-                              </button>
-                              <button
                                 onClick={() => setExpandedModuleId(
                                   expandedModuleId === module.id ? null : module.id
                                 )}
@@ -1909,8 +1950,34 @@ export default function EditCoursePage() {
                           className="rounded-lg border border-gray-200 bg-white p-3 dark:border-white/5 dark:bg-gray-800/50"
                         >
                           {editingLessonId === lesson.id ? (
-                            <div className="flex items-start gap-2">
-                              <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-2 shrink-0">
+                            <div className="flex items-center gap-2">
+                              <div className="flex flex-col gap-1">
+                                <button
+                                  onClick={() => moveLesson(module.id, lesson.id, 'up')}
+                                  disabled={lessonIndex === 0 || reorderingLessons === lesson.id}
+                                  className="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                                  title="Move lesson up"
+                                >
+                                  {reorderingLessons === lesson.id ? (
+                                    <div className="h-3 w-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                  ) : (
+                                    <HiOutlineChevronUp className="h-3.5 w-3.5" />
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => moveLesson(module.id, lesson.id, 'down')}
+                                  disabled={lessonIndex === module.lessons.length - 1 || reorderingLessons === lesson.id}
+                                  className="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                                  title="Move lesson down"
+                                >
+                                  {reorderingLessons === lesson.id ? (
+                                    <div className="h-3 w-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                  ) : (
+                                    <HiOutlineChevronDown className="h-3.5 w-3.5" />
+                                  )}
+                                </button>
+                              </div>
+                              <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 shrink-0">
                                 {lesson.type === 'VIDEO' && <HiOutlineVideoCamera className="h-3.5 w-3.5" />}
                                 {lesson.type === 'ARTICLE' && <HiOutlineDocumentText className="h-3.5 w-3.5" />}
                                 {lesson.type === 'QUIZ' && <HiOutlineClipboardList className="h-3.5 w-3.5" />}
@@ -2067,8 +2134,34 @@ export default function EditCoursePage() {
                               </button>
                             </div>
                           ) : (
-                            <div className="flex items-start gap-2">
-                              <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-0.5 shrink-0">
+                            <div className="flex items-center gap-2">
+                              <div className="flex flex-col gap-1">
+                                <button
+                                  onClick={() => moveLesson(module.id, lesson.id, 'up')}
+                                  disabled={lessonIndex === 0 || reorderingLessons === lesson.id}
+                                  className="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                                  title="Move lesson up"
+                                >
+                                  {reorderingLessons === lesson.id ? (
+                                    <div className="h-3 w-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                  ) : (
+                                    <HiOutlineChevronUp className="h-3.5 w-3.5" />
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => moveLesson(module.id, lesson.id, 'down')}
+                                  disabled={lessonIndex === module.lessons.length - 1 || reorderingLessons === lesson.id}
+                                  className="inline-flex items-center justify-center h-7 w-7 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                                  title="Move lesson down"
+                                >
+                                  {reorderingLessons === lesson.id ? (
+                                    <div className="h-3 w-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                  ) : (
+                                    <HiOutlineChevronDown className="h-3.5 w-3.5" />
+                                  )}
+                                </button>
+                              </div>
+                              <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 shrink-0">
                                 {lesson.type === 'VIDEO' && <HiOutlineVideoCamera className="h-3.5 w-3.5" />}
                                 {lesson.type === 'ARTICLE' && <HiOutlineDocumentText className="h-3.5 w-3.5" />}
                                 {lesson.type === 'QUIZ' && <HiOutlineClipboardList className="h-3.5 w-3.5" />}

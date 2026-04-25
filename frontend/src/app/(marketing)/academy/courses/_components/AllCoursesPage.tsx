@@ -87,7 +87,9 @@ export default function AllCoursesPage() {
           maxPrice: maxPrice,
           sortBy: sortBy,
         });
-        setCourses(prioritizeCourses(allCourses));
+        // Filter only published courses (approved by admin)
+        const publishedCourses = allCourses.filter((c) => c.status === "published");
+        setCourses(prioritizeCourses(publishedCourses));
         setCurrentPage(1); // Reset to first page when filters change
       } catch (error) {
         console.error("Error fetching courses:", error);
