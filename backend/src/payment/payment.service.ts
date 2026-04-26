@@ -112,8 +112,9 @@ export class PaymentService {
         productName = course.title;
         productCategory = 'Course Enrollment';
 
-        if (amount < 1) {
-          throw new BadRequestException('This coupon reduces payable amount below the minimum payment amount (1 BDT). Please use a smaller coupon.');
+        // Allow 100% discount (amount = 0) but reject fractional amounts between 0 and 1 BDT
+        if (amount > 0 && amount < 1) {
+          throw new BadRequestException('This coupon reduces payable amount to a fractional amount less than 1 BDT. Please use a smaller discount.');
         }
 
         if (couponPricing.appliedCoupon) {
@@ -455,8 +456,9 @@ export class PaymentService {
 
     const finalAmount = Number(Math.max(0, baseAmount - discountAmount).toFixed(2));
 
-    if (finalAmount < 1) {
-      throw new BadRequestException('This coupon reduces payable amount below the minimum payment amount (1 BDT). Please use a smaller coupon.');
+    // Allow 100% discount (finalAmount = 0) but reject fractional amounts between 0 and 1 BDT
+    if (finalAmount > 0 && finalAmount < 1) {
+      throw new BadRequestException('This coupon reduces payable amount to a fractional amount less than 1 BDT. Please use a smaller discount.');
     }
 
     return {
