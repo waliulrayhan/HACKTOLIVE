@@ -1,4 +1,9 @@
-import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import {
+  BadGatewayException,
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import * as crypto from 'crypto';
@@ -135,7 +140,7 @@ export class EpsService {
       } else {
         throw new Error('Failed to obtain token from EPS');
       }
-    } catch (error) {
+    } catch (error: any) {
       this.invalidateToken();
 
       if (this.isRateLimitError(error)) {
@@ -199,6 +204,41 @@ export class EpsService {
     throw new ServiceUnavailableException(
       `Payment gateway is temporarily busy. Please try again in about ${retryAfter} seconds${suffix}.`
     );
+  }
+
+  private getEpsErrorMessage(error: any): string {
+    const data = error?.response?.data;
+    if (typeof data === 'string' && data.trim()) {
+      return data.trim();
+    }
+    if (typeof data?.ErrorMessage === 'string' && data.ErrorMessage.trim()) {
+      return data.ErrorMessage.trim();
+    }
+    if (typeof data?.message === 'string' && data.message.trim()) {
+      return data.message.trim();
+    }
+    return error?.message || 'Unknown EPS error';
+  }
+
+  private throwMappedGatewayException(error: any): never {
+    const status = error?.response?.status;
+    const message = this.getEpsErrorMessage(error);
+
+    if (status === 400 && /domain mismatch|invalid url/i.test(message)) {
+      throw new ServiceUnavailableException(
+        'EPS live rejected callback URL domain. Update EPS merchant BaseUrl/whitelist to match your PAYMENT_*_URL domain.'
+      );
+    }
+
+    if (status >= 400 && status < 500) {
+      throw new BadGatewayException(`EPS rejected the request (${status}): ${message}`);
+    }
+
+    if (status >= 500) {
+      throw new ServiceUnavailableException(`EPS is temporarily unavailable (${status}). Please try again shortly.`);
+    }
+
+    throw error;
   }
 
   /**
@@ -294,7 +334,7 @@ export class EpsService {
           errorCode: response.data?.ErrorCode,
         };
       }
-    } catch (error) {
+    } catch (error: any) {
       if (this.isRateLimitError(error)) {
         const retryAfter = this.getRetryAfterSeconds(error);
         const traceId = error?.response?.data?.traceId;
@@ -336,6 +376,8 @@ export class EpsService {
       if (error.response?.status) {
         this.logger.error(`EPS Response Status: ${error.response.status}`);
       }
+
+      this.throwMappedGatewayException(error);
       
       throw error;
     }
@@ -392,7 +434,7 @@ export class EpsService {
           message: 'Failed to retrieve transaction status',
         };
       }
-    } catch (error) {
+    } catch (error: any) {
       if (this.isRateLimitError(error)) {
         const retryAfter = this.getRetryAfterSeconds(error);
         const traceId = error?.response?.data?.traceId;
@@ -434,6 +476,8 @@ export class EpsService {
       if (error.response?.status) {
         this.logger.error(`EPS Response Status: ${error.response.status}`);
       }
+
+      this.throwMappedGatewayException(error);
       
       throw error;
     }
@@ -476,7 +520,7 @@ export class EpsService {
         epsTransactionId: statusCheck.epsTransactionId,
         merchantTransactionId: statusCheck.merchantTransactionId,
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error validating EPS payment: ${error.message}`, error.stack);
       throw error;
     }
