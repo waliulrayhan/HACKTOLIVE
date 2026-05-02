@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import * as crypto from 'crypto';
@@ -39,6 +39,8 @@ export interface EpsPaymentInitData {
 @Injectable()
 export class EpsService {
   private readonly logger = new Logger(EpsService.name);
+  private static readonly MAX_RATE_LIMIT_RETRIES = 2;
+  private static readonly DEFAULT_RETRY_AFTER_SECONDS = 5;
   private readonly config: EpsConfig;
   private readonly baseUrl: string;
   private authToken: string | null = null;
@@ -94,7 +96,7 @@ export class EpsService {
   /**
    * Get authentication token from EPS
    */
-  async getToken(forceRefresh = false): Promise<string> {
+  async getToken(forceRefresh = false, retryCount = 0): Promise<string> {
     try {
       // Check if we have a valid token (unless forcing refresh)
       if (!forceRefresh && this.authToken && this.tokenExpiry && this.tokenExpiry > new Date()) {
@@ -135,6 +137,29 @@ export class EpsService {
       }
     } catch (error) {
       this.invalidateToken();
+
+      if (this.isRateLimitError(error)) {
+        const retryAfter = this.getRetryAfterSeconds(error);
+        const traceId = error?.response?.data?.traceId;
+
+        if (retryCount < EpsService.MAX_RATE_LIMIT_RETRIES) {
+          this.logger.warn(
+            `EPS token endpoint rate-limited (429). Retrying in ${retryAfter}s ` +
+            `(attempt ${retryCount + 1}/${EpsService.MAX_RATE_LIMIT_RETRIES + 1})` +
+            `${traceId ? ` traceId=${traceId}` : ''}`
+          );
+
+          await this.waitForRetry(retryAfter);
+          return this.getToken(true, retryCount + 1);
+        }
+
+        this.logger.error(
+          `EPS token endpoint still rate-limited after retries` +
+          `${traceId ? ` (traceId=${traceId})` : ''}`
+        );
+        this.throwRateLimitException(error);
+      }
+
       this.logger.error(`Error getting EPS token: ${error.message}`, error.stack);
       throw error;
     }
@@ -147,6 +172,33 @@ export class EpsService {
     const status = error.response?.status;
     // 401 Unauthorized, 403 Forbidden, 404 Not Found (redirect to login)
     return status === 401 || status === 403 || status === 404;
+  }
+
+  private isRateLimitError(error: any): boolean {
+    return error?.response?.status === 429;
+  }
+
+  private getRetryAfterSeconds(error: any): number {
+    const retryAfterHeader = error?.response?.headers?.['retry-after'];
+    const parsed = Number(retryAfterHeader);
+    if (Number.isFinite(parsed) && parsed > 0) {
+      return Math.min(parsed, 60);
+    }
+    return EpsService.DEFAULT_RETRY_AFTER_SECONDS;
+  }
+
+  private async waitForRetry(seconds: number): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+  }
+
+  private throwRateLimitException(error: any): never {
+    const retryAfter = this.getRetryAfterSeconds(error);
+    const traceId = error?.response?.data?.traceId;
+    const suffix = traceId ? ` (traceId: ${traceId})` : '';
+
+    throw new ServiceUnavailableException(
+      `Payment gateway is temporarily busy. Please try again in about ${retryAfter} seconds${suffix}.`
+    );
   }
 
   /**
@@ -243,6 +295,27 @@ export class EpsService {
         };
       }
     } catch (error) {
+      if (this.isRateLimitError(error)) {
+        const retryAfter = this.getRetryAfterSeconds(error);
+        const traceId = error?.response?.data?.traceId;
+
+        if (retryCount < EpsService.MAX_RATE_LIMIT_RETRIES) {
+          this.logger.warn(
+            `EPS InitializeEPS rate-limited (429). Retrying in ${retryAfter}s ` +
+            `(attempt ${retryCount + 1}/${EpsService.MAX_RATE_LIMIT_RETRIES + 1})` +
+            `${traceId ? ` traceId=${traceId}` : ''}`
+          );
+          await this.waitForRetry(retryAfter);
+          return this.initPayment(data, retryCount + 1);
+        }
+
+        this.logger.error(
+          `EPS InitializeEPS still rate-limited after retries` +
+          `${traceId ? ` (traceId=${traceId})` : ''}`
+        );
+        this.throwRateLimitException(error);
+      }
+
       // Check if this is an authentication error and we haven't retried yet
       if (this.isAuthError(error) && retryCount === 0) {
         this.logger.warn(`EPS authentication failed (${error.response?.status}), invalidating token and retrying...`);
@@ -320,6 +393,27 @@ export class EpsService {
         };
       }
     } catch (error) {
+      if (this.isRateLimitError(error)) {
+        const retryAfter = this.getRetryAfterSeconds(error);
+        const traceId = error?.response?.data?.traceId;
+
+        if (retryCount < EpsService.MAX_RATE_LIMIT_RETRIES) {
+          this.logger.warn(
+            `EPS transaction status endpoint rate-limited (429). Retrying in ${retryAfter}s ` +
+            `(attempt ${retryCount + 1}/${EpsService.MAX_RATE_LIMIT_RETRIES + 1})` +
+            `${traceId ? ` traceId=${traceId}` : ''}`
+          );
+          await this.waitForRetry(retryAfter);
+          return this.checkTransactionStatus(merchantTransactionId, retryCount + 1);
+        }
+
+        this.logger.error(
+          `EPS transaction status endpoint still rate-limited after retries` +
+          `${traceId ? ` (traceId=${traceId})` : ''}`
+        );
+        this.throwRateLimitException(error);
+      }
+
       // Check if this is an authentication error and we haven't retried yet
       if (this.isAuthError(error) && retryCount === 0) {
         this.logger.warn(`EPS authentication failed (${error.response?.status}), invalidating token and retrying...`);
